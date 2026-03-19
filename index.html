@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanapawn Jardrit Toolkit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: #f5f4f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 0.5px solid rgba(0,0,0,0.1);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    .header-title {
+      font-size: 26px;
+      font-weight: 500;
+      color: #1a1a1a;
+      line-height: 1.3;
+      margin-bottom: 0;
+    }
+
+    .divider {
+      height: 0.5px;
+      background: rgba(0,0,0,0.08);
+      margin: 1.5rem 0;
+    }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #ffffff;
+      border: 0.5px solid rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    }
+
+    .card:hover {
+      border-color: rgba(0,0,0,0.2);
+      background: #fafaf8;
+    }
+
+    .card:active {
+      transform: scale(0.99);
+    }
+
+    .icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .icon-wrap svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .icon-blue  { background: #E6F1FB; color: #185FA5; }
+    .icon-teal  { background: #E1F5EE; color: #0F6E56; }
+    .icon-amber { background: #FAEEDA; color: #854F0B; }
+
+    .card-text { flex: 1; }
+
+    .card-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 3px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: #1a1a1a;
+      line-height: 1.3;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: #777;
+      margin-top: 2px;
+    }
+
+    .arrow {
+      color: #bbb;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a18; }
+      .container { background: #242422; border-color: rgba(255,255,255,0.08); box-shadow: none; }
+      .header-title { color: #f0ede8; }
+      .divider { background: rgba(255,255,255,0.07); }
+      .card { background: #2a2a28; border-color: rgba(255,255,255,0.08); }
+      .card:hover { background: #303030; border-color: rgba(255,255,255,0.15); }
+      .card-title { color: #f0ede8; }
+      .card-sub { color: #888; }
+      .card-num { color: #555; }
+      .arrow { color: #555; }
+      .icon-blue  { background: #0C447C; color: #B5D4F4; }
+      .icon-teal  { background: #085041; color: #9FE1CB; }
+      .icon-amber { background: #633806; color: #FAC775; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="header-title">Tanapawn's Toolkit</h1>
+
+    <div class="divider"></div>
+
+    <div class="cards">
+
+      <a class="card" href="https://rccolumnanalysis.netlify.app/" target="_blank" rel="noopener">
+        <div class="icon-wrap icon-blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="18" rx="1"/>
+            <rect x="14" y="3" width="7" height="18" rx="1"/>
+            <path d="M10 9 Q12 12 14 9"/>
+            <path d="M10 15 Q12 18 14 15"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-num">01</div>
+          <div class="card-title">RC Column Analysis</div>
+          <div class="card-sub">Interaction Diagram</div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+
+      <a class="card" href="https://rcbeamanalysis.netlify.app/" target="_blank" rel="noopener">
+        <div class="icon-wrap icon-teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 17 L3 7 Q3 5 5 5 L19 5 Q21 5 21 7 L21 17"/>
+            <path d="M1 17 L23 17"/>
+            <path d="M7 17 L7 11"/>
+            <path d="M17 17 L17 11"/>
+            <path d="M7 11 L17 11"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-num">02</div>
+          <div class="card-title">Reinforced Concrete Beam Analysis</div>
+          <div class="card-sub">Cross-section &amp; moment capacity</div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+
+      <a class="card" href="https://weightpillinghammer.netlify.app/" target="_blank" rel="noopener">
+        <div class="icon-wrap icon-amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3 L12 18"/>
+            <path d="M8 6 L16 6"/>
+            <path d="M9 10 L15 10"/>
+            <path d="M6 18 L18 18"/>
+            <path d="M10 18 L10 21 L14 21 L14 18"/>
+            <circle cx="12" cy="4" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-num">03</div>
+          <div class="card-title">Weight of Piling Hammer</div>
+          <div class="card-sub">Pile driving equipment calculator</div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+</body>
+</html>
