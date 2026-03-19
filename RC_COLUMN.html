@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=0.1">
+<title>RC Column Analysis — Interaction Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161922;
+    --surface2: #1e222d;
+    --border: #2a2f3e;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --green: #00ff88;
+    --yellow: #ffd60a;
+    --text: #e8ecf4;
+    --muted: #ffffff;
+    --danger: #ff4d6d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding: 0 24px 48px;
+  }
+
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative;
+    z-index: 1;
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(13,15,20,0.9);
+    backdrop-filter: blur(10px);
+  }
+  .logo {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: #000;
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  header span { font-size: 14px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; display: block; }
+  .badge {
+    margin-left: auto;
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.3);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  .layout {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 32px auto;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+
+  /* full-width rows */
+  .row-full {
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  /* split rows: two equal columns side by side */
+  .row-split {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .row-half {
+    flex: 1 1 50%;
+    min-width: 0;
+    background: var(--surface);
+  }
+  .row-half-left { border-right: 1px solid var(--border); }
+
+  /* chart rows need min-height */
+  .row-split-chart {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+  }
+  .row-half-chart {
+    flex: 1 1 50%;
+    min-width: 0;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+  }
+  .row-half-chart.left { border-right: 1px solid var(--border); }
+
+
+
+  .section-header {
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-header .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .section-header .dot.orange { background: var(--accent2); }
+  .section-header .dot.green { background: var(--green); }
+  .section-header .dot.yellow { background: var(--yellow); }
+
+  .input-group {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .input-row:last-child { margin-bottom: 0; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field-input-wrap { display: flex; align-items: center; gap: 6px; }
+  .field-input-wrap input, .field-input-wrap select { flex: 1; min-width: 0; }
+  .field label {
+    font-size: 14px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .field label em { color: var(--accent); font-style: normal; }
+  .field input, .field select {
+    background: rgba(0,229,255,0.04);
+    border: 1px solid rgba(0,229,255,0.25);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+  .field input:hover, .field select:hover {
+    border-color: rgba(0,229,255,0.5);
+    background: rgba(0,229,255,0.07);
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.09);
+    box-shadow: 0 0 0 3px rgba(0,229,255,0.12);
+  }
+  .field select option { background: var(--surface2); }
+  .unit {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .calc-btn {
+    margin: 16px 20px;
+    width: calc(100% - 40px);
+    padding: 13px;
+    background: linear-gradient(135deg, var(--accent), #0099bb);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .calc-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0,229,255,0.3);
+  }
+  .calc-btn:active { transform: translateY(0); }
+
+  /* RESULTS */
+  .results-block {
+    padding: 10px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(42,47,62,0.35);
+    gap: 12px;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-label {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .result-value {
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .result-value.green { color: var(--green); }
+  .result-value.orange { color: var(--accent2); }
+  .result-value.yellow { color: var(--yellow); }
+  .result-value.danger { color: var(--danger); }
+
+  .status-pill {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .status-ok { background: rgba(0,255,136,0.15); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+  .status-warn { background: rgba(255,214,10,0.15); color: var(--yellow); border: 1px solid rgba(255,214,10,0.3); }
+  .status-fail { background: rgba(255,77,109,0.15); color: var(--danger); border: 1px solid rgba(255,77,109,0.3); }
+
+  /* RIGHT PANEL */
+  .panel-right {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-right .section-panel {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .panel-right .section-header {
+    flex-shrink: 0;
+  }
+  .chart-header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+  }
+  .chart-title { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; }
+  .chart-subtitle { font-size: 14px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .legend {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .charts-row {
+    display: contents; /* X and Y chart go into separate col cells */
+  }
+  .chart-area {
+    padding: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 320px;
+    flex: 1;
+  }
+  .chart-axis-label {
+    font-size: 14px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chart-axis-label .bar { width: 24px; height: 3px; border-radius: 2px; }
+  .chart-canvas-wrap { flex: 1; position: relative; min-height: 0; }
+
+  /* TABLE */
+  .table-area {
+    border-top: 1px solid var(--border);
+    overflow-y: auto;
+    background: var(--surface);
+    max-height: 220px;
+    flex-shrink: 0;
+  }
+  .calc-section-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #fff;
+    padding: 9px 16px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  /* color themes per step */
+  .calc-section-header[data-n="1"] { background: rgba(0,229,255,0.06); border-left: 3px solid rgba(0,229,255,0.5); color: rgba(0,229,255,0.8); }
+  .calc-section-header[data-n="2"] { background: rgba(0,255,136,0.05); border-left: 3px solid rgba(0,255,136,0.45); color: rgba(0,255,136,0.75); }
+  .calc-section-header[data-n="3"] { background: rgba(255,214,10,0.05); border-left: 3px solid rgba(255,214,10,0.45); color: rgba(255,214,10,0.75); }
+  .calc-section-header[data-n="4"] { background: rgba(255,107,53,0.06); border-left: 3px solid rgba(255,107,53,0.5); color: rgba(255,107,53,0.8); }
+  .calc-section-header[data-n="5"] { background: rgba(180,100,255,0.06); border-left: 3px solid rgba(180,100,255,0.45); color: rgba(180,100,255,0.8); }
+  .calc-section-header[data-n="6"] { background: rgba(255,77,109,0.06); border-left: 3px solid rgba(255,77,109,0.45); color: rgba(255,77,109,0.75); }
+  .calc-section-header[data-n="7"] { background: rgba(100,180,255,0.05); border-left: 3px solid rgba(100,180,255,0.4); color: rgba(100,180,255,0.75); }
+  .calc-section-header .step-num {
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+  .calc-section-header[data-n="1"] .step-num { background: rgba(0,229,255,0.2); color: rgba(0,229,255,0.9); }
+  .calc-section-header[data-n="2"] .step-num { background: rgba(0,255,136,0.18); color: rgba(0,255,136,0.9); }
+  .calc-section-header[data-n="3"] .step-num { background: rgba(255,214,10,0.18); color: rgba(255,214,10,0.9); }
+  .calc-section-header[data-n="4"] .step-num { background: rgba(255,107,53,0.2); color: rgba(255,107,53,0.9); }
+  .calc-section-header[data-n="5"] .step-num { background: rgba(180,100,255,0.2); color: rgba(180,100,255,0.9); }
+  .calc-section-header[data-n="6"] .step-num { background: rgba(255,77,109,0.2); color: rgba(255,77,109,0.9); }
+  .calc-section-header[data-n="7"] .step-num { background: rgba(100,180,255,0.18); color: rgba(100,180,255,0.9); }
+  .calc-step {
+    padding: 8px 16px 4px;
+    border-bottom: 1px solid rgba(42,47,62,0.5);
+    font-family: 'DM Mono', monospace;
+  }
+  .calc-step:hover { background: rgba(0,229,255,0.02); }
+  .calc-line1, .calc-line2 {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    overflow: visible;
+    word-break: break-word;
+  }
+  .calc-line1 { margin-bottom: 3px; }
+  .calc-line2 { margin-bottom: 6px; }
+  .calc-var {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    min-width: 48px;
+    white-space: nowrap;
+  }
+  .calc-eq {
+    font-size: 14px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .calc-formula-sym {
+    font-size: 14px;
+    color: var(--text);
+    opacity: 0.75;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.5;
+  }
+  .calc-sub-val {
+    font-size: 13px;
+    color: var(--muted);
+    white-space: normal;
+    word-break: break-word;
+    flex: 1;
+    line-height: 1.5;
+  }
+  .calc-result {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .calc-result em { font-style: normal; font-size: 11px; color: var(--muted); margin-left: 3px; }
+  .calc-result.cyan   { color: var(--accent); }
+  .calc-result.orange { color: var(--accent2); }
+  .calc-result.green  { color: var(--green); }
+  .calc-result.yellow { color: var(--yellow); }
+  .table-area::-webkit-scrollbar { width: 4px; height: 4px; }
+  .table-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-family: 'DM Mono', monospace;
+  }
+  thead {
+    position: sticky;
+    top: 0;
+    background: var(--surface2);
+    z-index: 2;
+  }
+  th {
+    padding: 8px 14px;
+    text-align: right;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  th:first-child { text-align: left; }
+  td {
+    padding: 6px 14px;
+    text-align: right;
+    border-bottom: 1px solid rgba(42,47,62,0.5);
+    color: var(--text);
+  }
+  td:first-child { text-align: left; color: var(--muted); }
+  tr:hover td { background: rgba(0,229,255,0.03); }
+  .td-x { color: var(--accent); }
+  .td-y { color: var(--accent2); }
+  .td-point { color: var(--yellow); font-weight: 600; }
+
+  /* SECTION DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+  }
+
+  .no-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--muted);
+    gap: 10px;
+  }
+  .no-data svg { opacity: 0.3; }
+  .no-data p { font-size: 14px; font-family: 'DM Mono', monospace; }
+
+  .section-panel {
+    padding: 16px 24px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: flex-start;
+    gap: 28px;
+  }
+  .section-svg-wrap {
+    flex-shrink: 0;
+  }
+  .section-info {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    font-family: 'DM Mono', monospace;
+    min-width: 0;
+  }
+  .prop-group {
+    flex: 1;
+    padding: 14px 16px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .prop-group:last-child { border-right: none; }
+  .prop-group-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .prop-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .prop-label {
+    font-size: 14px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .prop-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .prop-value em {
+    font-style: normal;
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 3px;
+    font-weight: 400;
+  }
+  .prop-value.cyan   { color: var(--accent); }
+  .prop-value.orange { color: var(--accent2); }
+  .prop-value.green  { color: var(--green); }
+  .prop-value.yellow { color: var(--yellow); }
+  .section-info-row { display: none; }
+  .section-info-item { display: none; }
+
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">RC</div>
+  <div>
+    <h1>REINFORCE CONCRETE COLUMN ANALYSIS</h1>
+    <span>ACI 318 — Rectangular Section Analysis</span>
+  </div>
+  <div class="badge">v1.0</div>
+</header>
+
+<div class="layout">
+
+  <!-- ═══ ROW 1: Input Parameter (full width) ═══ -->
+  <div class="row-full">
+    <div style="display:flex;width:100%;">
+
+      <!-- LEFT COLUMN: Applied Force | Concrete+Column | Column Properties | Slenderness -->
+      <div style="flex:1 1 50%;min-width:0;border-right:1px solid var(--border);">
+
+        <!-- Applied Force -->
+        <div class="section-header"><span class="dot orange"></span>Applied Forces</div>
+        <div class="input-group">
+          <div class="input-row">
+            <div class="field"><label>P <em>(axial)</em></label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="P" value="20000" step="100"><span class="unit">kg</span></div></div>
+            <div class="field"><label>Mx <em>(moment-x)</em></label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="Mx" value="2000" step="100"><span class="unit">kg-m</span></div></div>
+            <div class="field"><label>My <em>(moment-y)</em></label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="My" value="2000" step="100"><span class="unit">kg-m</span></div></div>
+          </div>
+          <div class="input-row">
+            <div class="field"><label>Vx <em>(shear-x)</em></label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="Vx" value="0" step="100"><span class="unit">kg</span></div></div>
+            <div class="field"><label>Vy <em>(shear-y)</em></label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="Vy" value="0" step="100"><span class="unit">kg</span></div></div>
+            <div class="field"><label>n <em>(biaxial exp.)</em></label><div class="field-input-wrap"><input oninput="calculate()" onchange="calculate()" type="number" id="biaxN" value="1.5" step="0.1" min="1" max="2"></div></div>
+          </div>
+        </div>
+
+        <!-- Concrete + Column Section -->
+        <div class="section-header" style="border-top:1px solid var(--border)"><span class="dot"></span>Concrete + Column Section</div>
+        <div class="input-group">
+          <div class="input-row">
+            <div class="field"><label>f'c</label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="fc" value="240" step="10"><span class="unit">ksc</span></div></div>
+            <div class="field"><label>Es</label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="Es" value="2000000" step="100000"><span class="unit">ksc</span></div></div>
+          </div>
+          <div class="input-row">
+            <div class="field"><label>H <em>(x)</em></label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="H" value="50" step="5"><span class="unit">cm</span></div></div>
+            <div class="field"><label>W <em>(y)</em></label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="W" value="50" step="5"><span class="unit">cm</span></div></div>
+          </div>
+          <div class="input-row">
+            <div class="field"><label>L <em>(length)</em></label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="L" value="350" step="10"><span class="unit">cm</span></div></div>
+            <div class="field"><label>Covering</label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="cover" value="2.5" step="0.5"><span class="unit">cm</span></div></div>
+            <div class="field"><label>k</label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="k" value="1" step="0.05" min="0.5" max="2"></div></div>
+          </div>
+        </div>
+
+        <!-- Column Properties (results) -->
+        <div id="results-section" style="display:none">
+          <div class="section-header" style="border-top:1px solid var(--border)"><span class="dot"></span>Column Properties</div>
+          <div style="display:flex;border-bottom:1px solid var(--border);">
+            <div style="flex:1;padding:10px 16px;border-right:1px solid var(--border);">
+              <div class="result-row"><span class="result-label">Ec</span><span class="result-value" id="res-Ec">—</span></div>
+              <div class="result-row"><span class="result-label">A</span><span class="result-value" id="res-A">—</span></div>
+              <div class="result-row"><span class="result-label">Ast</span><span class="result-value" id="res-Ast">—</span></div>
+            </div>
+            <div style="flex:1;padding:10px 16px;">
+              <div class="result-row"><span class="result-label">fy <em>(main)</em></span><span class="result-value" id="res-fy">—</span></div>
+              <div class="result-row"><span class="result-label">fys <em>(stirrup)</em></span><span class="result-value yellow" id="res-fys">—</span></div>
+              <div class="result-row"><span class="result-label">ρ</span><span class="result-value" id="res-rho">—</span></div>
+            </div>
+          </div>
+
+          <!-- Slenderness -->
+          <div class="section-header" style="border-top:1px solid var(--border)"><span class="dot yellow"></span>Slenderness</div>
+          <div style="display:flex;border-bottom:1px solid var(--border);">
+            <div style="flex:1;padding:10px 16px;border-right:1px solid var(--border);">
+              <div class="result-row"><span class="result-label">kl/r-x</span><span class="result-value yellow" id="res-klrx">—</span></div>
+              <div class="result-row"><span class="result-label">Status X</span><span id="res-slendX">—</span></div>
+            </div>
+            <div style="flex:1;padding:10px 16px;">
+              <div class="result-row"><span class="result-label">kl/r-y</span><span class="result-value yellow" id="res-klry">—</span></div>
+              <div class="result-row"><span class="result-label">Status Y</span><span id="res-slendY">—</span></div>
+            </div>
+          </div>
+          <div style="padding:10px 16px;border-bottom:1px solid var(--border);">
+            <div class="result-row"><span class="result-label">R (reduction)</span><span class="result-value orange" id="res-R">—</span></div>
+          </div>
+        </div>
+
+      </div><!-- end left -->
+
+      <!-- RIGHT COLUMN: Main Steel | Stirrup+Spacing | Capacity | Shear -->
+      <div style="flex:1 1 50%;min-width:0;">
+
+        <!-- Main Steel -->
+        <div class="section-header"><span class="dot yellow"></span>Main Steel</div>
+        <div class="input-group">
+          <div class="input-row">
+            <div class="field"><label>Grade</label>
+              <select onchange="calculate()" id="steelGrade">
+                <option value="SR24">SR24</option>
+                <option value="SD30">SD30</option>
+                <option value="SD40" selected>SD40</option>
+                <option value="SD50">SD50</option>
+              </select>
+            </div>
+            <div class="field"><label>DB</label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="DB" value="16" step="2"><span class="unit">mm</span></div></div>
+          </div>
+          <div class="input-row">
+            <div class="field"><label>n(X)</label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="nX" value="5" step="1" min="2"><span class="unit">เส้น</span></div></div>
+            <div class="field"><label>n(Y)</label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="nY" value="4" step="1" min="2"><span class="unit">เส้น</span></div></div>
+          </div>
+        </div>
+
+        <!-- Stirrup Steel + Spacing -->
+        <div class="section-header" style="border-top:1px solid var(--border)"><span class="dot orange"></span>Stirrup Steel + Spacing</div>
+        <div class="input-group">
+          <div class="input-row">
+            <div class="field"><label>Grade</label>
+              <select onchange="calculate()" id="stirrupGrade">
+                <option value="SR24" selected>SR24</option>
+                <option value="SD30">SD30</option>
+                <option value="SD40">SD40</option>
+                <option value="SD50">SD50</option>
+              </select>
+            </div>
+            <div class="field"><label>RB</label><div class="field-input-wrap"><input oninput="calculate()" type="number" id="RB" value="6" step="2"><span class="unit">mm</span></div></div>
+            <div class="field"><label>@ Spacing</label><div class="field-input-wrap"><input type="number" id="stirrupSpacing" value="15" step="1" min="1" oninput="checkStirrup()"><span class="unit">cm</span></div></div>
+          </div>
+        </div>
+
+        <!-- Capacity Check (results) -->
+        <div id="results-section-right" style="display:none">
+          <div class="section-header" style="border-top:1px solid var(--border)"><span class="dot green"></span>Capacity Check</div>
+
+          <div style="display:flex;border-bottom:1px solid var(--border);">
+            <div style="flex:1;padding:10px 16px;border-right:1px solid var(--border);">
+              <div class="result-row"><span class="result-label" id="lbl-MnxP">Mn-x <em>(at P)</em></span><span class="result-value cyan" id="res-MnxP">—</span></div>
+              <div class="result-row"><span class="result-label">Mx/Mn-x</span><span class="result-value" id="res-ratioX">—</span></div>
+            </div>
+            <div style="flex:1;padding:10px 16px;">
+              <div class="result-row"><span class="result-label" id="lbl-MnyP">Mn-y <em>(at P)</em></span><span class="result-value orange" id="res-MnyP">—</span></div>
+              <div class="result-row"><span class="result-label">My/Mn-y</span><span class="result-value" id="res-ratioY">—</span></div>
+            </div>
+          </div>
+          <div style="padding:10px 16px;border-bottom:1px solid var(--border);">
+            <div class="result-row">
+              <span class="result-label" id="lbl-biaxFormula">(Mx/Mn-x)ⁿ + (My/Mn-y)ⁿ</span>
+              <span class="result-value" id="res-biaxVal">—</span>
+            </div>
+            <div class="result-row" style="justify-content:flex-end;">
+              <span id="res-biaxCheck">—</span>
+            </div>
+          </div>
+
+          <!-- Shear Capacity -->
+          <div class="section-header" style="border-top:1px solid var(--border)"><span class="dot"></span>Shear Capacity</div>
+          <div style="display:flex;border-bottom:1px solid var(--border);">
+            <div style="flex:1;padding:10px 16px;border-right:1px solid var(--border);">
+              <div class="result-row"><span class="result-label">Av <em>(2-leg)</em></span><span class="result-value" id="res-Av">—</span></div>
+              <div class="result-row"><span class="result-label">Vs</span><span class="result-value green" id="res-Vs">—</span></div>
+              <div class="result-row"><span class="result-label">Vc-x</span><span class="result-value cyan" id="res-Vcx">—</span></div>
+              <div class="result-row"><span class="result-label">Vn-x</span><span class="result-value cyan" id="res-Vnx">—</span></div>
+              <div class="result-row"><span class="result-label">Vx (demand)</span><span class="result-value" id="res-Vx-demand">—</span></div>
+              <div class="result-row"><span class="result-label">Vx Check</span><span id="res-shear-x">—</span></div>
+            </div>
+            <div style="flex:1;padding:10px 16px;">
+              <div class="result-row"><span class="result-label"> </span><span class="result-value"></span></div>
+              <div class="result-row"><span class="result-label"> </span><span class="result-value"></span></div>
+              <div class="result-row"><span class="result-label">Vc-y</span><span class="result-value orange" id="res-Vcy">—</span></div>
+              <div class="result-row"><span class="result-label">Vn-y</span><span class="result-value orange" id="res-Vny">—</span></div>
+              <div class="result-row"><span class="result-label">Vy (demand)</span><span class="result-value" id="res-Vy-demand">—</span></div>
+              <div class="result-row"><span class="result-label">Vy Check</span><span id="res-shear-y">—</span></div>
+            </div>
+          </div>
+
+          <!-- Stirrup Spacing Check -->
+          <div class="section-header" style="border-top:1px solid var(--border)"><span class="dot orange"></span>Stirrup Spacing</div>
+          <div class="results-block">
+            <div class="result-row"><span class="result-label">16×DB</span><span class="result-value" id="res-s1">—</span></div>
+            <div class="result-row"><span class="result-label">48×RB</span><span class="result-value" id="res-s2">—</span></div>
+            <div class="result-row"><span class="result-label">min(H,W)</span><span class="result-value" id="res-s3">—</span></div>
+            <div class="result-row"><span class="result-label">Max @</span><span class="result-value yellow" id="res-smax">—</span></div>
+            <div style="height:1px;background:var(--border);margin:6px 0;"></div>
+            <div class="result-row">
+              <span class="result-label" style="font-weight:700;color:var(--text)">ผลตรวจสอบ</span>
+              <span id="res-stirrup-check">—</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end right -->
+
+    </div>
+  </div><!-- end ROW 1 -->
+
+<!-- ═══ ROW 2: Column Cross Section (full width) ═══ -->
+  <div class="row-full">
+    <div class="section-header"><span class="dot green"></span>Column Cross Section</div>
+    <div class="section-panel">
+      <div class="section-svg-wrap">
+        <svg id="sectionSVG" width="340" height="340" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="section-info" id="sectionInfo">
+        <div style="font-size: 14px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Properties</div>
+        <div class="section-info-row" id="sectionDims">—</div>
+        <div class="section-info-row" id="sectionRebar">—</div>
+        <div class="section-info-row" id="sectionAst">—</div>
+      </div>
+    </div>
+  </div><!-- end ROW 2 -->
+
+  <!-- ═══ ROW 3: Interaction Diagrams X | Y ═══ -->
+  <div class="row-split-chart">
+    <div class="row-half-chart left">
+      <div class="chart-area" style="flex:1;display:flex;flex-direction:column;padding:16px;">
+        <div class="chart-axis-label" style="color:var(--accent)"><div class="bar" style="background:var(--accent)"></div>Interaction Diagram — X Axis</div>
+        <div class="chart-canvas-wrap" style="flex:1;position:relative;min-height:0;"><canvas id="chartX"></canvas></div>
+      </div>
+    </div>
+    <div class="row-half-chart">
+      <div class="chart-area" style="flex:1;display:flex;flex-direction:column;padding:16px;">
+        <div class="chart-axis-label" style="color:var(--accent2)"><div class="bar" style="background:var(--accent2)"></div>Interaction Diagram — Y Axis</div>
+        <div class="chart-canvas-wrap" style="flex:1;position:relative;min-height:0;"><canvas id="chartY"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ROW 4: Tables X | Y ═══ -->
+  <div class="row-split">
+    <div class="row-half row-half-left">
+      <div class="section-header"><span class="dot"></span>Table Interaction Diagram — X</div>
+      <div class="table-area">
+        <table>
+          <thead><tr><th>Point</th><th class="td-x">Mn-x (t-m)</th><th class="td-x">ϕPn-x (t)</th></tr></thead>
+          <tbody id="tableBodyX"><tr><td colspan="3" style="text-align:center;padding:16px;color:var(--muted)">—</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row-half">
+      <div class="section-header"><span class="dot orange"></span>Table Interaction Diagram — Y</div>
+      <div class="table-area">
+        <table>
+          <thead><tr><th>Point</th><th class="td-y">Mn-y (t-m)</th><th class="td-y">ϕPn-y (t)</th></tr></thead>
+          <tbody id="tableBodyY"><tr><td colspan="3" style="text-align:center;padding:16px;color:var(--muted)">—</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ROW 5: Calculation Steps X | Y ═══ -->
+  <div class="row-split">
+    <div class="row-half row-half-left">
+      <div class="section-header"><span class="dot"></span>ขั้นตอนการคำนวณ — X</div>
+      <div class="results-block" id="stepsX" style="font-family:'DM Mono',monospace;font-size: 14px;">—</div>
+    </div>
+    <div class="row-half">
+      <div class="section-header"><span class="dot orange"></span>ขั้นตอนการคำนวณ — Y</div>
+      <div class="results-block" id="stepsY" style="font-family:'DM Mono',monospace;font-size: 14px;">—</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+function drawSection(i, d_x, dp_x, d_y, dp_y, Ast, Ast_x, Ast_y) {
+  const svgEl = document.getElementById('sectionSVG');
+  const VW = 340, VH = 340;
+  svgEl.setAttribute('viewBox', `0 0 ${VW} ${VH}`);
+  svgEl.setAttribute('width', VW);
+  svgEl.setAttribute('height', VH);
+
+  const pad = 38;
+  const scaleX = (VW - pad*2) / i.H;
+  const scaleY = (VH - pad*2) / i.W;
+  const scale  = Math.min(scaleX, scaleY) * 0.82;
+  const cw = i.H * scale;
+  const ch = i.W * scale;
+  const ox = (VW - cw) / 2;
+  const oy = (VH - ch) / 2;
+
+  const coverPx = i.cover * scale;
+  const barR    = (i.DB / 10) * scale / 2;
+  const stirW   = (i.RB / 10) * scale;
+
+  // ตำแหน่งศูนย์กลางเหล็กเสริม:
+  // - ขอบนอกเหล็กปลอกอยู่ที่ cover จากขอบคอนกรีต
+  // - ศูนย์กลางเหล็กปลอกอยู่ที่ cover + stirW/2
+  // - ขอบในเหล็กปลอกอยู่ที่ cover + stirW
+  // - ศูนย์กลางเหล็กหลักอยู่ที่ cover + stirW + barR (ชิดขอบในพอดี)
+  const barCenterOffset = coverPx + stirW + barR;
+
+  const bars = [];
+  const nX = i.nX, nY = i.nY;
+
+  // แนวนอน (top & bottom): กระจายตาม H
+  const xSpan = cw - 2 * barCenterOffset;
+  for (let k = 0; k < nX; k++) {
+    const bx = ox + barCenterOffset + (nX > 1 ? (k / (nX-1)) * xSpan : xSpan/2);
+    bars.push({ x: bx, y: oy + barCenterOffset });
+    bars.push({ x: bx, y: oy + ch - barCenterOffset });
+  }
+  // แนวตั้ง (left & right): กระจายตาม W ยกเว้นมุมที่มีอยู่แล้ว
+  const ySpan = ch - 2 * barCenterOffset;
+  for (let k = 1; k < nY-1; k++) {
+    const by = oy + barCenterOffset + (k / (nY-1)) * ySpan;
+    bars.push({ x: ox + barCenterOffset,      y: by });
+    bars.push({ x: ox + cw - barCenterOffset, y: by });
+  }
+
+  // ── SVG defs: gradients + filters ──
+  let s = `<defs>
+    <!-- concrete texture gradient -->
+    <linearGradient id="concGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#2c3140"/>
+      <stop offset="40%"  stop-color="#232838"/>
+      <stop offset="100%" stop-color="#1a1e2a"/>
+    </linearGradient>
+    <!-- aggregate speckle pattern -->
+    <pattern id="aggPat" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
+      <circle cx="3"  cy="3"  r="1.2" fill="rgba(255,255,255,0.04)"/>
+      <circle cx="9"  cy="7"  r="0.9" fill="rgba(255,255,255,0.03)"/>
+      <circle cx="6"  cy="10" r="1.0" fill="rgba(255,255,255,0.025)"/>
+      <circle cx="1"  cy="8"  r="0.7" fill="rgba(255,255,255,0.02)"/>
+      <circle cx="10" cy="2"  r="0.8" fill="rgba(255,255,255,0.03)"/>
+    </pattern>
+    <!-- rebar gradient: shiny steel -->
+    <radialGradient id="rebarGrad" cx="35%" cy="30%" r="65%">
+      <stop offset="0%"   stop-color="#ffe566"/>
+      <stop offset="40%"  stop-color="#e8b800"/>
+      <stop offset="100%" stop-color="#7a5a00"/>
+    </radialGradient>
+    <!-- rebar highlight -->
+    <radialGradient id="rebarHi" cx="30%" cy="25%" r="45%">
+      <stop offset="0%"   stop-color="rgba(255,255,220,0.7)"/>
+      <stop offset="100%" stop-color="rgba(255,255,220,0)"/>
+    </radialGradient>
+    <!-- stirrup gradient -->
+    <linearGradient id="stirGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#c0c8d8"/>
+      <stop offset="100%" stop-color="#707888"/>
+    </linearGradient>
+    <!-- drop shadow -->
+    <filter id="barShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0.5" dy="1" stdDeviation="1" flood-color="rgba(0,0,0,0.6)"/>
+    </filter>
+    <filter id="concShadow">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.5)"/>
+    </filter>
+    <!-- inner shadow for concrete depth -->
+    <filter id="innerShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feFlood flood-color="rgba(0,0,0,0.4)" result="flood"/>
+      <feComposite in="flood" in2="SourceGraphic" operator="in" result="shadow"/>
+      <feGaussianBlur in="shadow" stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>`;
+
+  // ── Concrete body ──
+  s += `
+    <rect x="${ox}" y="${oy}" width="${cw}" height="${ch}"
+      fill="url(#concGrad)" stroke="#404660" stroke-width="1.5"
+      filter="url(#concShadow)" rx="1"/>
+    <!-- aggregate overlay -->
+    <rect x="${ox}" y="${oy}" width="${cw}" height="${ch}"
+      fill="url(#aggPat)" rx="1"/>
+    <!-- top-left highlight edge -->
+    <line x1="${ox}" y1="${oy}" x2="${ox+cw}" y2="${oy}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <line x1="${ox}" y1="${oy}" x2="${ox}" y2="${oy+ch}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    <!-- bottom-right shadow edge -->
+    <line x1="${ox+cw}" y1="${oy}" x2="${ox+cw}" y2="${oy+ch}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+    <line x1="${ox}" y1="${oy+ch}" x2="${ox+cw}" y2="${oy+ch}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>`;
+
+  // ── Cover zone (subtle) ──
+  s += `
+    <rect x="${ox+coverPx}" y="${oy+coverPx}"
+      width="${cw-2*coverPx}" height="${ch-2*coverPx}"
+      fill="none" stroke="rgba(0,229,255,0.15)" stroke-width="0.6" stroke-dasharray="3,2.5"/>`;
+
+  // ── Stirrup (rounded rect, steel color) ──
+  // ขอบนอกเหล็กปลอกชิดที่ coverPx จากขอบ → centerline อยู่ที่ coverPx + stirW/2
+  const sx = ox + coverPx;
+  const sy = oy + coverPx;
+  const sw = cw - 2*coverPx;
+  const sh = ch - 2*coverPx;
+  s += `
+    <rect x="${sx}" y="${sy}" width="${sw}" height="${sh}"
+      fill="none" stroke="url(#stirGrad)" stroke-width="${stirW}"
+      stroke-linecap="round" stroke-linejoin="round" rx="2"
+      filter="url(#barShadow)"/>
+    <!-- stirrup shine -->
+    <rect x="${sx}" y="${sy}" width="${sw}" height="${sh}"
+      fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="${stirW*0.3}"
+      stroke-linecap="round" stroke-linejoin="round" rx="2"/>`;
+
+  // ── Rebar bars ──
+  bars.forEach(b => {
+    s += `
+      <!-- bar body -->
+      <circle cx="${b.x}" cy="${b.y}" r="${barR}"
+        fill="url(#rebarGrad)" filter="url(#barShadow)"/>
+      <!-- deformation rings (ribbed rebar look) -->
+      <ellipse cx="${b.x}" cy="${b.y}" rx="${barR*0.85}" ry="${barR*0.25}"
+        fill="none" stroke="rgba(100,60,0,0.5)" stroke-width="0.5"
+        transform="rotate(-20,${b.x},${b.y})"/>
+      <ellipse cx="${b.x}" cy="${b.y}" rx="${barR*0.85}" ry="${barR*0.25}"
+        fill="none" stroke="rgba(100,60,0,0.5)" stroke-width="0.5"
+        transform="rotate(20,${b.x},${b.y})"/>
+      <!-- specular highlight -->
+      <circle cx="${b.x - barR*0.28}" cy="${b.y - barR*0.28}" r="${barR*0.32}"
+        fill="url(#rebarHi)"/>`;
+  });
+
+
+
+  // ── Dimension lines ──
+  const dimGap  = 9;
+  const dimBot  = oy + ch + dimGap;
+  const dimLeft = ox - dimGap;
+  const tick    = 4;
+
+  // Horizontal (H)
+  s += `
+    <line x1="${ox}" y1="${dimBot}" x2="${ox+cw}" y2="${dimBot}"
+      stroke="#5a6080" stroke-width="0.8"/>
+    <line x1="${ox}"    y1="${dimBot-tick}" x2="${ox}"    y2="${dimBot+tick}" stroke="#5a6080" stroke-width="0.8"/>
+    <line x1="${ox+cw}" y1="${dimBot-tick}" x2="${ox+cw}" y2="${dimBot+tick}" stroke="#5a6080" stroke-width="0.8"/>
+    <!-- arrow heads -->
+    <polygon points="${ox+5},${dimBot-2} ${ox},${dimBot} ${ox+5},${dimBot+2}" fill="#5a6080"/>
+    <polygon points="${ox+cw-5},${dimBot-2} ${ox+cw},${dimBot} ${ox+cw-5},${dimBot+2}" fill="#5a6080"/>
+    <text x="${ox+cw/2}" y="${dimBot+10}" text-anchor="middle"
+      fill="rgba(255,255,255,0.9)" font-family="DM Mono,monospace" font-size="12" font-weight="500">H = ${i.H} cm</text>`;
+
+  // Vertical (W)
+  s += `
+    <line x1="${dimLeft}" y1="${oy}" x2="${dimLeft}" y2="${oy+ch}"
+      stroke="#5a6080" stroke-width="0.8"/>
+    <line x1="${dimLeft-tick}" y1="${oy}"    x2="${dimLeft+tick}" y2="${oy}"    stroke="#5a6080" stroke-width="0.8"/>
+    <line x1="${dimLeft-tick}" y1="${oy+ch}" x2="${dimLeft+tick}" y2="${oy+ch}" stroke="#5a6080" stroke-width="0.8"/>
+    <polygon points="${dimLeft-2},${oy+5} ${dimLeft},${oy} ${dimLeft+2},${oy+5}" fill="#5a6080"/>
+    <polygon points="${dimLeft-2},${oy+ch-5} ${dimLeft},${oy+ch} ${dimLeft+2},${oy+ch-5}" fill="#5a6080"/>
+    <text x="${dimLeft-3}" y="${oy+ch/2}" text-anchor="middle"
+      fill="rgba(255,255,255,0.9)" font-family="DM Mono,monospace" font-size="12" font-weight="500"
+      transform="rotate(-90,${dimLeft-3},${oy+ch/2})">W = ${i.W} cm</text>`;
+
+  // ── Axis labels ──
+  s += `
+    <text x="${ox+cw/2}" y="${oy-6}" text-anchor="middle"
+      fill="rgba(0,229,255,0.7)" font-family="DM Mono,monospace" font-size="10" font-weight="700"
+      letter-spacing="1">X</text>
+    <text x="${ox+cw+5}" y="${oy+ch/2+4}" text-anchor="start"
+      fill="rgba(255,107,53,0.8)" font-family="DM Mono,monospace" font-size="10" font-weight="700"
+      letter-spacing="1">Y</text>`;
+
+
+
+  svgEl.innerHTML = s;
+
+  // Info panel
+  const totalBars = bars.length;
+  const spacing = document.getElementById('stirrupSpacing').value;
+  document.getElementById('sectionInfo').innerHTML = `
+    <div class="prop-group">
+      <div class="prop-group-label">Section & Cover</div>
+      <div class="prop-row"><span class="prop-label">H × W</span><span class="prop-value cyan">${i.H} × ${i.W}<em>cm</em></span></div>
+      <div class="prop-row"><span class="prop-label">Area (A)</span><span class="prop-value">${(i.H*i.W).toFixed(0)}<em>cm²</em></span></div>
+      <div class="prop-row"><span class="prop-label">Length (L)</span><span class="prop-value">${i.L}<em>cm</em></span></div>
+      <div class="prop-row"><span class="prop-label">Covering</span><span class="prop-value">${i.cover}<em>cm</em></span></div>
+      <div class="prop-row"><span class="prop-label">k</span><span class="prop-value">${i.k}</span></div>
+    </div>
+    <div class="prop-group">
+      <div class="prop-group-label">Reinforcement</div>
+      <div class="prop-row"><span class="prop-label">Main Bar</span><span class="prop-value yellow">DB${i.DB}</span></div>
+      <div class="prop-row"><span class="prop-label">n(X) / n(Y)</span><span class="prop-value">${i.nX} / ${i.nY}<em>เส้น</em></span></div>
+      <div class="prop-row"><span class="prop-label">Total Bars</span><span class="prop-value yellow">${totalBars}<em>เส้น</em></span></div>
+      <div class="prop-row"><span class="prop-label">Stirrup</span><span class="prop-value orange">RB${i.RB} @ ${spacing}<em>cm</em></span></div>
+      <div class="prop-row"><span class="prop-label">Ast</span><span class="prop-value green">${Ast.toFixed(2)}<em>cm²</em></span></div>
+      <div class="prop-row"><span class="prop-label">ρ</span><span class="prop-value green">${(Ast/(i.H*i.W)*100).toFixed(2)}<em>%</em></span></div>
+    </div>
+    <div class="prop-group">
+      <div class="prop-group-label">Material</div>
+      <div class="prop-row"><span class="prop-label">f'c</span><span class="prop-value">${i.fc}<em>ksc</em></span></div>
+      <div class="prop-row"><span class="prop-label">fy</span><span class="prop-value">${i.fy}<em>ksc</em></span></div>
+      <div class="prop-row"><span class="prop-label">Es</span><span class="prop-value">${i.Es.toLocaleString()}<em>ksc</em></span></div>
+      <div class="prop-row"><span class="prop-label">Ec</span><span class="prop-value">${(15100*Math.sqrt(i.fc)).toFixed(0)}<em>ksc</em></span></div>
+    </div>
+  `;
+}
+
+function checkStirrup() {
+  const max = window._stirrupMax;
+  if (max === undefined) return;
+  const val = parseFloat(document.getElementById('stirrupSpacing').value);
+  const el = document.getElementById('res-stirrup-check');
+  if (isNaN(val) || val <= 0) { el.innerHTML = '—'; return; }
+  const ok = val <= max;
+  el.innerHTML = `<span class="status-pill ${ok ? 'status-ok' : 'status-fail'}">${ok ? '✓ ผ่าน' : '✗ ไม่ผ่าน'}</span>`;
+}
+
+// charts managed via window._chartX / window._chartY
+
+function getInputs() {
+  return {
+    P:  parseFloat(document.getElementById('P').value)  || 0,
+    Mx: parseFloat(document.getElementById('Mx').value) || 0,
+    My: parseFloat(document.getElementById('My').value) || 0,
+    fc: parseFloat(document.getElementById('fc').value),
+    steelGrade: document.getElementById('steelGrade').value,
+    Es: parseFloat(document.getElementById('Es').value),
+    H:  parseFloat(document.getElementById('H').value),
+    W:  parseFloat(document.getElementById('W').value),
+    L:  parseFloat(document.getElementById('L').value),
+    cover: parseFloat(document.getElementById('cover').value),
+    k:  parseFloat(document.getElementById('k').value),
+    DB: parseFloat(document.getElementById('DB').value),
+    RB: parseFloat(document.getElementById('RB').value),
+    nX: parseInt(document.getElementById('nX').value),
+    nY: parseInt(document.getElementById('nY').value),
+    stirrupGrade: document.getElementById('stirrupGrade').value,
+    Vx: parseFloat(document.getElementById('Vx').value) || 0,
+    Vy: parseFloat(document.getElementById('Vy').value) || 0,
+    biaxN: parseFloat(document.getElementById('biaxN').value) || 1.5,
+  };
+}
+
+function calculate() {
+  const i = getInputs();
+
+  // Derived
+  const fyMap = { SR24: 2400, SD30: 3000, SD40: 4000, SD50: 5000 };
+  i.fy  = fyMap[i.steelGrade];
+  i.fys = fyMap[i.stirrupGrade];
+  const Ec = 15100 * Math.sqrt(i.fc);
+  const A = i.H * i.W;
+  const barR = i.DB / 10 / 2; // cm radius of main bar
+  const stirrupR = i.RB / 10 / 2;
+
+  const d_x  = i.H - i.cover - barR;   // effective depth x-axis
+  const dp_x = i.cover + barR;          // d' x-axis
+  const d_y  = i.W - i.cover - barR;
+  const dp_y = i.cover + barR;
+
+  // Ast
+  const barArea = Math.PI * (i.DB / 10) ** 2 / 4; // cm²
+  let Ast_x, Ast_y, Ast;
+  Ast_x = barArea * i.nX;
+  Ast_y = barArea * i.nY;
+  // Total unique bars: if nX >= nY, perimeter = nX*2 + (nY-2)*2, else (nX-2)*2 + nY*2
+  if (i.nX >= i.nY) {
+    Ast = barArea * (i.nX * 2 + (i.nY - 2) * 2);
+  } else {
+    Ast = barArea * ((i.nX - 2) * 2 + i.nY * 2);
+  }
+
+  // Section props
+  const Ix = (1/12) * i.W * i.H ** 3;
+  const Iy = (1/12) * i.H * i.W ** 3;
+  const rx = Math.sqrt(Ix / A);
+  const ry = Math.sqrt(Iy / A);
+
+  const klrx = i.k * i.L / rx;
+  const klry = i.k * i.L / ry;
+  // Slenderness limit: 34 - 12(M1/M2), M1/M2 = 0.5 fixed per design assumption
+  const limit = 34 - 12 * 0.5; // = 28
+
+  const hasMoment = !(i.Mx === 0 && i.My === 0);
+  function Rfactor(klr) {
+    let R;
+    if (hasMoment) R = 1.07 - 0.006 * i.L / (klr === klrx ? rx : ry);
+    else           R = 1.07 - 0.008 * i.L / (klr === klrx ? rx : ry);
+    return Math.min(R, 1);
+  }
+  const Rx = Rfactor(klrx);
+  const Ry = Rfactor(klry);
+  const R  = Math.min(Rx, Ry);
+  const phi = R;
+
+  // ---- KEY POINTS ----
+  // 1) Pure Compression
+  const Pn0 = (0.85 * i.fc * (A - Ast) + i.fy * Ast) / 1000; // tons
+
+  // Helper: cap stress
+  function capStress(s) { return Math.min(Math.abs(s), i.fy) * Math.sign(s); }
+
+  // ---- X-axis Points ----
+  function computeX(c) {
+    const a = 0.85 * c;
+    const Cc = 0.85 * i.fc * i.W * a / 1000;
+    const es_tens = 0.003 * (d_x - c) / c;
+    const fs_tens = capStress(es_tens * i.Es);
+    const es_comp = 0.003 * (c - dp_x) / c;
+    const fs_comp = capStress(es_comp * i.Es);
+    const Pn = (Cc + Ast_y * fs_comp / 1000 - Ast_y * fs_tens / 1000);
+    const Mn = (Cc * (i.H/2 - a/2) + Ast_y * fs_comp * (i.H/2 - dp_x) + Ast_y * fs_tens * (d_x - i.H/2)) / 100000;
+    return { Pn, Mn };
+  }
+  function computeY(c) {
+    const a = 0.85 * c;
+    const Cc = 0.85 * i.fc * i.H * a / 1000;
+    const es_tens = 0.003 * (d_y - c) / c;
+    const fs_tens = capStress(es_tens * i.Es);
+    const es_comp = 0.003 * (c - dp_y) / c;
+    const fs_comp = capStress(es_comp * i.Es);
+    const Pn = (Cc + Ast_x * fs_comp / 1000 - Ast_x * fs_tens / 1000);
+    const Mn = (Cc * (i.W/2 - a/2) + Ast_x * fs_comp * (i.W/2 - dp_y) + Ast_x * fs_tens * (d_y - i.W/2)) / 100000;
+    return { Pn, Mn };
+  }
+
+  // Moment Zero Tension (c = full depth = H or W)
+  const mzt_x = computeX(i.H);
+  const mzt_y = computeY(i.W);
+
+  // Balance
+  const Cb_x = 6120 * d_x / (i.fy + 6120);
+  const Cb_y = 6120 * d_y / (i.fy + 6120);
+  const bal_x = computeX(Cb_x);
+  const bal_y = computeY(Cb_y);
+
+  // Tension Controlled Limit (εt = 0.005)
+  // Excel: C = 0.003/(0.003+0.005)*d
+  //        fs  = fy  (tension steel yields)
+  //        fs' = IF(6120*(C-d')/d > fy, fy, 6120*(C-d')/d)   ← key difference from generic computeX
+  //        Pn  = Cc - fs*Ast_y + fs'*Ast_y
+  //        Mn  = (Cc*(H/2-a/2) + Ast_y*fs*(H/2-d') + fs'*Ast_y*(d-H/2)) / 100000
+  function tclX() {
+    const C   = 0.003 / (0.003 + 0.005) * d_x;
+    const a   = 0.85 * C;
+    const Cc  = 0.85 * i.fc * i.W * a / 1000;
+    const fs  = i.fy;
+    const fsp = Math.min(6120 * (C - dp_x) / d_x, i.fy);
+    const Pn  = Cc - fs * Ast_y / 1000 + fsp * Ast_y / 1000;
+    const Mn  = (Cc * (i.H/2 - a/2) + Ast_y * fs * (i.H/2 - dp_x) + fsp * Ast_y * (d_x - i.H/2)) / 100000;
+    return { Pn, Mn };
+  }
+  function tclY() {
+    const C   = 0.003 / (0.003 + 0.005) * d_y;
+    const a   = 0.85 * C;
+    const Cc  = 0.85 * i.fc * i.H * a / 1000;
+    const fs  = i.fy;
+    const fsp = Math.min(6120 * (C - dp_y) / d_y, i.fy);
+    const Pn  = Cc - fs * Ast_x / 1000 + fsp * Ast_x / 1000;
+    const Mn  = (Cc * (i.W/2 - a/2) + Ast_x * fs * (i.W/2 - dp_y) + fsp * Ast_x * (d_y - i.W/2)) / 100000;
+    return { Pn, Mn };
+  }
+  const tcl_x = tclX();
+  const tcl_y = tclY();
+
+  // Pure Bending — Excel uses interpolation formula (NOT iteration):
+  // Mn_pb_x = (|Pn_tension| * Mn_TCL_x) / (|Pn_tension| + Pn_TCL_x)
+  // Mn_pb_y = (|Pn_tension| * Mn_TCL_y) / (|Pn_tension| + Pn_TCL_y)
+  // ϕPn = 0  (pure bending, no axial)
+  // Pure Tension (needed for Pure Bending interpolation)
+  const Pnt = -Ast * i.fy / 1000;
+
+  const pb_x = {
+    Mn: (Math.abs(Pnt) * tcl_x.Mn) / (Math.abs(Pnt) + tcl_x.Pn),
+    Pn: 0
+  };
+  const pb_y = {
+    Mn: (Math.abs(Pnt) * tcl_y.Mn) / (Math.abs(Pnt) + tcl_y.Pn),
+    Pn: 0
+  };
+
+  // Pure Tension
+  // ── Shear Capacity ──
+  const s_cm   = parseFloat(document.getElementById('stirrupSpacing').value); // cm
+  const Av     = 2 * Math.PI * (i.RB/10)**2 / 4; // 2-leg stirrup area, cm²
+  const Vs     = Av * i.fys * d_x / s_cm / 1000;  // tons (use d_x for Vs)
+
+  const Ag = i.H * i.W;
+  let Vc_x, Vc_y;
+  if (i.P >= 0) {
+    // Compression: Vc = 0.93√fc' × b × d × √(1 + 0.029P/Ag)
+    Vc_x = 0.93 * Math.sqrt(i.fc) * i.W * d_x * Math.sqrt(1 + 0.029 * (i.P/Ag)) / 1000;
+    Vc_y = 0.93 * Math.sqrt(i.fc) * i.H * d_y * Math.sqrt(1 + 0.029 * (i.P/Ag)) / 1000;
+  } else {
+    // Tension: Vc = 0.53(1 + 0.029P/Ag)√fc' × b × d
+    Vc_x = 0.53 * (1 + 0.029 * (i.P/Ag)) * Math.sqrt(i.fc) * i.W * d_x / 1000;
+    Vc_y = 0.53 * (1 + 0.029 * (i.P/Ag)) * Math.sqrt(i.fc) * i.H * d_y / 1000;
+    Vc_x = Math.max(Vc_x, 0);
+    Vc_y = Math.max(Vc_y, 0);
+  }
+  const Vn_x = Vc_x + Vs;
+  const Vn_y = Vc_y + Vs;
+  const Vx_tons = i.Vx / 1000;
+  const Vy_tons = i.Vy / 1000;
+  const shearOK_x = Vx_tons <= Vn_x;
+  const shearOK_y = Vy_tons <= Vn_y;
+
+  // Build full curve (many points)
+  function buildCurveX() {
+    const pts = [];
+    pts.push({ x: 0, y: Pn0 * phi });
+    pts.push({ x: Math.abs(mzt_x.Mn), y: mzt_x.Pn * phi });
+    pts.push({ x: Math.abs(bal_x.Mn), y: bal_x.Pn * phi });
+    pts.push({ x: Math.abs(tcl_x.Mn), y: tcl_x.Pn * phi });
+    pts.push({ x: Math.abs(pb_x.Mn), y: 0 });
+    pts.push({ x: 0, y: Pnt * phi });
+    return pts;
+  }
+  function buildCurveY() {
+    const pts = [];
+    pts.push({ x: 0, y: Pn0 * phi });
+    pts.push({ x: Math.abs(mzt_y.Mn), y: mzt_y.Pn * phi });
+    pts.push({ x: Math.abs(bal_y.Mn), y: bal_y.Pn * phi });
+    pts.push({ x: Math.abs(tcl_y.Mn), y: tcl_y.Pn * phi });
+    pts.push({ x: Math.abs(pb_y.Mn), y: 0 });
+    pts.push({ x: 0, y: Pnt * phi });
+    return pts;
+  }
+
+  const curveX = buildCurveX();
+  const curveY = buildCurveY();
+
+  // Demand point
+  const demandMx = i.Mx / 1000; // kg-m → tons-m
+  const demandMy = i.My / 1000;
+  const demandP  = i.P / 1000;
+
+  // Check if demand inside X-curve (simple polygon check)
+  function isInsideCurve(Mn, Pn, curve) {
+    // Use linear interpolation: at given Pn, find max Mn from curve
+    // Find two bracketing points by Pn (y)
+    let maxMn = 0;
+    for (let j = 0; j < curve.length - 1; j++) {
+      const p1 = curve[j], p2 = curve[j+1];
+      const minP = Math.min(p1.y, p2.y), maxP = Math.max(p1.y, p2.y);
+      if (Pn >= minP && Pn <= maxP) {
+        const t = (Pn - p1.y) / (p2.y - p1.y + 0.0001);
+        const interp = p1.x + t * (p2.x - p1.x);
+        maxMn = Math.max(maxMn, interp);
+      }
+    }
+    return { inside: Mn <= maxMn, capacity: maxMn };
+  }
+
+  const chkX = isInsideCurve(demandMx, demandP, curveX);
+  const chkY = isInsideCurve(demandMy, demandP, curveY);
+
+  // Mn at demand P level (capacity from interaction diagram)
+  const MnX_atP = chkX.capacity; // t-m
+  const MnY_atP = chkY.capacity; // t-m
+
+  // ── Capacity check ──
+  const noMoment = (i.Mx === 0 && i.My === 0);
+  let biaxVal, biaxOK, biaxLabel, ratioX, ratioY;
+  let MnX_display = MnX_atP, MnY_display = MnY_atP;
+
+  if (noMoment) {
+    // Pure axial: check P against ϕPn (compression or tension)
+    if (demandP >= 0) {
+      // Compression: check against Pure Compression ϕPn0
+      const phiPn0 = Pn0 * phi;
+      ratioX = demandP / phiPn0;
+      ratioY = demandP / phiPn0;
+      biaxVal = ratioX; // single ratio
+      biaxOK  = demandP <= phiPn0;
+      biaxLabel = `P / ϕPn₀ = ${demandP.toFixed(2)} / ${phiPn0.toFixed(2)}`;
+      MnX_display = phiPn0;
+      MnY_display = phiPn0;
+    } else {
+      // Tension: check against Pure Tension ϕPnt
+      const phiPnt = Pnt * phi; // negative
+      ratioX = demandP / phiPnt;
+      ratioY = demandP / phiPnt;
+      biaxVal = ratioX;
+      biaxOK  = demandP >= phiPnt;
+      biaxLabel = `P / ϕPnt = ${demandP.toFixed(2)} / ${phiPnt.toFixed(2)}`;
+      MnX_display = phiPnt;
+      MnY_display = phiPnt;
+    }
+  } else {
+    // Biaxial bending: (Mx/Mn-x)^n + (My/Mn-y)^n <= 1
+    ratioX  = MnX_atP > 0 ? demandMx / MnX_atP : 999;
+    ratioY  = MnY_atP > 0 ? demandMy / MnY_atP : 999;
+    const n = parseFloat(i.biaxN) || 1.5;
+    biaxVal = Math.pow(ratioX, n) + Math.pow(ratioY, n);
+    biaxOK  = biaxVal <= 1.0;
+    biaxLabel = `(Mx/Mn-x)ⁿ + (My/Mn-y)ⁿ`;
+  }
+  const isOK = biaxOK;
+
+  // ---- UPDATE UI ----
+  document.getElementById('results-section').style.display = 'block';
+  document.getElementById('results-section-right').style.display = 'block';
+  document.getElementById('res-Ec').textContent = Ec.toFixed(0) + ' ksc';
+  document.getElementById('res-fy').textContent  = i.fy.toLocaleString() + ' ksc (' + i.steelGrade + ')';
+  document.getElementById('res-fys').textContent = i.fys.toLocaleString() + ' ksc (' + i.stirrupGrade + ')';
+  document.getElementById('res-A').textContent = A.toFixed(1) + ' cm²';
+  document.getElementById('res-Ast').textContent = Ast.toFixed(2) + ' cm²';
+  document.getElementById('res-rho').textContent = (Ast/A*100).toFixed(2) + '%';
+  document.getElementById('res-klrx').textContent = klrx.toFixed(2);
+  document.getElementById('res-klry').textContent = klry.toFixed(2);
+
+  function slendEl(id, klr, limit) {
+    const el = document.getElementById(id);
+    const isShort = klr < limit;
+    el.innerHTML = `<span class="status-pill ${isShort ? 'status-ok' : 'status-warn'}">${isShort ? 'Short Column' : 'Slender Column'}</span>`;
+  }
+  slendEl('res-slendX', klrx, limit);
+  slendEl('res-slendY', klry, limit);
+
+  document.getElementById('res-R').textContent = R.toFixed(4);
+  // phi = R (no hook factor)
+
+
+  // ---- STIRRUP SPACING ----
+  const s1 = 16 * (i.DB / 10);
+  const s2 = 48 * (i.RB / 10);
+  const s3 = Math.min(i.H, i.W);
+  window._stirrupMax = Math.min(s1, s2, s3);
+
+  document.getElementById('res-s1').textContent = s1.toFixed(1) + ' cm';
+  document.getElementById('res-s2').textContent = s2.toFixed(1) + ' cm';
+  document.getElementById('res-s3').textContent = s3.toFixed(1) + ' cm';
+  document.getElementById('res-smax').textContent = window._stirrupMax.toFixed(1) + ' cm';
+  checkStirrup();
+
+  // Shear results
+  document.getElementById('res-Av').textContent  = Av.toFixed(3) + ' cm²';
+  document.getElementById('res-Vs').textContent  = Vs.toFixed(3) + ' t';
+  document.getElementById('res-Vcx').textContent = Vc_x.toFixed(3) + ' t';
+  document.getElementById('res-Vcy').textContent = Vc_y.toFixed(3) + ' t';
+  document.getElementById('res-Vnx').textContent = Vn_x.toFixed(3) + ' t';
+  document.getElementById('res-Vny').textContent = Vn_y.toFixed(3) + ' t';
+  document.getElementById('res-Vx-demand').textContent = Vx_tons.toFixed(3) + ' t';
+  document.getElementById('res-Vy-demand').textContent = Vy_tons.toFixed(3) + ' t';
+  document.getElementById('res-shear-x').innerHTML = `<span class="status-pill ${shearOK_x ? 'status-ok' : 'status-fail'}">${shearOK_x ? '✓ ผ่าน' : '✗ ไม่ผ่าน'}</span>`;
+  document.getElementById('res-shear-y').innerHTML = `<span class="status-pill ${shearOK_y ? 'status-ok' : 'status-fail'}">${shearOK_y ? '✓ ผ่าน' : '✗ ไม่ผ่าน'}</span>`;
+
+  // Biaxial results
+  if (noMoment) {
+    document.getElementById('lbl-MnxP').innerHTML = demandP >= 0 ? 'ϕPn₀ <em>(comp.)</em>' : 'ϕPnt <em>(tension)</em>';
+    document.getElementById('lbl-MnyP').innerHTML = demandP >= 0 ? 'ϕPn₀ <em>(comp.)</em>' : 'ϕPnt <em>(tension)</em>';
+    document.getElementById('res-MnxP').textContent = MnX_display.toFixed(2) + ' t';
+    document.getElementById('res-MnyP').textContent = MnY_display.toFixed(2) + ' t';
+  } else {
+    document.getElementById('lbl-MnxP').innerHTML = 'Mn-x <em>(at P)</em>';
+    document.getElementById('lbl-MnyP').innerHTML = 'Mn-y <em>(at P)</em>';
+    document.getElementById('res-MnxP').textContent = MnX_atP.toFixed(3) + ' t-m';
+    document.getElementById('res-MnyP').textContent = MnY_atP.toFixed(3) + ' t-m';
+  }
+  document.getElementById('res-ratioX').textContent  = ratioX.toFixed(4);
+  document.getElementById('res-ratioY').textContent  = ratioY.toFixed(4);
+  document.getElementById('res-biaxVal').textContent = noMoment
+    ? biaxVal.toFixed(4)
+    : biaxVal.toFixed(4) + ' (n=' + (parseFloat(i.biaxN)||1.5) + ')';
+  document.getElementById('lbl-biaxFormula').textContent = noMoment
+    ? (demandP >= 0 ? 'P / ϕPn₀' : 'P / ϕPnt')
+    : '(Mx/Mn-x)ⁿ + (My/Mn-y)ⁿ';
+  document.getElementById('res-biaxCheck').innerHTML = `<span class="status-pill ${biaxOK ? 'status-ok' : 'status-fail'}">${biaxOK ? '✓ ผ่าน' : '✗ ไม่ผ่าน'}</span>`;
+
+  // res-status removed from UI
+
+  // subtitle removed (info now in section panel)
+
+  drawSection(i, d_x, dp_x, d_y, dp_y, Ast, Ast_x, Ast_y);
+
+  // TABLE
+  const rows = [
+    { label: 'Pure Compression',        mx: 0,                    px: Pn0*phi,         my: 0,                    py: Pn0*phi },
+    { label: 'Moment Zero Tension',      mx: Math.abs(mzt_x.Mn),  px: mzt_x.Pn*phi,   my: Math.abs(mzt_y.Mn),  py: mzt_y.Pn*phi },
+    { label: 'Balance Failure',          mx: Math.abs(bal_x.Mn),  px: bal_x.Pn*phi,   my: Math.abs(bal_y.Mn),  py: bal_y.Pn*phi },
+    { label: 'Tension Controlled Limit', mx: Math.abs(tcl_x.Mn),  px: tcl_x.Pn*phi,   my: Math.abs(tcl_y.Mn),  py: tcl_y.Pn*phi },
+    { label: 'Pure Bending',             mx: Math.abs(pb_x.Mn),   px: 0,               my: Math.abs(pb_y.Mn),   py: 0 },
+    { label: 'Pure Tension',             mx: 0,                    px: Pnt*phi,         my: 0,                    py: Pnt*phi },
+  ];
+  // TABLE X
+  const tbodyX = document.getElementById('tableBodyX');
+  tbodyX.innerHTML = rows.map(r =>
+    `<tr><td>${r.label}</td><td class="td-x">${r.mx.toFixed(3)}</td><td class="td-x">${r.px.toFixed(2)}</td></tr>`
+  ).join('') + `<tr style="background:rgba(255,214,10,0.05)">
+    <td class="td-point">▶ Demand</td>
+    <td class="td-point">${demandMx.toFixed(3)}</td>
+    <td class="td-point">${demandP.toFixed(2)}</td>
+  </tr>`;
+
+  // TABLE Y
+  const tbodyY = document.getElementById('tableBodyY');
+  tbodyY.innerHTML = rows.map(r =>
+    `<tr><td>${r.label}</td><td class="td-y">${r.my.toFixed(3)}</td><td class="td-y">${r.py.toFixed(2)}</td></tr>`
+  ).join('') + `<tr style="background:rgba(255,214,10,0.05)">
+    <td class="td-point">▶ Demand</td>
+    <td class="td-point">${demandMy.toFixed(3)}</td>
+    <td class="td-point">${demandP.toFixed(2)}</td>
+  </tr>`;
+
+  // CALCULATION STEPS X & Y — detailed with formula + substitution
+  function stepRow(varName, formula, substitution, result, unit='', accent='') {
+    // line1: varName = formula (symbolic)
+    // line2: varName = substitution = result
+    const hasResult = result !== '';
+    return `<div class="calc-step">
+      <div class="calc-line1">
+        <span class="calc-var">${varName}</span>
+        <span class="calc-eq">=</span>
+        <span class="calc-formula-sym">${formula}</span>
+      </div>
+      ${hasResult ? `<div class="calc-line2">
+        <span class="calc-var" style="visibility:hidden">${varName}</span>
+        <span class="calc-eq">=</span>
+        <span class="calc-sub-val">${substitution}</span>
+        <span class="calc-eq">=</span>
+        <span class="calc-result ${accent}">${result}${unit ? '<em> '+unit+'</em>' : ''}</span>
+      </div>` : ''}
+    </div>`;
+  }
+  let _stepN = 0;
+  function stepHeader(title) {
+    _stepN++;
+    const num = _stepN;
+    // extract just the label after the number
+    const label = title.replace(/^\d+\.\s*/, '');
+    return `<div class="calc-section-header" data-n="${num}">
+      <span class="step-num">${num}</span>
+      ${label}
+    </div>`;
+  }
+  function resetStepN() { _stepN = 0; }
+
+  // ── X-axis ──
+  const ab_x   = (0.85 * Cb_x).toFixed(2);
+  const Cc_bal_x = (0.85 * i.fc * i.W * 0.85 * Cb_x / 1000).toFixed(3);
+  const fs2_bal_x = Math.min(0.003 * i.Es * (Cb_x - dp_x) / Cb_x, i.fy).toFixed(1);
+  const Ctcl_x_val = (0.003 / 0.008 * d_x).toFixed(2);
+  const atcl_x    = (0.85 * 0.003 / 0.008 * d_x).toFixed(2);
+
+  resetStepN();
+  document.getElementById('stepsX').innerHTML = [
+    stepHeader('1. ข้อมูลพื้นฐาน'),
+    stepRow('d',    'H - Covering - ∅stirrup - ∅bar/2',  `${i.H} - ${i.cover} - ${(i.RB/10).toFixed(1)} - ${(i.DB/10/2).toFixed(1)}`,  d_x.toFixed(2), 'cm'),
+    stepRow("d'",   'Covering + ∅stirrup + ∅bar/2',       `${i.cover} + ${(i.RB/10).toFixed(1)} + ${(i.DB/10/2).toFixed(1)}`,          dp_x.toFixed(2), 'cm'),
+    stepRow('Ast-x','(π/4) × (DB/10)² × n(X)',            `(π/4) × ${(i.DB/10).toFixed(1)}² × ${i.nX}`,                               Ast_x.toFixed(2), 'cm²'),
+
+    stepHeader('2. Pure Compression'),
+    stepRow('Pn₀',  "0.85f'c(Ag - Ast) + fy·Ast",       `0.85×${i.fc}×(${i.H*i.W}-${Ast.toFixed(2)}) + ${i.fy}×${Ast.toFixed(2)}`,  Pn0.toFixed(2), 'tons'),
+    stepRow('ϕPn₀', 'Pn₀ × ϕ',                            `${Pn0.toFixed(2)} × ${phi.toFixed(4)}`,                                     (Pn0*phi).toFixed(2), 'tons', 'cyan'),
+
+    stepHeader('3. Moment Zero Tension (c = H)'),
+    stepRow('c',    'H (full compression)',                 `${i.H}`,                                                                    i.H, 'cm'),
+    stepRow('a',    '0.85 × c',                            `0.85 × ${i.H}`,                                                            (0.85*i.H).toFixed(2), 'cm'),
+    stepRow('Cc',   "0.85f'c × W × a / 1000",            `0.85×${i.fc}×${i.W}×${(0.85*i.H).toFixed(2)}/1000`,                       mzt_x.Pn.toFixed(3), 'tons'),
+    stepRow('ϕMn',  "(Cc×(H/2-a/2) + Cs×(H/2-d') + T×(d-H/2)) × ϕ", `(${mzt_x.Pn.toFixed(3)}×(${i.H}/2-${(0.85*i.H).toFixed(2)}/2) + ...) × ${phi.toFixed(4)}`,                                                 (mzt_x.Mn*phi).toFixed(3), 't-m', 'cyan'),
+
+    stepHeader('4. Balance Failure'),
+    stepRow('Cb',   '6120 × d / (fy + 6120)',              `6120 × ${d_x.toFixed(2)} / (${i.fy} + 6120)`,                             Cb_x.toFixed(2), 'cm'),
+    stepRow('ab',   '0.85 × Cb',                           `0.85 × ${Cb_x.toFixed(2)}`,                                               ab_x, 'cm'),
+    stepRow('Cc',   "0.85f'c × W × ab / 1000",           `0.85×${i.fc}×${i.W}×${ab_x}/1000`,                                        Cc_bal_x, 'tons'),
+    stepRow("fs'",  `${parseFloat(fs2_bal_x)>=i.fy ? "fy (controls)" : "0.003×Es×(Cb-d')/Cb"}`, `${parseFloat(fs2_bal_x)>=i.fy ? i.fy : "0.003×"+i.Es+"×("+Cb_x.toFixed(2)+"-"+dp_x.toFixed(2)+")/"+Cb_x.toFixed(2)}`, fs2_bal_x, 'ksc'),
+    stepRow('fs',   'fy',                                  `${i.fy}`,                                                                  i.fy, 'ksc'),
+    stepRow('ϕPn',  "(Cc + fs'·Ast-x - fs·Ast-x) × ϕ", `(${Cc_bal_x} + ${fs2_bal_x}×${Ast_x.toFixed(2)}/1000 - ${i.fy}×${Ast_x.toFixed(2)}/1000) × ${phi.toFixed(4)}`, (bal_x.Pn*phi).toFixed(2), 'tons', 'cyan'),
+    stepRow('ϕMn',  "(Cc×(H/2-ab/2) + Cs×(H/2-d') + T×(d-H/2)) / 100000 × ϕ", `(${Cc_bal_x}×(${i.H}/2-${ab_x}/2) + ${fs2_bal_x}×${Ast_x.toFixed(2)}×(${i.H}/2-${dp_x.toFixed(2)}) - ${i.fy}×${Ast_x.toFixed(2)}×(${d_x.toFixed(2)}-${i.H}/2)) / 100000 × ${phi.toFixed(4)}`,                                      bal_x.Mn.toFixed(3), 't-m', 'cyan'),
+
+    stepHeader('5. Tension Controlled Limit (εt = 0.005)'),
+    stepRow('C',    '0.003/(0.003+0.005) × d',            `0.375 × ${d_x.toFixed(2)}`,                                                Ctcl_x_val, 'cm'),
+    stepRow('a',    '0.85 × C',                            `0.85 × ${Ctcl_x_val}`,                                                    atcl_x, 'cm'),
+    stepRow("fs'",  `${Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x,i.fy)>=i.fy ? "fy (controls)" : "6120×(C-d')/d"}`, `${Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x,i.fy)>=i.fy ? i.fy : "6120×("+Ctcl_x_val+"-"+dp_x.toFixed(2)+")/"+d_x.toFixed(2)}`, Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x, i.fy).toFixed(1), 'ksc'),
+    stepRow('ϕPn',  "(Cc - fs·Ast-x + fs'·Ast-x) × ϕ", `(${(0.85*i.fc*i.W*parseFloat(atcl_x)/1000).toFixed(3)} - ${i.fy}×${Ast_x.toFixed(2)}/1000 + ${Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x,i.fy).toFixed(1)}×${Ast_x.toFixed(2)}/1000) × ${phi.toFixed(4)}`,                                         (tcl_x.Pn*phi).toFixed(2), 'tons', 'cyan'),
+    stepRow('ϕMn',  "(Cc×(H/2-a/2) + Cs×(H/2-d') + T×(d-H/2)) / 100000", `(${(0.85*i.fc*i.W*parseFloat(atcl_x)/1000).toFixed(3)}×(${i.H}/2-${atcl_x}/2) + ${Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x,i.fy).toFixed(1)}×${Ast_x.toFixed(2)}×(${i.H}/2-${dp_x.toFixed(2)}) + ${i.fy}×${Ast_x.toFixed(2)}×(${d_x.toFixed(2)}-${i.H}/2)) / 100000`,                                           tcl_x.Mn.toFixed(3), 't-m', 'cyan'),
+
+    stepHeader('6. Pure Bending (Interpolation)'),
+    stepRow('ϕMn',  '(|Pnt| × Mn_TCL) / (|Pnt| + Pn_TCL)', `(${Math.abs(Pnt).toFixed(2)} × ${tcl_x.Mn.toFixed(3)}) / (${Math.abs(Pnt).toFixed(2)} + ${tcl_x.Pn.toFixed(2)})`, pb_x.Mn.toFixed(3), 't-m', 'cyan'),
+
+    stepHeader('7. Pure Tension'),
+    stepRow('Pnt',  '-Ast × fy / 1000',                   `-${Ast.toFixed(2)} × ${i.fy} / 1000`,                                     Pnt.toFixed(2), 'tons', 'cyan'),
+
+    stepHeader('8. Shear Capacity — X'),
+    stepRow('Av',  '2 × (π/4) × (RB/10)²',
+                   `2 × (π/4) × ${(i.RB/10).toFixed(1)}²`,
+                   Av.toFixed(3), 'cm²'),
+    stepRow('Vs',  'Av × fys × d / s',
+                   `${Av.toFixed(3)} × ${i.fys} × ${d_x.toFixed(2)} / ${s_cm}`,
+                   Vs.toFixed(3), 'tons', 'green'),
+    ...(i.P >= 0 ? [
+      stepRow('Vc-x', "0.93√f'c × W × d × √(1 + 0.029P/Ag)",
+                      `0.93 × √${i.fc} × ${i.W} × ${d_x.toFixed(2)} × √(1 + 0.029×${i.P}/${i.H*i.W})`,
+                      Vc_x.toFixed(3), 'tons', 'cyan'),
+    ] : [
+      stepRow('Vc-x', "0.53 × (1 + 0.029P/Ag) × √f'c × W × d",
+                      `0.53 × (1 + 0.029×${i.P}/${i.H*i.W}) × √${i.fc} × ${i.W} × ${d_x.toFixed(2)}`,
+                      Vc_x.toFixed(3), 'tons', 'cyan'),
+    ]),
+    stepRow('Vn-x', 'Vc + Vs',
+                    `${Vc_x.toFixed(3)} + ${Vs.toFixed(3)}`,
+                    Vn_x.toFixed(3), 'tons', 'cyan'),
+  ].join('');
+
+  // ── Y-axis ──
+  const ab_y    = (0.85 * Cb_y).toFixed(2);
+  const Ctcl_y_val = (0.003 / 0.008 * d_y).toFixed(2);
+  const atcl_y     = (0.85 * 0.003 / 0.008 * d_y).toFixed(2);
+
+  resetStepN();
+  document.getElementById('stepsY').innerHTML = [
+    stepHeader('1. ข้อมูลพื้นฐาน'),
+    stepRow('d',    'W - Covering - ∅stirrup - ∅bar/2',  `${i.W} - ${i.cover} - ${(i.RB/10).toFixed(1)} - ${(i.DB/10/2).toFixed(1)}`,  d_y.toFixed(2), 'cm'),
+    stepRow("d'",   'Covering + ∅stirrup + ∅bar/2',       `${i.cover} + ${(i.RB/10).toFixed(1)} + ${(i.DB/10/2).toFixed(1)}`,          dp_y.toFixed(2), 'cm'),
+    stepRow('Ast-y','(π/4) × (DB/10)² × n(Y)',            `(π/4) × ${(i.DB/10).toFixed(1)}² × ${i.nY}`,                               Ast_y.toFixed(2), 'cm²'),
+
+    stepHeader('2. Pure Compression'),
+    stepRow('Pn₀',  "0.85f'c(Ag - Ast) + fy·Ast",       `0.85×${i.fc}×(${i.H*i.W}-${Ast.toFixed(2)}) + ${i.fy}×${Ast.toFixed(2)}`,  Pn0.toFixed(2), 'tons'),
+    stepRow('ϕPn₀', 'Pn₀ × ϕ',                            `${Pn0.toFixed(2)} × ${phi.toFixed(4)}`,                                     (Pn0*phi).toFixed(2), 'tons', 'orange'),
+
+    stepHeader('3. Moment Zero Tension (c = W)'),
+    stepRow('c',    'W (full compression)',                 `${i.W}`,                                                                    i.W, 'cm'),
+    stepRow('a',    '0.85 × c',                            `0.85 × ${i.W}`,                                                            (0.85*i.W).toFixed(2), 'cm'),
+    stepRow('Cc',   "0.85f'c × H × a / 1000",            `0.85×${i.fc}×${i.H}×${(0.85*i.W).toFixed(2)}/1000`,                       mzt_y.Pn.toFixed(3), 'tons'),
+    stepRow('ϕMn',  "(Cc×(W/2-a/2) + Cs×(W/2-d') + T×(d-W/2)) × ϕ", `(${mzt_y.Pn.toFixed(3)}×(${i.W}/2-${(0.85*i.W).toFixed(2)}/2) + ...) × ${phi.toFixed(4)}`,                                                 (mzt_y.Mn*phi).toFixed(3), 't-m', 'orange'),
+
+    stepHeader('4. Balance Failure'),
+    stepRow('Cb',   '6120 × d / (fy + 6120)',              `6120 × ${d_y.toFixed(2)} / (${i.fy} + 6120)`,                             Cb_y.toFixed(2), 'cm'),
+    stepRow('ab',   '0.85 × Cb',                           `0.85 × ${Cb_y.toFixed(2)}`,                                               ab_y, 'cm'),
+    stepRow('Cc',   "0.85f'c × H × ab / 1000",           `0.85×${i.fc}×${i.H}×${ab_y}/1000`,                                        (0.85*i.fc*i.H*parseFloat(ab_y)/1000).toFixed(3), 'tons'),
+    stepRow("fs'",  `${Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y,i.fy)>=i.fy ? "fy (controls)" : "0.003×Es×(Cb-d')/Cb"}`, `${Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y,i.fy)>=i.fy ? i.fy : "0.003×"+i.Es+"×("+Cb_y.toFixed(2)+"-"+dp_y.toFixed(2)+")/"+Cb_y.toFixed(2)}`, Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y, i.fy).toFixed(1), 'ksc'),
+    stepRow('fs',   'fy',                                  `${i.fy}`,                                                                  i.fy, 'ksc'),
+    stepRow('ϕPn',  "(Cc + fs'·Ast-y - fs·Ast-y) × ϕ", `(${(0.85*i.fc*i.H*parseFloat(ab_y)/1000).toFixed(3)} + ${Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y,i.fy).toFixed(1)}×${Ast_y.toFixed(2)}/1000 - ${i.fy}×${Ast_y.toFixed(2)}/1000) × ${phi.toFixed(4)}`,                                         (bal_y.Pn*phi).toFixed(2), 'tons', 'orange'),
+    stepRow('ϕMn',  "(Cc×(W/2-ab/2) + Cs×(W/2-d') + T×(d-W/2)) / 100000 × ϕ", `(${(0.85*i.fc*i.H*parseFloat(ab_y)/1000).toFixed(3)}×(${i.W}/2-${ab_y}/2) + ${Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y,i.fy).toFixed(1)}×${Ast_y.toFixed(2)}×(${i.W}/2-${dp_y.toFixed(2)}) - ${i.fy}×${Ast_y.toFixed(2)}×(${d_y.toFixed(2)}-${i.W}/2)) / 100000 × ${phi.toFixed(4)}`,                                      bal_y.Mn.toFixed(3), 't-m', 'orange'),
+
+    stepHeader('5. Tension Controlled Limit (εt = 0.005)'),
+    stepRow('C',    '0.003/(0.003+0.005) × d',            `0.375 × ${d_y.toFixed(2)}`,                                                Ctcl_y_val, 'cm'),
+    stepRow('a',    '0.85 × C',                            `0.85 × ${Ctcl_y_val}`,                                                    atcl_y, 'cm'),
+    stepRow("fs'",  `${Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y,i.fy)>=i.fy ? "fy (controls)" : "6120×(C-d')/d"}`, `${Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y,i.fy)>=i.fy ? i.fy : "6120×("+Ctcl_y_val+"-"+dp_y.toFixed(2)+")/"+d_y.toFixed(2)}`, Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y, i.fy).toFixed(1), 'ksc'),
+    stepRow('ϕPn',  "(Cc - fs·Ast-y + fs'·Ast-y) × ϕ", `(${(0.85*i.fc*i.H*parseFloat(atcl_y)/1000).toFixed(3)} - ${i.fy}×${Ast_y.toFixed(2)}/1000 + ${Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y,i.fy).toFixed(1)}×${Ast_y.toFixed(2)}/1000) × ${phi.toFixed(4)}`,                                         (tcl_y.Pn*phi).toFixed(2), 'tons', 'orange'),
+    stepRow('ϕMn',  "(Cc×(W/2-a/2) + Cs×(W/2-d') + T×(d-W/2)) / 100000", `(${(0.85*i.fc*i.H*parseFloat(atcl_y)/1000).toFixed(3)}×(${i.W}/2-${atcl_y}/2) + ${Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y,i.fy).toFixed(1)}×${Ast_y.toFixed(2)}×(${i.W}/2-${dp_y.toFixed(2)}) + ${i.fy}×${Ast_y.toFixed(2)}×(${d_y.toFixed(2)}-${i.W}/2)) / 100000`,                                           tcl_y.Mn.toFixed(3), 't-m', 'orange'),
+
+    stepHeader('6. Pure Bending (Interpolation)'),
+    stepRow('ϕMn',  '(|Pnt| × Mn_TCL) / (|Pnt| + Pn_TCL)', `(${Math.abs(Pnt).toFixed(2)} × ${tcl_y.Mn.toFixed(3)}) / (${Math.abs(Pnt).toFixed(2)} + ${tcl_y.Pn.toFixed(2)})`, pb_y.Mn.toFixed(3), 't-m', 'orange'),
+
+    stepHeader('7. Pure Tension'),
+    stepRow('Pnt',  '-Ast × fy / 1000',                   `-${Ast.toFixed(2)} × ${i.fy} / 1000`,                                     Pnt.toFixed(2), 'tons', 'orange'),
+
+    stepHeader('8. Shear Capacity — Y'),
+    stepRow('Av',  '2 × (π/4) × (RB/10)²',
+                   `2 × (π/4) × ${(i.RB/10).toFixed(1)}²`,
+                   Av.toFixed(3), 'cm²'),
+    stepRow('Vs',  'Av × fys × d / s',
+                   `${Av.toFixed(3)} × ${i.fys} × ${d_y.toFixed(2)} / ${s_cm}`,
+                   (Av * i.fys * d_y / s_cm / 1000).toFixed(3), 'tons', 'green'),
+    ...(i.P >= 0 ? [
+      stepRow('Vc-y', "0.93√f'c × H × d × √(1 + 0.029P/Ag)",
+                      `0.93 × √${i.fc} × ${i.H} × ${d_y.toFixed(2)} × √(1 + 0.029×${i.P}/${i.H*i.W})`,
+                      Vc_y.toFixed(3), 'tons', 'orange'),
+    ] : [
+      stepRow('Vc-y', "0.53 × (1 + 0.029P/Ag) × √f'c × H × d",
+                      `0.53 × (1 + 0.029×${i.P}/${i.H*i.W}) × √${i.fc} × ${i.H} × ${d_y.toFixed(2)}`,
+                      Vc_y.toFixed(3), 'tons', 'orange'),
+    ]),
+    stepRow('Vn-y', 'Vc + Vs',
+                    `${Vc_y.toFixed(3)} + ${(Av * i.fys * d_y / s_cm / 1000).toFixed(3)}`,
+                    Vn_y.toFixed(3), 'tons', 'orange'),
+  ].join('');
+
+  // CHARTS
+  const pointLabels = [
+    'Pure Compression',
+    'Moment Zero Tension',
+    'Balance Failure',
+    'Tension Controlled Limit',
+    'Pure Bending',
+    'Pure Tension'
+  ];
+
+  const labelPlugin = {
+    id: 'pointLabels',
+    afterDatasetsDraw(chart) {
+      const ctx2 = chart.ctx;
+      const ds = chart.data.datasets[0];
+      if (!ds) return;
+      ctx2.save();
+      ctx2.font = 'bold 12px DM Mono, monospace';
+      const chartW = chart.chartArea.right;
+      // idx: 0=Pure Compression, 1=MZT, 2=Balance, 3=TCL, 4=Pure Bending, 5=Pure Tension
+      const centerAbove = new Set([1, 3, 4]); // MZT, TCL, Pure Bending → center above
+      ds.data.forEach((pt, idx) => {
+        if (idx >= pointLabels.length) return;
+        const meta = chart.getDatasetMeta(0);
+        const el = meta.data[idx];
+        if (!el) return;
+        const x = el.x, y = el.y;
+        const label = pointLabels[idx];
+        ctx2.fillStyle = 'rgba(255,255,255,0.9)';
+        if (idx === 5) {
+          // Pure Tension: right of point
+          ctx2.textAlign = 'left';
+          ctx2.fillText(label, x + 10, y + 5);
+        } else if (centerAbove.has(idx)) {
+          // Center above point
+          ctx2.textAlign = 'center';
+          ctx2.fillText(label, x, y - 12);
+        } else {
+          // Pure Compression (0) and Balance (2): smart left/right
+          const labelW = ctx2.measureText(label).width;
+          const rightEdge = x + 10 + labelW;
+          if (rightEdge < chartW) {
+            ctx2.textAlign = 'left';
+            ctx2.fillText(label, x + 10, y - 10);
+          } else {
+            ctx2.textAlign = 'right';
+            ctx2.fillText(label, x - 10, y - 10);
+          }
+        }
+      });
+      ctx2.restore();
+    }
+  };
+
+  function makeChartOptions(color, demandLabel) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 500, easing: 'easeInOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1e222d',
+          borderColor: '#2a2f3e',
+          borderWidth: 1,
+          titleColor: '#e8ecf4',
+          bodyColor: 'rgba(255,255,255,0.8)',
+          titleFont: { family: 'DM Mono', size: 14 },
+          bodyFont: { family: 'DM Mono', size: 14 },
+          callbacks: {
+            title: (items) => {
+              const idx = items[0].dataIndex;
+              if (idx < pointLabels.length) return pointLabels[idx];
+              return '';
+            },
+            label: (item) => `Mn = ${item.parsed.x.toFixed(3)} t-m   ϕPn = ${item.parsed.y.toFixed(2)} t`
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'ϕMn (t-m)', color: 'rgba(255,255,255,0.85)', font: { family: 'DM Mono', size: 14 } },
+          ticks: { color: 'rgba(255,255,255,0.75)', font: { family: 'DM Mono', size: 13 } },
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          min: 0
+        },
+        y: {
+          title: { display: true, text: 'ϕPn (t)', color: 'rgba(255,255,255,0.85)', font: { family: 'DM Mono', size: 14 } },
+          ticks: { color: 'rgba(255,255,255,0.75)', font: { family: 'DM Mono', size: 13 } },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        }
+      }
+    };
+  }
+
+  if (window._chartX) window._chartX.destroy();
+  if (window._chartY) window._chartY.destroy();
+
+  window._chartX = new Chart(document.getElementById('chartX').getContext('2d'), {
+    type: 'scatter',
+    plugins: [labelPlugin],
+    data: {
+      datasets: [
+        {
+          label: 'X-axis Envelope',
+          data: curveX,
+          showLine: true,
+          borderColor: '#00e5ff',
+          backgroundColor: 'rgba(0,229,255,0.08)',
+          borderWidth: 2,
+          pointRadius: 5,
+          pointBackgroundColor: '#00e5ff',
+          pointBorderColor: '#0d0f14',
+          pointBorderWidth: 1,
+          fill: true,
+          tension: 0.15,
+        },
+
+      ]
+    },
+    options: makeChartOptions('#00e5ff', 'Demand (Mx, P)')
+  });
+
+  window._chartY = new Chart(document.getElementById('chartY').getContext('2d'), {
+    type: 'scatter',
+    plugins: [labelPlugin],
+    data: {
+      datasets: [
+        {
+          label: 'Y-axis Envelope',
+          data: curveY,
+          showLine: true,
+          borderColor: '#ff6b35',
+          backgroundColor: 'rgba(255,107,53,0.08)',
+          borderWidth: 2,
+          pointRadius: 5,
+          pointBackgroundColor: '#ff6b35',
+          pointBorderColor: '#0d0f14',
+          pointBorderWidth: 1,
+          fill: true,
+          tension: 0.15,
+        },
+
+      ]
+    },
+    options: makeChartOptions('#ff6b35', 'Demand (My, P)')
+  });
+}
+
+// Auto-calculate on load
+window.addEventListener('load', calculate);
+</script>
+</body>
+</html>
