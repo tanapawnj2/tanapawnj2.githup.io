@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=0.1">
+<title>Reinforced Concrete Beam Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #161922;
+  --surface2: #1e222d;
+  --border: #2a2f3e;
+  --accent: #00e5ff;
+  --accent2: #ff6b35;
+  --accent3: #ffd60a;
+  --purple: #b482ff;
+  --green: #00ff88;
+  --text: #e8ecf4;
+  --text-dim: #8892aa;
+  --text-muted: #4a5570;
+  --danger: #ff4d6d;
+  --success: #00ff88;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Syne','Sarabun',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:24px 24px 80px;}
+/* Header */
+header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+.tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;background:rgba(79,158,255,.1);border:1px solid rgba(79,158,255,.2);padding:3px 10px;border-radius:2px;display:inline-block;margin-bottom:8px;}
+h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:.04em;line-height:1.2;}
+h1 span{color:var(--accent);}
+.subtitle{color:var(--text-dim);font-size:12px;margin-top:4px;font-family:'Space Mono',monospace;}
+.version{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);}
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+.card:hover{border-color:rgba(0,229,255,.3);box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.card-hd{padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.ico{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.ico-b{background:rgba(0,229,255,.15);color:var(--accent);}
+.ico-g{background:rgba(0,255,136,.12);color:var(--green);}
+.ico-y{background:rgba(255,214,10,.12);color:var(--accent3);}
+.ico-p{background:rgba(255,107,53,.12);color:var(--accent2);}
+.card-ttl{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);}
+.card-bd{padding:16px 18px;}
+/* Grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+/* Form */
+.fld{display:flex;flex-direction:column;gap:4px;}
+label{font-family:'DM Mono',monospace;font-size:13px;font-weight:400;color:var(--text-dim);}
+label .sy{color:var(--accent);font-style:normal;}
+.iw{position:relative;display:flex;align-items:center;}
+input[type=number],select{width:100%;background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.25);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:14px;padding:7px 36px 7px 11px;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;-webkit-appearance:none;appearance:none;}
+input[type=number]:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,.12);background:rgba(0,229,255,0.07);}
+input.hi{border-color:rgba(0,229,255,.35);background:rgba(0,229,255,0.06);}
+input[readonly]{opacity:.5;cursor:default;}
+.un{position:absolute;right:8px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text-dim);pointer-events:none;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237a8aaa' d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer;}
+/* SVG dimension labels */
+.svg-dim-label { fill: #ffffff; font-size: 12px; }
+@media print {
+  .svg-dim-label { fill: #111111 !important; }
+  /* Calculation Steps — keep on same page */
+  .print-steps-card {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+  .print-steps-card .step-group {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
+.steps-wrap{display:flex;flex-direction:column;gap:10px;}
+.step-group{background:var(--bg);border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+.step-group-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text);background:var(--surface2);padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.step-group-title::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px;flex-shrink:0;box-shadow:0 0 6px rgba(0,229,255,.4);}
+.step-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;padding:9px 14px;border-bottom:1px solid rgba(42,48,69,.4);}
+.step-row:last-child{border-bottom:none;}
+.step-lhs{display:flex;flex-direction:column;gap:2px;}
+.step-name{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:var(--text);}
+.step-formula{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:var(--text);margin-top:1px;}
+.step-val{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:var(--text);text-align:right;white-space:nowrap;}
+.step-val.ok{color:var(--success);}
+.step-val.warn{color:var(--accent3);}
+.step-val.bad{color:var(--danger);}
+.step-val.hi{font-size:14px;color:var(--text);font-weight:400;}
+.step-note{font-family:'Sarabun',sans-serif;font-size:13px;color:var(--accent3);grid-column:1/-1;padding:5px 10px;background:rgba(245,200,66,.05);border-left:3px solid var(--accent3);border-radius:0 4px 4px 0;margin-top:3px;}
+/* Divider */
+.dv{display:flex;align-items:center;gap:10px;margin:12px 0 10px;}
+.dv span{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;}
+.dv::before,.dv::after{content:'';flex:1;height:1px;background:var(--border);}
+/* Strip label */
+.slbl{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;padding:3px 10px;border-radius:3px;display:inline-block;margin-bottom:12px;}
+.slbl-c{background:rgba(0,229,255,.10);color:var(--accent);border:1px solid rgba(0,229,255,.25);}
+.slbl-m{background:rgba(255,107,53,.10);color:var(--accent2);border:1px solid rgba(255,107,53,.25);}
+/* Stirrup row */
+.sr{display:grid;grid-template-columns:1fr 26px 1fr;align-items:end;gap:10px;margin-bottom:12px;}
+.at{font-family:'Sarabun',sans-serif;font-size:13px;color:var(--text-muted);text-align:center;padding-bottom:7px;}
+/* Layer row */
+.lr{display:grid;grid-template-columns:54px 1fr 1fr;gap:10px;align-items:end;margin-bottom:9px;}
+.ltag{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:var(--accent2);text-align:right;padding-bottom:8px;}
+/* ====== RESULT PARAGRAPH ====== */
+.rb{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:12px;}
+.rb-ttl{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.rb-ttl::before{content:'';width:10px;height:1px;background:var(--accent);}
+.rp{font-family:'Sarabun',sans-serif;font-size:14px;color:#fff;line-height:2.2;}
+.v{font-family:'Sarabun',sans-serif;font-weight:700;font-size:14px;}
+.vb{color:var(--accent);} .vg{color:var(--green);} .vy{color:var(--accent3);}
+.vr{color:var(--danger);} .vp{color:var(--purple);}
+.lbl{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:#fff;}
+.rhi{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.15);border-radius:6px;padding:10px 14px;}
+.rbig{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--accent);line-height:1.2;}
+.rbig-lbl{font-family:'Sarabun',sans-serif;font-size:14px;color:var(--text-muted);margin-top:2px;}
+/* Diagrams */
+.dia-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.dia-lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
+.dia-stirrup{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:#fff;text-align:center;margin-top:2px;}
+/* Actions */
+.ab{display:flex;justify-content:flex-end;gap:12px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
+.btn{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:9px 20px;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
+.btn-s{background:transparent;border:1px solid rgba(0,229,255,.25);color:var(--text-dim);}
+.btn-s:hover{border-color:var(--accent);color:var(--accent);}
+.btn-p{background:var(--accent);color:#0a0f1a;}
+.btn-p:hover{background:#6fb0ff;transform:translateY(-1px);box-shadow:0 4px 18px rgba(79,158,255,.3);}
+/* Notify */
+.noti{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--accent);border-radius:6px;padding:10px 18px;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);transform:translateY(60px);opacity:0;transition:all .3s;z-index:100;}
+.noti.show{transform:translateY(0);opacity:1;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  @page { size:A4 portrait; margin:12mm 10mm 12mm 10mm; }
+
+  *,*::before,*::after { background:#fff !important; color:#111 !important; box-shadow:none !important; text-shadow:none !important; border-color:#ccc !important; }
+  body { background:#fff !important; font-family:'Sarabun',sans-serif; font-size:9pt; line-height:1.45; }
+  body::before { display:none !important; }
+  .wrap { padding:0 !important; max-width:100% !important; }
+
+  /* Hide screen-only elements */
+  .ab,.noti,.btn,.tag,#print-body,#input-params,#assign-reinforce { display:none !important; }
+  /* Show cloned assign-reinforce inside overlay */
+  #print-overlay #assign-reinforce { display:block !important; }
+
+  /* Show print overlay */
+  #print-overlay { display:block !important; }
+
+  @page { size:A4 portrait; margin:12mm 10mm 12mm 10mm; }
+
+  /* Print page structure */
+  .print-page { display:block; }
+  .print-page-header {
+    display:flex !important;
+    justify-content:space-between !important;
+    align-items:center !important;
+    border-bottom:1.5px solid #222 !important;
+    margin-bottom:4mm !important;
+    padding-bottom:2mm !important;
+  }
+  .print-page-content { display:block; }
+  /* Page number: fixed bottom-right */
+  .print-page-footer {
+    position:fixed !important;
+    bottom:5mm !important;
+    right:10mm !important;
+    font-family:'Sarabun',sans-serif !important;
+    font-size:9pt !important;
+    color:#555 !important;
+    z-index:9999;
+  }
+  /* Each page footer shows only its own number via nth-child */
+  .print-page-footer { display:none !important; }
+  .print-page:nth-child(1) .print-page-footer-1 { display:block !important; }
+  .print-page:nth-child(2) .print-page-footer-2 { display:block !important; }
+  .print-page:nth-child(3) .print-page-footer-3 { display:block !important; }
+  .print-page:nth-child(4) .print-page-footer-4 { display:block !important; }
+  /* Hide original screen header on print */
+  header { display:none !important; }
+
+  /* 2-column print grid */
+  .pgrid { display:grid !important; grid-template-columns:1fr 1fr !important; gap:6mm !important; align-items:start !important; }
+  .pcol  { display:flex !important; flex-direction:column !important; gap:3mm !important; }
+
+  /* Cards */
+  .card { border:1px solid #ccc !important; border-radius:3px !important; break-inside:avoid !important; page-break-inside:avoid !important; margin:0 !important; }
+  .card-hd { background:#efefef !important; padding:3px 8px !important; border-bottom:1px solid #ccc !important; }
+  .card-ttl { font-size:9pt !important; font-weight:700 !important; color:#111 !important; }
+  .ico { display:none !important; }
+  .card-bd { padding:5px 8px !important; }
+  .g2,.g3 { display:block !important; }
+
+  /* Divider */
+  .dv { margin:2mm 0 !important; border-bottom:1px solid #ccc !important; }
+  .dv span { font-size:8pt !important; color:#555 !important; }
+
+  /* Result blocks */
+  .rb { background:#f7f7f7 !important; border:1px solid #ddd !important; border-radius:3px !important; padding:4px 8px !important; margin-bottom:2mm !important; break-inside:avoid !important; }
+  .rb-ttl { font-size:8pt !important; font-weight:700 !important; border-bottom:1px solid #ccc !important; padding-bottom:2px !important; margin-bottom:3px !important; }
+  .rb-ttl::before { display:none !important; }
+  .rp { font-size:8pt !important; line-height:1.75 !important; }
+  .v  { font-size:8.5pt !important; font-weight:700 !important; }
+  .vb,.vg,.vy,.vr,.vp { color:#111 !important; }
+  .lbl { color:#555 !important; font-size:7.5pt !important; }
+  .rhi { background:#eef3ff !important; border:1px solid #aac !important; padding:4px 6px !important; }
+  .rbig { font-size:12pt !important; font-weight:700 !important; }
+  .rbig-lbl { font-size:7.5pt !important; color:#555 !important; }
+
+  /* Diagrams */
+  .dia-wrap { break-inside:avoid !important; }
+  .dia-lbl  { font-size:8pt !important; font-weight:700 !important; color:#333 !important; }
+  .dia-stirrup { font-size:8pt !important; color:#111 !important; }
+  svg { width:100% !important; height:auto !important; }
+
+  /* Steps */
+  .steps-wrap { gap:2px !important; }
+  .step-group { border:1px solid #ccc !important; border-radius:3px !important; break-inside:avoid !important; page-break-inside:avoid !important; margin:0 !important; }
+  .step-group-title { background:#efefef !important; font-size:7.5pt !important; font-weight:700 !important; padding:3px 8px !important; border-bottom:1px solid #ccc !important; }
+  .step-group-title::before { background:#555 !important; width:2px !important; height:10px !important; }
+  .step-row { padding:2px 8px !important; border-bottom:1px solid #eee !important; gap:6px !important; }
+  .step-name    { font-size:8pt !important; }
+  .step-formula { font-size:7pt !important; color:#444 !important; }
+  .step-val     { font-size:8pt !important; }
+  .step-val.ok  { color:#1a6a1a !important; }
+  .step-val.warn{ color:#7a5500 !important; }
+  .step-val.bad { color:#aa1111 !important; }
+  .step-val.hi  { font-weight:700 !important; }
+  .step-note    { font-size:7pt !important; color:#7a5500 !important; background:#fffbee !important; border-left:2px solid #cc9900 !important; padding:2px 6px !important; }
+  /* inner g2 inside cards → keep as grid */
+  .card-bd .g2 { display:grid !important; grid-template-columns:1fr 1fr !important; gap:6px !important; }
+
+  /* ── Page 1: Parameters compact ── */
+  #print-overlay #input-params { display:grid !important; grid-template-columns:1fr 1fr !important; gap:4mm !important; margin-bottom:4mm !important; }
+  #print-overlay #input-params .card,
+  #print-overlay #assign-reinforce { margin-bottom:0 !important; }
+  #print-overlay #assign-reinforce .card-bd { padding:6px 12px !important; }
+  #print-overlay #input-params .card-hd,
+  #print-overlay #assign-reinforce .card-hd { padding:4px 12px !important; }
+  #print-overlay #input-params .card-ttl,
+  #print-overlay #assign-reinforce .card-ttl { font-size:10.5pt !important; }
+  #print-overlay #input-params .card-bd { padding:6px 12px !important; }
+  #print-overlay #input-params label,
+  #print-overlay #assign-reinforce label { font-size:10pt !important; margin-bottom:1px !important; }
+  #print-overlay #input-params input,
+  #print-overlay #assign-reinforce input,
+  #print-overlay #input-params select,
+  #print-overlay #assign-reinforce select { font-size:10pt !important; padding:3px 28px 3px 7px !important; }
+  #print-overlay #input-params .un,
+  #print-overlay #assign-reinforce .un { font-size:9.5pt !important; }
+  #print-overlay #input-params .fld,
+  #print-overlay #assign-reinforce .fld { gap:2px !important; margin-bottom:6px !important; }
+  #print-overlay #input-params .g2 { gap:6px !important; }
+  #print-overlay #assign-reinforce .g2 { display:grid !important; grid-template-columns:1fr 1fr !important; gap:5mm !important; }
+  #print-overlay #input-params .dv,
+  #print-overlay #assign-reinforce .dv { margin:2.5mm 0 !important; }
+  #print-overlay #input-params .dv span,
+  #print-overlay #assign-reinforce .dv span { font-size:9pt !important; }
+  #print-overlay #assign-reinforce .slbl { font-size:10pt !important; padding:2px 8px !important; margin-bottom:5px !important; }
+  #print-overlay #assign-reinforce .lr { gap:6px !important; margin-bottom:4px !important; }
+  #print-overlay #assign-reinforce .ltag { font-size:9.5pt !important; padding-bottom:6px !important; }
+  #print-overlay #assign-reinforce .sr { gap:6px !important; margin-bottom:5px !important; }
+  #print-overlay #assign-reinforce .at { font-size:13px !important; padding-bottom:6px !important; }
+  .print-strip-hdr { font-size:11pt !important; font-weight:700 !important; padding:4px 8px !important; border-radius:3px !important; margin-bottom:3mm !important; display:block !important; }
+  .print-strip-hdr-c { background:#e8f0ff !important; color:#1a3a7a !important; border:1px solid #aac !important; }
+  .print-strip-hdr-m { background:#f0e8ff !important; color:#3a1a7a !important; border:1px solid #caa !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Header -->
+<header style="position:relative;z-index:1;padding:24px 0 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;margin-bottom:28px;">
+  <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--accent),#0099bb);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:#000;flex-shrink:0;">RC</div>
+  <div>
+    <h1>REINFORCED CONCRETE <span>BEAM ANALYSIS</span></h1>
+    <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text-dim);margin-top:3px;display:block;">ACI / SDM Method</span>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+    <div style="background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;padding:4px 12px;border-radius:4px;letter-spacing:1px;">v2.0</div>
+    <div class="version" id="clock" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-dim);"></div>
+  </div>
+</header>
+
+<!-- Parameters Row -->
+<div class="g2" id="input-params">
+  <div>
+    <div class="card">
+      <div class="card-hd"><div class="ico ico-b">⬛</div><div class="card-ttl">Beam Parameters</div></div>
+      <div class="card-bd">
+        <div class="g3">
+          <div class="fld"><label><span class="sy">H</span> ความลึก</label><div class="iw"><input type="number" id="H" value="50" min="1" class="hi"><span class="un">cm</span></div></div>
+          <div class="fld"><label><span class="sy">W</span> ความกว้าง</label><div class="iw"><input type="number" id="W" value="25" min="1" class="hi"><span class="un">cm</span></div></div>
+          <div class="fld"><label><span class="sy">c</span> ระยะหุ้ม</label><div class="iw"><input type="number" id="c" value="3" min="1" class="hi"><span class="un">cm</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="ico ico-g">◈</div><div class="card-ttl">Concrete Parameters</div></div>
+      <div class="card-bd">
+        <div class="g2" style="gap:11px">
+          <div class="fld"><label><span class="sy">fc'</span> กำลังอัดคอนกรีต</label><div class="iw"><input type="number" id="fc" value="240" min="1" class="hi"><span class="un">ksc</span></div></div>
+          <div class="fld"><label><span class="sy">β₁</span></label><div class="iw"><input type="number" id="beta1" readonly><span class="un">—</span></div></div>
+          <div class="fld"><label><span class="sy">Ec</span> Young's Modulus of Concrete</label><div class="iw"><input type="number" id="Ec" readonly><span class="un">ksc</span></div></div>
+          <div class="fld"><label><span class="sy">φ</span> Strength Reduction Factor</label><div class="iw"><input type="number" id="phi" value="0.9" step="0.01" class="hi"><span class="un">—</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <div class="card-hd"><div class="ico ico-y">⬡</div><div class="card-ttl">Main Steel Parameters</div></div>
+      <div class="card-bd">
+        <div class="g2" style="gap:11px;align-items:end">
+          <div class="fld"><label>Steel Grade</label><select id="mainGrade" class="hi"><option value="SR24">SR24</option><option value="SD30">SD30</option><option value="SD40" selected>SD40</option><option value="SD50">SD50</option></select></div>
+          <div class="fld"><label><span class="sy">Fy</span> Yield Strength of Steel</label><div class="iw"><input type="number" id="mainFy" readonly><span class="un">ksc</span></div></div>
+          <div class="fld" style="grid-column:span 2"><label><span class="sy">s</span> Spacing ระหว่างชั้น</label><div class="iw"><input type="number" id="spacing_layer" value="2" min="1" class="hi"><span class="un">cm</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="ico ico-p">⬢</div><div class="card-ttl">Stirrup Steel Parameters</div></div>
+      <div class="card-bd">
+        <div class="g2" style="gap:11px;align-items:end">
+          <div class="fld"><label>Steel Grade</label><select id="stirrupGrade" class="hi"><option value="SR24" selected>SR24</option><option value="SD30">SD30</option><option value="SD40">SD40</option><option value="SD50">SD50</option></select></div>
+          <div class="fld"><label><span class="sy">Fys</span> Yield Strength of Steel</label><div class="iw"><input type="number" id="stirrupFy" readonly><span class="un">ksc</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reinforcement Assignment (side-by-side) -->
+<div class="card" id="assign-reinforce">
+  <div class="card-hd"><div class="ico ico-b">⬤</div><div class="card-ttl">Assign Reinforcement Steel</div></div>
+  <div class="card-bd">
+    <div class="g2" style="gap:28px">
+
+      <!-- Column Strip -->
+      <div>
+        <div class="slbl slbl-c">Column Strip</div>
+        <div class="dv"><span>Stirrup</span></div>
+        <div class="sr">
+          <div class="fld"><label>Dia</label><div class="iw"><input type="number" id="col_stirrup_dia" value="9" min="6" class="hi"><span class="un">mm</span></div></div>
+          <div class="at">@</div>
+          <div class="fld"><label>Spacing</label><div class="iw"><input type="number" id="col_stirrup_sp" value="10" min="1" class="hi"><span class="un">cm</span></div></div>
+        </div>
+        <div class="dv"><span>Main Top Steel — Tension</span></div>
+        <div class="lr"><div class="ltag">L1</div><div class="fld"><label>จำนวนเส้น</label><div class="iw"><input type="number" id="col_top1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia (mm)</label><div class="iw"><input type="number" id="col_top1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="col_top2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_top2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="col_top3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_top3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="dv"><span>Main Bottom Steel — Compression</span></div>
+        <div class="lr"><div class="ltag">L1</div><div class="fld"><label>จำนวนเส้น</label><div class="iw"><input type="number" id="col_bot1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia (mm)</label><div class="iw"><input type="number" id="col_bot1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="col_bot2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_bot2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="col_bot3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_bot3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+      </div>
+
+      <!-- Middle Strip -->
+      <div>
+        <div class="slbl slbl-m">Middle Strip</div>
+        <div class="dv"><span>Stirrup</span></div>
+        <div class="sr">
+          <div class="fld"><label>Dia</label><div class="iw"><input type="number" id="mid_stirrup_dia" value="9" min="6" class="hi"><span class="un">mm</span></div></div>
+          <div class="at">@</div>
+          <div class="fld"><label>Spacing</label><div class="iw"><input type="number" id="mid_stirrup_sp" value="10" min="1" class="hi"><span class="un">cm</span></div></div>
+        </div>
+        <div class="dv"><span>Main Top Steel — Compression</span></div>
+        <div class="lr"><div class="ltag">L1</div><div class="fld"><label>จำนวนเส้น</label><div class="iw"><input type="number" id="mid_top1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia (mm)</label><div class="iw"><input type="number" id="mid_top1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="mid_top2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_top2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="mid_top3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_top3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="dv"><span>Main Bottom Steel — Tension</span></div>
+        <div class="lr"><div class="ltag">L1</div><div class="fld"><label>จำนวนเส้น</label><div class="iw"><input type="number" id="mid_bot1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia (mm)</label><div class="iw"><input type="number" id="mid_bot1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="mid_bot2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_bot2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+        <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="mid_bot3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_bot3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+      </div>
+
+    </div>
+    <div class="ab">
+      <button class="btn btn-s" onclick="resetDefaults()">↺ Reset</button>
+      <button class="btn btn-s" onclick="printAt120()">🖨 Print</button>
+    </div>
+  </div>
+</div>
+
+<!-- Results -->
+<div id="print-body">
+<div class="card">
+  <div class="card-hd"><div class="ico ico-g">◉</div><div class="card-ttl">Calculation Results</div></div>
+  <div class="card-bd">
+    <div class="g2" style="gap:28px">
+
+      <!-- Column Strip -->
+      <div id="print-col-results">
+        <div class="slbl slbl-c">Column Strip</div>
+
+        <div class="rb">
+          <div class="rb-ttl">หน้าตัดเหล็กเสริม</div>
+          <div class="rp">
+            As (Tension) = <span class="v vb" id="rc_As">—</span> <span class="lbl">cm²</span> &nbsp;·&nbsp; A's (Comp.) = <span class="v vb" id="rc_As2">—</span> <span class="lbl">cm²</span><br>
+            d = <span class="v vg" id="rc_d">—</span> <span class="lbl">cm</span> &nbsp;·&nbsp; d' = <span class="v vg" id="rc_dp">—</span> <span class="lbl">cm</span><br>
+            Stirrup = <span class="v" id="rc_stirrup">—</span>
+          </div>
+        </div>
+
+        <div class="rb">
+          <div class="rb-ttl">อัตราส่วนเหล็กเสริม</div>
+          <div class="rp">
+            ρ = As/(b·d) = <span class="v vb" id="rc_rho">—</span><br>
+            ρ' = A's/(b·d) = <span class="v vb" id="rc_rho2">—</span><br>
+            ρ − ρ' = <span class="v" id="rc_rhodiff">—</span><br>
+            (ρ − ρ')min = <span class="v" id="rc_rhodiffmin">—</span>
+          </div>
+        </div>
+
+        <div class="rb">
+          <div class="rb-ttl">Neutral Axis &amp; Stress Block &nbsp;<span id="rc_mode" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);font-weight:700"></span></div>
+          <div class="rp">
+            a = <span class="v vy" id="rc_a">—</span> <span class="lbl">cm</span><br>
+            c = <span class="v vy" id="rc_c">—</span> <span class="lbl">cm</span><br>
+            fs' = <span class="v vy" id="rc_fs2">—</span> <span class="lbl">kg/cm²</span><br>
+            <span id="rc_compbeh" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2)"></span>
+          </div>
+        </div>
+
+        <div class="rb">
+          <div class="rb-ttl">กำลังรับแรง</div>
+          <div class="g2" style="gap:10px;margin-bottom:10px">
+            <div class="rhi"><div class="rbig" id="rc_Mn">—</div><div class="rbig-lbl">φMn (kg-m)</div></div>
+            <div class="rhi" style="background:rgba(127,212,184,.06);border-color:rgba(127,212,184,.2)"><div class="rbig" id="rc_Vb" style="color:var(--accent2)">—</div><div class="rbig-lbl">φVb (kg)</div></div>
+          </div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent3)" id="rc_beh"></div>
+        </div>
+      </div>
+
+      <!-- Middle Strip -->
+      <div id="print-mid-results">
+        <div class="slbl slbl-m">Middle Strip</div>
+
+        <div class="rb">
+          <div class="rb-ttl">หน้าตัดเหล็กเสริม</div>
+          <div class="rp">
+            As (Tension) = <span class="v vp" id="rm_As">—</span> <span class="lbl">cm²</span> &nbsp;·&nbsp; A's (Comp.) = <span class="v vp" id="rm_As2">—</span> <span class="lbl">cm²</span><br>
+            d = <span class="v vg" id="rm_d">—</span> <span class="lbl">cm</span> &nbsp;·&nbsp; d' = <span class="v vg" id="rm_dp">—</span> <span class="lbl">cm</span><br>
+            Stirrup = <span class="v" id="rm_stirrup">—</span>
+          </div>
+        </div>
+
+        <div class="rb">
+          <div class="rb-ttl">อัตราส่วนเหล็กเสริม</div>
+          <div class="rp">
+            ρ = As/(b·d) = <span class="v vp" id="rm_rho">—</span><br>
+            ρ' = A's/(b·d) = <span class="v vp" id="rm_rho2">—</span><br>
+            ρ − ρ' = <span class="v" id="rm_rhodiff">—</span><br>
+            (ρ − ρ')min = <span class="v" id="rm_rhodiffmin">—</span>
+          </div>
+        </div>
+
+        <div class="rb">
+          <div class="rb-ttl">Neutral Axis &amp; Stress Block &nbsp;<span id="rm_mode" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);font-weight:700"></span></div>
+          <div class="rp">
+            a = <span class="v vy" id="rm_a">—</span> <span class="lbl">cm</span><br>
+            c = <span class="v vy" id="rm_c">—</span> <span class="lbl">cm</span><br>
+            fs' = <span class="v vy" id="rm_fs2">—</span> <span class="lbl">kg/cm²</span><br>
+            <span id="rm_compbeh" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2)"></span>
+          </div>
+        </div>
+
+        <div class="rb">
+          <div class="rb-ttl">กำลังรับแรง</div>
+          <div class="g2" style="gap:10px;margin-bottom:10px">
+            <div class="rhi"><div class="rbig" id="rm_Mn">—</div><div class="rbig-lbl">φMn (kg-m)</div></div>
+            <div class="rhi" style="background:rgba(127,212,184,.06);border-color:rgba(127,212,184,.2)"><div class="rbig" id="rm_Vb" style="color:var(--accent2)">—</div><div class="rbig-lbl">φVb (kg)</div></div>
+          </div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent3)" id="rm_beh"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Diagrams -->
+    <div class="dv" style="margin-top:10px"><span>Cross-Section Diagrams</span></div>
+    <div class="g2" style="gap:16px">
+      <div class="dia-wrap">
+        <div class="dia-lbl" style="color:var(--accent)">Column Strip</div>
+        <svg id="svg-col" width="100%" height="220" viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="dia-stirrup">Stirrup : <span id="rc_stirrup_dia">—</span></div>
+      </div>
+      <div class="dia-wrap">
+        <div class="dia-lbl" style="color:var(--purple)">Middle Strip</div>
+        <svg id="svg-mid" width="100%" height="220" viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="dia-stirrup">Stirrup : <span id="rm_stirrup_dia">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Calculation Steps (outside Results card) -->
+<div class="dv" style="margin-top:20px"><span>Calculation Steps</span></div>
+<div class="g2" style="gap:16px;align-items:start">
+  <div class="card"><div class="card-hd"><div class="ico ico-b">①</div><div class="card-ttl">Column Strip</div></div><div class="card-bd"><div id="steps-col" class="steps-wrap"></div></div></div>
+  <div class="card"><div class="card-hd"><div class="ico ico-p">②</div><div class="card-ttl">Middle Strip</div></div><div class="card-bd"><div id="steps-mid" class="steps-wrap"></div></div></div>
+</div>
+<!-- Steps Part 2: φMn, Shear, Behavior -->
+<div class="g2" style="gap:16px;align-items:start">
+  <div class="card"><div class="card-hd"><div class="ico ico-b">①</div><div class="card-ttl">Column Strip</div></div><div class="card-bd"><div id="steps-col-b" class="steps-wrap"></div></div></div>
+  <div class="card"><div class="card-hd"><div class="ico ico-p">②</div><div class="card-ttl">Middle Strip</div></div><div class="card-bd"><div id="steps-mid-b" class="steps-wrap"></div></div></div>
+</div>
+
+</div><!-- /print-body -->
+</div>
+<div class="noti" id="noti"></div>
+
+<script>
+const steelFy={SR24:2400,SD30:3000,SD40:4000,SD50:5000};
+const g=id=>document.getElementById(id);
+const sep=v=>String(v).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const fmt=(v,d=2)=>{
+  if(v===null||v===undefined||isNaN(v)) return '—';
+  const s=Number(v).toFixed(d);
+  return d===0 ? sep(s) : s;
+};
+const PI=Math.PI;
+const sA=(n,dmm)=>PI*(dmm/10)**2/4*n;
+
+setInterval(()=>{g('clock').textContent=new Date().toLocaleTimeString('th-TH');},1000);
+['fc','mainGrade','stirrupGrade'].forEach(id=>g(id).addEventListener('input',upd));
+
+// Auto-calculate on any input change
+const autoCalcIds = ['H','W','c','fc','phi','mainGrade','spacing_layer','stirrupGrade','col_stirrup_dia','col_stirrup_sp','col_top1_n','col_top1_d','col_top2_n','col_top2_d','col_top3_n','col_top3_d','col_bot1_n','col_bot1_d','col_bot2_n','col_bot2_d','col_bot3_n','col_bot3_d','mid_stirrup_dia','mid_stirrup_sp','mid_top1_n','mid_top1_d','mid_top2_n','mid_top2_d','mid_top3_n','mid_top3_d','mid_bot1_n','mid_bot1_d','mid_bot2_n','mid_bot2_d','mid_bot3_n','mid_bot3_d'];
+autoCalcIds.forEach(id => {
+  const el = g(id);
+  if (el) el.addEventListener('input', () => calculate());
+});
+function upd(){
+  const fc=parseFloat(g('fc').value)||240;
+  g('Ec').value=(15100*Math.sqrt(fc)).toFixed(0);
+  g('mainFy').value=steelFy[g('mainGrade').value]||4000;
+  g('stirrupFy').value=steelFy[g('stirrupGrade').value]||2400;
+  // β₁ คำนวณจาก fc'
+  let b1;
+  if(fc<=280)       b1=0.85;
+  else if(fc<=560)  b1=0.85-0.05*(fc-280)/70;
+  else              b1=0.65;
+  b1=Math.max(0.65, Math.round(b1*10000)/10000);
+  g('beta1').value=b1.toFixed(4);
+}
+upd();
+
+function calc(pfx,isTop){
+  // ─── Parameters ────────────────────────────────────────────────
+  const H  = parseFloat(g('H').value);           // K3
+  const W  = parseFloat(g('W').value);           // K4
+  const c  = parseFloat(g('c').value);           // K5
+  const fc = parseFloat(g('fc').value);          // K7
+  const b1 = parseFloat(g('beta1').value);       // K20
+  const phi= parseFloat(g('phi').value);         // K21
+  const Fy = parseFloat(g('mainFy').value);      // K14
+  const Fys= parseFloat(g('stirrupFy').value);   // K18
+  const sl = parseFloat(g('spacing_layer').value); // K11
+  const sDia = parseFloat(g(pfx+'_stirrup_dia').value)/10; // J28/J39 → cm
+  const sSp  = parseFloat(g(pfx+'_stirrup_sp').value);     // M28/M39
+
+  const tp=isTop?'_top':'_bot', cp=isTop?'_bot':'_top';
+  const tN=[1,2,3].map(i=>parseFloat(g(pfx+tp+i+'_n').value)||0);
+  const tD=[1,2,3].map(i=>parseFloat(g(pfx+tp+i+'_d').value)||0);
+  const cN=[1,2,3].map(i=>parseFloat(g(pfx+cp+i+'_n').value)||0);
+  const cD=[1,2,3].map(i=>parseFloat(g(pfx+cp+i+'_d').value)||0);
+
+  // AD = เส้นผ่าศูนย์กลางเป็น cm  (AD30=J29/10, AD31=J30/10, ...)
+  const ADt=tD.map(v=>v/10);
+  const ADc=cD.map(v=>v/10);
+
+  // ─── d (tension side) ─────────────────────────────────────────
+  // Col  AF30 = K3-K5-J28/10-AD30/2
+  //      AF31 = IF(J30=0, 0, K3-K5-J28/10-AD30-K11-AD31/2)
+  //      AF32 = IF(J31=0, 0, K3-K5-J28/10-AD30-K11-AD31-K11-AD32/2)
+  // Mid  AF47 = K3-K5-J39/10-AD47/2
+  //      AF48 = IF(J47=0, 0, K3-K5-J39/10-AD47-K11-AD48/2)
+  //      AF49 = IF(J48=0, 0, K3-K5-J39/10-AD47-K11*2-AD48-AD49/2)  ← K11*2
+  // R    = IF(J_L3<>0, AVG(AF0:AF2), IF(J_L2<>0, AVG(AF0:AF1), AF0))
+  const AF0 = H - c - sDia - ADt[0]/2;
+  const AF1 = (tD[1]===0) ? 0 : H - c - sDia - ADt[0] - sl - ADt[1]/2;
+  const AF2 = (tD[2]===0) ? 0 :
+    isTop
+      ? H - c - sDia - ADt[0] - sl  - ADt[1] - sl   - ADt[2]/2  // col: K11 ปกติ
+      : H - c - sDia - ADt[0] - sl*2 - ADt[1]        - ADt[2]/2; // mid: K11*2
+  // AG30=AF0, AG31=AVERAGE(AF0:AF1), AG32=AVERAGE(AF0:AF2)
+  // R32 = IF(J31<>0, AG32, IF(J30<>0, AG31, AG30))
+  let d;
+  if(tD[2]!==0 && tN[2]>0)      d=(AF0+AF1+AF2)/3;
+  else if(tD[1]!==0 && tN[1]>0) d=(AF0+AF1)/2;
+  else                            d=AF0;
+
+  // ─── d' (compression side) ────────────────────────────────────
+  // AF35 = K5+J28/10+AD35/2
+  // AF36 = IF(J35=0, 0, K5+J28/10+AD35+K11+AD36/2)
+  // AF37 = IF(J35=0, 0, K5+J28/10+AD35+K11+AD36+K11+AD37/2)
+  // Col/Mid compression side ใช้สูตรเดียวกัน (J ต่างกันแต่ค่าในกรณีนี้เหมือนกัน)
+  // R37/R44 = IF(J_L3<>0, AVG(BF0:BF2), IF(J_L2<>0, AVG(BF0:BF1), BF0))
+  const BF0 = c + sDia + ADc[0]/2;
+  const BF1 = (cD[1]===0) ? 0 : c + sDia + ADc[0] + sl + ADc[1]/2;
+  const BF2 = (cD[2]===0) ? 0 : c + sDia + ADc[0] + sl + ADc[1] + sl + ADc[2]/2;
+  let dp;
+  if(cD[2]!==0 && cN[2]>0)      dp=(BF0+BF1+BF2)/3;
+  else if(cD[1]!==0 && cN[1]>0) dp=(BF0+BF1)/2;
+  else                            dp=BF0;
+
+  // ─── Steel areas  M=PI()*(J/10)^2/4*H ─────────────────────────
+  const As  = tN.reduce((s,n,i)=>s+sA(n,tD[i]),0);  // M32/M49
+  const As2 = cN.reduce((s,n,i)=>s+sA(n,cD[i]),0);  // M37/M44
+
+  // ─── ρ, ρ' ────────────────────────────────────────────────────
+  // K53=M32/(K4*R32)  K54=M37/(K4*R32)
+  // K71=M49/(K4*R49)  K72=M44/(K4*R49)
+  const rho  = As  / (W*d);
+  const rho2 = As2 / (W*d);
+  const rhob   = b1*0.85*fc*6120 / (Fy*(6120+Fy));  // K22
+  const rhomin = 14/Fy;                              // K24
+
+  // ─── (ρ−ρ')min ────────────────────────────────────────────────
+  // K55 = 0.85*K20*(K7*R37*6120 / (K14*R32*(6120-K14)))
+  // K73 = 0.85*K20*(K7*R44*6120 / (K14*R49*(6120-K14)))
+  const rdmin = 0.85*b1 * (fc*dp*6120) / (Fy*d*(6120-Fy));
+  const rd    = rho - rho2;           // K56/K74
+  const mode  = rd>=rdmin ? 1 : 2;   // K57/K75
+
+  // ─── Quadratic (Mode 2) ───────────────────────────────────────
+  // Col Q54 = K20*K7*K4*K20 = b1²·fc·W
+  // Mid Q72 = 0.85*K7*K4*K20 = 0.85·fc·W·b1
+  // ทั้งคู่เท่ากันเมื่อ b1=0.85 → ใช้สูตรตรงจาก Excel
+  const Aq_col = b1*fc*W*b1;          // Q54 = K20·K7·K4·K20
+  const Aq_mid = 0.85*fc*W*b1;        // Q72 = 0.85·K7·K4·K20
+  const Aq = isTop ? Aq_col : Aq_mid;
+
+  // Q55/Q73 = 6120*As2 - Fy*As
+  const Bq = 6120*As2 - Fy*As;
+  // Q56 = -6120*M37*R37   (comp-area × comp-depth)
+  // Q74 = -6120*R44*M44   (same form)
+  const Cq = -6120*As2*dp;
+
+  const disc = Math.sqrt(Math.max(Bq**2 - 4*Aq*Cq, 0));
+  const cv = Math.max((-Bq+disc)/(2*Aq), (-Bq-disc)/(2*Aq)); // W56/W74 = MAX(c1,c2)
+
+  // ─── Mode 1 ───────────────────────────────────────────────────
+  // W55/W73 = (As-As2)*Fy / (0.85*fc*W)   → a
+  // Z55/Z73 = W55/b1                       → c
+  // T55/T73 = Fy                            → fs'
+  // AA55 = ((As-As2)*Fy*(d-0.5*a) + As2*Fy*(d-dp)) / 100 * phi
+  const a1  = (As-As2)*Fy / (0.85*fc*W);   // W55/W73
+  const c1v = a1/b1;                        // Z55/Z73
+  const phiMn1 = phi * ((As-As2)*Fy*(d-0.5*a1) + As2*Fy*(d-dp)) / 100;
+
+  // ─── Mode 2 ───────────────────────────────────────────────────
+  // T56/T74 = ABS(W56-R37)*6120/W56  → fs' ใช้ c (W56) ไม่ใช่ a
+  // AA56/AA74 = (b1*fc*W*cv*b1*(d-0.5*cv*b1) + As2*T56*(d-dp)) / 100 * phi
+  const fs2_m2 = Math.abs(cv-dp)*6120/cv;  // T56/T74
+  const phiMn2 = phi * (b1*fc*W*cv*b1*(d-0.5*cv*b1) + As2*fs2_m2*(d-dp)) / 100;
+
+  let ao, co, fs2o, phiMn;
+  if(mode===1){
+    ao=a1; co=c1v; fs2o=Fy; phiMn=phiMn1;
+  } else {
+    ao=cv*b1; co=cv; fs2o=fs2_m2; phiMn=phiMn2;
+  }
+
+  // ─── Shear ────────────────────────────────────────────────────
+  // K62/K80 = K20*0.53*SQRT(K7)*K4*d
+  // K63/K81 = PI()*(J_stirrup/10)^2/4   (1 leg)
+  // K64/K82 = K63*K18*d/M_sp*K20*2
+  // K65/K83 = K64+K62
+  const As1leg = PI*sDia**2/4;                 // K63/K81
+  const phiVc  = b1*0.53*Math.sqrt(fc)*W*d;   // K62/K80
+  const phiVs  = As1leg*Fys*d/sSp*b1*2;       // K64/K82
+  const phiVb  = phiVc + phiVs;               // K65/K83
+
+  // ─── Behavior ─────────────────────────────────────────────────
+  // K67 = IF(AND(rho>rhomin, rho>rhob), "Concrete Crushing",
+  //         IF(AND(rho>rhomin, rho<rhob), "Steel Yielding", "Required more..."))
+  let beh;
+  if(rho>rhomin && rho>rhob)      beh='Failure Mode: Concrete Crushing';
+  else if(rho>rhomin && rho<rhob) beh='Failure Mode: Steel Yielding';
+  else beh=isTop?'Required more Top Main Steel':'Required more Bottom Main Steel';
+  const cbeh = rd>=rdmin ? 'Steel Compression Yielding' : 'Steel Compression Not Yielding';
+
+  return{As,As2,d,dp,rho,rho2,rhob,rhomin,rd,rdmin,mode,a:ao,c:co,fs2:fs2o,phiMn,phiVc,phiVs,phiVb,beh,cbeh};
+}
+
+function fill(p,r){
+  g(`r${p}_As`).textContent=fmt(r.As);
+  g(`r${p}_As2`).textContent=fmt(r.As2);
+  g(`r${p}_d`).textContent=fmt(r.d);
+  g(`r${p}_dp`).textContent=fmt(r.dp);
+  g(`r${p}_rho`).textContent=fmt(r.rho,5);
+  g(`r${p}_rho2`).textContent=fmt(r.rho2,5);
+
+  const de=g(`r${p}_rhodiff`), dme=g(`r${p}_rhodiffmin`);
+  de.textContent=fmt(r.rd,5); dme.textContent=fmt(r.rdmin,5);
+  const ok=r.rd>=r.rdmin;
+  de.className='v '+(ok?'vg':'vr'); dme.className='v '+(ok?'vg':'vr');
+
+  const re=g(`r${p}_rho`);
+  if(r.rho<r.rhomin) re.className='v vr';
+  else if(r.rho>r.rhob) re.className='v vy';
+  else re.className='v vg';
+
+  g(`r${p}_mode`).textContent='Mode '+r.mode;
+  g(`r${p}_a`).textContent=fmt(r.a);
+  g(`r${p}_c`).textContent=fmt(r.c);
+  g(`r${p}_fs2`).textContent=fmt(r.fs2,0);
+  g(`r${p}_compbeh`).textContent=r.cbeh;
+  g(`r${p}_Mn`).textContent=fmt(Math.abs(r.phiMn),0);
+  g(`r${p}_Vb`).textContent=fmt(r.phiVb,0);
+  g(`r${p}_beh`).textContent=r.beh;
+  // Stirrup label (Results section)
+  const pfx = p==='c' ? 'col' : 'mid';
+  const stirrupType = g('stirrupGrade').value==='SR24' ? 'RB' : 'DB';
+  const stirrupDia  = parseFloat(g(pfx+'_stirrup_dia').value);
+  const stirrupSp   = parseFloat(g(pfx+'_stirrup_sp').value);
+  const stirrupStr  = `${stirrupType}${stirrupDia} @ ${stirrupSp} cm`;
+  g(`r${p}_stirrup`).textContent = stirrupStr;
+  // Stirrup label (below diagram)
+  const diaStirrEl = g(`r${p}_stirrup_dia`);
+  if (diaStirrEl) diaStirrEl.textContent = stirrupStr;
+}
+
+function drawSVG(el,res,tNids,tDids,bNids,bDids,sDiaId,cTop,cBot){
+  const W=parseFloat(g('W').value),H=parseFloat(g('H').value),c=parseFloat(g('c').value);
+  const sl=parseFloat(g('spacing_layer').value);
+  const sd=parseFloat(g(sDiaId).value)/10;
+  const sc=Math.min(150/W,155/H);
+  const bw=W*sc,bh=H*sc,ox=62,oy=18;
+  let h='';
+  h+=`<rect x="${ox}" y="${oy}" width="${bw}" height="${bh}" fill="#1c2030" stroke="${cTop}" stroke-width="1.5"/>`;
+  h+=`<rect x="${ox+c*sc}" y="${oy+c*sc}" width="${bw-2*c*sc}" height="${bh-2*c*sc}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width=".5" stroke-dasharray="3,3"/>`;
+  h+=`<rect x="${ox+c*sc}" y="${oy+c*sc}" width="${bw-2*c*sc}" height="${bh-2*c*sc}" fill="none" stroke="${cTop}" stroke-width="${Math.max(sd*sc*.7,1.2)}" opacity=".4" rx="2"/>`;
+  const rx=ox+bw+14;
+  h+=`<line x1="${rx}" y1="${oy}" x2="${rx}" y2="${oy+bh}" stroke="#4a5570" stroke-width=".7"/>`;
+  h+=`<line x1="${rx-3}" y1="${oy}" x2="${rx+3}" y2="${oy}" stroke="#4a5570" stroke-width=".7"/>`;
+  h+=`<line x1="${rx-3}" y1="${oy+bh}" x2="${rx+3}" y2="${oy+bh}" stroke="#4a5570" stroke-width=".7"/>`;
+  h+=`<text x="${rx+5}" y="${oy+bh/2+4}" class="svg-dim-label" font-family="Sarabun,sans-serif" font-weight="400">H=${H} cm</text>`;
+  const by=oy+bh+14;
+  h+=`<line x1="${ox}" y1="${by}" x2="${ox+bw}" y2="${by}" stroke="#4a5570" stroke-width=".7"/>`;
+  h+=`<line x1="${ox}" y1="${by-3}" x2="${ox}" y2="${by+3}" stroke="#4a5570" stroke-width=".7"/>`;
+  h+=`<line x1="${ox+bw}" y1="${by-3}" x2="${ox+bw}" y2="${by+3}" stroke="#4a5570" stroke-width=".7"/>`;
+  h+=`<text x="${ox+bw/2}" y="${by+12}" class="svg-dim-label" font-family="Sarabun,sans-serif" font-weight="400" text-anchor="middle">W=${W} cm</text>`;
+  function dots(nids,dids,fromTop,col,gradeId){
+    let ye=c+sd;
+    const grade=g(gradeId).value==='SR24'?'RB':'DB';
+    for(let i=0;i<3;i++){
+      const n=parseFloat(g(nids[i]).value)||0,dmm=parseFloat(g(dids[i]).value)||0;
+      if(n<=0||dmm<=0) continue;
+      const dc=dmm/10;
+      if(i===0) ye+=dc/2; else ye+=parseFloat(g(dids[i-1]).value)/10/2+sl+dc/2;
+      const cy=fromTop?oy+ye*sc:oy+bh-ye*sc;
+      const r=Math.max(dc/2*sc,3.5);
+      const iw=bw-2*(c+sd)*sc,sp=n>1?iw/(n-1):0;
+      for(let j=0;j<n;j++){
+        const cx=ox+(c+sd)*sc+j*sp;
+        h+=`<circle cx="${cx}" cy="${cy}" r="${r+2}" fill="${col}" opacity=".12"/>`;
+        h+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}" stroke="rgba(0,0,0,.3)" stroke-width=".7"/>`;
+      }
+      // label: e.g. 4DB12
+      const lbl=`${n}${grade}${dmm}`;
+      h+=`<text x="${ox-6}" y="${cy+3.5}" fill="${col}" font-size="8.5" font-family="monospace" text-anchor="end" opacity=".9">${lbl}</text>`;
+    }
+  }
+  dots(tNids,tDids,true,cTop,'mainGrade'); dots(bNids,bDids,false,cBot,'mainGrade');
+
+  // Neutral Axis
+  if(res && res.c_val > 0){
+    const naY = oy + res.c_val * sc;
+    if(naY > oy && naY < oy+bh){
+      // compression zone shading
+      h+=`<rect x="${ox}" y="${oy}" width="${bw}" height="${res.c_val*sc}" fill="#ff6b6b" opacity=".06"/>`;
+      // N.A. line
+      h+=`<line x1="${ox-10}" y1="${naY}" x2="${ox+bw+10}" y2="${naY}" stroke="#ff6b6b" stroke-width="1.2" stroke-dasharray="5,3"/>`;
+      // left label
+      h+=`<text x="${ox-12}" y="${naY+3.5}" fill="#ff6b6b" font-size="8" font-family="monospace" text-anchor="end">N.A.</text>`;
+      // c dimension arrow (right side)
+      const arx = ox+bw+28;
+      h+=`<line x1="${arx}" y1="${oy}" x2="${arx}" y2="${naY}" stroke="#ff6b6b" stroke-width=".8"/>`;
+      h+=`<line x1="${arx-3}" y1="${oy}" x2="${arx+3}" y2="${oy}" stroke="#ff6b6b" stroke-width=".8"/>`;
+      h+=`<line x1="${arx-3}" y1="${naY}" x2="${arx+3}" y2="${naY}" stroke="#ff6b6b" stroke-width=".8"/>`;
+      h+=`<text x="${arx+5}" y="${oy+res.c_val*sc/2+3.5}" fill="#ff6b6b" font-size="8" font-family="monospace">c=${res.c_val.toFixed(2)}</text>`;
+    }
+  }
+
+  el.innerHTML=h;
+}
+
+function fillSteps(elId, r, pfx){
+  const sep = v => v.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const f4 = v => (isNaN(v)||v==null) ? '—' : Number(v).toFixed(4);
+  const f2 = v => (isNaN(v)||v==null) ? '—' : Number(v).toFixed(2);
+  const f0 = v => (isNaN(v)||v==null) ? '—' : sep(Number(v).toFixed(0));
+  const fc =parseFloat(g('fc').value);
+  const b1 =parseFloat(g('beta1').value);
+  const Fy =parseFloat(g('mainFy').value);
+  const Fys=parseFloat(g('stirrupFy').value);
+  const phi=parseFloat(g('phi').value);
+  const W  =parseFloat(g('W').value);
+  const H  =parseFloat(g('H').value);
+  const cv =parseFloat(g('c').value);
+  const isTension = pfx==='col';
+  const tensLabel = isTension ? 'Top (Tension)' : 'Bottom (Tension)';
+  const compLabel = isTension ? 'Bottom (Comp.)' : 'Top (Comp.)';
+
+  // aliases ให้ตรงกับ return{} ของ calc()
+  const As=r.As, As2=r.As2, d=r.d, dp=r.dp;
+  const rho=r.rho, rho2=r.rho2, rhob=r.rhob, rhomin=r.rhomin;
+  const rd=r.rd, rdmin=r.rdmin, mode=r.mode;
+  const ao=r.a, co=r.c, fs2=r.fs2;
+  const phiMn=r.phiMn, phiVc=r.phiVc, phiVs=r.phiVs, phiVb=r.phiVb;
+  const beh=r.beh, cbeh=r.cbeh;
+
+  function row(name, formula, val, cls='', note=''){
+    return `<div class="step-row">
+      <div class="step-lhs">
+        <div class="step-name">${name}</div>
+        ${formula?`<div class="step-formula">${formula}</div>`:''}
+        ${note?`<div class="step-note">${note}</div>`:''}
+      </div>
+      <div class="step-val ${cls}">${val}</div>
+    </div>`;
+  }
+  function grp(title, rows){
+    return `<div class="step-group"><div class="step-group-title">${title}</div>${rows}</div>`;
+  }
+
+  let html='';
+
+  // ── 1. หน้าตัดและวัสดุ ──────────────────────────────────
+  html+=grp('① หน้าตัดและวัสดุ',
+    row('ความลึก H','',f2(H)+' cm')+
+    row('ความกว้าง b','',f2(W)+' cm')+
+    row('ระยะหุ้ม c','',f2(cv)+' cm')+
+    row("fc'","",f0(fc)+' ksc')+
+    row('β₁','',b1.toFixed(2))+
+    row('φ','',phi.toFixed(2))+
+    row('Fy','',f0(Fy)+' ksc')+
+    row('Fy','',f0(Fys)+' ksc')
+  );
+
+  // ── 2. พื้นที่เหล็กและ d ────────────────────────────────
+  html+=grp('② เหล็กเสริมและ Effective Depth',
+    row('As — '+tensLabel,'Σ (π·dia²/4)·n',f2(As)+' cm²')+
+    row("A's — "+compLabel,'Σ (π·dia²/4)·n',f2(As2)+' cm²')+
+    row('d (tension)','',f2(d)+' cm')+
+    row("d' (comp.)","",f2(dp)+' cm')
+  );
+
+  // ── 3. Steel Ratio ───────────────────────────────────────
+  const rhoOk = rho>=rhomin && rho<=rhob;
+  html+=grp('③ Steel Ratio',
+    row('ρ  = As / (b·d)',`${f2(As)} / (${f2(W)}×${f2(d)})`,f4(rho),
+        rho>rhob?'warn':rhoOk?'ok':'bad')+
+    row("ρ' = A's / (b·d)",`${f2(As2)} / (${f2(W)}×${f2(d)})`,f4(rho2))+
+    row('ρb','β₁·0.85·fc·6120 / (Fy·(6120+Fy))',f4(rhob))+
+    row('ρmin','14 / Fy',f4(rhomin))+
+    row("ρ − ρ'","—",f4(rd),rd>=rdmin?'ok':'bad')+
+    row("(ρ−ρ')min","0.85·β₁·(fc·d'·6120) / (Fy·d·(6120−Fy))",f4(rdmin))+
+    row('Mode', rd>=rdmin ? "ρ−ρ' ≥ (ρ−ρ')min" : "ρ−ρ' < (ρ−ρ')min", 'Mode '+mode,
+        mode===1?'ok':'warn',
+        mode===1
+          ? "Mode 1: หา a จาก force equilibrium"
+          : "Mode 2: แก้สมการกำลังสอง Ac²+Bc+C=0")
+  );
+
+  // ── 4. Neutral Axis ──────────────────────────────────────
+  if(mode===1){
+    html+=grp('④ Neutral Axis — Mode 1',
+      row('a','(As − A\'s)·Fy / (0.85·fc\'·b)',f2(ao)+' cm')+
+      row('c = a / β₁',`${f2(ao)} / ${b1}`,f2(co)+' cm')+
+      row("fs'","Fy  (Mode 1 → comp. steel yields)",f0(fs2)+' ksc',fs2>=Fy?'ok':'warn')
+    );
+  } else {
+    const A=0.85*b1*fc*W, B=6120*As2-Fy*As, C=-6120*As2*dp;
+    html+=grp('④ Neutral Axis — Mode 2 (Quadratic)',
+      row('A = 0.85·β₁·fc\'·b',`0.85×${b1}×${fc}×${W}`,f2(A))+
+      row('B = 6120·A\'s − Fy·As',`6120×${f2(As2)} − ${Fy}×${f2(As)}`,f2(B))+
+      row('C = −6120·A\'s·d\'',`−6120×${f2(As2)}×${f2(dp)}`,f2(C))+
+      row('c = (−B + √(B²−4AC)) / 2A','',f2(co)+' cm')+
+      row('a = c · β₁',`${f2(co)} × ${b1}`,f2(ao)+' cm')+
+      row("fs' = |c−d'|·6120 / c",`|${f2(co)}−${f2(dp)}|×6120/${f2(co)}`,f0(fs2)+' ksc',
+          fs2>=Fy?'ok':'warn',
+          fs2>=Fy?"fs' ≥ Fy → เหล็กรับแรงอัดคราก":"fs' < Fy → เหล็กรับแรงอัดยังไม่คราก")
+    );
+  }
+
+  // ── 5. φMn ───────────────────────────────────────────────
+  let html2 = '';
+  if(mode===1){
+    html2+=grp('⑤ กำลังรับโมเมนต์ φMn — Mode 1',
+      row('φMn',
+        "[(As−A's)·Fy·(d−a/2) + A's·Fy·(d−d')] / 100 · φ",
+        f0(Math.abs(phiMn))+' kg-m','hi')
+    );
+  } else {
+    html2+=grp('⑤ กำลังรับโมเมนต์ φMn — Mode 2',
+      row('φMn',
+        "[0.85·fc'·b·c·β₁·(d−0.5·c·β₁) + A's·fs'·(d−d')] / 100 · φ",
+        f0(Math.abs(phiMn))+' kg-m','hi')
+    );
+  }
+
+  // ── 6. Shear ──────────────────────────────────────────────
+  const sDia=parseFloat(g(pfx+'_stirrup_dia').value)/10;
+  const sSp =parseFloat(g(pfx+'_stirrup_sp').value);
+  const As1 =Math.PI*sDia**2/4;
+  html2+=grp('⑥ กำลังรับแรงเฉือน',
+    row('Diameter stirrup','',f2(sDia*10)+' mm')+
+    row('As stirrup','π·(Φs/10)² / 4',f4(As1)+' cm²')+
+    row('Spacing @','',f2(sSp)+' cm')+
+    row('φVc','φ · 0.53 · √fc\' · b · d',f0(phiVc)+' kg')+
+    row('φVs','φ · As(1leg) · Fys · d / s · 2',f0(phiVs)+' kg')+
+    row('φVb = φVc + φVs','',f0(phiVb)+' kg','hi')
+  );
+
+  // ── 7. Behavior ───────────────────────────────────────────
+  html2+=grp('⑦ พฤติกรรมการวิบัติ',
+    row('Failure Mode','',beh,
+        beh.includes('Crushing')?'warn':beh.includes('Yielding')?'ok':'bad')+
+    row('Comp. Steel Behavior','',cbeh,
+        cbeh.includes('not')?'warn':'ok')
+  );
+
+  g(elId).innerHTML=html;
+  // Put groups 5-7 into separate container for page 4
+  const elB = g(elId+'-b');
+  if(elB) elB.innerHTML=html2;
+}
+
+function calculate(){
+  const col=calc('col',true), mid=calc('mid',false);
+  fill('c',col); fill('m',mid);
+  fillSteps('steps-col', col, 'col');
+  fillSteps('steps-mid', mid, 'mid');
+  drawSVG(g('svg-col'),col,['col_top1_n','col_top2_n','col_top3_n'],['col_top1_d','col_top2_d','col_top3_d'],['col_bot1_n','col_bot2_n','col_bot3_n'],['col_bot1_d','col_bot2_d','col_bot3_d'],'col_stirrup_dia','#4f9eff','#e06500');
+  drawSVG(g('svg-mid'),mid,['mid_top1_n','mid_top2_n','mid_top3_n'],['mid_top1_d','mid_top2_d','mid_top3_d'],['mid_bot1_n','mid_bot2_n','mid_bot3_n'],['mid_bot1_d','mid_bot2_d','mid_bot3_d'],'mid_stirrup_dia','#b482ff','#7fd4b8');
+  showN('✓ Calculated');
+}
+
+function resetDefaults(){
+  const def={H:50,W:25,c:3,fc:240,phi:0.9,spacing_layer:2,col_stirrup_dia:9,col_stirrup_sp:10,col_top1_n:2,col_top1_d:12,col_top2_n:2,col_top2_d:12,col_top3_n:2,col_top3_d:12,col_bot1_n:2,col_bot1_d:12,col_bot2_n:2,col_bot2_d:12,col_bot3_n:2,col_bot3_d:12,mid_stirrup_dia:9,mid_stirrup_sp:10,mid_top1_n:2,mid_top1_d:12,mid_top2_n:2,mid_top2_d:12,mid_top3_n:2,mid_top3_d:12,mid_bot1_n:2,mid_bot1_d:12,mid_bot2_n:2,mid_bot2_d:12,mid_bot3_n:2,mid_bot3_d:12};
+  Object.entries(def).forEach(([k,v])=>{if(g(k))g(k).value=v;});
+  g('mainGrade').value='SD40'; g('stirrupGrade').value='SR24'; upd(); showN('↺ Reset');
+}
+function showN(m){const n=g('noti');n.textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2500);}
+
+// ── Print: build 2-column layout ──────────────────────────
+let printOverlay = null;
+
+window.addEventListener('beforeprint', () => {
+  if (printOverlay) { printOverlay.remove(); printOverlay = null; }
+
+  // ── Left column content ──
+  const col1 = document.createElement('div');
+  col1.className = 'pcol';
+
+  const hdrL = document.createElement('div');
+  hdrL.className = 'print-strip-hdr print-strip-hdr-c';
+  hdrL.textContent = 'Column Strip';
+
+  // Results
+  const res_col = g('print-col-results');
+
+  // Diagram — clone entire dia-wrap (includes SVG + stirrup label)
+  const diaWrapCol = g('svg-col') ? g('svg-col').closest('.dia-wrap') : null;
+
+  // ── Right column content ──
+  const col2 = document.createElement('div');
+  col2.className = 'pcol';
+
+  const hdrR = document.createElement('div');
+  hdrR.className = 'print-strip-hdr print-strip-hdr-m';
+  hdrR.textContent = 'Middle Strip';
+
+  const res_mid = g('print-mid-results');
+
+  // Diagram — clone entire dia-wrap (includes SVG + stirrup label)
+  const diaWrapMid = g('svg-mid') ? g('svg-mid').closest('.dia-wrap') : null;
+
+  // ── Assemble ──
+  // Grid 1: Results + Diagrams (หน้าแรก)
+  const grid1 = document.createElement('div');
+  grid1.className = 'pgrid';
+
+  const col1a = document.createElement('div');
+  col1a.className = 'pcol';
+  col1a.appendChild(hdrL.cloneNode(true));
+  if (res_col) col1a.appendChild(res_col.cloneNode(true));
+  if (diaWrapCol) col1a.appendChild(diaWrapCol.cloneNode(true));
+
+  const col2a = document.createElement('div');
+  col2a.className = 'pcol';
+  col2a.appendChild(hdrR.cloneNode(true));
+  if (res_mid) col2a.appendChild(res_mid.cloneNode(true));
+  if (diaWrapMid) col2a.appendChild(diaWrapMid.cloneNode(true));
+
+  grid1.appendChild(col1a);
+  grid1.appendChild(col2a);
+
+  // Grid 2: Calculation Steps (ขึ้นหน้าใหม่)
+  const pageBreak = document.createElement('div');
+  pageBreak.style.cssText = 'page-break-before:always;break-before:page;height:0;';
+
+  // Grid 2: Steps ①②③④ (หน้า 3)
+  const grid2 = document.createElement('div');
+  grid2.className = 'pgrid';
+
+  const col1b = document.createElement('div');
+  col1b.className = 'pcol';
+  const stepsColCard = g('steps-col');
+  if (stepsColCard) {
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    wrap.innerHTML = '<div class="card-hd"><div class="card-ttl">Calculation Steps — Column Strip</div></div>';
+    const bd = document.createElement('div');
+    bd.className = 'card-bd';
+    bd.appendChild(stepsColCard.cloneNode(true));
+    wrap.appendChild(bd);
+    col1b.appendChild(wrap);
+  }
+
+  const col2b = document.createElement('div');
+  col2b.className = 'pcol';
+  const stepsMidCard = g('steps-mid');
+  if (stepsMidCard) {
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    wrap.innerHTML = '<div class="card-hd"><div class="card-ttl">Calculation Steps — Middle Strip</div></div>';
+    const bd = document.createElement('div');
+    bd.className = 'card-bd';
+    bd.appendChild(stepsMidCard.cloneNode(true));
+    wrap.appendChild(bd);
+    col2b.appendChild(wrap);
+  }
+
+  grid2.appendChild(col1b);
+  grid2.appendChild(col2b);
+
+  // Grid 3: Steps ⑤⑥⑦ (หน้า 4)
+  const grid3 = document.createElement('div');
+  grid3.className = 'pgrid';
+
+  const col1c = document.createElement('div');
+  col1c.className = 'pcol';
+  const stepsColB = g('steps-col-b');
+  if (stepsColB) {
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    wrap.innerHTML = '<div class="card-hd"><div class="card-ttl">Calculation Steps — Column Strip</div></div>';
+    const bd = document.createElement('div');
+    bd.className = 'card-bd';
+    bd.appendChild(stepsColB.cloneNode(true));
+    wrap.appendChild(bd);
+    col1c.appendChild(wrap);
+  }
+
+  const col2c = document.createElement('div');
+  col2c.className = 'pcol';
+  const stepsMidB = g('steps-mid-b');
+  if (stepsMidB) {
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    wrap.innerHTML = '<div class="card-hd"><div class="card-ttl">Calculation Steps — Middle Strip</div></div>';
+    const bd = document.createElement('div');
+    bd.className = 'card-bd';
+    bd.appendChild(stepsMidB.cloneNode(true));
+    wrap.appendChild(bd);
+    col2c.appendChild(wrap);
+  }
+
+  grid3.appendChild(col1c);
+  grid3.appendChild(col2c);
+
+  // Input params section at top (full width)
+  const inputParams = g('input-params');
+  const inputClone = inputParams ? inputParams.cloneNode(true) : null;
+  if (inputClone) {
+    inputClone.style.cssText = 'display:grid !important;grid-template-columns:1fr 1fr;gap:4mm;margin-bottom:4mm;';
+  }
+
+  const assignReinforce = g('assign-reinforce');
+  const assignClone = assignReinforce ? assignReinforce.cloneNode(true) : null;
+
+  // ── Helper: build a print page with header + footer ──
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+  const titleHTML = `<div style="font-family:'Syne',sans-serif;font-size:13pt;font-weight:800;color:#111;letter-spacing:-.02em;">REINFORCED CONCRETE <span style="color:#007a99">BEAM</span> ANALYSIS</div>`;
+
+  function makePage(contentNodes, pageNum, totalPages) {
+    const page = document.createElement('div');
+    page.className = 'print-page';
+
+    // Header — left: title+date, right: page number
+    const hdr = document.createElement('div');
+    hdr.className = 'print-page-header';
+    hdr.innerHTML = `
+      <div>
+        ${titleHTML}
+        <div style="font-family:'Sarabun',sans-serif;font-size:9pt;color:#555;margin-top:1px;">${dateStr}</div>
+      </div>
+      <div style="text-align:right;font-family:'Sarabun',sans-serif;font-size:9pt;color:#333;">
+        ${pageNum}
+      </div>`;
+    page.appendChild(hdr);
+
+    // Content wrapper
+    const content = document.createElement('div');
+    content.className = 'print-page-content';
+    contentNodes.forEach(n => content.appendChild(n));
+    page.appendChild(content);
+
+    return page;
+  }
+
+  printOverlay = document.createElement('div');
+  printOverlay.id = 'print-overlay';
+  printOverlay.style.display = 'none';
+
+  // Page 1: Parameters + Assign Reinforcement
+  const p1nodes = [];
+  if (inputClone) p1nodes.push(inputClone);
+  if (assignClone) p1nodes.push(assignClone);
+  printOverlay.appendChild(makePage(p1nodes, 1, 4));
+
+  // Page 2: Results + Diagrams
+  const p2break = document.createElement('div');
+  p2break.style.cssText = 'page-break-before:always;break-before:page;height:0;';
+  printOverlay.appendChild(p2break);
+  printOverlay.appendChild(makePage([grid1], 2, 4));
+
+  // Page 3: Calculation Steps ①②③④
+  const p3break = document.createElement('div');
+  p3break.style.cssText = 'page-break-before:always;break-before:page;height:0;';
+  printOverlay.appendChild(p3break);
+  printOverlay.appendChild(makePage([grid2], 3, 4));
+
+  // Page 4: Calculation Steps ⑤⑥⑦
+  const p4break = document.createElement('div');
+  p4break.style.cssText = 'page-break-before:always;break-before:page;height:0;';
+  printOverlay.appendChild(p4break);
+  printOverlay.appendChild(makePage([grid3], 4, 4));
+
+  document.body.appendChild(printOverlay);
+});
+
+function printAt120(){
+  document.body.style.zoom = '100%';
+  window.print();
+}
+window.addEventListener('afterprint', ()=>{
+  document.body.style.zoom = '';
+  if (printOverlay) { printOverlay.remove(); printOverlay = null; }
+});
+
+calculate();
+</script>
+</body>
+</html>
