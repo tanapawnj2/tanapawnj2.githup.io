@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Name</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f7f5f2;
+      color: #1a1814;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 360px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #e4e0da;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+
+    .name {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: .3rem;
+    }
+
+    .bio {
+      font-size: .85rem;
+      color: #9a9690;
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+
+    .link {
+      display: block;
+      padding: .85rem 1.2rem;
+      border: 1px solid #e4e0da;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #1a1814;
+      font-size: .9rem;
+      background: #fff;
+      transition: border-color .2s, transform .15s;
+    }
+
+    .link:hover {
+      border-color: #c8b49a;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="avatar">👤</div>
+    <div class="name">Your Name</div>
+    <div class="bio">Designer & Developer</div>
+
+    <div class="links">
+      <a href="#" class="link">Portfolio</a>
+      <a href="#" class="link">GitHub</a>
+      <a href="#" class="link">LinkedIn</a>
+      <a href="mailto:you@example.com" class="link">Email</a>
+    </div>
+  </div>
+</body>
+</html>
