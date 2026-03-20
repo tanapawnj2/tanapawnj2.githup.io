@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beam Analysis — Matrix Stiffness Method</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d12;--surface:#13161e;--surface2:#191d28;--border:#222736;--accent:#00e5ff;--accent2:#ff6b35;--accent3:#a8ff78;--accent4:#c084fc;--text:#e8ecf4;--muted:#8896b8;--r:#ffd60a;--pink:#f9a8d4;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+header{position:relative;z-index:1;padding:16px 32px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+header h1{font-family:'Space Mono',monospace;font-size:21px;color:var(--accent);}
+#hdr-sub{font-size:15px;color:#c8d0e8;}
+.mbadge{font-family:'Space Mono',monospace;font-size:13px;padding:2px 7px;border-radius:9px;background:rgba(192,132,252,.12);color:var(--accent4);border:1px solid rgba(192,132,252,.28);}
+.ibadge{font-family:'Space Mono',monospace;font-size:13px;padding:2px 7px;border-radius:9px;background:rgba(168,255,120,.1);color:var(--accent3);border:1px solid rgba(168,255,120,.28);display:none;}
+.main{position:relative;z-index:1;display:grid;grid-template-columns:260px 280px minmax(500px,900px);min-height:calc(100vh - 58px);overflow-x:auto;align-items:stretch;}
+.col-left{display:flex;flex-direction:column;border-right:1px solid var(--border);min-width:260px;align-self:stretch;}
+.col-props{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 12px;overflow-y:auto;flex-shrink:0;}
+.col-supports{background:var(--surface);padding:14px 12px;overflow-y:auto;flex:1;min-height:0;}
+.col-loads{background:var(--surface);border-right:1px solid var(--border);border-left:1px solid var(--border);padding:14px 12px;overflow-y:auto;min-width:280px;align-self:stretch;}
+.panel{display:none;}
+.sec{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;color:#c8d0e8;text-transform:uppercase;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.sec:first-child{margin-top:0;}
+.field{margin-bottom:9px;}
+label{display:block;font-size:14px;color:#c8d0e8;margin-bottom:3px;font-family:'Space Mono',monospace;}
+input[type=number]{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:5px;font-family:'Space Mono',monospace;font-size:16px;outline:none;transition:border-color .2s;}
+input[type=number]:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,255,.08);}
+.scard{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 10px;margin-bottom:7px;}
+.scard-hd{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.snum{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(255,214,10,.18);color:#ffd60a;border:1px solid rgba(255,214,10,.4);}
+.slbl{font-family:'Space Mono',monospace;font-size:14px;color:var(--muted);flex:1;}
+.srem{background:none;border:none;color:#8896b8;cursor:pointer;font-size:17px;padding:1px 4px;border-radius:3px;transition:color .2s;}
+.srem:hover{color:#ff4d6d;}
+.tbtns{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:7px;}
+.tbtn{padding:5px 2px;background:var(--surface);border:1px solid var(--border);color:#8896b8;border-radius:4px;cursor:pointer;font-family:'Space Mono',monospace;font-size:13px;transition:all .15s;text-align:center;}
+.tbtn:hover{border-color:var(--accent);color:var(--text);}
+.tbtn.on{background:rgba(255,214,10,.08);border-color:#ffd60a;color:#ffd60a;}
+.tbtn.on.fx{background:rgba(168,255,120,.08);border-color:var(--accent3);color:var(--accent3);}
+.tbtn.on.fr{background:rgba(255,77,109,.07);border-color:#ff4d6d;color:#ff4d6d;}
+.add-supp{width:100%;padding:7px;background:rgba(255,214,10,.06);border:1px dashed rgba(255,214,10,.25);color:#ffd60a;border-radius:5px;cursor:pointer;font-family:'Space Mono',monospace;font-size:14px;transition:all .2s;margin-bottom:2px;}
+.add-supp:hover{background:rgba(255,214,10,.12);border-color:#ffd60a;}
+.lrow{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px;margin-bottom:7px;}
+.lhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.lbadge{font-family:'Space Mono',monospace;font-size:13px;padding:2px 6px;border-radius:3px;background:rgba(255,107,53,.14);color:var(--accent2);border:1px solid rgba(255,107,53,.28);}
+.lbadge.u{background:rgba(168,255,120,.09);color:var(--accent3);border-color:rgba(168,255,120,.28);}
+.lbadge.m{background:rgba(192,132,252,.09);color:var(--accent4);border-color:rgba(192,132,252,.28);}
+.xbtn{background:none;border:none;color:#8896b8;cursor:pointer;font-size:17px;padding:1px 4px;border-radius:3px;transition:color .2s;}
+.xbtn:hover{color:#ff4d6d;}
+.lf{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.lf .fw{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.lf input{padding:5px 7px;font-size:15px;}
+.lf label{font-size:13px;}
+.arow{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px;}
+.abtn{width:100%;padding:7px;background:rgba(0,229,255,.06);border:1px dashed rgba(0,229,255,.25);color:var(--accent);border-radius:5px;cursor:pointer;font-family:'Space Mono',monospace;font-size:14px;transition:all .2s;}
+.abtn:hover{background:rgba(0,229,255,.13);border-color:var(--accent);}
+.calc-btn{width:100%;padding:11px;background:var(--accent);color:#000;border:none;border-radius:6px;font-family:'Space Mono',monospace;font-size:16px;font-weight:700;cursor:pointer;margin-top:12px;letter-spacing:.8px;transition:all .2s;}
+.calc-btn:hover{background:#2ef0ff;transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,229,255,.25);}
+.results{padding:18px 22px;overflow-y:auto;min-width:0;min-height:calc(100vh - 58px);}
+.results-inner{max-width:900px;}
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:360px;color:var(--muted);text-align:center;gap:10px;}
+.dblock{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;margin-bottom:12px;}
+.dtitle{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#c8d0e8;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.dinfo{font-size:13px;color:var(--accent4);background:rgba(192,132,252,.08);border:1px solid rgba(192,132,252,.2);padding:1px 6px;border-radius:7px;}
+canvas{width:100%;display:block;border-radius:3px;}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;margin-bottom:12px;}
+.rcard{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:10px 12px;border-left:3px solid var(--r);}
+.rcard.mc{border-left-color:var(--accent2);}
+.rl{font-family:'Space Mono',monospace;font-size:12px;color:#c8d0e8;letter-spacing:.6px;margin-bottom:3px;}
+.rv{font-family:'Space Mono',monospace;font-size:19px;color:var(--r);font-weight:700;}
+.rcard.mc .rv{color:var(--accent2);}
+.ru{font-size:8.5px;color:var(--muted);margin-left:2px;}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.tag{font-family:'Space Mono',monospace;font-size:13px;padding:3px 8px;border-radius:12px;border:1px solid;}
+.tag.s{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.05);}
+.tag.mo{color:var(--accent2);border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.05);}
+.tag.id{color:var(--accent3);border-color:rgba(168,255,120,.3);background:rgba(168,255,120,.05);}
+.tag.mt{color:var(--accent4);border-color:rgba(192,132,252,.3);background:rgba(192,132,252,.05);}
+.tag.pk{color:var(--pink);border-color:rgba(249,168,212,.3);background:rgba(249,168,212,.05);}
+.minfo{background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.2);border-radius:7px;padding:9px 12px;margin-bottom:12px;font-family:'Space Mono',monospace;}
+.minfo .mt2{font-size:8.5px;letter-spacing:1px;color:#c8d0e8;margin-bottom:5px;}
+.minfo .mr{display:flex;gap:14px;flex-wrap:wrap;}
+.minfo .mv{font-size:17px;color:var(--accent4);}
+.minfo .mk{font-size:12px;color:#c8d0e8;}
+.sum-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:14px;}
+.sum-table th{text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:#c8d0e8;font-size:12px;letter-spacing:1px;text-transform:uppercase;}
+.sum-table td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.025);}
+.sum-table tr:last-child td{border-bottom:none;}
+.sum-table td.n{color:var(--accent);text-align:right;}
+.sum-table td.ng{color:var(--accent2);text-align:right;}
+.sum-table .hr td{background:rgba(0,229,255,.03);}
+.node-strip{display:flex;align-items:center;padding:5px 0;overflow-x:auto;}
+.nd{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.nl{height:2px;background:rgba(168,255,120,.2);flex:1;min-width:10px;}
+.nlb{color:#c8d0e8;margin:0 2px;font-family:'Space Mono',monospace;font-size:11px;}
+
+.err{background:rgba(255,77,109,.09);border:1px solid rgba(255,77,109,.28);color:#ff4d6d;padding:9px 12px;border-radius:6px;font-size:16px;margin-bottom:10px;}
+
+.rxn-row{display:flex;align-items:stretch;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.rxn-bar-wrap{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;}
+@media(max-width:900px){.main{grid-template-columns:260px 280px 1fr;}.results{padding:12px;}}
+</style>
+</head>
+<body>
+<header>
+  <h1>&#11035; BEAM ANALYZER</h1>
+  <span id="hdr-sub">Multi-Support Beam</span>
+  <span class="mbadge">MATRIX STIFFNESS METHOD</span>
+  <span class="ibadge" id="ibadge">INDETERMINATE</span>
+</header>
+<div class="main">
+
+<!-- Col 1a: Beam Properties -->
+<div class="col-left">
+  <div class="col-props">
+    <div class="sec" style="margin-top:0">Beam Properties</div>
+    <div class="field"><label>Length L (m)</label><input type="number" id="beamL" value="0" min="0" step="0.1" oninput="updateHeader()"></div>
+    <div class="field"><label>E (kg/cm²)</label><input type="number" id="beamE" value="2000000" min="1" step="10000"></div>
+    <div class="field"><label>I (cm⁴)</label><input type="number" id="beamI" value="500" min="0.0001" step="1"></div>
+    <button class="calc-btn" onclick="analyze()">&#9654; Calculate</button>
+  </div>
+
+  <!-- Col 1b: Supports -->
+  <div class="col-supports">
+    <div class="sec" style="margin-top:0">Supports <span style="color:#8896b8;font-size:12px;letter-spacing:0;text-transform:none;font-family:sans-serif">(unlimited)</span></div>
+    <div id="sc"></div>
+    <button class="add-supp" onclick="addSupport()">&#xFF0B; Add Support</button>
+  </div>
+</div>
+
+<!-- Col 2: Applied Loads -->
+<div class="col-loads">
+  <div class="sec" style="margin-top:0">Applied Loads</div>
+  <div id="lc"></div>
+  <div class="arow">
+    <button class="abtn" onclick="addLoad('point')">+ Point Load</button>
+    <button class="abtn" onclick="addLoad('udl')">+ Uniform Load</button>
+  </div>
+  <button class="abtn" style="width:100%;border-color:rgba(192,132,252,.2);color:var(--accent4);margin-top:4px;" onclick="addLoad('moment')">+ Applied Moment</button>
+</div>
+<div class="results" id="results">
+  <div class="welcome">
+    <svg width="54" height="54" viewBox="0 0 64 64" fill="none">
+      <rect x="8" y="30" width="48" height="4" rx="2" fill="#00e5ff" opacity=".6"/>
+      <circle cx="10" cy="34" r="4" stroke="#ffd60a" stroke-width="2" fill="none"/>
+      <circle cx="32" cy="34" r="4" stroke="#ffd60a" stroke-width="2" fill="none"/>
+      <polygon points="54,29 48,39 60,39" stroke="#ffd60a" stroke-width="2" fill="none"/>
+      <line x1="32" y1="12" x2="32" y2="30" stroke="#ff4d6d" stroke-width="2"/>
+      <polygon points="32,30 29,22 35,22" fill="#ff4d6d"/>
+    </svg>
+    <p style="font-size:17px;">Enter data and click <strong style="color:var(--accent)">Calculate</strong><br>
+    <span style="font-size:15px;font-family:'Space Mono',monospace;color:var(--accent4)">Multi-Support — Continuous Beam</span></p>
+  </div>
+</div>
+</div>
+<script>
+// ============================================================
+//  SIGN CONVENTION
+//  DOF: [v,theta] per node.  v up=+, theta CCW=+
+//  V(x) = Sum Fy(up) to LEFT of section
+//  M(x) = Sum M_CCW to LEFT about cut  (sagging=+)
+//  Reaction moment Mz from matrix (CCW+) enters M(x) as -Mz
+// ============================================================
+
+let supportCount=0, loadCount=0;
+
+
+const supports={};
+const TLBL={pin:'Pin',roller:'Roller',fixed:'Fixed',free:'Free'};
+const SCOL={pin:'#ffd60a',roller:'#00e5ff',fixed:'#a8ff78',free:'#ff4d6d'};
+
+function addSupport(type,xVal){
+  type=type||'pin'; xVal=xVal!=null?xVal:0;
+  supportCount++;
+  const id=supportCount;
+  supports[id]={type,x:xVal};
+  const d=document.createElement('div');
+  d.className='scard'; d.id='sc-'+id;
+  d.innerHTML=
+    '<div class="scard-hd">'+
+    '<span class="snum" id="snum-'+id+'">'+id+'</span>'+
+    '<span class="slbl" id="slbl-'+id+'">'+TLBL[type]+'</span>'+
+    '<button class="srem" onclick="removeSupport('+id+')" title="Remove">&#10005;</button>'+
+    '</div>'+
+    '<div class="tbtns" id="stbtns-'+id+'">'+
+    '<button class="tbtn '+(type==='free'?'on fr':'')+'" onclick="setSType('+id+',\'free\',this)">&#10005; Free</button>'+
+    '<button class="tbtn '+(type==='roller'?'on':'')+'" onclick="setSType('+id+',\'roller\',this)">&#9898; Roller</button>'+
+    '<button class="tbtn '+(type==='pin'?'on':'')+'" onclick="setSType('+id+',\'pin\',this)">&#128204; Pin</button>'+
+    '<button class="tbtn '+(type==='fixed'?'on fx':'')+'" onclick="setSType('+id+',\'fixed\',this)">&#128306; Fixed</button>'+
+    '</div>'+
+    '<div class="field" style="margin-bottom:0">'+
+    '<label>Position (m)</label>'+
+    '<input type="number" id="sx-'+id+'" value="'+xVal+'" step="0.1" onchange="supports['+id+'].x=+this.value;updateHeader()">'+
+    '</div>';
+  document.getElementById('sc').appendChild(d);
+  updateHeader();
+}
+
+function removeSupport(id){
+  const el=document.getElementById('sc-'+id);
+  if(el) el.remove();
+  delete supports[id];
+  updateHeader();
+}
+
+function setSType(id,val,btn){
+  supports[id].type=val;
+  document.getElementById('slbl-'+id).textContent=TLBL[val];
+  document.querySelectorAll('#stbtns-'+id+' .tbtn').forEach(function(b){b.classList.remove('on','fx','fr');});
+  btn.classList.add('on');
+  if(val==='fixed') btn.classList.add('fx');
+  if(val==='free') btn.classList.add('fr');
+  updateHeader();
+}
+
+function getSupportList(){
+  return Object.keys(supports).map(function(id){
+    const x=+document.getElementById('sx-'+id).value;
+    supports[id].x=x;
+    return {id:+id,type:supports[id].type,x:x};
+  }).sort(function(a,b){return a.x-b.x;});
+}
+
+function drawPreview(){
+  // Draw beam element diagram with current supports and loads (no solve needed)
+  var L=+document.getElementById('beamL').value;
+  if(L<=0) return;
+  var slist=getSupportList();
+  var cl=collectLoads(L); var loads=cl.loads||[];
+  // Inject canvas if results panel doesn't have it yet
+  var cf=document.getElementById('cf');
+  if(!cf){
+    var res=document.getElementById('results');
+    // Add a preview block if not already showing full results
+    var preview=document.getElementById('preview-block');
+    if(!preview){
+      preview=document.createElement('div');
+      preview.id='preview-block';
+      preview.className='dblock';
+      preview.innerHTML='<div class="dtitle">Beam Element Diagram</div><canvas id="cf" height="148"></canvas>';
+      res.insertBefore(preview, res.firstChild);
+    }
+    cf=document.getElementById('cf');
+  }
+  if(cf) drawFBD(L,slist,loads,[]);
+}
+
+function updateHeader(){
+  const slist=getSupportList().filter(function(s){return s.type!=='free';});
+  const nFixed=slist.filter(function(s){return s.type==='fixed';}).length;
+  const nVert=slist.length;
+  const doi=nFixed+nVert-2;
+  let lbl='Beam Analysis';
+  if(nVert===0) lbl='No Supports';
+  else if(nFixed===1&&nVert===1) lbl='Cantilever Beam';
+  else if(nVert===2&&nFixed===0) lbl='Simply Supported Beam';
+  else if(nVert===2&&nFixed===1) lbl='Propped Cantilever (Indet. 1&#176;)';
+  else if(nVert===2&&nFixed===2) lbl='Fixed-Fixed Beam (Indet. 2&#176;)';
+  else if(nVert>2) lbl='Continuous Beam &#8212; '+nVert+' Supports (Indet. '+doi+'&#176;)';
+  document.getElementById('hdr-sub').innerHTML=lbl;
+  document.getElementById('ibadge').style.display=doi>0?'inline-flex':'none';
+}
+
+function addLoad(type){
+  loadCount++;
+  const id=loadCount;
+  const d=document.createElement('div');
+  d.className='lrow'; d.id='l-'+id;
+  const nm=type==='point'?'Point Load':type==='udl'?'Uniform Load':'Moment';
+  const bc=type==='udl'?'u':type==='moment'?'m':'';
+  let fi='';
+  if(type==='point') fi='<div class="lf"><div><label>P (kg) &#8595;+</label><input type="number" id="lp-'+id+'" value="0" step="0.1"></div><div><label>x (m)</label><input type="number" id="lx-'+id+'" value="0" step="0.1"></div></div>';
+  else if(type==='udl') fi='<div class="lf"><div><label>w (kg/m) &#8595;+</label><input type="number" id="lw-'+id+'" value="0" step="0.1"></div><div class="fw"><div><label>x&#8321; (m)</label><input type="number" id="lx1-'+id+'" value="0" step="0.1"></div><div><label>x&#8322; (m)</label><input type="number" id="lx2-'+id+'" value="0" step="0.1"></div></div></div>';
+  else fi='<div class="lf"><div><label>M (kg&#183;m) &#8635;+</label><input type="number" id="lm-'+id+'" value="0" step="0.1"></div><div><label>x (m)</label><input type="number" id="lx-'+id+'" value="0" step="0.1"></div></div>';
+  d.innerHTML='<div class="lhd"><span class="lbadge '+bc+'" data-type="'+type+'">'+nm+' #'+id+'</span><button class="xbtn" onclick="rmLoad('+id+')">&#10005;</button></div>'+fi;
+  document.getElementById('lc').appendChild(d);
+}
+function rmLoad(id){var e=document.getElementById('l-'+id);if(e)e.remove();}
+
+function collectLoads(L){
+  var loads=[];
+  var rows=document.querySelectorAll('.lrow');
+  for(var ri=0;ri<rows.length;ri++){
+    var row=rows[ri];
+    var type=row.querySelector('.lbadge').dataset.type;
+    var id=row.id.split('-')[1];
+    if(type==='point'){
+      var P=+document.getElementById('lp-'+id).value;
+      var x=+document.getElementById('lx-'+id).value;
+      if(isNaN(P)||isNaN(x)) return {err:'Point #'+id+': missing data'};
+      if(x<0||x>L) return {err:'Point #'+id+': x out of beam range'};
+      loads.push({type:'point',P:P,x:x});
+    } else if(type==='udl'){
+      var w=+document.getElementById('lw-'+id).value;
+      var x1=+document.getElementById('lx1-'+id).value;
+      var x2=+document.getElementById('lx2-'+id).value;
+      if(isNaN(w)||isNaN(x1)||isNaN(x2)) return {err:'Uniform Load #'+id+': missing data'};
+      if(x1>=x2) return {err:'Uniform Load #'+id+': x2 must be > x1'};
+      loads.push({type:'udl',w:w,x1:x1,x2:x2});
+    } else {
+      var M=+document.getElementById('lm-'+id).value;
+      var xm=+document.getElementById('lx-'+id).value;
+      if(isNaN(M)||isNaN(xm)) return {err:'Moment #'+id+': missing data'};
+      loads.push({type:'moment',M:M,x:xm});
+    }
+  }
+  return {loads:loads};
+}
+
+// ---- Matrix helpers ----
+function gaussSolve(Ain,bin){
+  var n=Ain.length;
+  var A=Ain.map(function(r){return r.slice();});
+  var b=bin.slice();
+  for(var col=0;col<n;col++){
+    var maxR=col;
+    for(var r2=col+1;r2<n;r2++) if(Math.abs(A[r2][col])>Math.abs(A[maxR][col])) maxR=r2;
+    var tmp=A[col];A[col]=A[maxR];A[maxR]=tmp;
+    var tb=b[col];b[col]=b[maxR];b[maxR]=tb;
+    var piv=A[col][col];
+    if(Math.abs(piv)<1e-14) throw new Error('Singular at col '+col);
+    for(var r3=0;r3<n;r3++){
+      if(r3===col) continue;
+      var f=A[r3][col]/piv;
+      for(var c=col;c<n;c++) A[r3][c]-=f*A[col][c];
+      b[r3]-=f*b[col];
+    }
+  }
+  return A.map(function(r,i){return b[i]/r[i];});
+}
+
+function elemK(EI,L){
+  var a=EI/(L*L*L);
+  return [
+    [12*a,6*L*a,-12*a,6*L*a],
+    [6*L*a,4*L*L*a,-6*L*a,2*L*L*a],
+    [-12*a,-6*L*a,12*a,-6*L*a],
+    [6*L*a,2*L*L*a,-6*L*a,4*L*L*a]
+  ];
+}
+
+function fefElement(loads,xL,Le){
+  var fef=[0,0,0,0]; var L=Le;
+  for(var i=0;i<loads.length;i++){
+    var ld=loads[i];
+    if(ld.type==='point'){
+      var a=ld.x-xL; if(a<-1e-9||a>L+1e-9) continue;
+      var ac=Math.min(Math.max(a,0),L),b=L-ac,P=ld.P;
+      // Skip FEF if load is at element endpoint (at a node) — handled as direct nodal load
+      if(ac<1e-9||b<1e-9) continue;
+      fef[0]+=P*b*b*(3*ac+b)/(L*L*L);
+      fef[1]+=P*ac*b*b/(L*L);
+      fef[2]+=P*ac*ac*(ac+3*b)/(L*L*L);
+      fef[3]+=-P*ac*ac*b/(L*L);
+    } else if(ld.type==='udl'){
+      var gA=Math.max(ld.x1,xL),gB=Math.min(ld.x2,xL+L);
+      if(gA>=gB) continue;
+      var w=ld.w,a0=gA-xL,a1=gB-xL;
+      function Fi(t){return t-t*t*t/(L*L)+t*t*t*t/(2*L*L*L);}
+      function Mi(t){return t*t/2-2*t*t*t/(3*L)+t*t*t*t/(4*L*L);}
+      function Fj(t){return t*t*t/(L*L)-t*t*t*t/(2*L*L*L);}
+      function Mj(t){return -t*t*t/(3*L)+t*t*t*t/(4*L*L);}
+      fef[0]+=w*(Fi(a1)-Fi(a0));
+      fef[1]+=w*(Mi(a1)-Mi(a0));
+      fef[2]+=w*(Fj(a1)-Fj(a0));
+      fef[3]+=w*(Mj(a1)-Mj(a0));
+    }
+    // Note: applied moments are NOT added via FEF.
+    // Moment positions are injected as nodes, so they are applied
+    // directly as nodal loads (F_ext[2*ni+1] += M) — no FEF needed.
+  }
+  return fef;
+}
+
+// ---- Main solver ----
+function matrixSolve(L,EI,supList,loads){
+  // Build nodes
+  var nodeArr=[0,L];
+  for(var i=0;i<supList.length;i++) nodeArr.push(supList[i].x);
+  for(var i=0;i<loads.length;i++){
+    var ld=loads[i];
+    if(ld.type==='point'||ld.type==='moment'){if(ld.x>=0&&ld.x<=L)nodeArr.push(ld.x);}
+    else if(ld.type==='udl'){if(ld.x1>=0&&ld.x1<=L)nodeArr.push(ld.x1);if(ld.x2>=0&&ld.x2<=L)nodeArr.push(ld.x2);}
+  }
+  // Deduplicate and sort
+  var seen={};
+  var nodes=nodeArr.filter(function(x){var k=x.toFixed(9);if(seen[k])return false;seen[k]=true;return true;}).sort(function(a,b){return a-b;});
+  var nN=nodes.length,nE=nN-1,nDOF=nN*2;
+
+  function findNode(x){for(var i=0;i<nodes.length;i++)if(Math.abs(nodes[i]-x)<1e-9)return i;return -1;}
+
+  // Assemble K and F
+  var Kg=[];for(var i=0;i<nDOF;i++){Kg.push([]);for(var j=0;j<nDOF;j++)Kg[i].push(0);}
+  var F_ext=new Array(nDOF).fill(0);
+  for(var e=0;e<nE;e++){
+    var xL=nodes[e],xR=nodes[e+1],Le=xR-xL;
+    var ke=elemK(EI,Le);
+    var fef=fefElement(loads,xL,Le);
+    var gd=[2*e,2*e+1,2*e+2,2*e+3];
+    for(var ii=0;ii<4;ii++){F_ext[gd[ii]]-=fef[ii];for(var jj=0;jj<4;jj++)Kg[gd[ii]][gd[jj]]+=ke[ii][jj];}
+  }
+  for(var i=0;i<loads.length;i++){
+    var ld=loads[i];
+    if(ld.type==='point'){var ni=findNode(ld.x);if(ni>=0)F_ext[2*ni]-=ld.P;}
+    else if(ld.type==='moment'){var ni=findNode(ld.x);if(ni>=0)F_ext[2*ni+1]+=ld.M;}
+  }
+
+  // BCs
+  var constrained=new Set();
+  for(var i=0;i<supList.length;i++){
+    var s=supList[i];
+    var ni=findNode(s.x);
+    if(ni<0) return {err:'Support x='+s.x+': node not found'};
+    if(s.type==='pin'||s.type==='roller') constrained.add(2*ni);
+    else if(s.type==='fixed'){constrained.add(2*ni);constrained.add(2*ni+1);}
+  }
+  if(constrained.size<1) return {err:'At least one support required'};
+
+  // Partition
+  var freeDOFs=[];
+  for(var i=0;i<nDOF;i++) if(!constrained.has(i)) freeDOFs.push(i);
+  var nF=freeDOFs.length;
+  if(nF===0) return {err:'All DOFs constrained — over-constrained system'};
+
+  var Kff=freeDOFs.map(function(fi){return freeDOFs.map(function(fj){return Kg[fi][fj];});});
+  var Ff=freeDOFs.map(function(fi){return F_ext[fi];});
+  var d_free;
+  try{d_free=gaussSolve(Kff,Ff);}catch(e){return {err:'Matrix singular — system unstable: '+e.message};}
+  var d=new Array(nDOF).fill(0);
+  for(var i=0;i<nF;i++) d[freeDOFs[i]]=d_free[i];
+
+  // Reactions
+  var R=new Array(nDOF).fill(0);
+  constrained.forEach(function(ci){
+    var s=0;for(var j=0;j<nDOF;j++)s+=Kg[ci][j]*d[j];
+    R[ci]=s-F_ext[ci];
+  });
+
+  var rxns=supList.map(function(s){
+    var ni=findNode(s.x);
+    var Fy=constrained.has(2*ni)?R[2*ni]:0;
+    var Mz=constrained.has(2*ni+1)?R[2*ni+1]:0;
+    return {id:s.id,type:s.type,x:s.x,Fy:Fy,Mz:Mz};
+  });
+
+  // SFD & BMD
+  // Build xs array: uniform grid PLUS exact positions of supports and loads
+  // This ensures x values at discontinuities are exact — no interpolation needed
+  var suppSorted=rxns.slice().sort(function(a,b){return a.x-b.x;});
+  var EPS=1e-9, nBase=600;
+
+  // Collect all special x positions (both sides of each discontinuity)
+  var specialX={};
+  specialX['0']=0; specialX[L.toFixed(9)]=L;
+  for(var si=0;si<suppSorted.length;si++){
+    var sx0=suppSorted[si].x;
+    // Both just-before and just-after the support (for jump capture)
+    specialX[(sx0-EPS*10).toFixed(9)]=sx0-EPS*10;
+    specialX[sx0.toFixed(9)]=sx0;
+    specialX[(sx0+EPS*10).toFixed(9)]=sx0+EPS*10;
+  }
+  for(var li=0;li<loads.length;li++){
+    var ld=loads[li];
+    if(ld.type==='point'||ld.type==='moment'){
+      specialX[(ld.x-EPS*10).toFixed(9)]=ld.x-EPS*10;
+      specialX[ld.x.toFixed(9)]=ld.x;
+      specialX[(ld.x+EPS*10).toFixed(9)]=ld.x+EPS*10;
+    } else if(ld.type==='udl'){
+      specialX[ld.x1.toFixed(9)]=ld.x1;
+      specialX[ld.x2.toFixed(9)]=ld.x2;
+    }
+  }
+
+  // Merge with uniform grid
+  var xSet={};
+  for(var i=0;i<=nBase;i++){
+    var xg=L*i/nBase;
+    xSet[xg.toFixed(9)]=xg;
+  }
+  for(var k in specialX) xSet[k]=specialX[k];
+
+  // Sort and filter valid range
+  var XS=Object.values(xSet).filter(function(x){return x>=-EPS&&x<=L+EPS;});
+  XS.sort(function(a,b){return a-b;});
+
+  // Compute V and M at each x
+  var VS=[],MS=[];
+  for(var pi=0;pi<XS.length;pi++){
+    var x=XS[pi];
+    var V=0,M=0;
+    for(var si=0;si<suppSorted.length;si++){
+      var s=suppSorted[si];
+      if(x>=s.x-EPS){V+=s.Fy;M+=(-s.Mz+s.Fy*(x-s.x));}
+    }
+    for(var li=0;li<loads.length;li++){
+      var ld=loads[li];
+      if(ld.type==='point'&&x>=ld.x-EPS){V-=ld.P;M-=ld.P*(x-ld.x);}
+      else if(ld.type==='udl'&&x>ld.x1+EPS){
+        var xe=Math.min(x,ld.x2),wl=xe-ld.x1;
+        if(wl>0){V-=ld.w*wl;M-=ld.w*wl*(x-ld.x1-wl/2);}
+      }
+      else if(ld.type==='moment'){
+        // Skip endpoint moments — reaction already captures them
+        if(Math.abs(ld.x)<EPS||Math.abs(ld.x-L)<EPS) continue;
+        if(x>=ld.x-EPS) M-=ld.M;
+      }
+    }
+    VS.push(V);MS.push(M);
+  }
+
+  var maxV=Math.max.apply(null,VS.map(Math.abs));
+  var maxMp=Math.max.apply(null,MS),minMp=Math.min.apply(null,MS);
+  var maxM=Math.max(Math.abs(maxMp),Math.abs(minMp));
+
+  // Deflection by double integration using ACTUAL non-uniform spacing
+  var nD=XS.length-1;
+  var tRaw=new Array(nD+1).fill(0);
+  for(var i=1;i<=nD;i++){
+    var dxi=XS[i]-XS[i-1];  // actual step, not L/nD
+    tRaw[i]=tRaw[i-1]+(MS[i-1]+MS[i])/2*dxi/EI;
+  }
+  var vRaw=new Array(nD+1).fill(0);
+  for(var i=1;i<=nD;i++){
+    var dxi=XS[i]-XS[i-1];
+    vRaw[i]=vRaw[i-1]+(tRaw[i-1]+tRaw[i])/2*dxi;
+  }
+
+  // Find index of a given x in XS (exact match since XS contains support positions)
+  function findIdx(x){
+    var best=0,bd=1e18;
+    for(var ii=0;ii<XS.length;ii++){
+      var d=Math.abs(XS[ii]-x);
+      if(d<bd){bd=d;best=ii;}
+    }
+    return best;
+  }
+
+  // BCs for deflection
+  // Deflection BCs: always use v=0 conditions from supports (not θ=0)
+  // The matrix solver already satisfies θ=0 at fixed supports.
+  // The integration constants theta0 and v0 are determined purely from
+  // v(x_support)=0 conditions, giving the correct rigid-body adjustment.
+  var dispEqs=[];
+  for(var si=0;si<suppSorted.length;si++){
+    var s=suppSorted[si];
+    if(s.type==='pin'||s.type==='roller'||s.type==='fixed'){
+      var idx=findIdx(s.x);
+      dispEqs.push({x:s.x,vr:vRaw[idx]});
+    }
+  }
+  var theta0=0,v0=0;
+  if(dispEqs.length>=2){
+    // Use first and last v=0 supports for best accuracy over long spans
+    var e0=dispEqs[0],e1=dispEqs[dispEqs.length-1];
+    var detM=e0.x-e1.x;
+    if(Math.abs(detM)>1e-12){theta0=(-e0.vr+e1.vr)/detM;v0=-e0.vr-theta0*e0.x;}
+  } else if(dispEqs.length===1){
+    var e0=dispEqs[0];v0=-e0.vr-theta0*e0.x;
+  }
+  var DEF=XS.map(function(x,i){return (vRaw[i]+theta0*x+v0)*1000;});
+  var minDef=Math.min.apply(null,DEF);
+  var maxPosDef=Math.max.apply(null,DEF);
+  var maxDefAbs=Math.max.apply(null,DEF.map(Math.abs));
+  var xMaxDef=XS[DEF.indexOf(minDef)];
+  var xMaxPosDef=XS[DEF.indexOf(maxPosDef)];
+
+  return {ok:true,rxns:rxns,nodes:nodes,nN:nN,nE:nE,nDOF:nDOF,nC:constrained.size,freeDOF:nF,
+    xs:XS,Varr:VS,Marr:MS,DEF:DEF,minDef:minDef,maxPosDef:maxPosDef,maxDefAbs:maxDefAbs,xMaxDef:xMaxDef,xMaxPosDef:xMaxPosDef,
+    maxV:maxV,maxM:maxM,maxMp:maxMp,minMp:minMp};
+}
+
+// ---- Analyze ----
+function analyze(){
+  var L=+document.getElementById('beamL').value;
+  var beamE_cm2=+document.getElementById('beamE').value;
+  var beamE=beamE_cm2*1e4;  // kg/cm² → kg/m²
+  var beamI_cm4=+document.getElementById('beamI').value;
+  var beamI=beamI_cm4*1e-8;  // cm⁴ → m⁴
+  var EI=beamE*beamI;        // kg·m²
+  if(isNaN(L)||L<=0) return showErr('Beam length must be > 0');
+  if(isNaN(EI)||EI<=0) return showErr('EI must be > 0');
+  var cl=collectLoads(L);if(cl.err) return showErr(cl.err);
+  // Convert support positions from display units to meters
+  var slist=getSupportList().filter(function(s){return s.type!=='free';});
+  if(slist.length===0) return showErr('Please add at least one support');
+  // Single non-fixed support (Free/Roller/Pin) = unstable (no moment resistance)
+  if(slist.length===1){
+    var t=slist[0].type;
+    if(t==='roller'||t==='pin') return showErr('Single '+t+' support is unstable — beam cannot resist rotation. Add another support or use a Fixed support.');
+  }
+  for(var i=0;i<slist.length;i++){
+    var s=slist[i];
+    if(s.x<0||s.x>L) return showErr('Support #'+s.id+': x='+s.x+' is outside beam [0,'+L+']');
+  }
+  var xs_s=slist.map(function(s){return s.x;});
+  var xs_set=new Set(xs_s.map(function(x){return x.toFixed(6);}));
+  if(xs_set.size!==xs_s.length) return showErr('Two or more supports share the same position');
+  var res=matrixSolve(L,EI,slist,cl.loads);
+  if(!res.ok) return showErr(res.err);
+  renderResults(L,EI,slist,cl.loads,res);
+}
+function showErr(m){document.getElementById('results').innerHTML='<div class="err">&#9888; '+m+'</div>';}
+
+// ---- Render ----
+function renderResults(L,EI,slist,loads,res){
+  var rxns=res.rxns,nodes=res.nodes,nN=res.nN,nE=res.nE,nDOF=res.nDOF,nC=res.nC,freeDOF=res.freeDOF;
+  var xs=res.xs,Varr=res.Varr,Marr=res.Marr,DEF=res.DEF,minDef=res.minDef,maxPosDef=res.maxPosDef,maxDefAbs=res.maxDefAbs,xMaxDef=res.xMaxDef,xMaxPosDef=res.xMaxPosDef;
+  var maxV=res.maxV,maxM=res.maxM,maxMp=res.maxMp,minMp=res.minMp;
+
+  var rc='';
+  for(var i=0;i<rxns.length;i++){
+    var r=rxns[i];
+    rc+='<div class="rcard"><div class="rl">'+TLBL[r.type]+' @ x='+r.x+'m</div><div class="rv">'+r.Fy.toFixed(3)+'<span class="ru">kg ↑</span></div></div>';
+    if(Math.abs(r.Mz)>0.001)
+      rc+='<div class="rcard mc"><div class="rl">M @ x='+r.x+'m (Fixed)</div><div class="rv">'+(-r.Mz).toFixed(3)+'<span class="ru">kg·m</span></div></div>';
+  }
+
+  var ns='<div class="node-strip">';
+  for(var i=0;i<nN;i++){
+    var isSupp=slist.some(function(s){return Math.abs(s.x-nodes[i])<1e-9;});
+    var col=isSupp?'#ffd60a':'rgba(168,255,120,0.4)';
+    ns+='<div style="display:flex;align-items:center"><div class="nd" style="background:'+col+';box-shadow:0 0 4px '+col+'55"></div><span class="nlb" style="color:'+col+'">'+nodes[i].toFixed(2)+'</span></div>';
+    if(i<nN-1) ns+='<div class="nl"></div>';
+  }
+  ns+='</div>';
+
+  var sumRows='';
+  for(var i=0;i<rxns.length;i++){
+    var r=rxns[i];
+    sumRows+='<tr class="hr"><td>'+TLBL[r.type]+' R @ x='+r.x+'m</td><td class="n">'+r.Fy.toFixed(5)+'</td><td style="text-align:right;color:#c8d0e8">kg</td></tr>';
+    if(Math.abs(r.Mz)>0.001){
+      var mv=-r.Mz;
+      sumRows+='<tr><td>M @ x='+r.x+'m</td><td class="'+(mv<0?'ng':'n')+'">'+mv.toFixed(5)+'</td><td style="text-align:right;color:#c8d0e8">kN&#183;m</td></tr>';
+    }
+  }
+  var beamType=document.getElementById('hdr-sub').textContent||document.getElementById('hdr-sub').innerHTML;
+
+  document.getElementById('results').innerHTML=
+    '<div class="tags">'+
+    '<span class="tag s">V_max = '+maxV.toFixed(3)+' kg'+'</span>'+
+    '<span class="tag mo">M_max = '+maxM.toFixed(3)+' kg·m'+'</span>'+
+    '<span class="tag pk">&#948;_max = '+Math.abs(minDef).toFixed(3)+' mm @ x='+xMaxDef.toFixed(2)+'m</span>'+
+    '<span class="tag mt">[K] '+nDOF+'&#215;'+nDOF+' &#8212; '+nN+' nodes / '+nE+' elem</span>'+
+    '</div>'+
+    '<div class="rgrid">'+rc+'</div>'+
+    '<div class="dblock"><div class="dtitle">Beam Element Diagram</div><canvas id="cf" height="148"></canvas></div>'+
+    '<div class="dblock"><div class="dtitle">Free Body Diagram — Reactions</div><canvas id="cr" height="260"></canvas></div>'+
+    '<div class="dblock"><div class="dtitle">Shear Force Diagram &#8212; SFD</div><canvas id="cs" height="260"></canvas></div>'+
+    '<div class="dblock"><div class="dtitle">Bending Moment Diagram &#8212; BMD</div><canvas id="cm" height="260"></canvas></div>'+
+    '<div class="dblock"><div class="dtitle">Deflection &#8212; v(x) <span class="dinfo">Double Integration M/EI</span></div><canvas id="cd" height="260"></canvas></div>'+
+    '<div class="dblock"><div class="dtitle">Summary</div>'+
+    '<table class="sum-table"><tr><th>Parameter</th><th style="text-align:right">Value</th><th style="text-align:right">Unit</th></tr>'+
+    sumRows+
+    '<tr><td>V_max</td><td class="n">'+maxV.toFixed(5)+'</td><td style="text-align:right;color:#c8d0e8">kg</td></tr>'+
+    '<tr><td>M_max (+)</td><td class="n">'+maxMp.toFixed(5)+'</td><td style="text-align:right;color:#c8d0e8">kN&#183;m</td></tr>'+
+    '<tr><td>M_max (&#8722;)</td><td class="'+(minMp<0?'ng':'n')+'">'+minMp.toFixed(5)+'</td><td style="text-align:right;color:#c8d0e8">kN&#183;m</td></tr>'+
+    '<tr><td>&#948;_max (&#8595;)</td><td class="ng">'+Math.abs(minDef).toFixed(5)+'</td><td style="text-align:right;color:#c8d0e8">mm</td></tr>'+
+    '<tr><td>x @ &#948;_max (&#8595;)</td><td class="n">'+xMaxDef.toFixed(4)+'</td><td style="text-align:right;color:#c8d0e8">m</td></tr>'+
+    (maxPosDef>0.0001?'<tr><td>&#948;_max (&#8593;)</td><td class="n">'+maxPosDef.toFixed(5)+'</td><td style="text-align:right;color:#c8d0e8">mm</td></tr>'+
+    '<tr><td>x @ &#948;_max (&#8593;)</td><td class="n">'+xMaxPosDef.toFixed(4)+'</td><td style="text-align:right;color:#c8d0e8">m</td></tr>':'')+
+    '<tr><td>Beam type</td><td colspan="2" style="text-align:right;color:#c8d0e8;font-size:8.5px">'+beamType+'</td></tr>'+
+    '</table></div>';
+
+  requestAnimationFrame(function(){
+    var discXs=[];
+    for(var si=0;si<slist.length;si++) discXs.push(slist[si].x);
+    for(var li=0;li<loads.length;li++){
+      var ld=loads[li];
+      if(ld.type==='point'||ld.type==='moment') discXs.push(ld.x);
+      else if(ld.type==='udl'){discXs.push(ld.x1);discXs.push(ld.x2);}
+    }
+    drawFBD(L,slist,loads,rxns);
+    drawReactions('cr',rxns,L);
+    drawDiag('cs',xs,Varr,L,'#ef4444','V (kg)',discXs);
+    drawDiag('cm',xs,Marr,L,'#ef4444','M (kg·m)',discXs);
+    drawDeflection('cd',xs,DEF,L,maxDefAbs,xMaxDef,slist);
+  });
+}
+
+// ── Reaction Diagram ──────────────────────────────────────────────────────
+function drawReactions(id, rxns, L) {
+  var cv = document.getElementById(id);
+  if (!cv) return;
+  var dpr = window.devicePixelRatio || 1;
+  var W = cv.parentElement.offsetWidth - 32;
+  var H = 200;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  var ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Layout constants
+  var padL = 20, padR = 20, padT = 36, padB = 28;
+  var plotW = W - padL - padR;
+  var beamY = padT + 18;   // y of beam centreline
+  var beamH = 10;
+  var sc = plotW / L;
+  function px(x) { return padL + x * sc; }
+
+  // ── Beam background ──
+  ctx.fillStyle = '#1a3628';
+  ctx.fillRect(padL, beamY, plotW, beamH);
+  ctx.strokeStyle = '#a8ff78';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(padL, beamY, plotW, beamH);
+
+  // ── Beam length label ──
+  ctx.fillStyle = '#c8d0e8';
+  ctx.font = '12px Space Mono,monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('L = ' + L + ' m', W / 2, H - 8);
+
+  // ── Collect vertical and moment reactions ──
+  var maxFy = 0, hasMoment = false;
+  for (var i = 0; i < rxns.length; i++) {
+    if (Math.abs(rxns[i].Fy) > maxFy) maxFy = Math.abs(rxns[i].Fy);
+    if (Math.abs(rxns[i].Mz) > 0.001) hasMoment = true;
+  }
+  if (maxFy < 0.001) maxFy = 1;
+  var arrowMaxH = 60;  // max arrow height in px
+
+  // ── Draw each reaction ──
+  for (var i = 0; i < rxns.length; i++) {
+    var r = rxns[i];
+    var sx = px(r.x);
+    var col = SCOL[r.type] || '#ffd60a';
+
+    // ── Vertical reaction arrow ──
+    if (Math.abs(r.Fy) > 0.001) {
+      var arrowH = (Math.abs(r.Fy) / maxFy) * arrowMaxH;
+      var dir = r.Fy > 0 ? 1 : -1;  // +1 = upward reaction → arrow points up
+      var ay1 = beamY + (dir > 0 ? 0 : beamH);  // arrow base on beam edge
+      var ay2 = ay1 - dir * arrowH;              // arrow tip
+
+      // Arrow shaft
+      ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(sx, ay1); ctx.lineTo(sx, ay2); ctx.stroke();
+
+      // Arrow head
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.moveTo(sx, ay1);
+      ctx.lineTo(sx - 6, ay1 + dir * 16);
+      ctx.lineTo(sx + 6, ay1 + dir * 16);
+      ctx.closePath(); ctx.fill();
+
+      // Value label with unit
+      var valStr = r.Fy.toFixed(3) + ' kN';
+      var lblY = ay2 - dir * 6;
+      ctx.fillStyle = '#e8ecf4';
+      ctx.font = 'bold 10.7px Space Mono,monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(valStr, sx, lblY);
+
+      // Direction indicator (↑ or ↓)
+      ctx.font = '11px Space Mono,monospace';
+      ctx.fillStyle = col;
+      ctx.fillText(dir > 0 ? '↑' : '↓', sx, lblY + (dir > 0 ? -11 : 13));
+    }
+
+    // ── Moment reaction arc ──
+    if (Math.abs(r.Mz) > 0.001) {
+      var mv = -r.Mz;  // display convention: positive = CCW on beam
+      var arcDir = mv > 0 ? 1 : -1;
+      var arcR = 20;
+      var arcY = beamY + beamH / 2;
+
+      // Arc
+      ctx.strokeStyle = col; ctx.lineWidth = 2;
+      ctx.beginPath();
+      var aStart = arcDir > 0 ? 0.2 * Math.PI : 0.5 * Math.PI;
+      var aEnd   = arcDir > 0 ? 1.8 * Math.PI : 2.5 * Math.PI;
+      ctx.arc(sx, arcY, arcR, aStart, aEnd);
+      ctx.stroke();
+
+      // Arrowhead at arc end using correct motion tangent
+      var tipAngle = arcDir > 0 ? 1.8 * Math.PI : 2.5 * Math.PI;
+      var tx = sx + arcR * Math.cos(tipAngle);
+      var ty = arcY + arcR * Math.sin(tipAngle);
+      var mtx2 = arcDir>0 ? -Math.sin(tipAngle) :  Math.sin(tipAngle);
+      var mty2 = arcDir>0 ?  Math.cos(tipAngle) : -Math.cos(tipAngle);
+      var fahl=9, fahw=5;
+      var fbx=tx-fahl*mtx2, fby=ty-fahl*mty2;
+      var fwx=-mty2*fahw, fwy=mtx2*fahw;
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(fbx+fwx, fby+fwy);
+      ctx.lineTo(fbx-fwx, fby-fwy);
+      ctx.closePath(); ctx.fill();
+
+      // Value label with unit
+      var mStr = mv.toFixed(3) + ' kg·m';
+      var mDir = mv > 0 ? 1 : -1;
+      ctx.fillStyle = '#e8ecf4';
+      ctx.font = 'bold 12px Space Mono,monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(mStr, sx, arcY - arcR - 8);
+      ctx.font = '11px Space Mono,monospace';
+      ctx.fillStyle = col;
+      ctx.fillText(mDir > 0 ? '↺' : '↻', sx, arcY - arcR - 20);
+    }
+
+    // ── Support type + position label below beam ──
+    ctx.fillStyle = col;
+    ctx.font = 'bold 9.7px Space Mono,monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(TLBL[r.type], sx, beamY + beamH + 16);
+    ctx.fillStyle = '#c8d0e8';
+    ctx.font = '11px Space Mono,monospace';
+    ctx.fillText('x = ' + r.x + ' m', sx, beamY + beamH + 28);
+  }
+
+  // ── Scale legend ──
+  ctx.fillStyle = '#556070';
+  ctx.font = '8.7px Space Mono,monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('max = '+maxFy.toFixed(3)+' kg', padL, H-8);
+}
+
+
+// ---- Beam Element Diagram (supports + loads, no reactions) ----
+function drawFBD(L,slist,loads,rxns){
+  var cv=document.getElementById('cf');
+  var dpr=window.devicePixelRatio||1;
+  var W=cv.parentElement.offsetWidth-32;
+  cv.width=W*dpr; cv.height=148*dpr;
+  cv.style.width=W+'px'; cv.style.height='148px';
+  var ctx=cv.getContext('2d');
+  ctx.scale(dpr,dpr);
+  var H=148, pad=36, by=62, bh=14, sc=(W-pad*2)/L;
+  function px(x){return pad+x*sc;}
+
+  // Beam
+  ctx.fillStyle='#1a3628';
+  ctx.fillRect(pad,by,W-pad*2,bh);
+  ctx.strokeStyle='#a8ff78';ctx.lineWidth=1.5;
+  ctx.strokeRect(pad,by,W-pad*2,bh);
+
+  // Length label
+  ctx.setLineDash([3,4]);ctx.strokeStyle='#1e2438';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,H-16);ctx.lineTo(W-pad,H-16);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#c8d0e8';ctx.font='16px Space Mono,monospace';ctx.textAlign='center';
+  ctx.fillText('L = '+L+' m',W/2,H-5);
+
+  // Applied loads
+  for(var li=0;li<loads.length;li++){
+    var ld=loads[li];
+    if(ld.type==='point'){
+      var x=px(ld.x);
+      ctx.strokeStyle='#ff4d6d';ctx.fillStyle='#ff4d6d';ctx.lineWidth=2;
+      var pDown=ld.P>=0;
+      if(pDown){
+        // Downward arrow: stem above beam, tip at beam top
+        ctx.beginPath();ctx.moveTo(x,by-2);ctx.lineTo(x,by-28);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(x,by+2);ctx.lineTo(x-5,by-9);ctx.lineTo(x+5,by-9);ctx.closePath();ctx.fill();
+        ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
+        ctx.fillStyle='#e8ecf4';ctx.fillText(ld.P+' kg',x,by-31);
+      } else {
+        // Upward arrow: stem below beam, tip pointing up above beam
+        ctx.beginPath();ctx.moveTo(x,by+bh+2);ctx.lineTo(x,by+bh+28);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(x,by+bh-2);ctx.lineTo(x-5,by+bh+9);ctx.lineTo(x+5,by+bh+9);ctx.closePath();ctx.fill();
+        ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
+        ctx.fillStyle='#e8ecf4';ctx.fillText(ld.P+' kg',x,by+bh+40);
+      }
+    } else if(ld.type==='udl'){
+      var x1=px(ld.x1),x2=px(ld.x2);
+      var wDown=ld.w>=0;
+      ctx.fillStyle=wDown?'rgba(56,189,248,.08)':'rgba(56,189,248,.08)';
+      ctx.strokeStyle='#38bdf8';ctx.lineWidth=1.2;
+      var uy=wDown?by-26:by+bh;  // top of UDL box
+      ctx.fillRect(x1,uy,x2-x1,26);ctx.strokeRect(x1,uy,x2-x1,26);
+      var st=Math.max(2,Math.floor((x2-x1)/14));
+      for(var k=0;k<=st;k++){
+        var sx2=x1+k*(x2-x1)/st;
+        if(wDown){
+          // Downward: tick from mid-box to beam top
+          ctx.beginPath();ctx.moveTo(sx2,uy+12);ctx.lineTo(sx2,uy+26);ctx.stroke();
+        } else {
+          // Upward: tick from beam bottom to mid-box
+          ctx.beginPath();ctx.moveTo(sx2,uy);ctx.lineTo(sx2,uy+14);ctx.stroke();
+        }
+      }
+      ctx.fillStyle='#e8ecf4';ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
+      ctx.fillText('w = '+ld.w+' kg/m',(x1+x2)/2,wDown?uy-3:uy+36);
+    } else {
+      var x=px(ld.x);
+      ctx.strokeStyle='#c084fc';ctx.lineWidth=2;
+      var isCW=ld.M>=0;
+      // CW (positive M): arc from right going down-left; CCW (negative): reverse
+      var aS=isCW?-0.3*Math.PI:0.15*Math.PI;
+      var aE=isCW?1.85*Math.PI:2.3*Math.PI;
+      ctx.beginPath();ctx.arc(x,by+bh/2,16,aS,aE,!isCW);ctx.stroke();
+      // Arrowhead
+      ctx.fillStyle='#c084fc';
+      var aHead=isCW?1.85*Math.PI:0.15*Math.PI;
+      var ahx=x+16*Math.cos(aHead), ahy=by+bh/2+16*Math.sin(aHead);
+      var tang=isCW?[Math.sin(aHead),-Math.cos(aHead)]:[-Math.sin(aHead),Math.cos(aHead)];
+      var hw=4,hl=7;
+      ctx.beginPath();
+      ctx.moveTo(ahx+tang[0]*hl,ahy+tang[1]*hl);
+      ctx.lineTo(ahx-tang[1]*hw,ahy+tang[0]*hw);
+      ctx.lineTo(ahx+tang[1]*hw,ahy-tang[0]*hw);
+      ctx.closePath();ctx.fill();
+      ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
+      ctx.fillStyle='#c084fc';
+      ctx.fillText(ld.M+' kg·m',x,by-4);
+    }
+  }
+
+  // Support symbols (below beam, no labels, no reactions)
+  for(var si=0;si<slist.length;si++){
+    var s=slist[si]; var sx=px(s.x); var col=SCOL[s.type]||'#ffd60a';
+    ctx.strokeStyle=col; ctx.lineWidth=1.5;
+    if(s.type==='pin'){
+      var tw=11,th=17;
+      var grd=ctx.createLinearGradient(sx-tw,by+bh,sx+tw,by+bh+th);
+      grd.addColorStop(0,col+'55');grd.addColorStop(1,col+'11');
+      ctx.fillStyle=grd;
+      ctx.beginPath();ctx.moveTo(sx,by+bh);ctx.lineTo(sx-tw,by+bh+th);ctx.lineTo(sx+tw,by+bh+th);ctx.closePath();
+      ctx.fill();ctx.stroke();
+      ctx.fillStyle=col;
+      ctx.beginPath();ctx.arc(sx,by+bh,3,0,Math.PI*2);ctx.fill();
+      ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(sx-tw-2,by+bh+th);ctx.lineTo(sx+tw+2,by+bh+th);ctx.stroke();
+      ctx.lineWidth=1;ctx.strokeStyle=col+'88';
+      for(var k=0;k<5;k++){var hx=sx-tw+k*(tw*2)/4;ctx.beginPath();ctx.moveTo(hx,by+bh+th);ctx.lineTo(hx-4,by+bh+th+6);ctx.stroke();}
+    } else if(s.type==='roller'){
+      // Single circle roller
+      var rr=9, ry=by+bh+1;
+      var grd2=ctx.createRadialGradient(sx-2,ry+rr-2,1,sx,ry+rr,rr);
+      grd2.addColorStop(0,col+'55');grd2.addColorStop(1,col+'0a');
+      ctx.fillStyle=grd2;ctx.strokeStyle=col;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(sx,ry+rr,rr,0,Math.PI*2);ctx.fill();ctx.stroke();
+      // Centre dot
+      ctx.fillStyle=col;
+      ctx.beginPath();ctx.arc(sx,ry+rr,2.5,0,Math.PI*2);ctx.fill();
+      // Ground line
+      var gy=ry+rr*2+2;
+      ctx.strokeStyle=col;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(sx-14,gy);ctx.lineTo(sx+14,gy);ctx.stroke();
+      ctx.lineWidth=1;ctx.strokeStyle=col+'88';
+      for(var k=0;k<5;k++){var hx=sx-12+k*24/4;ctx.beginPath();ctx.moveTo(hx,gy);ctx.lineTo(hx-4,gy+6);ctx.stroke();}
+    } else if(s.type==='fixed'){
+      var ww=12,wh=bh+24,isL=sx<=W/2,wx=isL?sx-ww:sx;
+      var grd3=ctx.createLinearGradient(wx,by,wx+ww,by);
+      grd3.addColorStop(0,isL?col+'44':col+'11');grd3.addColorStop(1,isL?col+'11':col+'44');
+      ctx.fillStyle=grd3;ctx.fillRect(wx,by-8,ww,wh);ctx.strokeRect(wx,by-8,ww,wh);
+      ctx.save();ctx.beginPath();ctx.rect(wx,by-8,ww,wh);ctx.clip();
+      ctx.strokeStyle=col+'55';ctx.lineWidth=1;
+      for(var k=-3;k<7;k++){ctx.beginPath();ctx.moveTo(wx+k*6,by-8);ctx.lineTo(wx+k*6+wh,by-8+wh);ctx.stroke();}
+      ctx.restore();
+      ctx.strokeStyle=col;ctx.lineWidth=2.5;var ax=isL?wx+ww:wx;
+      ctx.beginPath();ctx.moveTo(ax,by-2);ctx.lineTo(ax,by+bh+2);ctx.stroke();
+    }
+    // x label only
+    ctx.font='15px Space Mono,monospace';ctx.fillStyle='#8896b8';ctx.textAlign='center';
+    var yLbl=s.type==='fixed'?by+bh+22:s.type==='roller'?by+bh+46:by+bh+33;
+    ctx.fillText(s.x+'m',sx,yLbl);
+  }
+}
+
+// ── Reaction Diagram ──────────────────────────────────────────────────────
+function drawReactions(id, rxns, L) {
+  var cv = document.getElementById(id);
+  if (!cv) return;
+  var dpr = window.devicePixelRatio || 1;
+  var W = cv.parentElement.offsetWidth - 32;
+  var H = 260;
+  cv.width = W*dpr; cv.height = H*dpr;
+  cv.style.width = W+'px'; cv.style.height = H+'px';
+  var ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var MOL    = '#ef4444';   // moment: red
+  var FY_COL = '#ffd60a';   // vertical force: yellow
+
+  // Layout: beam in the UPPER portion, forces hang DOWN below it
+  var padL=52, padR=52;
+  var beamY=52;             // beam top edge — near top, space above for moment arcs
+  var beamH=16;
+  var plotW=W-padL-padR;
+  var sc=plotW/L;
+  function px(x){ return padL+x*sc; }
+
+  // ── Scale vertical forces ──
+  var maxFy=0;
+  for(var i=0;i<rxns.length;i++) if(Math.abs(rxns[i].Fy)>maxFy) maxFy=Math.abs(rxns[i].Fy);
+  if(maxFy<0.001) maxFy=1;
+  var arrowMaxH=90;   // max arrow length (downward, below beam)
+  var HW=7, HL=14;    // arrowhead half-width, height
+
+  // ── Beam ──
+  ctx.fillStyle='#1a3628';
+  ctx.fillRect(padL, beamY, plotW, beamH);
+  ctx.strokeStyle='#a8ff78'; ctx.lineWidth=2;
+  ctx.strokeRect(padL, beamY, plotW, beamH);
+
+  // ── Draw reactions ──
+  for(var i=0;i<rxns.length;i++){
+    var r=rxns[i], sx=px(r.x);
+
+    // ══ MOMENT (drawn above beam, red) ═══════════════════════════════════
+    if(Math.abs(r.Mz)>0.001){
+      var mv=-r.Mz, arcDir=mv>0?1:-1;
+      var arcR=26, arcCY=beamY+beamH/2;
+
+      // Arc: ~346° sweep, head at 7 o'clock (CCW) or 5 o'clock (CW)
+      // Arrowhead tangent points inward-upward, matching target reference image
+      // CCW (mv>0): end=7π/6 (210°, bottom-left), tangent=(0.5,-0.866)=↑→
+      // CW  (mv<0): end=11π/6 (330°, bottom-right), tangent=(-0.5,-0.866)=↑←
+      var arcR2=30;
+      var arcCY2 = beamY + beamH/2;
+
+      ctx.strokeStyle=MOL; ctx.lineWidth=3; ctx.lineCap='round';
+      var aE2 = arcDir>0 ? (7/6)*Math.PI : (11/6)*Math.PI;
+      var aS2 = arcDir>0 ? aE2+0.55      : aE2-0.55;   // wider gap between head and tail
+      ctx.beginPath();
+      ctx.arc(sx, arcCY2, arcR2, aS2, aE2, arcDir<0);
+      ctx.stroke(); ctx.lineCap='butt';
+
+      // Arrowhead at arc end using exact motion tangent
+      var epx2 = sx      + arcR2*Math.cos(aE2);
+      var epy2 = arcCY2  + arcR2*Math.sin(aE2);
+      // CCW tangent at θ: (-sinθ, cosθ)
+      // CW  tangent at θ: ( sinθ,-cosθ)
+      var mtx2 = arcDir>0 ? -Math.sin(aE2) :  Math.sin(aE2);
+      var mty2 = arcDir>0 ?  Math.cos(aE2) : -Math.cos(aE2);
+      var ahl2=12, ahw2=7;
+      var bx2=epx2 - ahl2*mtx2, by2=epy2 - ahl2*mty2;
+      var wx2=-mty2*ahw2, wy2=mtx2*ahw2;
+      ctx.fillStyle=MOL;
+      ctx.beginPath();
+      ctx.moveTo(epx2, epy2);
+      ctx.lineTo(bx2+wx2, by2+wy2);
+      ctx.lineTo(bx2-wx2, by2-wy2);
+      ctx.closePath(); ctx.fill();
+
+      // Label above arc (red)
+      ctx.fillStyle=MOL;
+      ctx.font='bold 18px Space Mono,monospace'; ctx.textAlign='center';
+      ctx.fillText(mv.toFixed(3)+' kg·m', sx, beamY-arcR2-8);
+
+    }
+
+    // ══ VERTICAL FORCE (below beam, yellow) ══════════════════════════════
+    // Correct structural convention:
+    //   Fy > 0 = upward reaction (support pushes beam UP)
+    //            → arrow points UP, tip touches beam bottom, tail hangs below
+    //   Fy < 0 = downward reaction (e.g. overhang)
+    //            → arrow points DOWN, tail above beam, tip below
+    if(Math.abs(r.Fy)>0.001){
+      var ah=(Math.abs(r.Fy)/maxFy)*arrowMaxH;
+      var beamBot=beamY+beamH;
+      var dir=r.Fy>0?1:-1;  // +1 = upward reaction
+
+      // For upward reaction (dir=+1):
+      //   tip at beamBot (arrow touches beam from below, pointing up)
+      //   tail at beamBot + ah (hangs below)
+      var tipY  = dir>0 ? beamBot       : beamBot+ah;  // arrowhead end
+      var tailY = dir>0 ? beamBot+ah    : beamBot;     // shaft start
+
+      // ── Shaft ──
+      ctx.strokeStyle=FY_COL; ctx.lineWidth=3; ctx.lineCap='round';
+      ctx.beginPath();
+      ctx.moveTo(sx, tailY);
+      ctx.lineTo(sx, tipY + dir*HL);  // shaft ends at arrowhead base
+      ctx.stroke();
+      ctx.lineCap='butt';
+
+      // ── Arrowhead: tip points toward beam (upward for +Fy) ──
+      ctx.fillStyle=FY_COL;
+      ctx.beginPath();
+      ctx.moveTo(sx,       tipY);          // tip
+      ctx.lineTo(sx-HW,    tipY+dir*HL);   // left base
+      ctx.lineTo(sx+HW,    tipY+dir*HL);   // right base
+      ctx.closePath(); ctx.fill();
+
+      // ── Value label below the tail ──
+      ctx.fillStyle=FY_COL;
+      ctx.font='bold 17px Space Mono,monospace'; ctx.textAlign='center';
+      var lblY = dir>0 ? tailY+16 : tipY+16;
+      ctx.fillText(r.Fy.toFixed(3)+' kg', sx, lblY);
+
+    }
+
+    // ── x-position label (between beam and arrow tip) ──
+    ctx.fillStyle='#c8d0e8'; ctx.font='16px Space Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText('x = '+r.x+' m', sx, beamY+beamH+12);
+  }
+
+
+
+  // ── Length dim line ──
+  ctx.setLineDash([3,5]); ctx.strokeStyle='#1e2438'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(padL,H-18); ctx.lineTo(W-padR,H-18); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#c8d0e8'; ctx.font='16px Space Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('L = '+L+' m', W/2, H-5);
+}
+
+
+// ---- Critical point detection ----
+function findCriticalPoints(xs,ys,discXs,L,forcedZeros){
+  // forcedZeros: array of x positions that are KNOWN to be exactly zero
+  // (e.g. support positions for deflection diagram)
+  forcedZeros=forcedZeros||[];
+  var n=ys.length;
+  var minGap=L*0.02;  // smaller gap so both sides of a jump can be labeled
+  var maxAbs=Math.max.apply(null,ys.map(Math.abs).concat([0.001]));
+  var tolZero=Math.max(maxAbs*0.004,0.001);
+  var pts=[];
+
+  function add(x,y,typ,pri){pts.push({x:+x.toFixed(6),y:+y.toFixed(4),type:typ,pri:pri});}
+
+  // Start and end
+  add(xs[0],ys[0],'end',3);
+  add(xs[n-1],ys[n-1],'end',3);
+
+  // Forced zeros: exact x positions known to be zero (BC-constrained)
+  // Only add if the DEF array confirms the value is near zero there
+  var tolFZ=maxAbs*0.05;  // within 5% of max deflection = "near zero"
+  for(var fi=0;fi<forcedZeros.length;fi++){
+    var fxz=forcedZeros[fi];
+    // Find nearest index in xs
+    var bestI2=0,bestD2=1e9;
+    for(var ii=0;ii<n;ii++){var dd=Math.abs(xs[ii]-fxz);if(dd<bestD2){bestD2=dd;bestI2=ii;}}
+    var actualY=ys[bestI2];
+    // Only mark as forced zero if value is genuinely near zero
+    if(Math.abs(actualY)<=tolFZ) add(fxz,0,'zero',-1);
+  }
+
+  // Known discontinuity positions — sample values on both sides of jump
+  for(var di=0;di<discXs.length;di++){
+    var xd=discXs[di];
+    // Skip if this x is already a forced zero
+    var isForced=false;
+    for(var fi=0;fi<forcedZeros.length;fi++){
+      if(Math.abs(forcedZeros[fi]-xd)<1e-9){isForced=true;break;}
+    }
+    if(isForced) continue;
+    var best=0,bd=1e9;
+    for(var ii=0;ii<n;ii++){var dd=Math.abs(xs[ii]-xd);if(dd<bd){bd=dd;best=ii;}}
+    // Always add the exact position (best)
+    add(xs[best],ys[best],'disc',2);
+    // For interior disc points, also add neighbors to show both sides of jump
+    // But NOT for beam endpoints (x=0 or x=L) since endpoint value already includes all reactions
+    var isEndpoint=(Math.abs(xd)<1e-9||Math.abs(xd-L)<1e-9);
+    if(!isEndpoint){
+      var iL=Math.max(0,best-1);
+      var iR=Math.min(n-1,best+1);
+      if(iL!==best) add(xs[iL],ys[iL],'disc',2);
+      if(iR!==best) add(xs[iR],ys[iR],'disc',2);
+    }
+  }
+
+  // Local extrema: find where derivative changes sign (smooth window=3)
+  for(var i=3;i<n-3;i++){
+    var dL=ys[i]-ys[i-3];
+    var dR=ys[i+3]-ys[i];
+    if(dL*dR<-1e-10&&Math.abs(ys[i])>tolZero){
+      // Refine: scan nearby for true peak
+      var bestI=i;
+      for(var k=Math.max(0,i-3);k<=Math.min(n-1,i+3);k++){
+        if(Math.abs(ys[k])>Math.abs(ys[bestI])) bestI=k;
+      }
+      var typ=ys[bestI]>0?'max':'min';
+      add(xs[bestI],ys[bestI],typ,1);
+    }
+  }
+
+  // Zero crossings
+  // Skip zones near: (1) forced zeros (already added exactly), (2) discXs (jumps/support reactions)
+  var skipXs=forcedZeros.concat(discXs);
+  var skipGap=L*0.025;  // exclude window around each skip position
+  for(var i=0;i<n-1;i++){
+    var nearSkip=false;
+    for(var si3=0;si3<skipXs.length;si3++){
+      if(Math.abs(xs[i]-skipXs[si3])<skipGap||Math.abs(xs[i+1]-skipXs[si3])<skipGap){
+        nearSkip=true;break;
+      }
+    }
+    if(nearSkip) continue;
+    if(Math.abs(ys[i])<tolZero){
+      add(xs[i],0,'zero',0);
+    } else if(ys[i]*ys[i+1]<0){
+      var t=-ys[i]/(ys[i+1]-ys[i]);
+      var xz=xs[i]+t*(xs[i+1]-xs[i]);
+      add(xz,0,'zero',0);
+    }
+  }
+
+  // Sort by x
+  pts.sort(function(a,b){return a.x-b.x;});
+
+  // Merge nearby: keep highest priority (lowest pri number)
+  var merged=[];
+  for(var i=0;i<pts.length;i++){
+    var p=pts[i];
+    if(merged.length>0&&Math.abs(p.x-merged[merged.length-1].x)<minGap){
+      if(p.pri<merged[merged.length-1].pri) merged[merged.length-1]=p;
+    } else {
+      merged.push(p);
+    }
+  }
+  return merged;
+}
+
+// ---- Draw labels for critical points ----
+function drawLabels(ctx,pts,pad,z0,sx,sy,col,W,above,fmt){
+  fmt=fmt||function(v){return v.toFixed(3);};
+  ctx.font='bold 12px Space Mono,monospace';
+  for(var i=0;i<pts.length;i++){
+    var p=pts[i];
+    var px2=pad+p.x*sx;
+    var py2=z0-p.y*sy;
+    var lbl=fmt(p.y);
+    var isZero=(p.type==='zero'||Math.abs(p.y)<0.005);
+    var dotCol=isZero?'#38bdf8':'#38bdf8';
+
+    // Dot
+    ctx.fillStyle=dotCol;
+    ctx.beginPath();ctx.arc(px2,py2,2.8,0,Math.PI*2);ctx.fill();
+
+    if(isZero){
+      // Zero crossing: dot only, no label
+      ctx.fillStyle='#38bdf8';
+      ctx.beginPath();ctx.arc(px2,z0,2.5,0,Math.PI*2);ctx.fill();
+    } else {
+      // Value label: above for positive, below for negative
+      var isPos=p.y>=0;
+      var lx=Math.min(Math.max(px2,32),W-32);
+      var ly=isPos?py2-7:py2+14;
+      ctx.fillStyle='#38bdf8';ctx.textAlign='center';
+      ctx.fillText(lbl,lx,ly);
+      // x position in smaller font below value
+      ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
+      var ly2=isPos?py2-17:py2+23;
+      ctx.fillText(p.x.toFixed(2)+'m',lx,ly2);
+      ctx.font='bold 12px Space Mono,monospace';
+    }
+  }
+}
+
+// ---- Diagram with critical point labels ----
+function drawDiag(id,xs,ys,L,col,lbl,discXs){
+  discXs=discXs||[];
+  var cv=document.getElementById(id);
+  var dpr=window.devicePixelRatio||1;
+  var W=cv.parentElement.offsetWidth-32;
+  cv.width=W*dpr; cv.height=260*dpr;
+  cv.style.width=W+'px'; cv.style.height='260px';
+  var ctx=cv.getContext('2d');
+  ctx.scale(dpr,dpr);
+  var pad=90,tp=32,bp=48,pw=W-pad*2,ph=260-tp-bp,z0=tp+ph/2;
+  var maxA=Math.max.apply(null,ys.map(Math.abs).concat([0.001]));
+  // Reserve 26px top+bottom inside plot for labels, so curve never clips edge
+  var margin=26;
+  var sy=(ph/2-margin)/maxA,sx=pw/L,N=xs.length-1;
+
+  // Grid lines (grey, thin, dashed)
+  ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=0.5;
+  for(var i=1;i<=4;i++){
+    var y1=z0-(ph/2-margin)*i/4,y2=z0+(ph/2-margin)*i/4;
+    ctx.beginPath();ctx.moveTo(pad,y1);ctx.lineTo(pad+pw,y1);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(pad,y2);ctx.lineTo(pad+pw,y2);ctx.stroke();
+    var v=(maxA*i/4).toFixed(2);
+    ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
+    ctx.fillText(v,pad-4,y1+3);ctx.fillText('-'+v,pad-4,y2+3);
+  }
+  ctx.setLineDash([]);
+  ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';ctx.fillText('0',pad-4,z0+3);
+  // Y axis (white, solid)
+  ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(pad,tp);ctx.lineTo(pad,tp+ph);ctx.stroke();
+  // X axis / zero line (white, solid)
+  ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(pad,z0);ctx.lineTo(pad+pw,z0);ctx.stroke();
+
+  // Clip curve and fill to plot area
+  ctx.save();
+  ctx.beginPath();ctx.rect(pad,tp,pw,ph);ctx.clip();
+
+  // Fill + curve (clipped)
+  ctx.beginPath();ctx.moveTo(pad+xs[0]*sx,z0);
+  for(var i=0;i<=N;i++) ctx.lineTo(pad+xs[i]*sx,z0-ys[i]*sy);
+  ctx.lineTo(pad+xs[N]*sx,z0);ctx.closePath();ctx.fillStyle=col+'14';ctx.fill();
+  ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=2;ctx.shadowBlur=0;
+  for(var i=0;i<=N;i++){var px2=pad+xs[i]*sx,py2=z0-ys[i]*sy;i===0?ctx.moveTo(px2,py2):ctx.lineTo(px2,py2);}
+  ctx.stroke();ctx.shadowBlur=0;
+  ctx.restore();
+
+  // Critical point labels (drawn outside clip so text is not cut)
+  var cpts=findCriticalPoints(xs,ys,discXs,L);
+  drawLabels(ctx,cpts,pad,z0,sx,sy,col,W);
+
+  // X labels
+  ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
+  var nx=Math.min(10,Math.floor(L)+1);
+  for(var i=0;i<=nx;i++){var xv=L*i/nx;ctx.fillText(xv.toFixed(1),pad+xv*sx,tp+ph+14);}
+  ctx.fillText('x (m)',pad+pw/2,tp+ph+42);
+  ctx.save();ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
+  ctx.translate(12,tp+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText(lbl,0,0);ctx.restore();
+}
+
+// ---- Deflection diagram with labels ----
+function drawDeflection(id,xs,DEF,L,maxDefAbs,xMaxDef,slist){
+  var cv=document.getElementById(id);
+  var dpr=window.devicePixelRatio||1;
+  var W=cv.parentElement.offsetWidth-32;
+  cv.width=W*dpr; cv.height=260*dpr;
+  cv.style.width=W+'px'; cv.style.height='260px';
+  var ctx=cv.getContext('2d');
+  ctx.scale(dpr,dpr);
+  var pad=90,tp=22,bp=48,pw=W-pad*2,ph=260-tp-bp;
+  var sx=pw/L,N=xs.length-1;
+  var maxA=Math.max(maxDefAbs,0.001);
+  var col='#ef4444';
+
+  // True range with label margin reserved on both sides
+  var rawPos=Math.max.apply(null,DEF.concat([0]));
+  var rawNeg=Math.min.apply(null,DEF.concat([0]));
+  var hasPos=(rawPos>0.0001), hasNeg=(rawNeg<-0.0001);
+  // Label/curve clearance: 26px top if has positive, 26px bottom if has negative
+  var padTop=hasPos?28:10, padBot=hasNeg?28:10;
+  var innerH=ph-padTop-padBot;
+  // Scale: one pixel-per-unit that fits BOTH extremes inside innerH
+  var absPos=Math.max(rawPos,0.0001), absNeg=Math.max(-rawNeg,0.0001);
+  var totalRange=absPos+absNeg;
+  var sy=innerH/totalRange;
+  // Zero line position
+  var baseY=tp+padTop+absPos*sy;
+
+  // Grid lines (grey, thin, dashed)
+  ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=0.5;
+  var nDiv=3;
+  if(hasNeg){
+    for(var i=1;i<=nDiv;i++){
+      var y=baseY+absNeg*sy*i/nDiv;
+      ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(pad+pw,y);ctx.stroke();
+      ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
+      ctx.fillText('-'+(absNeg*i/nDiv).toFixed(3),pad-4,y+3);
+    }
+  }
+  if(hasPos){
+    for(var i=1;i<=nDiv;i++){
+      var y=baseY-absPos*sy*i/nDiv;
+      ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(pad+pw,y);ctx.stroke();
+      ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
+      ctx.fillText('+'+(absPos*i/nDiv).toFixed(3),pad-4,y+3);
+    }
+  }
+  ctx.setLineDash([]);
+  ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
+  ctx.fillText('0',pad-4,baseY+3);
+  // Y axis (white, solid)
+  ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(pad,tp);ctx.lineTo(pad,tp+ph);ctx.stroke();
+  // Zero / X axis line (white, solid)
+  ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(pad,baseY);ctx.lineTo(pad+pw,baseY);ctx.stroke();
+
+  // Undeflected
+  ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(168,255,120,0.18)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,baseY);ctx.lineTo(pad+pw,baseY);ctx.stroke();ctx.setLineDash([]);
+
+  // Clip curve to plot area
+  ctx.save();
+  ctx.beginPath();ctx.rect(pad,tp,pw,ph);ctx.clip();
+
+  // Fill + curve (clipped)
+  ctx.beginPath();ctx.moveTo(pad+xs[0]*sx,baseY);
+  for(var i=0;i<=N;i++) ctx.lineTo(pad+xs[i]*sx,baseY+(-DEF[i])*sy);
+  ctx.lineTo(pad+xs[N]*sx,baseY);ctx.closePath();ctx.fillStyle=col+'15';ctx.fill();
+  ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=2;ctx.shadowBlur=0;
+  for(var i=0;i<=N;i++){var px2=pad+xs[i]*sx,py2=baseY+(-DEF[i])*sy;i===0?ctx.moveTo(px2,py2):ctx.lineTo(px2,py2);}
+  ctx.stroke();ctx.shadowBlur=0;
+  ctx.restore();
+
+  // Support markers
+  for(var si=0;si<slist.length;si++){
+    var s=slist[si];
+    ctx.fillStyle=SCOL[s.type];ctx.beginPath();ctx.arc(pad+s.x*sx,baseY,3,0,Math.PI*2);ctx.fill();
+  }
+
+  // Critical points for deflection
+  // Pass support positions as forcedZeros — they are BC-constrained to exactly 0
+  // Do NOT use snap window (causes x position errors)
+  var suppXs=slist.map(function(s){return s.x;});
+  // Only include pin/roller/fixed supports (those with v=0 constraint)
+  var zeroSupps=slist.filter(function(s){
+    return s.type==='pin'||s.type==='roller'||s.type==='fixed';
+  }).map(function(s){return s.x;});
+  var cpts=findCriticalPoints(xs,DEF,suppXs,L,zeroSupps);
+  // For deflection: positive DEF = upward, negative = downward
+  // Flip y for drawing: canvas y = baseY + (-DEF)*sy
+  // We need a custom label draw for deflection (baseY as zero axis, downward positive on screen)
+  var z0=baseY; // zero line is at baseY
+  // Find max |deflection| in each span (between consecutive supports)
+  var spanPeaks=[];
+  var spanBounds=[0];
+  for(var si=0;si<slist.length;si++){
+    var sx2=slist[si].x;
+    if(sx2>0&&sx2<L) spanBounds.push(sx2);
+  }
+  spanBounds.push(L);
+  spanBounds.sort(function(a,b){return a-b;});
+  for(var sp=0;sp<spanBounds.length-1;sp++){
+    var xA=spanBounds[sp],xB=spanBounds[sp+1];
+    var peakIdx=-1,peakAbs=0;
+    for(var ii=0;ii<xs.length;ii++){
+      if(xs[ii]<=xA||xs[ii]>=xB) continue;
+      if(Math.abs(DEF[ii])>peakAbs){peakAbs=Math.abs(DEF[ii]);peakIdx=ii;}
+    }
+    if(peakIdx>=0&&peakAbs>0.0005) spanPeaks.push({x:xs[peakIdx],y:DEF[peakIdx]});
+  }
+
+  // Draw only span peaks
+  ctx.font='bold 12px Space Mono,monospace';
+  for(var i=0;i<spanPeaks.length;i++){
+    var p=spanPeaks[i];
+    var px2=pad+p.x*sx;
+    var py2=baseY+(-p.y)*sy;
+    ctx.fillStyle='#38bdf8';
+    ctx.beginPath();ctx.arc(px2,py2,2.8,0,Math.PI*2);ctx.fill();
+    var isDown=p.y<=0;
+    var lx=Math.min(Math.max(px2,34),W-34);
+    var ly=isDown?py2+14:py2-7;
+    ctx.fillStyle='#38bdf8';ctx.textAlign='center';
+    ctx.fillText(p.y.toFixed(3)+' mm',lx,ly);
+    ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
+    ctx.fillText(p.x.toFixed(2)+'m',lx,isDown?ly+9:ly-9);
+    ctx.font='bold 12px Space Mono,monospace';
+  }
+
+  // X labels
+  ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
+  var nx=Math.min(10,Math.floor(L)+1);
+  for(var i=0;i<=nx;i++){var xv=L*i/nx;ctx.fillText(xv.toFixed(1),pad+xv*sx,tp+ph+14);}
+  ctx.fillText('x (m)',pad+pw/2,tp+ph+42);
+  ctx.save();ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
+  ctx.translate(12,tp+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText('v (mm)',0,0);ctx.restore();
+}
+
+// ---- Init ----
+updateHeader();
+</script>
+</body>
+</html>
