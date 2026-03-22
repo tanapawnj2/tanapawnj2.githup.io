@@ -1448,14 +1448,28 @@ function drawLabels(ctx,pts,pad,z0,sx,sy,col,W,above,fmt){
     } else {
       // Value label: above for positive, below for negative
       var isPos=p.y>=0;
-      var lx=Math.min(Math.max(px2,32),W-32);
       var ly=isPos?py2-7:py2+14;
-      ctx.fillStyle='#38bdf8';ctx.textAlign='center';
-      ctx.fillText(lbl,lx,ly);
-      // x position in smaller font below value
-      ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
       var ly2=isPos?py2-17:py2+23;
-      ctx.fillText(p.x.toFixed(2)+'m',lx,ly2);
+      ctx.fillStyle='#38bdf8';
+      var edgeMargin=pad+10;
+      if(px2<edgeMargin){
+        // Near left edge: align left, shift right of dot
+        ctx.textAlign='left';
+        ctx.fillText(lbl,px2+5,ly);
+        ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
+        ctx.fillText(p.x.toFixed(2)+'m',px2+5,ly2);
+      } else if(px2>W-edgeMargin){
+        // Near right edge: align right, shift left of dot
+        ctx.textAlign='right';
+        ctx.fillText(lbl,px2-5,ly);
+        ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
+        ctx.fillText(p.x.toFixed(2)+'m',px2-5,ly2);
+      } else {
+        ctx.textAlign='center';
+        ctx.fillText(lbl,px2,ly);
+        ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
+        ctx.fillText(p.x.toFixed(2)+'m',px2,ly2);
+      }
       ctx.font='bold 12px Space Mono,monospace';
     }
   }
