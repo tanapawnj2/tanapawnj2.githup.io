@@ -97,6 +97,7 @@ canvas{width:100%;display:block;border-radius:3px;}
 .nlb{color:#c8d0e8;margin:0 2px;font-family:'Space Mono',monospace;font-size:11px;}
 
 .err{background:rgba(255,77,109,.09);border:1px solid rgba(255,77,109,.28);color:#ff4d6d;padding:9px 12px;border-radius:6px;font-size:16px;margin-bottom:10px;}
+.cv-tooltip{position:fixed;background:rgba(13,15,14,0.92);border:1px solid rgba(255,255,255,0.15);color:#e8ecf4;font-family:'Space Mono',monospace;font-size:11px;padding:5px 9px;border-radius:5px;pointer-events:none;display:none;z-index:999;white-space:nowrap;line-height:1.6;}
 
 .rxn-row{display:flex;align-items:stretch;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
 .rxn-bar-wrap{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;}
@@ -1519,6 +1520,8 @@ function drawDiag(id,xs,ys,L,col,lbl,discXs){
   ctx.fillText('x (m)',pad+pw/2,tp+ph+42);
   ctx.save();ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
   ctx.translate(12,tp+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText(lbl,0,0);ctx.restore();
+  // Attach tooltip
+  attachTooltip(id,xs,ys,{pad:pad,z0:z0,sx:sx,sy:sy,L:L,yLabel:lbl,yFmt:function(v){return v.toFixed(3);}});
 }
 
 // ---- Deflection diagram with labels ----
@@ -1658,10 +1661,55 @@ function drawDeflection(id,xs,DEF,L,maxDefAbs,xMaxDef,slist){
   ctx.fillText('x (m)',pad+pw/2,tp+ph+42);
   ctx.save();ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
   ctx.translate(12,tp+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText('v (mm)',0,0);ctx.restore();
+  // Attach tooltip
+  attachTooltip(id,xs,DEF,{pad:pad,z0:baseY,sx:sx,sy:sy,L:L,yLabel:'v',yFmt:function(v){return v.toFixed(3)+' mm';}});
+}
+
+
+// ── Canvas tooltip on hover ────────────────────────────────────────────────
+var _chartData={};
+
+function attachTooltip(id,xs,ys,params){
+  _chartData[id]={xs:xs,ys:ys,params:params};
+  var cv=document.getElementById(id);
+  if(!cv) return;
+  cv.onmousemove=function(e){
+    var rect=cv.getBoundingClientRect();
+    var dpr=window.devicePixelRatio||1;
+    var mx=(e.clientX-rect.left);
+    var p=_chartData[id].params;
+    var xData=(mx-p.pad)/p.sx;
+    if(xData<-0.01||xData>p.L+0.01){hideTooltip();return;}
+    xData=Math.max(0,Math.min(p.L,xData));
+    var xsArr=_chartData[id].xs,ysArr=_chartData[id].ys;
+    var yVal=null;
+    for(var i=0;i<xsArr.length-1;i++){
+      if(xsArr[i]<=xData+1e-9&&xData<=xsArr[i+1]+1e-9){
+        var dx=xsArr[i+1]-xsArr[i];
+        if(dx<1e-12){yVal=ysArr[i];}
+        else{var t=(xData-xsArr[i])/dx;yVal=ysArr[i]+t*(ysArr[i+1]-ysArr[i]);}
+        break;
+      }
+    }
+    if(yVal===null){hideTooltip();return;}
+    var tip=document.getElementById('cv-tooltip');
+    var fmt=p.yFmt||function(v){return v.toFixed(3);};
+    tip.innerHTML='x = '+xData.toFixed(3)+' m<br>'+p.yLabel+' = '+fmt(yVal);
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=(e.clientY-10)+'px';
+  };
+  cv.onmouseleave=function(){hideTooltip();};
+}
+
+function hideTooltip(){
+  var tip=document.getElementById('cv-tooltip');
+  if(tip) tip.style.display='none';
 }
 
 // ---- Init ----
 updateHeader();
 </script>
+<div class="cv-tooltip" id="cv-tooltip"></div>
 </body>
 </html>
