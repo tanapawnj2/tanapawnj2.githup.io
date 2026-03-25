@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1400"/>
+<title>Frame Analyzer — 2D Plane Frame</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0b0d12;--surface:#13161e;--surface2:#191d28;--border:#222736;--accent:#00e5ff;--accent2:#ff6b35;--accent3:#a8ff78;--accent4:#c084fc;--text:#e8ecf4;--muted:#8896b8;--r:#ffd60a;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;width:1400px;overflow-x:visible;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+header{position:relative;z-index:1;padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+header h1{font-family:'Space Mono',monospace;font-size:19px;color:var(--accent);}
+.mbadge{font-family:'Space Mono',monospace;font-size:12px;padding:2px 8px;border-radius:9px;background:rgba(192,132,252,.12);color:var(--accent4);border:1px solid rgba(192,132,252,.28);}
+.hright{margin-left:auto;display:flex;gap:7px;}
+/* 3-column layout */
+.main{position:relative;z-index:1;display:grid;grid-template-columns:300px 600px 260px;width:1160px;align-items:stretch;}
+.col-nodes{background:var(--surface);border-right:1px solid var(--border);padding:14px 12px;overflow-y:auto;min-width:270px;}
+.col-members{background:var(--surface);border-right:1px solid var(--border);padding:14px 12px;overflow-y:auto;min-width:270px;}
+.col-canvas{display:flex;flex-direction:column;min-width:500px;}
+/* Section title */
+.sec{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;color:#c8d0e8;text-transform:uppercase;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.sec:first-child{margin-top:0;}
+.field{margin-bottom:8px;}
+label{display:block;font-size:12px;color:#c8d0e8;margin-bottom:3px;font-family:'Space Mono',monospace;}
+input[type=number],select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:5px;font-family:'Space Mono',monospace;font-size:13px;outline:none;transition:border-color .2s;}
+input[type=number]:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,255,.08);}
+/* Cards */
+.scard,.card{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 10px;margin-bottom:7px;position:relative;}
+.scard-hd{display:flex;align-items:center;gap:7px;margin-bottom:7px;padding-right:20px;}
+.snum{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(0,229,255,.18);color:var(--accent);border:1px solid rgba(0,229,255,.4);}
+.snum.m{background:rgba(192,132,252,.18);color:var(--accent4);border-color:rgba(192,132,252,.4);}
+.snum.s{background:rgba(255,214,10,.18);color:#ffd60a;border-color:rgba(255,214,10,.4);}
+.snum.l{background:rgba(255,107,53,.18);color:var(--accent2);border-color:rgba(255,107,53,.4);}
+.slbl{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);flex:1;}
+.srem,.crem{background:none;border:none;color:#8896b8;cursor:pointer;font-size:13px;padding:2px 5px;border-radius:3px;transition:color .2s;position:absolute;top:6px;right:6px;line-height:1;}
+.srem:hover,.crem:hover{color:#ff4d6d;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+/* Buttons */
+.add-btn{width:100%;padding:7px;background:rgba(0,229,255,.05);border:1px dashed rgba(0,229,255,.2);color:var(--accent);border-radius:5px;cursor:pointer;font-family:'Space Mono',monospace;font-size:12px;transition:.2s;margin-bottom:4px;}
+.add-btn:hover{background:rgba(0,229,255,.1);border-color:var(--accent);}
+.add-btn.m{border-color:rgba(192,132,252,.25);color:var(--accent4);background:rgba(192,132,252,.05);}
+.add-btn.m:hover{background:rgba(192,132,252,.1);border-color:var(--accent4);}
+.add-btn.s{border-color:rgba(255,214,10,.25);color:#ffd60a;background:rgba(255,214,10,.05);}
+.add-btn.s:hover{background:rgba(255,214,10,.1);border-color:#ffd60a;}
+.add-btn.l{border-color:rgba(255,107,53,.25);color:var(--accent2);background:rgba(255,107,53,.05);}
+.add-btn.l:hover{background:rgba(255,107,53,.1);border-color:var(--accent2);}
+.calc-btn{width:100%;padding:11px;background:var(--accent);color:#000;border:none;border-radius:6px;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;letter-spacing:.8px;transition:.2s;}
+.calc-btn:hover{background:#2ef0ff;transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,229,255,.25);}
+.tbtn2{padding:5px 10px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;transition:.15s;}
+.tbtn2:hover{border-color:var(--accent);color:var(--accent);}
+.tbtn2.on{background:rgba(0,229,255,.08);border-color:var(--accent);color:var(--accent);}
+/* Error */
+.err{background:rgba(255,77,109,.09);border:1px solid rgba(255,77,109,.28);color:#ff4d6d;padding:9px 12px;border-radius:6px;font-size:13px;margin-bottom:10px;}
+/* Canvas toolbar */
+.canvas-toolbar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+.tinfo{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);}
+#frame-canvas{display:block;cursor:grab;width:100%;height:580px;}
+/* Results panel */
+.results-panel{background:var(--surface);border-left:1px solid var(--border);padding:14px 12px;overflow-y:auto;}
+.rcard{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 12px;margin-bottom:8px;border-left:3px solid var(--accent);}
+.rcard.m{border-left-color:var(--accent4);}
+.rcard.s{border-left-color:#ffd60a;}
+.rl{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.05em;margin-bottom:4px;}
+.rv{font-family:'Space Mono',monospace;font-size:15px;color:var(--accent);font-weight:700;}
+.sum-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:12px;}
+.sum-table th{text-align:left;padding:4px 6px;border-bottom:1px solid var(--border);color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
+.sum-table td{padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.03);}
+.sum-table td.v{color:var(--accent);text-align:right;}
+.sum-table td.vn{color:var(--accent2);text-align:right;}
+.dblock{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-bottom:10px;}
+.input-panel{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;min-width:300px;}
+.tab-bar{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border);flex-shrink:0;}
+.tab{padding:9px 4px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.15s;text-transform:uppercase;}
+.tab.on{color:var(--accent);border-color:var(--accent);background:rgba(0,229,255,.04);}
+.tab:hover:not(.on){color:var(--text);border-color:rgba(255,255,255,.15);}
+.tab-body{flex:1;overflow-y:auto;padding:12px;}
+.tab-pane{display:none;}.tab-pane.on{display:block;}
+.dtitle{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#c8d0e8;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<header>
+  <div style="width:32px;height:32px;background:rgba(0,229,255,.12);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid rgba(0,229,255,.2);">🏗</div>
+  <h1>FRAME ANALYZER</h1>
+  <span style="color:#c8d0e8;font-size:14px;">2D Plane Frame</span>
+  <span class="mbadge">DIRECT STIFFNESS METHOD</span>
+  <div class="hright">
+    <button class="tbtn2" onclick="resetView()">⌖ Reset View</button>
+    <button class="tbtn2 on" id="btn-grid" onclick="toggleGrid()">Grid</button>
+    <button class="tbtn2 on" id="btn-deformed" onclick="toggleDeformed()">Deformed</button>
+    <button class="tbtn2 on" id="btn-labels" onclick="toggleLabels()">Labels</button>
+  </div>
+</header>
+
+<div style="width:1400px;"><div class="main">
+<!-- Col 1: Tabbed input panel -->
+<div class="input-panel">
+  <button class="calc-btn" style="margin:10px 10px 0;width:calc(100% - 20px);" onclick="analyze()">&#9654; Calculate</button>
+  <div id="err-box" style="display:none;margin:6px 10px 0;"></div>
+  <div class="tab-bar">
+    <div class="tab on" id="tab-nodes" onclick="switchInputTab('nodes')">Nodes</div>
+    <div class="tab" id="tab-supports" onclick="switchInputTab('supports')">Supports</div>
+    <div class="tab" id="tab-members" onclick="switchInputTab('members')">Members</div>
+    <div class="tab" id="tab-udl" onclick="switchInputTab('udl')">UDL</div>
+    <div class="tab" id="tab-loads" onclick="switchInputTab('loads')">Loads</div>
+  </div>
+  <div class="tab-body">
+    <div class="tab-pane on" id="pane-nodes">
+      <div class="sec" style="margin-top:0">Nodes</div>
+      <div id="node-list"></div>
+      <button class="add-btn" onclick="addNode()">＋ Add Node</button>
+    </div>
+    <div class="tab-pane" id="pane-supports">
+      <div class="sec" style="margin-top:0">Supports</div>
+      <div id="supp-list"></div>
+      <button class="add-btn s" onclick="addSupport()">＋ Add Support</button>
+    </div>
+    <div class="tab-pane" id="pane-members">
+      <div class="sec" style="margin-top:0">Members</div>
+      <div id="member-list"></div>
+      <button class="add-btn m" onclick="addMember()">＋ Add Member</button>
+    </div>
+    <div class="tab-pane" id="pane-udl">
+      <div class="sec" style="margin-top:0">Member Loads (UDL)</div>
+      <div id="mload-list"></div>
+      <button class="add-btn m" style="border-color:rgba(0,229,255,.25);color:var(--accent);" onclick="addMemberLoad()">＋ Add UDL on Member</button>
+    </div>
+    <div class="tab-pane" id="pane-loads">
+      <div class="sec" style="margin-top:0">Nodal Loads</div>
+      <div id="load-list"></div>
+      <button class="add-btn l" onclick="addLoad()">＋ Add Nodal Load</button>
+    </div>
+  </div>
+</div>
+
+<!-- Col 3: Canvas + Results -->
+<div style="display:flex;flex-direction:column;min-width:0;flex:1;">
+<!-- ── Canvas toolbar ── -->
+<div class="canvas-toolbar">
+  <span class="tinfo" id="canvas-info">Scroll to zoom  •  Drag to pan</span>
+  <button class="tbtn2 on" id="btn-deformed" onclick="toggleDeformed()">Deformed</button>
+  <button class="tbtn2 on" id="btn-labels" onclick="toggleLabels()">Labels</button>
+</div>
+<!-- ── Canvas row ── -->
+<div style="display:flex;min-width:0;">
+  <canvas id="frame-canvas" style="flex:1;min-width:0;"></canvas>
+</div>
+<!-- 4 Diagram panels below canvas -->
+<div id="diagram-panels" style="display:none;border-top:1px solid var(--border);overflow:hidden;">
+  <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);">
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);">Diagram Scale:</span>
+    <button class="tbtn2" onclick="changeDiagScale(-1)">−</button>
+    <span id="diag-scale-lbl" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);min-width:50px;text-align:center;">0.200x</span>
+    <button class="tbtn2" onclick="changeDiagScale(1)">+</button>
+    <button class="tbtn2" onclick="diagScaleMult=0.2;document.getElementById('diag-scale-lbl').textContent='0.200x';if(results)drawAllDiagrams();">Reset</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:1px;background:var(--border);">
+    <div style="background:var(--surface);padding:12px 16px;">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#c8d0e8;margin-bottom:8px;">Free Body Diagram</div>
+      <canvas id="cv-fbd" style="display:block;width:560px;height:420px;"></canvas>
+    </div>
+    <div style="background:var(--surface);padding:12px 16px;">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#c8d0e8;margin-bottom:8px;">Shear Force — V (kg)</div>
+      <canvas id="cv-shear" style="display:block;width:560px;height:420px;"></canvas>
+    </div>
+    <div style="background:var(--surface);padding:12px 16px;">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#c8d0e8;margin-bottom:8px;">Bending Moment — M (kg·m)</div>
+      <canvas id="cv-moment" style="display:block;width:560px;height:420px;"></canvas>
+    </div>
+    <div style="background:var(--surface);padding:12px 16px;">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#c8d0e8;margin-bottom:8px;">Deflection — v (mm)</div>
+      <canvas id="cv-deflect" style="display:block;width:560px;height:420px;"></canvas>
+    </div>
+    <div style="background:var(--surface);padding:12px 16px;">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#c8d0e8;margin-bottom:8px;">Local Axis (x̄, ȳ per Member)</div>
+      <canvas id="cv-local" style="display:block;width:560px;height:420px;"></canvas>
+    </div>
+  </div>
+</div><!-- end fixed-width inner -->
+</div><!-- end col3 -->
+
+<!-- Col 4: Results -->
+<div class="results-panel" style="min-width:260px;max-width:260px;overflow-y:auto;">
+  <div class="sec" style="margin-top:0">Results</div>
+  <div id="results-content">
+    <div style="font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;text-align:center;padding:20px;">Run Calculate to see results</div>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+'use strict';
+// ── State ────────────────────────────────────────────────────────────────────
+var nodes={}, nodeCount=0;
+var members={}, memberCount=0;
+var supports={}, suppCount=0;
+var loads={}, loadCount=0;
+var results=null;
+var memberLoads={}, mLoadCount=0;
+var showDeformed=true, showLabels=true, showGrid=true;
+
+// ── Canvas & viewport ────────────────────────────────────────────────────────
+var cv=document.getElementById('frame-canvas');
+var ctx=cv.getContext('2d');
+var dpr=window.devicePixelRatio||1;
+var vp={ox:0,oy:0,scale:80}; // origin in canvas px, scale=px/m
+var dragging=false,dragStart={x:0,y:0},vpStart={ox:0,oy:0};
+
+function resize(){
+  var W=560;
+  var H=520;
+  cv.style.width=W+'px';
+  cv.style.height=H+'px';
+  cv.width=W*dpr; cv.height=H*dpr;
+  draw();
+}
+
+function toCanvas(x,y){return{x:vp.ox+x*vp.scale,y:vp.oy-y*vp.scale};}
+function toWorld(cx,cy){return{x:(cx-vp.ox)/vp.scale,y:(vp.oy-cy)/vp.scale};}
+
+// ── Tab switching ────────────────────────────────────────────────────────────
+
+
+// ── Node management ──────────────────────────────────────────────────────────
+function addNode(xv,yv){
+  nodeCount++;
+  var id=nodeCount;
+  xv=xv!=null?xv:0; yv=yv!=null?yv:0;
+  nodes[id]={x:xv,y:yv};
+  var d=document.createElement('div');
+  d.className='card'; d.id='nc-'+id;
+  d.innerHTML=
+    '<button class="crem" onclick="removeNode('+id+')">✕</button>'+
+    '<div class="card-hd"><span class="cnum">'+id+'</span><span class="clbl">Node #'+id+'</span></div>'+
+    '<div class="row2">'+
+    '<div class="field"><label>x (m)</label><input type="number" id="nx-'+id+'" value="'+xv+'" step="0.5" oninput="nodes['+id+'].x=+this.value;draw()"></div>'+
+    '<div class="field"><label>y (m)</label><input type="number" id="ny-'+id+'" value="'+yv+'" step="0.5" oninput="nodes['+id+'].y=+this.value;draw()"></div>'+
+    '</div>';
+  document.getElementById('node-list').appendChild(d);
+  draw(); return id;
+}
+function removeNode(id){
+  delete nodes[id];
+  var el=document.getElementById('nc-'+id); if(el)el.remove();
+  draw();
+}
+
+// ── Member management ────────────────────────────────────────────────────────
+function addMember(){
+  memberCount++;
+  var id=memberCount;
+  var nids=Object.keys(nodes);
+  var ni=nids[0]||1, nj=nids[1]||2;
+  members[id]={ni:+ni,nj:+nj,E:2100000,A:10,I:100};
+  var d=document.createElement('div');
+  d.className='card'; d.id='mc-'+id;
+  d.innerHTML=
+    '<button class="crem" onclick="removeMember('+id+')">✕</button>'+
+    '<div class="card-hd"><span class="cnum m">'+id+'</span><span class="clbl">Member #'+id+'</span></div>'+
+    '<div class="row2"><div class="field"><label>Node i</label>'+
+    '<input type="number" id="mni-'+id+'" value="'+ni+'" step="1" min="1" oninput="members['+id+'].ni=+this.value;draw()"></div>'+
+    '<div class="field"><label>Node j</label>'+
+    '<input type="number" id="mnj-'+id+'" value="'+nj+'" step="1" min="1" oninput="members['+id+'].nj=+this.value;draw()"></div></div>'+
+    '<div class="row3">'+
+    '<div class="field"><label>E (kg/cm²)</label><input type="number" id="me-'+id+'" value="2100000" step="100000" oninput="members['+id+'].E=+this.value"></div>'+
+    '<div class="field"><label>A (cm²)</label><input type="number" id="ma-'+id+'" value="10" step="1" oninput="members['+id+'].A=+this.value"></div>'+
+    '<div class="field"><label>I (cm⁴)</label><input type="number" id="mi-'+id+'" value="100" step="10" oninput="members['+id+'].I=+this.value"></div>'+
+    '</div>';
+  document.getElementById('member-list').appendChild(d);
+  draw();
+}
+function removeMember(id){
+  delete members[id];
+  var el=document.getElementById('mc-'+id); if(el)el.remove();
+  draw();
+}
+
+// ── Support management ───────────────────────────────────────────────────────
+function addSupport(){
+  suppCount++;
+  var id=suppCount;
+  var nids=Object.keys(nodes);
+  var ni=nids[0]||1;
+  supports[id]={node:+ni,type:'fixed'};
+  var d=document.createElement('div');
+  d.className='card'; d.id='sc-'+id;
+  d.innerHTML=
+    '<button class="crem" onclick="removeSupport('+id+')">✕</button>'+
+    '<div class="card-hd"><span class="cnum s">'+id+'</span><span class="clbl">Support #'+id+'</span></div>'+
+    '<div class="row2">'+
+    '<div class="field"><label>Node</label>'+
+    '<input type="number" id="sn-'+id+'" value="'+ni+'" step="1" min="1" oninput="supports['+id+'].node=+this.value;draw()"></div>'+
+    '<div class="field"><label>Type</label>'+
+    '<select id="st-'+id+'" onchange="supports['+id+'].type=this.value;draw()">'+
+    '<option value="fixed">▐ Fixed</option>'+
+    '<option value="pin">△ Pin</option>'+
+    '<option value="roller_x">○ Roller (free X)</option>'+
+    '<option value="roller_y">○ Roller (free Y)</option>'+
+    '</select></div></div>';
+  document.getElementById('supp-list').appendChild(d);
+  draw();
+}
+function removeSupport(id){
+  delete supports[id];
+  var el=document.getElementById('sc-'+id); if(el)el.remove();
+  draw();
+}
+
+// ── Load management ──────────────────────────────────────────────────────────
+function addMemberLoad(){
+  mLoadCount++;
+  var id=mLoadCount;
+  var mids=Object.keys(members);
+  var mid=mids[0]||1;
+  memberLoads[id]={member:+mid,w:10};
+  var d=document.createElement('div');
+  d.className='scard'; d.id='mlc-'+id;
+  d.innerHTML=
+    '<button class="crem" onclick="removeMemberLoad('+id+')">✕</button>'+
+    '<div class="card-hd"><span class="cnum m">'+id+'</span><span class="clbl">UDL #'+id+'</span></div>'+
+    '<div class="row2">'+
+    '<div class="field"><label>Member #</label>'+
+    '<input type="number" id="mlm-'+id+'" value="'+mid+'" step="1" min="1" oninput="memberLoads['+id+'].member=+this.value"></div>'+
+    '<div class="field"><label>w (kg/m) ↓+</label>'+
+    '<input type="number" id="mlw-'+id+'" value="10" step="1" oninput="memberLoads['+id+'].w=+this.value"></div>'+
+    '</div>';
+  document.getElementById('mload-list').appendChild(d);
+}
+function removeMemberLoad(id){
+  delete memberLoads[id];
+  var el=document.getElementById('mlc-'+id);if(el)el.remove();
+}
+
+function addLoad(){
+  loadCount++;
+  var id=loadCount;
+  var nids=Object.keys(nodes);
+  var ni=nids[0]||1;
+  loads[id]={node:+ni,Fx:0,Fy:0,M:0};
+  var d=document.createElement('div');
+  d.className='card'; d.id='lc-'+id;
+  d.innerHTML=
+    '<button class="crem" onclick="removeLoad('+id+')">✕</button>'+
+    '<div class="card-hd"><span class="cnum l">'+id+'</span><span class="clbl">Load #'+id+'</span></div>'+
+    '<div class="field"><label>Node</label>'+
+    '<input type="number" id="ln-'+id+'" value="'+ni+'" step="1" min="1" oninput="loads['+id+'].node=+this.value"></div>'+
+    '<div class="row3">'+
+    '<div class="field"><label>Fx (kg) →</label><input type="number" id="lfx-'+id+'" value="0" step="1" oninput="loads['+id+'].Fx=+this.value"></div>'+
+    '<div class="field"><label>Fy (kg) ↑</label><input type="number" id="lfy-'+id+'" value="0" step="1" oninput="loads['+id+'].Fy=+this.value"></div>'+
+    '<div class="field"><label>M (kg·m) ↺+</label><input type="number" id="lm-'+id+'" value="0" step="1" oninput="loads['+id+'].M=+this.value"></div>'+
+    '</div>';
+  document.getElementById('load-list').appendChild(d);
+}
+function removeLoad(id){
+  delete loads[id];
+  var el=document.getElementById('lc-'+id); if(el)el.remove();
+}
+
+// ── Solver ───────────────────────────────────────────────────────────────────
+function analyze(){
+  var nids=Object.keys(nodes).map(Number);
+  var mids=Object.keys(members).map(Number);
+  if(nids.length<2) return showErr('Need at least 2 nodes');
+  if(mids.length<1) return showErr('Need at least 1 member');
+  if(Object.keys(supports).length<1) return showErr('Need at least 1 support');
+  hideErr();
+
+  // Re-read DOM values
+  nids.forEach(function(id){
+    var ex=document.getElementById('nx-'+id), ey=document.getElementById('ny-'+id);
+    if(ex) nodes[id].x=+ex.value;
+    if(ey) nodes[id].y=+ey.value;
+  });
+  mids.forEach(function(id){
+    var m=members[id];
+    var eE=document.getElementById('me-'+id);
+    var eA=document.getElementById('ma-'+id);
+    var eI=document.getElementById('mi-'+id);
+    var eni=document.getElementById('mni-'+id);
+    var enj=document.getElementById('mnj-'+id);
+    if(eE) m.E=+eE.value; if(eA) m.A=+eA.value; if(eI) m.I=+eI.value;
+    if(eni) m.ni=+eni.value; if(enj) m.nj=+enj.value;
+  });
+  Object.keys(supports).forEach(function(id){
+    var es=document.getElementById('sn-'+id), et=document.getElementById('st-'+id);
+    if(es) supports[id].node=+es.value;
+    if(et) supports[id].type=et.value;
+  });
+  // Re-read member loads
+  Object.keys(memberLoads).forEach(function(id){
+    var em=document.getElementById('mlm-'+id), ew=document.getElementById('mlw-'+id);
+    if(em) memberLoads[id].member=+em.value;
+    if(ew) memberLoads[id].w=+ew.value;
+  });
+
+  Object.keys(loads).forEach(function(id){
+    var ln=document.getElementById('ln-'+id);
+    var lfx=document.getElementById('lfx-'+id);
+    var lfy=document.getElementById('lfy-'+id);
+    var lm=document.getElementById('lm-'+id);
+    if(ln) loads[id].node=+ln.value;
+    if(lfx) loads[id].Fx=+lfx.value;
+    if(lfy) loads[id].Fy=+lfy.value;
+    if(lm) loads[id].M=+lm.value;
+  });
+
+  // Map node ids to indices
+  var nodeIdx={};
+  nids.forEach(function(id,i){nodeIdx[id]=i;});
+  var nN=nids.length, nDOF=nN*3;
+
+  // Validate members reference valid nodes
+  for(var i=0;i<mids.length;i++){
+    var m=members[mids[i]];
+    if(nodeIdx[m.ni]===undefined) return showErr('Member #'+mids[i]+': Node '+m.ni+' not found');
+    if(nodeIdx[m.nj]===undefined) return showErr('Member #'+mids[i]+': Node '+m.nj+' not found');
+    if(m.ni===m.nj) return showErr('Member #'+mids[i]+': Node i = Node j');
+  }
+
+  // Build K
+  var K=[];
+  for(var i=0;i<nDOF;i++){K.push(new Float64Array(nDOF));}
+  var F=new Float64Array(nDOF);
+
+  // Member stiffness in global
+  var memberForces={};
+  mids.forEach(function(mid){
+    var m=members[mid];
+    var ni=nodeIdx[m.ni], nj=nodeIdx[m.nj];
+    var xi=nodes[m.ni].x, yi=nodes[m.ni].y;
+    var xj=nodes[m.nj].x, yj=nodes[m.nj].y;
+    var L=Math.sqrt((xj-xi)**2+(yj-yi)**2);
+    if(L<1e-9) return;
+    var cx=(xj-xi)/L, cy=(yj-yi)/L;
+    // Convert units: E kg/cm² → kg/m²; A cm²→m²; I cm⁴→m⁴
+    var Em=m.E*1e4, Am=m.A*1e-4, Im=m.I*1e-8;
+    var ea=Em*Am/L, ei=Em*Im;
+    // Local stiffness (6×6)
+    var kl=[[ea,0,0,-ea,0,0],
+             [0,12*ei/L**3,6*ei/L**2,0,-12*ei/L**3,6*ei/L**2],
+             [0,6*ei/L**2,4*ei/L,0,-6*ei/L**2,2*ei/L],
+             [-ea,0,0,ea,0,0],
+             [0,-12*ei/L**3,-6*ei/L**2,0,12*ei/L**3,-6*ei/L**2],
+             [0,6*ei/L**2,2*ei/L,0,-6*ei/L**2,4*ei/L]];
+    // Transform matrix T (6×6): [cx,cy,0; -cy,cx,0; 0,0,1] for each 3×3 block
+    function T(a,b,local){
+      // local index → global: row a, col b
+      var ti=Math.floor(a/3), tj=Math.floor(b/3); // block
+      var li=a%3, lj=b%3;
+      // t = [[cx,cy,0],[-cy,cx,0],[0,0,1]]
+      var t=[[cx,cy,0],[-cy,cx,0],[0,0,1]];
+      return (ti===tj)?t[li][lj]:(li===lj&&li===2?0:0);
+    }
+    // Build full 6x6 transformation matrix T (block diagonal)
+    var t=[[cx,cy,0],[-cy,cx,0],[0,0,1]];
+    var Tm=[];
+    for(var r=0;r<6;r++){Tm.push(new Array(6).fill(0));}
+    for(var r=0;r<3;r++) for(var c=0;c<3;c++){Tm[r][c]=t[r][c];Tm[r+3][c+3]=t[r][c];}
+    // Compute kg = T^T * kl * T  (full 6x6 matrix multiply, no shortcuts)
+    var tmp2=[];
+    for(var r=0;r<6;r++){tmp2.push(new Array(6).fill(0));}
+    for(var r=0;r<6;r++) for(var c=0;c<6;c++) for(var k=0;k<6;k++) tmp2[r][c]+=kl[r][k]*Tm[k][c];
+    var kg=[];
+    for(var r=0;r<6;r++){kg.push(new Array(6).fill(0));}
+    for(var r=0;r<6;r++) for(var c=0;c<6;c++) for(var k=0;k<6;k++) kg[r][c]+=Tm[k][r]*tmp2[k][c];
+    // Assemble into K
+    var dofs=[ni*3,ni*3+1,ni*3+2,nj*3,nj*3+1,nj*3+2];
+    for(var r=0;r<6;r++) for(var c=0;c<6;c++) K[dofs[r]][dofs[c]]+=kg[r][c];
+    memberForces[mid]={ni:ni,nj:nj,L:L,cx:cx,cy:cy,Em:Em,Am:Am,Im:Im,dofs:dofs};
+  });
+
+  // Apply loads
+  Object.values(loads).forEach(function(ld){
+    var ni=nodeIdx[ld.node];
+    if(ni===undefined) return;
+    F[ni*3]+=ld.Fx;
+    F[ni*3+1]+=ld.Fy;
+    F[ni*3+2]+=-ld.M;  // M+ = CCW in UI = negative in global DOF convention
+  });
+
+  // Apply FEF from member UDL loads
+  Object.values(memberLoads).forEach(function(ml){
+    var m=members[ml.member];
+    if(!m) return;
+    var ni=nodeIdx[m.ni], nj=nodeIdx[m.nj];
+    if(ni===undefined||nj===undefined) return;
+    var xi=nodes[m.ni].x,yi=nodes[m.ni].y,xj=nodes[m.nj].x,yj=nodes[m.nj].y;
+    var L=Math.sqrt((xj-xi)**2+(yj-yi)**2); if(L<1e-9) return;
+    var cx2=(xj-xi)/L, cy2=(yj-yi)/L;
+    var w=ml.w;
+    // FEF in local frame: w positive=downward=-local y
+    // [0,-wL/2,-wL²/12,0,-wL/2,+wL²/12]
+    var fefL=[0,-w*L/2,-w*L*L/12,0,-w*L/2,w*L*L/12];
+    // Transform to global: F_global = T^T * fef_local
+    var t2=[[cx2,cy2,0],[-cy2,cx2,0],[0,0,1]];
+    var Tm2=[];
+    for(var r=0;r<6;r++){Tm2.push(new Array(6).fill(0));}
+    for(var r=0;r<3;r++) for(var c=0;c<3;c++){Tm2[r][c]=t2[r][c];Tm2[r+3][c+3]=t2[r][c];}
+    var fefG=new Array(6).fill(0);
+    for(var r=0;r<6;r++) for(var k=0;k<6;k++) fefG[r]+=Tm2[k][r]*fefL[k]; // T^T
+    // Add to F (FEF acts on structure as equivalent nodal loads)
+    var dofs=[ni*3,ni*3+1,ni*3+2,nj*3,nj*3+1,nj*3+2];
+    for(var r=0;r<6;r++) F[dofs[r]]+=fefG[r];
+    // Store for diagram use
+    ml._w=w; ml._L=L; ml._cx=cx2; ml._cy=cy2; ml._ni=ni; ml._nj=nj;
+    ml._xi=nodes[m.ni].x; ml._yi=nodes[m.ni].y;
+    ml._xj=nodes[m.nj].x; ml._yj=nodes[m.nj].y;
+  });
+
+  // Constrained DOFs
+  var con=new Set();
+  var suppKeys=Object.keys(supports);
+  for(var i=0;i<suppKeys.length;i++){
+    var s=supports[suppKeys[i]];
+    var ni=nodeIdx[s.node];
+    if(ni===undefined) return showErr('Support #'+suppKeys[i]+': Node '+s.node+' not found');
+    if(s.type==='fixed'){con.add(ni*3);con.add(ni*3+1);con.add(ni*3+2);}
+    else if(s.type==='pin'){con.add(ni*3);con.add(ni*3+1);}
+    else if(s.type==='roller_x'){con.add(ni*3+1);} // free X, constrain Y
+    else if(s.type==='roller_y'){con.add(ni*3);}   // free Y, constrain X
+  }
+
+  var free=[];
+  for(var i=0;i<nDOF;i++) if(!con.has(i)) free.push(i);
+  if(free.length===0) return showErr('All DOFs constrained');
+
+  // Kff
+  var Kff=free.map(function(fi){return free.map(function(fj){return K[fi][fj];});});
+  var Ff=free.map(function(fi){return F[fi];});
+
+  // Solve
+  var d;
+  try{d=gaussSolve(Kff,Ff);}catch(e){return showErr('Matrix singular — system unstable');}
+  var disp=new Float64Array(nDOF);
+  for(var i=0;i<free.length;i++) disp[free[i]]=d[i];
+
+  // Reactions
+  var react=new Float64Array(nDOF);
+  con.forEach(function(ci){
+    var rval=0; for(var j=0;j<nDOF;j++) rval+=K[ci][j]*disp[j];
+    react[ci]=rval-F[ci];
+  });
+
+  // Member end forces (local)
+  var mfLocal={};
+  Object.keys(memberForces).forEach(function(mid){
+    var mf=memberForces[mid];
+    var cx=mf.cx,cy=mf.cy;
+    var t=[[cx,cy,0],[-cy,cx,0],[0,0,1]];
+    var dl=new Array(6);
+    for(var r=0;r<6;r++){
+      var br=Math.floor(r/3),lr=r%3;
+      var s=0;
+      for(var k=0;k<3;k++) s+=t[lr][k]*disp[mf.dofs[r-lr+k]];
+      dl[r]=s;
+    }
+    // f_local = kl * dl
+    var L=mf.L, Em=mf.Em, Am=mf.Am, Im=mf.Im;
+    var ea=Em*Am/L, ei=Em*Im;
+    var kl=[[ea,0,0,-ea,0,0],[0,12*ei/L**3,6*ei/L**2,0,-12*ei/L**3,6*ei/L**2],
+             [0,6*ei/L**2,4*ei/L,0,-6*ei/L**2,2*ei/L],[-ea,0,0,ea,0,0],
+             [0,-12*ei/L**3,-6*ei/L**2,0,12*ei/L**3,-6*ei/L**2],
+             [0,6*ei/L**2,2*ei/L,0,-6*ei/L**2,4*ei/L]];
+    var fl=new Array(6).fill(0);
+    for(var r=0;r<6;r++) for(var c=0;c<6;c++) fl[r]+=kl[r][c]*dl[c];
+    mfLocal[mid]={N:-fl[0],Vi:fl[1],Mi:fl[2],Vj:-fl[4],Mj:-fl[5]};
+  });
+
+  results={disp:disp,react:react,nodeIdx:nodeIdx,nids:nids,mfLocal:mfLocal};
+  renderResults();
+  draw();
+}
+
+function gaussSolve(A,b){
+  var n=A.length;
+  var M=A.map(function(r,i){return r.concat([b[i]]);});
+  for(var col=0;col<n;col++){
+    var maxR=col;
+    for(var r=col+1;r<n;r++) if(Math.abs(M[r][col])>Math.abs(M[maxR][col])) maxR=r;
+    var tmp=M[col]; M[col]=M[maxR]; M[maxR]=tmp;
+    if(Math.abs(M[col][col])<1e-14) throw new Error('singular');
+    for(var r=col+1;r<n;r++){
+      var f=M[r][col]/M[col][col];
+      for(var c=col;c<=n;c++) M[r][c]-=f*M[col][c];
+    }
+  }
+  var x=new Array(n).fill(0);
+  for(var i=n-1;i>=0;i--){
+    x[i]=M[i][n];
+    for(var j=i+1;j<n;j++) x[i]-=M[i][j]*x[j];
+    x[i]/=M[i][i];
+  }
+  return x;
+}
+
+
+// ── Diagram computation ────────────────────────────────────────────────────
+function computeDiagrams(){
+  if(!results) return;
+  var mids=Object.keys(members).map(Number);
+  var diags={};
+  mids.forEach(function(mid){
+    var m=members[mid];
+    if(!results.nodeIdx[m.ni]===undefined||results.nodeIdx[m.nj]===undefined) return;
+    var ni=results.nodeIdx[m.ni], nj=results.nodeIdx[m.nj];
+    var xi=nodes[m.ni].x,yi=nodes[m.ni].y,xj=nodes[m.nj].x,yj=nodes[m.nj].y;
+    var L=Math.sqrt((xj-xi)**2+(yj-yi)**2);
+    var cx=(xj-xi)/L, cy=(yj-yi)/L;
+    // Local displacements
+    var dg=[results.disp[ni*3],results.disp[ni*3+1],results.disp[ni*3+2],
+            results.disp[nj*3],results.disp[nj*3+1],results.disp[nj*3+2]];
+    // Transform to local
+    var t=[[cx,cy,0],[-cy,cx,0],[0,0,1]];
+    var dl=new Array(6).fill(0);
+    for(var r=0;r<6;r++){
+      var br=Math.floor(r/3),lr=r%3;
+      for(var k=0;k<3;k++) dl[r]+=t[lr][k]*dg[br*3+k];
+    }
+    // Local stiffness × local disp = local forces
+    var Em=m.E*1e4, Am=m.A*1e-4, Im=m.I*1e-8;
+    var ea=Em*Am/L, ei=Em*Im;
+    var kl=[[ea,0,0,-ea,0,0],[0,12*ei/L**3,6*ei/L**2,0,-12*ei/L**3,6*ei/L**2],
+             [0,6*ei/L**2,4*ei/L,0,-6*ei/L**2,2*ei/L],[-ea,0,0,ea,0,0],
+             [0,-12*ei/L**3,-6*ei/L**2,0,12*ei/L**3,-6*ei/L**2],
+             [0,6*ei/L**2,2*ei/L,0,-6*ei/L**2,4*ei/L]];
+    var fl=new Array(6).fill(0);
+    for(var r=0;r<6;r++) for(var c=0;c<6;c++) fl[r]+=kl[r][c]*dl[c];
+    // Check if member has UDL
+    var w_udl=0;
+    Object.values(memberLoads).forEach(function(ml){if(ml.member===mid) w_udl+=ml.w;});
+
+    // N, V, M along member (50 pts)
+    var nPts=50;
+    var xs=[],Narr=[],Varr=[],Marr=[],DEFarr=[];
+    var N=fl[0];
+    // Correct formulas (FEF method, section sign convention):
+    // V(s) = fl[1] + w*L/2 - w*s
+    // M(s) = -fl[2] - w*L²/12 + Vi*s - w*s²/2
+    var Vi_true = fl[1] + w_udl*L/2;
+    var Mi_true = -fl[2] - w_udl*L*L/12;
+    for(var i=0;i<=nPts;i++){
+      var s=L*i/nPts;
+      xs.push(s);
+      Narr.push(-N);
+      Varr.push(Vi_true - w_udl*s);
+      Marr.push(Mi_true + Vi_true*s - 0.5*w_udl*s*s);
+      // Deflection (transverse) from cubic Hermite
+      var xi_=s/L;
+      var N1=1-3*xi_*xi_+2*xi_*xi_*xi_;
+      var N2=L*xi_*(1-xi_)*(1-xi_);
+      var N3=3*xi_*xi_-2*xi_*xi_*xi_;
+      var N4=L*xi_*xi_*(xi_-1);
+      DEFarr.push((N1*dl[1]+N2*dl[2]+N3*dl[4]+N4*dl[5])*1000); // mm
+    }
+    diags[mid]={xs:xs,N:Narr,V:Varr,M:Marr,DEF:DEFarr,L:L,
+                xi:nodes[m.ni].x,yi:nodes[m.ni].y,xj:nodes[m.nj].x,yj:nodes[m.nj].y,
+                cx:cx,cy:cy,mid:mid};
+  });
+  return diags;
+}
+
+// ── Diagram type selector ────────────────────────────────────────────────
+var activeDiagram='none';
+var diagScaleMult=0.2;  // user-adjustable scale (base is 0.08)
+
+function changeDiagScale(dir){
+  if(dir>0) diagScaleMult*=1.25;
+  else diagScaleMult/=1.25;
+  document.getElementById('diag-scale-lbl').textContent=diagScaleMult.toFixed(3)+'x';
+  if(results) drawAllDiagrams();
+} // 'none','N','V','M','DEF'
+var DIAG_COLORS={N:'#a78bfa',V:'#ef4444',M:'#ffd24d',DEF:'#00e5ff'};
+var DIAG_LABELS={N:'Axial N (kg)',V:'Shear V (kg)',M:'Moment M (kg·m)',DEF:'Deflection v (mm)'};
+var DIAG_SCALE=40; // px per unit (adaptive)
+
+function setDiagram(type){
+  activeDiagram=activeDiagram===type?'none':type;
+  ['N','V','M','DEF'].forEach(function(t){
+    var b=document.getElementById('dbtn-'+t);
+    if(b) b.classList.toggle('on',activeDiagram===t);
+  });
+  draw();
+}
+
+function drawDiagramOverlay(ctx2,diags){
+  if(!diags||activeDiagram==='none') return;
+  var key=activeDiagram;
+  var color=DIAG_COLORS[key];
+
+  // Find global max for scaling
+  var mids=Object.keys(diags).map(Number);
+  var allY=[];
+  mids.forEach(function(mid){allY=allY.concat(diags[mid][key]);});
+  var maxA=Math.max.apply(null,allY.map(Math.abs).concat([0.001]));
+
+  // Scale: how many canvas px per unit value
+  // Use viewport scale to size diagrams relative to members
+  var scalePx=vp.scale*0.5/maxA; // 0.5m max diagram width at current zoom
+
+  mids.forEach(function(mid){
+    var d=diags[mid];
+    var vals=d[key];
+    var nPts=vals.length;
+    var L=d.L, cx=d.cx, cy=d.cy;
+    // Perpendicular direction (rotated 90° CCW from member axis)
+    var px=-cy, py=cx; // local y direction in world coords
+
+    // Draw filled shape
+    ctx2.save();
+    ctx2.beginPath();
+    // Baseline: along member
+    var p0=toCanvas(d.xi,d.yi);
+    ctx2.moveTo(p0.x,p0.y);
+    for(var i=0;i<nPts;i++){
+      var s=d.xs[i];
+      var wx=d.xi+cx*s+px*vals[i]*scalePx/vp.scale;
+      var wy=d.yi+cy*s+py*vals[i]*scalePx/vp.scale;
+      var pc=toCanvas(wx,wy);
+      ctx2.lineTo(pc.x,pc.y);
+    }
+    var pL=toCanvas(d.xj,d.yj);
+    ctx2.lineTo(pL.x,pL.y);
+    ctx2.closePath();
+    ctx2.fillStyle=color+'28';
+    ctx2.fill();
+
+    // Curve line
+    ctx2.beginPath();
+    ctx2.strokeStyle=color;
+    ctx2.lineWidth=1.8;
+    for(var i=0;i<nPts;i++){
+      var s=d.xs[i];
+      var wx=d.xi+cx*s+px*vals[i]*scalePx/vp.scale;
+      var wy=d.yi+cy*s+py*vals[i]*scalePx/vp.scale;
+      var pc=toCanvas(wx,wy);
+      i===0?ctx2.moveTo(pc.x,pc.y):ctx2.lineTo(pc.x,pc.y);
+    }
+    ctx2.stroke();
+
+    // End lines (caps)
+    ctx2.strokeStyle=color+'88';ctx2.lineWidth=1;
+    [0,nPts-1].forEach(function(i){
+      var s=d.xs[i];
+      var wx0=d.xi+cx*s, wy0=d.yi+cy*s;
+      var wx1=wx0+px*vals[i]*scalePx/vp.scale;
+      var wy1=wy0+py*vals[i]*scalePx/vp.scale;
+      var pc0=toCanvas(wx0,wy0),pc1=toCanvas(wx1,wy1);
+      ctx2.beginPath();ctx2.moveTo(pc0.x,pc0.y);ctx2.lineTo(pc1.x,pc1.y);ctx2.stroke();
+    });
+
+    // Max/min labels
+    var maxIdx=0, minIdx=0;
+    for(var i=1;i<nPts;i++){
+      if(vals[i]>vals[maxIdx]) maxIdx=i;
+      if(vals[i]<vals[minIdx]) minIdx=i;
+    }
+    [maxIdx,minIdx].forEach(function(ii){
+      if(Math.abs(vals[ii])<maxA*0.05) return;
+      var s=d.xs[ii];
+      var wx=d.xi+cx*s+px*vals[ii]*scalePx/vp.scale;
+      var wy=d.yi+cy*s+py*vals[ii]*scalePx/vp.scale;
+      var pc=toCanvas(wx,wy);
+      ctx2.fillStyle=color;
+      ctx2.beginPath();ctx2.arc(pc.x,pc.y,3,0,Math.PI*2);ctx2.fill();
+      ctx2.font='bold 11px Space Mono,monospace';ctx2.textAlign='center';
+      ctx2.fillStyle=color;
+      var offset=vals[ii]>=0?-10:12;
+      ctx2.fillText(vals[ii].toFixed(2),pc.x,pc.y+offset);
+    });
+
+    ctx2.restore();
+  });
+}
+
+function drawAllDiagrams(){
+  document.getElementById('diagram-panels').style.display='block';
+  var diags=computeDiagrams();
+  if(!diags) return;
+  drawStructureCanvas('cv-fbd',  diags,null,    'fbd');
+  drawStructureCanvas('cv-shear',diags,'V',     'V');
+  drawStructureCanvas('cv-moment',diags,'M',    'M');
+  drawStructureCanvas('cv-deflect',diags,'DEF', 'DEF');
+  drawLocalAxisCanvas('cv-local',diags);
+}
+
+function drawStructureCanvas(canvasId,diags,key,mode){
+  var cv2=document.getElementById(canvasId);
+  if(!cv2) return;
+  var W=560;
+  var H=420;
+  var dpr2=window.devicePixelRatio||1;
+  cv2.width=W*dpr2; cv2.height=H*dpr2;
+  cv2.style.width=W+'px'; cv2.style.height=H+'px';
+  cv2.style.maxWidth='none';
+  cv2.style.minWidth='none';
+  var c=cv2.getContext('2d');
+  c.scale(dpr2,dpr2);
+  c.clearRect(0,0,W,H);
+  c.fillStyle='#0b0d12'; c.fillRect(0,0,W,H);
+
+  // Compute bounding box of all nodes + diagram extent
+  var nids=Object.keys(nodes).map(Number);
+  if(!nids.length) return;
+  var xs2=nids.map(function(id){return nodes[id].x;});
+  var ys2=nids.map(function(id){return nodes[id].y;});
+
+  // Include diagram extents in bounding box
+  var mids=Object.keys(diags).map(Number);
+  var allVals=[]; 
+  if(key) mids.forEach(function(mid){allVals=allVals.concat(diags[mid][key]);});
+  var maxA=allVals.length?Math.max.apply(null,allVals.map(Math.abs)):0.001;
+  if(maxA<1e-9) maxA=0.001;
+
+  var pad2=40;
+  var xMin=Math.min.apply(null,xs2), xMax=Math.max.apply(null,xs2);
+  var yMin=Math.min.apply(null,ys2), yMax=Math.max.apply(null,ys2);
+  var spanX=xMax-xMin||1, spanY=yMax-yMin||1;
+  // Add margin for diagrams
+  var diagMargin=key?(spanX>spanY?spanY*0.4:spanX*0.4)*0.8:0;
+  xMin-=diagMargin; xMax+=diagMargin; yMin-=diagMargin; yMax+=diagMargin;
+  spanX=xMax-xMin; spanY=yMax-yMin;
+  var scaleX=(W-pad2*2)/spanX, scaleY=(H-pad2*2)/spanY;
+  var sc=Math.min(scaleX,scaleY)*0.85;
+  var offX=pad2+(W-pad2*2-(spanX*sc))/2-xMin*sc;
+  var offY=H-pad2-(H-pad2*2-(spanY*sc))/2+yMin*sc;
+
+  function tc(wx,wy){return{x:offX+wx*sc,y:offY-wy*sc};}
+
+  // Grid dots
+  c.fillStyle='rgba(255,255,255,0.04)';
+  for(var gx=Math.floor(xMin);gx<=Math.ceil(xMax);gx++){
+    for(var gy=Math.floor(yMin);gy<=Math.ceil(yMax);gy++){
+      var gp=tc(gx,gy);
+      c.beginPath();c.arc(gp.x,gp.y,1.2,0,Math.PI*2);c.fill();
+    }
+  }
+
+  // Members (undeformed skeleton)
+  mids.forEach(function(mid){
+    var m=members[mid];
+    if(!nodes[m.ni]||!nodes[m.nj]) return;
+    var pi=tc(nodes[m.ni].x,nodes[m.ni].y);
+    var pj=tc(nodes[m.nj].x,nodes[m.nj].y);
+    c.strokeStyle='#1e3828'; c.lineWidth=6; c.lineCap='round';
+    c.beginPath();c.moveTo(pi.x,pi.y);c.lineTo(pj.x,pj.y);c.stroke();
+    c.strokeStyle='#2a6648'; c.lineWidth=3;
+    c.beginPath();c.moveTo(pi.x,pi.y);c.lineTo(pj.x,pj.y);c.stroke();
+  });
+
+  // Diagram overlay per member
+  if(key){
+    var color=DIAG_COLORS[key]||'#00e5ff';
+    var diagSc=sc*0.08/maxA*diagScaleMult;
+    mids.forEach(function(mid){
+      var d=diags[mid];
+      var vals=d[key], nPts=vals.length;
+      var cx3=d.cx,cy3=d.cy;
+      var px3=-cy3,py3=cx3; // perpendicular
+      c.save();
+      c.beginPath();
+      var p0=tc(d.xi,d.yi);
+      c.moveTo(p0.x,p0.y);
+      for(var i=0;i<nPts;i++){
+        var s=d.xs[i];
+        var wx=d.xi+cx3*s+px3*vals[i]*diagSc;
+        var wy=d.yi+cy3*s+py3*vals[i]*diagSc;
+        var p2=tc(wx,wy);
+        c.lineTo(p2.x,p2.y);
+      }
+      var pL=tc(d.xj,d.yj);
+      c.lineTo(pL.x,pL.y);
+      c.closePath();
+      c.fillStyle=color+'25'; c.fill();
+      c.beginPath();c.strokeStyle=color;c.lineWidth=1.8;
+      for(var i=0;i<nPts;i++){
+        var s=d.xs[i];
+        var wx=d.xi+cx3*s+px3*vals[i]*diagSc;
+        var wy=d.yi+cy3*s+py3*vals[i]*diagSc;
+        var p2=tc(wx,wy);
+        i===0?c.moveTo(p2.x,p2.y):c.lineTo(p2.x,p2.y);
+      }
+      c.stroke();
+      // End cap lines
+      [0,nPts-1].forEach(function(i){
+        var s=d.xs[i];
+        var wx0=d.xi+cx3*s,wy0=d.yi+cy3*s;
+        var wx1=wx0+px3*vals[i]*diagSc,wy1=wy0+py3*vals[i]*diagSc;
+        var p0b=tc(wx0,wy0),p1b=tc(wx1,wy1);
+        c.strokeStyle=color+'88';c.lineWidth=1;
+        c.beginPath();c.moveTo(p0b.x,p0b.y);c.lineTo(p1b.x,p1b.y);c.stroke();
+      });
+      // Max/min labels
+      var maxIdx=0,minIdx=0;
+      for(var i=1;i<nPts;i++){if(vals[i]>vals[maxIdx])maxIdx=i;if(vals[i]<vals[minIdx])minIdx=i;}
+      [maxIdx,minIdx].forEach(function(ii){
+        if(Math.abs(vals[ii])<maxA*0.08) return;
+        var s=d.xs[ii];
+        var wx=d.xi+cx3*s+px3*vals[ii]*diagSc,wy=d.yi+cy3*s+py3*vals[ii]*diagSc;
+        var p2=tc(wx,wy);
+        c.fillStyle=color;c.beginPath();c.arc(p2.x,p2.y,2.5,0,Math.PI*2);c.fill();
+        c.font='bold 10px Space Mono,monospace';c.textAlign='center';c.fillStyle=color;
+        var above=vals[ii]>=0;
+        c.fillText(vals[ii].toFixed(2),p2.x,above?p2.y-7:p2.y+12);
+      });
+      c.restore();
+    });
+  }
+
+  // FBD: draw loads and reactions
+  if(mode==='fbd'){
+    // Loads
+    Object.values(loads).forEach(function(ld){
+      if(!nodes[ld.node]) return;
+      var p=tc(nodes[ld.node].x,nodes[ld.node].y);
+      var arLen=sc*0.5;
+      // Px: horizontal arrow
+      if(Math.abs(ld.Fx)>0.0001){
+        var dir=ld.Fx>0?1:-1;
+        var ex=p.x-dir*arLen;
+        c.strokeStyle='#ff5c5c';c.lineWidth=2;
+        c.beginPath();c.moveTo(ex,p.y);c.lineTo(p.x,p.y);c.stroke();
+        c.fillStyle='#ff5c5c';
+        c.beginPath();c.moveTo(p.x,p.y);
+        c.lineTo(p.x-dir*10,p.y-5);c.lineTo(p.x-dir*10,p.y+5);
+        c.closePath();c.fill();
+        c.font='bold 10px Space Mono,monospace';c.fillStyle='#ff5c5c';
+        c.textAlign=ld.Fx>0?'right':'left';
+        c.fillText('Px='+ld.Fx+'kg',ex+(ld.Fx>0?-4:4),p.y-8);
+      }
+      // Py: vertical arrow
+      if(Math.abs(ld.Fy)>0.0001){
+        var dir2=ld.Fy>0?1:-1;
+        var ey2=p.y+dir2*arLen;
+        c.strokeStyle='#ff5c5c';c.lineWidth=2;
+        c.beginPath();c.moveTo(p.x,ey2);c.lineTo(p.x,p.y);c.stroke();
+        c.fillStyle='#ff5c5c';
+        c.beginPath();c.moveTo(p.x,p.y);
+        c.lineTo(p.x-5,p.y+dir2*10);c.lineTo(p.x+5,p.y+dir2*10);
+        c.closePath();c.fill();
+        c.font='bold 10px Space Mono,monospace';c.fillStyle='#ff5c5c';
+        c.textAlign='left';
+        c.fillText('Py='+ld.Fy+'kg',p.x+6,ey2+(ld.Fy>0?14:-4));
+      }
+      // M: moment arc (CCW+ = positive)
+      if(Math.abs(ld.M)>0.0001){
+        var ar=Math.max(sc*0.12, 16);
+        var cw=ld.M<0; // positive M = CCW
+        c.strokeStyle='#c084fc';c.lineWidth=2;
+        var startA=cw?-0.3*Math.PI:0.15*Math.PI;
+        var endA=cw?1.85*Math.PI:2.3*Math.PI;
+        c.beginPath();c.arc(p.x,p.y,ar,startA,endA,cw);c.stroke();
+        // arrowhead (flip because canvas Y is inverted)
+        c.fillStyle='#c084fc';
+        if(cw){
+          c.beginPath();c.moveTo(p.x+ar,p.y);
+          c.lineTo(p.x+ar-6,p.y-4);c.lineTo(p.x+ar-6,p.y+4);
+          c.closePath();c.fill();
+        } else {
+          c.beginPath();c.moveTo(p.x+ar,p.y);
+          c.lineTo(p.x+ar+6,p.y-4);c.lineTo(p.x+ar+6,p.y+4);
+          c.closePath();c.fill();
+        }
+        c.font='bold 10px Space Mono,monospace';c.fillStyle='#c084fc';
+        c.textAlign='center';
+        var cwlbl=ld.M<0?' ↻ (CW)':' ↺ (CCW)';
+        c.fillText('M='+ld.M+'kg·m'+cwlbl,p.x,p.y-ar-7);
+      }
+    });
+    // Member UDL arrows
+    Object.values(memberLoads).forEach(function(ml){
+      if(!ml._xi===undefined) return;
+      var m2=members[ml.member]; if(!m2) return;
+      if(!nodes[m2.ni]||!nodes[m2.nj]) return;
+      var pi2=tc(nodes[m2.ni].x,nodes[m2.ni].y);
+      var pj2=tc(nodes[m2.nj].x,nodes[m2.nj].y);
+      var nArrows=8;
+      var cx3=ml._cx||0, cy3=ml._cy||0;
+      var px3=-cy3, py3=cx3; // local y perp direction
+      var arH=sc*0.25; // arrow height
+      var dir=ml.w>=0?1:-1;
+      c.strokeStyle='#38bdf8';c.fillStyle='#38bdf8';c.lineWidth=1.2;
+      // Top line
+      c.beginPath();
+      c.moveTo(pi2.x+px3*arH*dir,pi2.y-py3*arH*dir);
+      c.lineTo(pj2.x+px3*arH*dir,pj2.y-py3*arH*dir);
+      c.stroke();
+      // Arrow ticks
+      for(var k=0;k<=nArrows;k++){
+        var t3=k/nArrows;
+        var bx=pi2.x+(pj2.x-pi2.x)*t3;
+        var by2=pi2.y+(pj2.y-pi2.y)*t3;
+        var tx=bx+px3*arH*dir, ty=by2-py3*arH*dir;
+        c.beginPath();c.moveTo(tx,ty);c.lineTo(bx,by2);c.stroke();
+        // small arrowhead
+        var ax2=-px3*dir, ay2=py3*dir;
+        c.beginPath();c.moveTo(bx,by2);
+        c.lineTo(bx-ax2*6+ay2*3,by2-ay2*6-ax2*3);
+        c.lineTo(bx-ax2*6-ay2*3,by2-ay2*6+ax2*3);
+        c.closePath();c.fill();
+      }
+      // Label
+      var mx2=(pi2.x+pj2.x)/2+px3*arH*dir*1.5;
+      var my2=(pi2.y+pj2.y)/2-py3*arH*dir*1.5;
+      c.font='bold 10px Space Mono,monospace';c.textAlign='center';
+      c.fillText('w='+ml.w+'kg/m',mx2,my2);
+    });
+
+    // Reactions
+    if(results){
+      Object.keys(supports).forEach(function(sid){
+        // Re-read node from DOM
+        var snEl=document.getElementById('sn-'+sid);
+        var nodeId=snEl?+snEl.value:+supports[sid].node;
+        var ni=results.nodeIdx[+nodeId];
+        if(ni===undefined) return;
+        var nd=nodes[nodeId];
+        if(!nd) return;
+        var p=tc(nd.x,nd.y);
+        var Fx=results.react[ni*3]||0, Fy=results.react[ni*3+1]||0, Mz=-(results.react[ni*3+2]||0);
+        var arLen=sc*0.5;
+
+        var arLenR=Math.max(sc*0.4, 40);
+        // Fx: horizontal arrow
+        if(Math.abs(Fx)>0.0001){
+          var dir=Fx>0?1:-1;
+          var ex=p.x+dir*arLenR;
+          c.strokeStyle='#ffd24d';c.lineWidth=2;
+          c.beginPath();c.moveTo(p.x,p.y);c.lineTo(ex,p.y);c.stroke();
+          c.fillStyle='#ffd24d';
+          c.beginPath();c.moveTo(ex,p.y);
+          c.lineTo(ex-dir*10,p.y-5);c.lineTo(ex-dir*10,p.y+5);
+          c.closePath();c.fill();
+          c.font='bold 10px Space Mono,monospace';c.fillStyle='#ffd24d';
+          c.textAlign=Fx>0?'left':'right';
+          c.fillText('Fx='+Fx.toFixed(2)+'kg',ex+(dir*4),p.y-8);
+        }
+        // Fy: vertical arrow
+        if(Math.abs(Fy)>0.0001){
+          var dir2=Fy>0?1:-1;
+          var ey2=p.y-dir2*arLenR;
+          c.strokeStyle='#ffd24d';c.lineWidth=2;
+          c.beginPath();c.moveTo(p.x,p.y);c.lineTo(p.x,ey2);c.stroke();
+          c.fillStyle='#ffd24d';
+          c.beginPath();c.moveTo(p.x,ey2);
+          c.lineTo(p.x-5,ey2+dir2*10);c.lineTo(p.x+5,ey2+dir2*10);
+          c.closePath();c.fill();
+          c.font='bold 10px Space Mono,monospace';c.fillStyle='#ffd24d';
+          c.textAlign='left';
+          c.fillText('Fy='+Fy.toFixed(2)+'kg',p.x+6,ey2+(Fy>0?-4:14));
+        }
+
+        // Reaction moment arc (orange)
+        if(Math.abs(Mz)>0.001){
+          var ar=14;
+          var cw=Mz<0;
+          c.strokeStyle='#ff9900';c.lineWidth=2;
+          c.beginPath();c.arc(p.x,p.y,ar,0.2*Math.PI,1.8*Math.PI,!cw);c.stroke();
+          c.fillStyle='#ff9900';
+          if(!cw){
+            c.beginPath();c.moveTo(p.x+ar,p.y);c.lineTo(p.x+ar-5,p.y-4);c.lineTo(p.x+ar-5,p.y+4);c.closePath();c.fill();
+          } else {
+            c.beginPath();c.moveTo(p.x+ar,p.y);c.lineTo(p.x+ar+5,p.y-4);c.lineTo(p.x+ar+5,p.y+4);c.closePath();c.fill();
+          }
+          c.font='bold 10px Space Mono,monospace';c.fillStyle='#ff9900';c.textAlign='center';
+          var cwLabel=Mz<0?' ↻ (CW)':' ↺ (CCW)';
+          c.fillText('M='+Mz.toFixed(2)+'kg·m'+cwLabel,p.x,p.y-ar-6);
+        }
+      });
+    }
+  }
+
+  // Supports
+  Object.values(supports).forEach(function(s){
+    if(!nodes[s.node]) return;
+    var p=tc(nodes[s.node].x,nodes[s.node].y);
+    drawSupportSmall(c,p.x,p.y,s.type,sc);
+  });
+
+  // Nodes
+  nids.forEach(function(nid){
+    var p=tc(nodes[nid].x,nodes[nid].y);
+    c.fillStyle='#0b0d12';c.strokeStyle='#00e5ff';c.lineWidth=1.5;
+    c.beginPath();c.arc(p.x,p.y,4,0,Math.PI*2);c.fill();c.stroke();
+    c.fillStyle='rgba(0,229,255,0.7)';c.font='9px Space Mono,monospace';c.textAlign='center';
+    c.fillText(nid,p.x,p.y-8);
+  });
+}
+
+function drawSupportSmall(c2,x,y,type,sc2){
+  var sz=Math.max(6,Math.min(12,sc2*0.08));
+  c2.strokeStyle='#ffd24d';c2.fillStyle='rgba(255,210,77,0.15)';c2.lineWidth=1.2;
+  if(type==='fixed'){
+    c2.fillRect(x-sz,y-2,sz*2,sz+2);c2.strokeRect(x-sz,y-2,sz*2,sz+2);
+  } else if(type==='pin'){
+    c2.beginPath();c2.moveTo(x,y);c2.lineTo(x-sz,y+sz*1.4);c2.lineTo(x+sz,y+sz*1.4);
+    c2.closePath();c2.fill();c2.stroke();
+  } else {
+    c2.beginPath();c2.arc(x,y+sz*0.7,sz*0.6,0,Math.PI*2);c2.fill();c2.stroke();
+    c2.beginPath();c2.moveTo(x-sz,y+sz*1.3);c2.lineTo(x+sz,y+sz*1.3);c2.stroke();
+  }
+}
+
+
+function drawLocalAxisCanvas(canvasId,diags){
+  var cv2=document.getElementById(canvasId);
+  if(!cv2) return;
+  var W=560;
+  var H=420;
+  var dpr2=window.devicePixelRatio||1;
+  cv2.width=W*dpr2; cv2.height=H*dpr2;
+  cv2.style.width=W+'px'; cv2.style.height=H+'px';
+  cv2.style.maxWidth='none';
+  cv2.style.minWidth='none';
+  var c=cv2.getContext('2d');
+  c.scale(dpr2,dpr2);
+  c.clearRect(0,0,W,H);
+  c.fillStyle='#0b0d12'; c.fillRect(0,0,W,H);
+
+  var nids=Object.keys(nodes).map(Number);
+  if(!nids.length) return;
+  var xs2=nids.map(function(id){return nodes[id].x;});
+  var ys2=nids.map(function(id){return nodes[id].y;});
+  var xMin=Math.min.apply(null,xs2)-1, xMax=Math.max.apply(null,xs2)+1;
+  var yMin=Math.min.apply(null,ys2)-1, yMax=Math.max.apply(null,ys2)+1;
+  var spanX=xMax-xMin||1, spanY=yMax-yMin||1;
+  var pad2=40;
+  var scaleX=(W-pad2*2)/spanX, scaleY=(H-pad2*2)/spanY;
+  var sc=Math.min(scaleX,scaleY)*0.85;
+  var offX=pad2+(W-pad2*2-(spanX*sc))/2-xMin*sc;
+  var offY=H-pad2-(H-pad2*2-(spanY*sc))/2+yMin*sc;
+  function tc(wx,wy){return{x:offX+wx*sc,y:offY-wy*sc};}
+
+  // Grid dots
+  c.fillStyle='rgba(255,255,255,0.04)';
+  for(var gx=Math.floor(xMin);gx<=Math.ceil(xMax);gx++){
+    for(var gy=Math.floor(yMin);gy<=Math.ceil(yMax);gy++){
+      var gp=tc(gx,gy);c.beginPath();c.arc(gp.x,gp.y,1.2,0,Math.PI*2);c.fill();
+    }
+  }
+
+  // Members (skeleton)
+  var mids=Object.keys(diags).map(Number);
+  mids.forEach(function(mid){
+    var m=members[mid];
+    if(!nodes[m.ni]||!nodes[m.nj]) return;
+    var pi=tc(nodes[m.ni].x,nodes[m.ni].y);
+    var pj=tc(nodes[m.nj].x,nodes[m.nj].y);
+    c.strokeStyle='#1e3828';c.lineWidth=6;c.lineCap='round';
+    c.beginPath();c.moveTo(pi.x,pi.y);c.lineTo(pj.x,pj.y);c.stroke();
+    c.strokeStyle='#2a6648';c.lineWidth=3;
+    c.beginPath();c.moveTo(pi.x,pi.y);c.lineTo(pj.x,pj.y);c.stroke();
+  });
+
+  // Local axes per member
+  var arLen=sc*0.5; // arrow length in canvas px
+  mids.forEach(function(mid){
+    var d=diags[mid];
+    var cx3=d.cx,cy3=d.cy;      // local x direction
+    var px3=-cy3,py3=cx3;        // local y direction (perp, CCW)
+    var midX=(d.xi+d.xj)/2, midY=(d.yi+d.yj)/2;
+    var pm=tc(midX,midY);
+
+    // Local x̄ axis (along member) — cyan
+    drawArrow2(c, pm.x, pm.y, pm.x+cx3*arLen, pm.y-cy3*arLen, '#00e5ff', 7);
+    c.fillStyle='#00e5ff';c.font='bold 11px Space Mono,monospace';c.textAlign='left';
+    c.fillText('x̄',pm.x+cx3*arLen+4,pm.y-cy3*arLen+4);
+
+    // Local ȳ axis (perp to member) — accent3 green
+    drawArrow2(c, pm.x, pm.y, pm.x+px3*arLen, pm.y-py3*arLen, '#a8ff78', 7);
+    c.fillStyle='#a8ff78';c.font='bold 11px Space Mono,monospace';c.textAlign='left';
+    c.fillText('ȳ',pm.x+px3*arLen+4,pm.y-py3*arLen+4);
+
+    // Origin dot
+    c.fillStyle='#ffd24d';c.beginPath();c.arc(pm.x,pm.y,4,0,Math.PI*2);c.fill();
+
+    // Member label
+    c.fillStyle='rgba(136,150,184,0.8)';c.font='10px Space Mono,monospace';c.textAlign='center';
+    // Offset label slightly to avoid axis overlap
+    c.fillText('#'+mid, pm.x - cy3*arLen*0.25, pm.y + cx3*arLen*0.25 + 4);
+
+    // Angle annotation
+    var angleDeg=(Math.atan2(cy3,cx3)*180/Math.PI).toFixed(1);
+    c.fillStyle='rgba(136,150,184,0.6)';c.font='9px Space Mono,monospace';c.textAlign='center';
+    c.fillText(angleDeg+'°', pm.x-cy3*arLen*0.2-cx3*20, pm.y+cx3*arLen*0.2+cy3*20+10);
+  });
+
+  // Nodes
+  nids.forEach(function(nid){
+    var p=tc(nodes[nid].x,nodes[nid].y);
+    c.fillStyle='#0b0d12';c.strokeStyle='#00e5ff';c.lineWidth=1.5;
+    c.beginPath();c.arc(p.x,p.y,4,0,Math.PI*2);c.fill();c.stroke();
+    c.fillStyle='rgba(0,229,255,0.7)';c.font='9px Space Mono,monospace';c.textAlign='center';
+    c.fillText(nid,p.x,p.y-8);
+  });
+
+  // Supports
+  Object.values(supports).forEach(function(s){
+    if(!nodes[s.node]) return;
+    var p=tc(nodes[s.node].x,nodes[s.node].y);
+    drawSupportSmall(c,p.x,p.y,s.type,sc);
+  });
+
+  // Legend
+  c.fillStyle='#00e5ff';c.beginPath();c.moveTo(10,H-26);c.lineTo(22,H-26);c.strokeStyle='#00e5ff';c.lineWidth=2;c.stroke();
+  c.fillStyle='#00e5ff';c.font='10px Space Mono,monospace';c.textAlign='left';c.fillText('x̄ local axis',26,H-22);
+  c.strokeStyle='#a8ff78';c.lineWidth=2;c.beginPath();c.moveTo(10,H-12);c.lineTo(22,H-12);c.stroke();
+  c.fillStyle='#a8ff78';c.fillText('ȳ local axis',26,H-8);
+}
+
+function drawArrow2(c2,x1,y1,x2,y2,color,headSize){
+  var dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
+  if(len<1) return;
+  var ux=dx/len,uy=dy/len;
+  c2.strokeStyle=color;c2.lineWidth=2;
+  c2.beginPath();c2.moveTo(x1,y1);c2.lineTo(x2,y2);c2.stroke();
+  c2.fillStyle=color;
+  c2.beginPath();
+  c2.moveTo(x2,y2);
+  c2.lineTo(x2-ux*headSize+uy*headSize/2,y2-uy*headSize-ux*headSize/2);
+  c2.lineTo(x2-ux*headSize-uy*headSize/2,y2-uy*headSize+ux*headSize/2);
+  c2.closePath();c2.fill();
+}
+
+function renderResults(){
+  if(!results) return;
+  var html='';
+  // Reactions
+  html+='<div class="sec" style="margin-top:0">Reactions</div>';
+  Object.keys(supports).forEach(function(sid){
+    var s=supports[sid];
+    var ni=results.nodeIdx[s.node];
+    if(ni===undefined) return;
+    var Fx=results.react[ni*3], Fy=results.react[ni*3+1], M=-results.react[ni*3+2];
+    html+='<div class="rcard s"><div class="rl">Node '+s.node+' ('+s.type+')</div>'+
+      '<table class="sum-table"><tr><td>Fx</td><td class="'+(Fx<0?'vn':'v')+'">'+Fx.toFixed(4)+'</td><td style="color:var(--muted)">kg</td></tr>'+
+      '<tr><td>Fy</td><td class="'+(Fy<0?'vn':'v')+'">'+Fy.toFixed(4)+'</td><td style="color:var(--muted)">kg</td></tr>'+
+      (Math.abs(M)>1e-6?'<tr><td>M</td><td class="'+(M<0?'vn':'v')+'">'+M.toFixed(4)+'</td><td style="color:var(--muted)">kg·m</td></tr>':'')+
+      '</table></div>';
+  });
+  // Member forces
+  html+='<div class="sec">Member Forces</div>';
+  Object.keys(results.mfLocal).forEach(function(mid){
+    var mf=results.mfLocal[mid];
+    html+='<div class="rcard m"><div class="rl">Member #'+mid+' (N/V/M at i→j)</div>'+
+      '<table class="sum-table">'+
+      '<tr><td>N</td><td class="'+(mf.N<0?'vn':'v')+'">'+mf.N.toFixed(3)+'</td><td style="color:var(--muted)">kg</td></tr>'+
+      '<tr><td>V<sub>i</sub></td><td class="'+(mf.Vi<0?'vn':'v')+'">'+mf.Vi.toFixed(3)+'</td><td style="color:var(--muted)">kg</td></tr>'+
+      '<tr><td>M<sub>i</sub></td><td class="'+(mf.Mi<0?'vn':'v')+'">'+mf.Mi.toFixed(3)+'</td><td style="color:var(--muted)">kg·m</td></tr>'+
+      '<tr><td>V<sub>j</sub></td><td class="'+(mf.Vj<0?'vn':'v')+'">'+mf.Vj.toFixed(3)+'</td><td style="color:var(--muted)">kg</td></tr>'+
+      '<tr><td>M<sub>j</sub></td><td class="'+(mf.Mj<0?'vn':'v')+'">'+mf.Mj.toFixed(3)+'</td><td style="color:var(--muted)">kg·m</td></tr>'+
+      '</table></div>';
+  });
+  // Displacements
+  html+='<div class="sec">Node Displacements</div>';
+  results.nids.forEach(function(nid){
+    var ni=results.nodeIdx[nid];
+    var u=results.disp[ni*3]*1000, v=results.disp[ni*3+1]*1000, th=results.disp[ni*3+2]*180/Math.PI;
+    html+='<div class="rcard"><div class="rl">Node '+nid+'</div>'+
+      '<table class="sum-table">'+
+      '<tr><td>u</td><td class="'+(u<0?'vn':'v')+'">'+u.toFixed(4)+'</td><td style="color:var(--muted)">mm</td></tr>'+
+      '<tr><td>v</td><td class="'+(v<0?'vn':'v')+'">'+v.toFixed(4)+'</td><td style="color:var(--muted)">mm</td></tr>'+
+      '<tr><td>θ</td><td class="'+(th<0?'vn':'v')+'">'+th.toFixed(4)+'</td><td style="color:var(--muted)">°</td></tr>'+
+      '</table></div>';
+  });
+  document.getElementById('results-content').innerHTML=html;
+  drawAllDiagrams();
+}
+
+// ── Drawing ──────────────────────────────────────────────────────────────────
+var COLORS={node:'#00e5c8',member:'#4a9',deformed:'#ffd24d',support:'#ffd24d',load:'#ff5c5c',grid:'rgba(255,255,255,0.04)'};
+var DISP_SCALE=200; // amplification for deformed shape
+
+function draw(){
+  var W=cv.width/dpr, H=cv.height/dpr;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.save(); ctx.scale(dpr,dpr);
+
+  // Grid
+  if(showGrid){
+    ctx.strokeStyle=COLORS.grid; ctx.lineWidth=1;
+    var gstep=vp.scale>=40?1:vp.scale>=20?2:5;
+    var x0=Math.floor(-vp.ox/vp.scale/gstep)*gstep;
+    var y0=Math.floor((vp.oy-H)/vp.scale/gstep)*gstep;
+    for(var gx=x0;gx<=(W-vp.ox)/vp.scale+gstep;gx+=gstep){
+      var px=vp.ox+gx*vp.scale;
+      ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,H);ctx.stroke();
+    }
+    for(var gy=y0;gy<=(vp.oy)/vp.scale+gstep;gy+=gstep){
+      var py=vp.oy-gy*vp.scale;
+      ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(W,py);ctx.stroke();
+    }
+    // Axes
+    ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(vp.ox,0);ctx.lineTo(vp.ox,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,vp.oy);ctx.lineTo(W,vp.oy);ctx.stroke();
+  }
+
+  // Members
+  Object.keys(members).forEach(function(mid){
+    var m=members[mid];
+    if(!nodes[m.ni]||!nodes[m.nj]) return;
+    var pi=toCanvas(nodes[m.ni].x,nodes[m.ni].y);
+    var pj=toCanvas(nodes[m.nj].x,nodes[m.nj].y);
+    ctx.strokeStyle='#2a5c48'; ctx.lineWidth=4; ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(pi.x,pi.y);ctx.lineTo(pj.x,pj.y);ctx.stroke();
+    ctx.strokeStyle='#3a9'; ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(pi.x,pi.y);ctx.lineTo(pj.x,pj.y);ctx.stroke();
+    if(showLabels){
+      var mx=(pi.x+pj.x)/2, my=(pi.y+pj.y)/2;
+      // Offset label perpendicularly to member
+      var dx=pj.x-pi.x, dy=pj.y-pi.y, ml=Math.sqrt(dx*dx+dy*dy)||1;
+      var perpX=-dy/ml*12, perpY=dx/ml*12;
+      var lx=mx+perpX, ly=my+perpY;
+      var mLabel='M'+mid;
+      ctx.font='bold 12px Space Mono,monospace'; ctx.textAlign='center';
+      var mw=ctx.measureText(mLabel).width;
+      ctx.fillStyle='rgba(20,0,0,0.8)';
+      ctx.fillRect(lx-mw/2-4, ly-13, mw+8, 17);
+      ctx.strokeStyle='rgba(255,80,80,0.4)'; ctx.lineWidth=1;
+      ctx.strokeRect(lx-mw/2-4, ly-13, mw+8, 17);
+      ctx.fillStyle='#ff5555';
+      ctx.fillText(mLabel,lx,ly);
+    }
+  });
+
+  // Deformed shape
+  if(showDeformed&&results){
+    Object.keys(members).forEach(function(mid){
+      var m=members[mid];
+      if(!nodes[m.ni]||!nodes[m.nj]) return;
+      var ni=results.nodeIdx[m.ni], nj=results.nodeIdx[m.nj];
+      if(ni===undefined||nj===undefined) return;
+      var xi=nodes[m.ni].x+results.disp[ni*3]*DISP_SCALE;
+      var yi=nodes[m.ni].y+results.disp[ni*3+1]*DISP_SCALE;
+      var xj=nodes[m.nj].x+results.disp[nj*3]*DISP_SCALE;
+      var yj=nodes[m.nj].y+results.disp[nj*3+1]*DISP_SCALE;
+      var pi=toCanvas(xi,yi), pj=toCanvas(xj,yj);
+      ctx.strokeStyle='rgba(255,210,77,0.7)'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(pi.x,pi.y);ctx.lineTo(pj.x,pj.y);ctx.stroke();
+      ctx.setLineDash([]);
+    });
+  }
+
+  // Supports
+  Object.values(supports).forEach(function(s){
+    if(!nodes[s.node]) return;
+    var p=toCanvas(nodes[s.node].x,nodes[s.node].y);
+    drawSupport(ctx,p.x,p.y,s.type);
+  });
+
+  // (Loads drawn in FBD panel only)
+
+  // Nodes
+  Object.keys(nodes).forEach(function(nid){
+    var n=nodes[nid];
+    var p=toCanvas(n.x,n.y);
+    ctx.fillStyle='#0b0d0c'; ctx.strokeStyle=COLORS.node; ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fill();ctx.stroke();
+    if(showLabels){
+      // Node number with background
+      var nLabel='N'+nid;
+      ctx.font='bold 13px Space Mono,monospace'; ctx.textAlign='center';
+      var nw=ctx.measureText(nLabel).width;
+      ctx.fillStyle='rgba(0,20,18,0.75)';
+      ctx.fillRect(p.x-nw/2-3, p.y-26, nw+6, 16);
+      ctx.fillStyle='#ffffff';
+      ctx.fillText(nLabel,p.x,p.y-14);
+      // Coordinates
+      var cLabel='('+n.x+','+n.y+')';
+      ctx.font='10px Space Mono,monospace';
+      var cw=ctx.measureText(cLabel).width;
+      ctx.fillStyle='rgba(0,20,18,0.75)';
+      ctx.fillRect(p.x-cw/2-3, p.y+8, cw+6, 14);
+      ctx.fillStyle='rgba(255,255,255,0.75)';
+      ctx.fillText(cLabel,p.x,p.y+19);
+    }
+  });
+
+  // Deformed nodes
+  if(showDeformed&&results){
+    results.nids.forEach(function(nid){
+      var ni=results.nodeIdx[nid];
+      var xd=nodes[nid].x+results.disp[ni*3]*DISP_SCALE;
+      var yd=nodes[nid].y+results.disp[ni*3+1]*DISP_SCALE;
+      var p=toCanvas(xd,yd);
+      ctx.fillStyle='rgba(255,210,77,0.9)'; ctx.strokeStyle='#ffd24d'; ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();ctx.stroke();
+    });
+  }
+
+  ctx.restore();
+}
+
+function drawSupport(ctx,x,y,type){
+  ctx.strokeStyle='#ffd24d'; ctx.fillStyle='rgba(255,210,77,0.15)'; ctx.lineWidth=1.5;
+  if(type==='fixed'){
+    ctx.fillRect(x-12,y-2,24,14); ctx.strokeRect(x-12,y-2,24,14);
+    ctx.strokeStyle='rgba(255,210,77,0.4)';
+    for(var k=0;k<4;k++){ctx.beginPath();ctx.moveTo(x-10+k*7,y+12);ctx.lineTo(x-14+k*7,y+18);ctx.stroke();}
+  } else if(type==='pin'){
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-10,y+14);ctx.lineTo(x+10,y+14);ctx.closePath();
+    ctx.fill();ctx.stroke();
+    for(var k=0;k<3;k++){ctx.beginPath();ctx.moveTo(x-8+k*8,y+14);ctx.lineTo(x-12+k*8,y+20);ctx.stroke();}
+  } else {
+    ctx.beginPath();ctx.arc(x,y+8,6,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x-12,y+14);ctx.lineTo(x+12,y+14);ctx.stroke();
+    if(type==='roller_x'){
+      ctx.strokeStyle='rgba(255,210,77,0.4)';
+      ctx.beginPath();ctx.moveTo(x,y-8);ctx.lineTo(x,y+22);ctx.stroke();
+    }
+  }
+}
+
+function drawArrow(ctx,x,y,dx,dy,col){
+  var len=Math.sqrt(dx**2+dy**2); if(len<0.1)return;
+  var ux=dx/len, uy=dy/len;
+  var s=8;
+  ctx.fillStyle=col;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-ux*s+uy*s/2,y-uy*s-ux*s/2);ctx.lineTo(x-ux*s-uy*s/2,y-uy*s+ux*s/2);ctx.closePath();ctx.fill();
+}
+
+function drawMomentArrow(ctx,x,y,cw,r,col){
+  ctx.strokeStyle=col; ctx.lineWidth=2;
+  var start=cw?-0.3*Math.PI:0.15*Math.PI;
+  var end=cw?1.85*Math.PI:2.3*Math.PI;
+  ctx.beginPath();ctx.arc(x,y,r,start,end,!cw);ctx.stroke();
+  ctx.fillStyle=col;
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+r-5,y-4);ctx.lineTo(x+r-5,y+4);ctx.closePath();ctx.fill();
+}
+
+// ── Mouse events ──────────────────────────────────────────────────────────────
+cv.addEventListener('wheel',function(e){
+  // Only zoom canvas if cursor is over it, not scrolling page
+  e.preventDefault();
+  var rect=cv.getBoundingClientRect();
+  var mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  var factor=e.deltaY<0?1.15:0.87;
+  vp.ox=mx-(mx-vp.ox)*factor;
+  vp.oy=my-(my-vp.oy)*factor;
+  vp.scale*=factor;
+  draw();
+},{passive:false});
+
+window.addEventListener('scroll',function(){
+  if(results) requestAnimationFrame(drawAllDiagrams);
+},{passive:true});
+
+cv.addEventListener('mousedown',function(e){
+  if(e.button===0||e.button===1){dragging=true;dragStart={x:e.clientX,y:e.clientY};vpStart={ox:vp.ox,oy:vp.oy};e.preventDefault();}
+});
+cv.addEventListener('mousemove',function(e){
+  if(dragging) cv.style.cursor='grabbing'; else cv.style.cursor='grab';
+  if(dragging){
+    vp.ox=vpStart.ox+(e.clientX-dragStart.x);
+    vp.oy=vpStart.oy+(e.clientY-dragStart.y);
+    draw();
+  }
+  var rect=cv.getBoundingClientRect();
+  var w=toWorld(e.clientX-rect.left,e.clientY-rect.top);
+  document.getElementById('canvas-info').textContent='x='+w.x.toFixed(2)+'m  y='+w.y.toFixed(2)+'m  |  Scroll=zoom  •  Drag=pan';
+});
+cv.addEventListener('mouseup',function(){dragging=false;cv.style.cursor='grab';});
+cv.addEventListener('mouseleave',function(){dragging=false;cv.style.cursor='grab';});
+
+
+
+// ── Toggle controls ───────────────────────────────────────────────────────────
+function toggleDeformed(){showDeformed=!showDeformed;document.getElementById('btn-deformed').classList.toggle('on',showDeformed);draw();}
+function toggleLabels(){showLabels=!showLabels;document.getElementById('btn-labels').classList.toggle('on',showLabels);draw();}
+function toggleGrid(){showGrid=!showGrid;document.getElementById('btn-grid').classList.toggle('on',showGrid);draw();}
+function resetView(){vp.ox=cv.clientWidth*0.15;vp.oy=cv.clientHeight*0.85;vp.scale=80;draw();}
+
+function showErr(m){
+  var b=document.getElementById('err-box');
+  b.style.display='block'; b.className='err'; b.textContent='⚠ '+m;
+}
+function hideErr(){document.getElementById('err-box').style.display='none';}
+
+function switchInputTab(name){
+  ['nodes','supports','members','udl','loads'].forEach(function(t){
+    document.getElementById('tab-'+t).classList.toggle('on',t===name);
+    document.getElementById('pane-'+t).classList.toggle('on',t===name);
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('resize',function(){resize();if(results)setTimeout(drawAllDiagrams,50);});
+resize();
+
+// Default portal frame example
+addNode(0,0); addNode(0,3); addNode(3,3); addNode(3,0);
+addMember();
+setTimeout(function(){
+  document.getElementById('mni-1').value=1; members[1].ni=1;
+  document.getElementById('mnj-1').value=2; members[1].nj=2;
+  addMember();
+  document.getElementById('mni-2').value=2; members[2].ni=2;
+  document.getElementById('mnj-2').value=3; members[2].nj=3;
+  addMember();
+  document.getElementById('mni-3').value=3; members[3].ni=3;
+  document.getElementById('mnj-3').value=4; members[3].nj=4;
+  addSupport();
+  document.getElementById('sn-1').value=1; supports[1].node=1;
+  addSupport();
+  document.getElementById('sn-2').value=4; supports[2].node=4;
+  addLoad();
+  document.getElementById('ln-1').value=2; loads[1].node=2;
+  document.getElementById('lfx-1').value=10; loads[1].Fx=10;
+  resetView();
+  draw();
+},100);
+</script>
+</div>
+</body>
+</html>
