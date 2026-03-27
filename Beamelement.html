@@ -384,7 +384,7 @@ function addLoad(type){
   let fi='';
   if(type==='point') fi='<div class="lf"><div><label>P (kg) &#8595;+</label><input type="number" id="lp-'+id+'" value="0" step="0.1"></div><div><label>x (m)</label><input type="number" id="lx-'+id+'" value="0" step="0.1"></div></div>';
   else if(type==='udl') fi='<div class="lf"><div><label>w (kg/m) &#8595;+</label><input type="number" id="lw-'+id+'" value="0" step="0.1"></div><div class="fw"><div><label>x&#8321; (m)</label><input type="number" id="lx1-'+id+'" value="0" step="0.1"></div><div><label>x&#8322; (m)</label><input type="number" id="lx2-'+id+'" value="0" step="0.1"></div></div></div>';
-  else fi='<div class="lf"><div><label>M (kg&#183;m) &#8635;+</label><input type="number" id="lm-'+id+'" value="0" step="0.1"></div><div><label>x (m)</label><input type="number" id="lx-'+id+'" value="0" step="0.1"></div></div>';
+  else fi='<div class="lf"><div><label>M (kg&#183;m) &#8634;+</label><input type="number" id="lm-'+id+'" value="0" step="0.1"></div><div><label>x (m)</label><input type="number" id="lx-'+id+'" value="0" step="0.1"></div></div>';
   d.innerHTML='<div class="lhd"><span class="lbadge '+bc+'" data-type="'+type+'">'+nm+' #'+id+'</span><button class="xbtn" onclick="rmLoad('+id+')">&#10005;</button></div>'+fi;
   document.getElementById('lc').appendChild(d);
 }
@@ -850,7 +850,7 @@ function renderResults(L,slist,loads,res){
     drawFBD(L,slist,loads,rxns);
     drawReactions('cr',rxns,L);
     drawDiag('cs',xs,Varr,L,'#ef4444','V (kg)',discXs);
-    drawDiag('cm',xs,Marr,L,'#ef4444','M (kg·m)',discXs);
+    drawDiag('cm',xs,Marr.map(function(v){return -v;}),L,'#ef4444','M (kg·m)',discXs);
     drawDeflection('cd',xs,DEF,L,maxDefAbs,xMaxDef,slist);
   });
 }
@@ -968,12 +968,12 @@ function drawReactions(id, rxns, L) {
       ctx.closePath(); ctx.fill();
 
       // Value label with unit
-      var mStr = mv.toFixed(3) + ' kg·m';
+      var mStr = (-mv).toFixed(3) + ' kg·m ' + (mv>0?'↻(CW)':'↺(CCW)');
       var mDir = mv > 0 ? 1 : -1;
       ctx.fillStyle = '#e8ecf4';
-      ctx.font = 'bold 12px Space Mono,monospace';
+      ctx.font = '11px Space Mono,monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(mStr, sx, arcY - arcR - 8);
+      ctx.fillText(mStr, sx, arcY - arcR - 6);
       ctx.font = '11px Space Mono,monospace';
       ctx.fillStyle = col;
       ctx.fillText(mDir > 0 ? '↺' : '↻', sx, arcY - arcR - 20);
@@ -1081,9 +1081,19 @@ function drawFBD(L,slist,loads,rxns){
       ctx.lineTo(ahx-tang[1]*hw,ahy+tang[0]*hw);
       ctx.lineTo(ahx+tang[1]*hw,ahy-tang[0]*hw);
       ctx.closePath();ctx.fill();
-      ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
+      ctx.font='12px Space Mono,monospace';
       ctx.fillStyle='#c084fc';
-      ctx.fillText(ld.M+' kg·m',x,by-4);
+      var mCWStr=ld.M>=0?' ↺(CCW)':' ↻(CW)';
+      var mLbl=ld.M+' kg·m'+mCWStr;
+      var mLblW=ctx.measureText(mLbl).width;
+      // Align: right-align if near right edge, left-align if near left edge
+      var lx=x, lAlign='center';
+      var _lpad=typeof padL!=='undefined'?padL:pad;
+      var _rpad=typeof padR!=='undefined'?padR:pad;
+      if(x+mLblW/2>W-_rpad-5){lx=Math.min(x,W-_rpad-4);lAlign='right';}
+      else if(x-mLblW/2<_lpad+5){lx=Math.max(x,_lpad+4);lAlign='left';}
+      ctx.textAlign=lAlign;
+      ctx.fillText(mLbl,lx,by+bh/2-28);
     }
   }
 
@@ -1195,8 +1205,8 @@ function drawReactions(id, rxns, L) {
   var FY_COL = '#ffd60a';   // vertical force: yellow
 
   // Layout: beam in the UPPER portion, forces hang DOWN below it
-  var padL=72, padR=72;
-  var beamY=52;             // beam top edge — near top, space above for moment arcs
+  var padL=120, padR=120;
+  var beamY=62;             // beam top edge — near top, space above for moment arcs
   var beamH=16;
   var plotW=W-padL-padR;
   var sc=plotW/L;
@@ -1258,7 +1268,8 @@ function drawReactions(id, rxns, L) {
       // Label above arc (red)
       ctx.fillStyle=MOL;
       ctx.font='bold 18px Space Mono,monospace'; ctx.textAlign='center';
-      ctx.fillText(mv.toFixed(3)+' kg·m', sx, beamY-arcR2-8);
+      var cwStr2=mv>0?' ↻(CW)':' ↺(CCW)';
+      ctx.fillText((-mv).toFixed(3)+' kg·m'+cwStr2, sx, beamY-arcR2-8);
 
     }
 
