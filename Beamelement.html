@@ -139,6 +139,7 @@ canvas{width:100%;display:block;border-radius:3px;}
   <div class="arow">
     <button class="abtn" onclick="addLoad('point')">+ Point Load</button>
     <button class="abtn" onclick="addLoad('udl')">+ Uniform Load</button>
+    <button class="abtn" onclick="addLoad('trap')">+ Trapezoidal Load</button>
   </div>
   <button class="abtn" style="width:100%;border-color:rgba(192,132,252,.2);color:var(--accent4);margin-top:4px;" onclick="addLoad('moment')">+ Applied Moment</button>
 </div>
@@ -379,11 +380,12 @@ function addLoad(type){
   const id=loadCount;
   const d=document.createElement('div');
   d.className='lrow'; d.id='l-'+id;
-  const nm=type==='point'?'Point Load':type==='udl'?'Uniform Load':'Moment';
-  const bc=type==='udl'?'u':type==='moment'?'m':'';
+  const nm=type==='point'?'Point Load':type==='udl'?'Uniform Load':type==='trap'?'Trap Load':'Moment';
+  const bc=type==='udl'||type==='trap'?'u':type==='moment'?'m':'';
   let fi='';
   if(type==='point') fi='<div class="lf"><div><label>P (kg) &#8595;+</label><input type="number" id="lp-'+id+'" value="0" step="0.1"></div><div><label>x (m)</label><input type="number" id="lx-'+id+'" value="0" step="0.1"></div></div>';
   else if(type==='udl') fi='<div class="lf"><div><label>w (kg/m) &#8595;+</label><input type="number" id="lw-'+id+'" value="0" step="0.1"></div><div class="fw"><div><label>x&#8321; (m)</label><input type="number" id="lx1-'+id+'" value="0" step="0.1"></div><div><label>x&#8322; (m)</label><input type="number" id="lx2-'+id+'" value="0" step="0.1"></div></div></div>';
+  else if(type==='trap') fi='<div class="lf"><div><label>w&#8321; (kg/m) &#8595;+</label><input type="number" id="lw1-'+id+'" value="0" step="0.1"></div><div><label>w&#8322; (kg/m) &#8595;+</label><input type="number" id="lw2-'+id+'" value="0" step="0.1"></div><div class="fw"><div><label>x&#8321; (m)</label><input type="number" id="lx1t-'+id+'" value="0" step="0.1"></div><div><label>x&#8322; (m)</label><input type="number" id="lx2t-'+id+'" value="0" step="0.1"></div></div></div>';
   else fi='<div class="lf"><div><label>M (kg&#183;m) &#8634;+</label><input type="number" id="lm-'+id+'" value="0" step="0.1"></div><div><label>x (m)</label><input type="number" id="lx-'+id+'" value="0" step="0.1"></div></div>';
   d.innerHTML='<div class="lhd"><span class="lbadge '+bc+'" data-type="'+type+'">'+nm+' #'+id+'</span><button class="xbtn" onclick="rmLoad('+id+')">&#10005;</button></div>'+fi;
   document.getElementById('lc').appendChild(d);
@@ -410,6 +412,14 @@ function collectLoads(L){
       if(isNaN(w)||isNaN(x1)||isNaN(x2)) return {err:'Uniform Load #'+id+': missing data'};
       if(x1>=x2) return {err:'Uniform Load #'+id+': x2 must be > x1'};
       loads.push({type:'udl',w:w,x1:x1,x2:x2});
+    } else if(type==='trap'){
+      var w1=+document.getElementById('lw1-'+id).value;
+      var w2=+document.getElementById('lw2-'+id).value;
+      var x1t=+document.getElementById('lx1t-'+id).value;
+      var x2t=+document.getElementById('lx2t-'+id).value;
+      if(isNaN(w1)||isNaN(w2)||isNaN(x1t)||isNaN(x2t)) return {err:'Trap Load #'+id+': missing data'};
+      if(x1t>=x2t) return {err:'Trap Load #'+id+': x2 must be > x1'};
+      loads.push({type:'trap',w1:w1,w2:w2,x1:x1t,x2:x2t});
     } else {
       var M=+document.getElementById('lm-'+id).value;
       var xm=+document.getElementById('lx-'+id).value;
@@ -477,6 +487,30 @@ function fefElement(loads,xL,Le){
       fef[1]+=w*(Mi(a1)-Mi(a0));
       fef[2]+=w*(Fj(a1)-Fj(a0));
       fef[3]+=w*(Mj(a1)-Mj(a0));
+    } else if(ld.type==='trap'){
+      var gA2=Math.max(ld.x1,xL),gB2=Math.min(ld.x2,xL+L);
+      if(gA2<gB2){
+        var Lseg=ld.x2-ld.x1;
+        var a0t=gA2-xL, a1t=gB2-xL;
+        var w1t=ld.w1+(gA2-ld.x1)/Lseg*(ld.w2-ld.w1);
+        var w2t=ld.w1+(gB2-ld.x1)/Lseg*(ld.w2-ld.w1);
+        var segL2=a1t-a0t, nq=40;
+        for(var ki=0;ki<=nq;ki++){
+          var s=a0t+segL2*ki/nq;
+          var wq=w1t+(w2t-w1t)*ki/nq;
+          var wf=(ki===0||ki===nq)?wq/2:wq;
+          var xi3=s/L;
+          var Ni2=1-3*xi3*xi3+2*xi3*xi3*xi3;
+          var Nj2=3*xi3*xi3-2*xi3*xi3*xi3;
+          var Nmi2=s*(1-xi3)*(1-xi3);
+          var Nmj2=s*s/L*(xi3-1);
+          var ds2=segL2/nq;
+          fef[0]+=wf*ds2*Ni2;
+          fef[1]+=wf*ds2*Nmi2;
+          fef[2]+=wf*ds2*Nj2;
+          fef[3]+=wf*ds2*Nmj2;
+        }
+      }
     }
     // Note: applied moments are NOT added via FEF.
     // Moment positions are injected as nodes, so they are applied
@@ -504,7 +538,7 @@ function matrixSolve(L,segs,supList,loads){
   for(var i=0;i<loads.length;i++){
     var ld=loads[i];
     if(ld.type==='point'||ld.type==='moment'){if(ld.x>=0&&ld.x<=L)nodeArr.push(ld.x);}
-    else if(ld.type==='udl'){if(ld.x1>=0&&ld.x1<=L)nodeArr.push(ld.x1);if(ld.x2>=0&&ld.x2<=L)nodeArr.push(ld.x2);}
+    else if(ld.type==='udl'||ld.type==='trap'){if(ld.x1>=0&&ld.x1<=L)nodeArr.push(ld.x1);if(ld.x2>=0&&ld.x2<=L)nodeArr.push(ld.x2);}
   }
   // Inject segment boundaries as nodes
   var segKeys=Object.keys(segs);
@@ -641,6 +675,23 @@ function matrixSolve(L,segs,supList,loads){
       else if(ld.type==='udl'&&x>ld.x1+EPS){
         var xe=Math.min(x,ld.x2),wl=xe-ld.x1;
         if(wl>0){V-=ld.w*wl;M-=ld.w*wl*(x-ld.x1-wl/2);}
+      }
+      else if(ld.type==='trap'&&x>ld.x1+EPS){
+        var xe2=Math.min(x,ld.x2),wl2=xe2-ld.x1;
+        var Lseg2=ld.x2-ld.x1;
+        if(wl2>0){
+          var wa=ld.w1,wb=ld.w1+(ld.w2-ld.w1)*wl2/Lseg2;
+          // V: integral of w from x1 to xe = (wa+wb)/2 * wl2
+          V-=(wa+wb)/2*wl2;
+          // M: integral of w(t)*(x-t) dt from x1 to xe
+          // = integral (wa+(wb-wa)*(t-x1)/wl2)*(x-t) dt
+          // = wa*(x-x1)*wl2/2 - wa*wl2*wl2/3 + ... exact:
+          // = wa*wl2*(x-x1) - wa*wl2*wl2/2 + (wb-wa)/wl2*(x*wl2*wl2/2-wl2*wl2*(x1+wl2*2/3))
+          // Simpler exact formula:
+          // = (wa/2)*wl2*(2*(x-x1)-wl2) + (wb-wa)/6*wl2*(3*(x-x1)-2*wl2)
+          var dx=x-ld.x1;
+          M-=(wa/2)*wl2*(2*dx-wl2)+(wb-wa)/6*wl2*(3*dx-2*wl2);
+        }
       }
       else if(ld.type==='moment'){
         // Skip endpoint moments — reaction already captures them
@@ -845,7 +896,7 @@ function renderResults(L,slist,loads,res){
     for(var li=0;li<loads.length;li++){
       var ld=loads[li];
       if(ld.type==='point'||ld.type==='moment') discXs.push(ld.x);
-      else if(ld.type==='udl'){discXs.push(ld.x1);discXs.push(ld.x2);}
+      else if(ld.type==='udl'||ld.type==='trap'){discXs.push(ld.x1);discXs.push(ld.x2);}
     }
     drawFBD(L,slist,loads,rxns);
     drawReactions('cr',rxns,L);
@@ -1045,23 +1096,68 @@ function drawFBD(L,slist,loads,rxns){
     } else if(ld.type==='udl'){
       var x1=px(ld.x1),x2=px(ld.x2);
       var wDown=ld.w>=0;
-      ctx.fillStyle=wDown?'rgba(56,189,248,.08)':'rgba(56,189,248,.08)';
+      var arrH=26;
+      // Both downward and upward: arrows above beam
+      var uy=by-arrH;  // base of arrows at beam top, tail extends upward
+      ctx.fillStyle='rgba(56,189,248,.08)';
       ctx.strokeStyle='#38bdf8';ctx.lineWidth=1.2;
-      var uy=wDown?by-26:by+bh;  // top of UDL box
-      ctx.fillRect(x1,uy,x2-x1,26);ctx.strokeRect(x1,uy,x2-x1,26);
+      ctx.fillRect(x1,uy,x2-x1,arrH);ctx.strokeRect(x1,uy,x2-x1,arrH);
       var st=Math.max(2,Math.floor((x2-x1)/14));
       for(var k=0;k<=st;k++){
         var sx2=x1+k*(x2-x1)/st;
+        ctx.strokeStyle='#38bdf8';ctx.lineWidth=1.2;
+        ctx.beginPath();ctx.moveTo(sx2,uy);ctx.lineTo(sx2,by);ctx.stroke();
+        ctx.fillStyle='#38bdf8';ctx.beginPath();
         if(wDown){
-          // Downward: tick from mid-box to beam top
-          ctx.beginPath();ctx.moveTo(sx2,uy+12);ctx.lineTo(sx2,uy+26);ctx.stroke();
+          // w>0: arrowhead at beam top pointing DOWN toward beam
+          ctx.moveTo(sx2,by);ctx.lineTo(sx2-3,by-7);ctx.lineTo(sx2+3,by-7);
         } else {
-          // Upward: tick from beam bottom to mid-box
-          ctx.beginPath();ctx.moveTo(sx2,uy);ctx.lineTo(sx2,uy+14);ctx.stroke();
+          // w<0: arrowhead at tail (top) pointing UP away from beam
+          ctx.moveTo(sx2,uy);ctx.lineTo(sx2-3,uy+7);ctx.lineTo(sx2+3,uy+7);
         }
+        ctx.closePath();ctx.fill();
       }
       ctx.fillStyle='#e8ecf4';ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
-      ctx.fillText('w = '+ld.w+' kg/m',(x1+x2)/2,wDown?uy-3:uy+36);
+      ctx.fillText('w = '+ld.w+' kg/m',(x1+x2)/2,uy-3);
+    } else if(ld.type==='trap'&&ld.x1<ld.x2){
+      var tx1=px(Math.max(ld.x1,0)),tx2=px(Math.min(ld.x2,L));
+      var maxW=Math.max(Math.abs(ld.w1),Math.abs(ld.w2),0.001);
+      var maxH=32;
+      // w>0 = downward: base at beam top (by), tail goes UP, tip points DOWN at beam
+      // w<0 = upward:   base at beam bottom (by+bh), tail goes DOWN, tip points UP at beam
+      var allDown=(ld.w1>=0&&ld.w2>=0), allUp=(ld.w1<=0&&ld.w2<=0);
+      var ty=by;  // base always at beam top
+      var th1=-(Math.abs(ld.w1)/maxW)*maxH;
+      var th2=-(Math.abs(ld.w2)/maxW)*maxH;
+      ctx.strokeStyle='#00e5ff';ctx.fillStyle='rgba(0,229,255,0.15)';ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.moveTo(tx1,ty);ctx.lineTo(tx1,ty+th1);ctx.lineTo(tx2,ty+th2);ctx.lineTo(tx2,ty);ctx.closePath();
+      ctx.fill();ctx.stroke();
+      var nT=Math.min(14,Math.max(2,Math.round((tx2-tx1)/20)));
+      for(var ti=0;ti<=nT;ti++){
+        var tf=ti/nT;
+        var tx=tx1+(tx2-tx1)*tf;
+        var th=th1+(th2-th1)*tf;
+        if(Math.abs(th)<1) continue;
+        ctx.strokeStyle='#00e5ff';ctx.lineWidth=1.2;
+        ctx.beginPath();ctx.moveTo(tx,ty+th);ctx.lineTo(tx,ty);ctx.stroke();
+        // arrowhead always at base line (beam edge), pointing toward beam
+        ctx.fillStyle='#00e5ff';ctx.beginPath();
+        if(allUp){
+          // upward load: arrowhead at TAIL pointing UP away from beam
+          ctx.moveTo(tx,ty+th);ctx.lineTo(tx-3,ty+th+7);ctx.lineTo(tx+3,ty+th+7);
+        } else {
+          // downward load: arrowhead at beam top pointing DOWN
+          ctx.moveTo(tx,ty);ctx.lineTo(tx-3,ty-7);ctx.lineTo(tx+3,ty-7);
+        }
+        ctx.closePath();ctx.fill();
+      }
+      ctx.font='bold 13px Space Mono,monospace';ctx.textAlign='center';ctx.fillStyle='#00e5ff';
+      // w1 label above tip at tx1
+      ctx.textAlign='center';
+      var lth1=ty+th1, lth2=ty+th2;
+      ctx.fillText('w₁='+ld.w1+' kg/m', tx1, (th1<0?lth1-6:ty-6));
+      // w2 label above tip at tx2
+      ctx.fillText('w₂='+ld.w2+' kg/m', tx2, (th2<0?lth2-6:ty-6));
     } else {
       var x=px(ld.x);
       ctx.strokeStyle='#c084fc';ctx.lineWidth=2;
