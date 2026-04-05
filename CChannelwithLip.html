@@ -9,7 +9,7 @@
 :root{
   --bg:#0f1117;--bg2:#161b25;--bg3:#1c2333;--bg4:#222c3c;
   --border:#2a3650;--border2:#334166;
-  --text:#e2e8f0;--muted:#7a8aaa;--dim:#4a5870;
+  --text:#ffffff;--muted:#ffffff;--dim:#ffffff;
   --blue:#4a90d9;--blue2:#2563a8;--blue-glow:rgba(74,144,217,.15);
   --orange:#f0883e;--red:#e05252;--green:#4ade80;
   --yellow:#f5c842;--purple:#a78bfa;--cyan:#22d3ee;
@@ -17,8 +17,18 @@
   --sans:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{min-width:1280px}
+html{min-width:1372px}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+/* ── Subscript / Superscript ── */
+sub,sup{
+  font-size:0.72em;
+  font-weight:600;
+  line-height:0;
+  position:relative;
+  vertical-align:baseline;
+}
+sub{ bottom:-0.3em; }
+sup{ top:-0.4em; }
 
 /* HEADER */
 .hdr{background:linear-gradient(135deg,#0d1520,#1a2540);border-bottom:1px solid var(--border2);
@@ -30,8 +40,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 .hdr-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);margin-left:auto}
 
 /* LAYOUT */
-.layout{display:flex;min-width:1280px}
-.sidebar{width:268px;min-width:268px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+.layout{display:flex;min-width:1372px}
+.sidebar{width:360px;min-width:360px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
   position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column}
 .sidebar::-webkit-scrollbar{width:3px}
 .sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
@@ -42,13 +52,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 .sg-title{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
   color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .sg-title::after{content:'';flex:1;height:1px;background:var(--border2)}
-.inp-row{display:flex;align-items:center;margin-bottom:6px}
-.inp-row .lbl{font-size:11px;color:var(--muted);width:75px;font-family:var(--mono);flex-shrink:0}
+.inp-row{display:flex;align-items:center;margin-bottom:7px;gap:6px}
+.inp-row .lbl{font-size:12px;color:#fff;width:80px;font-family:var(--sans);flex-shrink:0;font-weight:500}
 .inp-row .sym{font-size:11px;color:var(--dim);width:12px;text-align:center;flex-shrink:0}
-.inp-row input{width:70px;background:var(--bg3);border:1px solid var(--border);color:var(--text);
-  font-family:var(--mono);font-size:12px;padding:3px 7px;border-radius:3px;text-align:right;transition:border-color .15s}
+.inp-row input{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);color:#fff;
+  font-family:var(--sans);font-size:13px;font-weight:600;padding:5px 10px;border-radius:4px;text-align:center;transition:border-color .15s}
 .inp-row input:focus{outline:none;border-color:var(--blue);background:var(--bg4)}
-.inp-row .unit{font-size:10px;color:var(--dim);width:28px;margin-left:4px;font-family:var(--mono)}
+.inp-row .unit{font-size:11px;color:rgba(255,255,255,0.6);width:36px;flex-shrink:0;font-family:var(--sans)}
 .calc-btn{margin:12px 14px 14px;width:calc(100% - 28px);background:var(--blue2);color:#fff;
   border:1px solid var(--blue);border-radius:4px;font-family:var(--mono);font-size:11px;font-weight:600;
   letter-spacing:.1em;padding:8px;cursor:pointer;text-transform:uppercase;transition:background .15s}
@@ -63,8 +73,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 .tag-blue{background:var(--blue2)} .tag-orange{background:#b45309} .tag-green{background:#166534}
 .tag-red{background:#991b1b} .tag-purple{background:#6d28d9} .tag-cyan{background:#0e7490}
 .tag-pink{background:#9d174d}
-.sec-title{font-size:12px;font-weight:600;color:var(--text)}
-.sec-ref{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.sec-title{font-size:12px;font-weight:600;color:#fff;font-family:var(--sans)}
+.sec-ref{margin-left:auto;font-family:var(--sans);font-size:10px;color:rgba(255,255,255,0.6)}
 .sec-body{padding:14px}
 
 /* TWO-COLUMN REPORT GRID */
@@ -74,40 +84,40 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 .rep-col-full{padding:14px;border-top:1px solid var(--border)}
 
 /* REPORT ROW — สไตล์ PDF */
-.rr{display:flex;align-items:baseline;padding:2.5px 0;gap:4px;font-family:var(--mono);font-size:12px}
-.rr-lbl{color:var(--muted);font-size:11px;min-width:0}
+.rr{display:flex;align-items:baseline;padding:2.5px 0;gap:4px;font-family:var(--sans);font-size:12px}
+.rr-lbl{color:#fff;font-size:12px;min-width:0;font-family:var(--sans)}
 .rr-eq{color:var(--dim);flex-shrink:0}
 .rr-sub{color:var(--dim);font-size:10px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rr-val{color:var(--blue);font-weight:600;white-space:nowrap;margin-left:auto;padding-left:8px}
-.rr-unit{color:var(--dim);font-size:10px;margin-left:3px;flex-shrink:0}
+.rr-val{color:#fff;font-weight:600;white-space:nowrap;margin-left:auto;padding-left:8px;font-family:var(--sans)}
+.rr-unit{color:rgba(255,255,255,0.5);font-size:10px;margin-left:3px;flex-shrink:0;font-family:var(--sans)}
 
 /* FORMULA LINE */
-.fml{font-family:var(--mono);font-size:11px;color:var(--cyan);background:var(--bg3);
+.fml{font-family:var(--sans);font-size:12px;color:var(--cyan);background:var(--bg3);
   border:1px solid var(--border);border-radius:3px;padding:5px 9px;margin:4px 0;line-height:1.7}
 .fml-val{color:var(--yellow);font-weight:600}
 .fml-def{font-size:9px;color:var(--dim);margin-top:2px}
 
 /* GOVERNING RESULT */
-.gov{background:linear-gradient(90deg,rgba(74,144,217,.1),transparent);
-  border-left:3px solid var(--blue);padding:7px 11px;margin-top:8px;border-radius:0 4px 4px 0}
-.gov-lbl{font-family:var(--mono);font-size:10px;color:var(--muted)}
-.gov-val{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:baseline;gap:6px}
-.gov-unit{font-size:11px;color:var(--muted);font-weight:400}
-.gov-tag{font-family:var(--mono);font-size:8px;font-weight:700;background:var(--blue2);
-  color:#fff;padding:1px 5px;border-radius:2px;letter-spacing:.06em;margin-right:6px}
+.gov{background:linear-gradient(90deg,rgba(245,200,66,.12),transparent);
+  border-left:3px solid #f5c842;padding:8px 12px;margin-top:10px;border-radius:0 4px 4px 0}
+.gov-lbl{font-family:var(--sans);font-size:11px;color:rgba(255,255,255,0.7)}
+.gov-val{font-family:var(--sans);font-size:18px;font-weight:800;color:#f5c842;display:flex;align-items:baseline;gap:6px}
+.gov-unit{font-size:12px;color:rgba(245,200,66,0.7);font-weight:500;font-family:var(--sans)}
+.gov-tag{font-family:var(--sans);font-size:9px;font-weight:700;background:#c47f00;
+  color:#fff;padding:2px 7px;border-radius:2px;letter-spacing:.1em;margin-right:6px}
 
 /* CONDITION */
-.cond{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:3px;display:inline-block;margin:3px 0}
+.cond{font-family:var(--sans);font-size:11px;padding:3px 8px;border-radius:3px;display:inline-block;margin:3px 0}
 .cond-y{background:rgba(245,200,66,.08);color:var(--yellow);border:1px solid rgba(245,200,66,.2)}
 
 /* SECTION DIVIDER */
-.sdiv{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--muted);display:flex;align-items:center;gap:8px;margin:10px 0 7px}
+.sdiv{font-family:var(--sans);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:8px;margin:10px 0 7px}
 .sdiv::before{content:'';width:10px;height:1px;background:var(--border2)}
 .sdiv::after{content:'';flex:1;height:1px;background:var(--border2)}
 
 /* LOCAL BUCKLING TABLE */
-.loc-tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;margin:8px 0}
+.loc-tbl{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:11px;margin:8px 0}
 .loc-tbl th{background:var(--bg3);color:var(--muted);font-weight:500;font-size:9px;
   letter-spacing:.1em;text-transform:uppercase;padding:5px 7px;border:1px solid var(--border);text-align:center}
 .loc-tbl td{padding:5px 7px;border:1px solid var(--border);text-align:center;color:var(--text)}
@@ -117,9 +127,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 /* PROPS GRID */
 .props-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
 .pbox{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px 10px}
-.pbox-lbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
-.pbox-val{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--blue)}
-.pbox-unit{font-family:var(--mono);font-size:9px;color:var(--dim);margin-left:2px}
+.pbox-lbl{font-family:var(--sans);font-size:9px;color:#fff;letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+.pbox-val{font-family:var(--sans);font-size:14px;font-weight:600;color:#fff}
+.pbox-unit{font-family:var(--sans);font-size:9px;color:rgba(255,255,255,0.5);margin-left:2px}
 
 canvas{display:block;border-radius:4px;background:#0f1117}
 
@@ -127,33 +137,33 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 .calc-block{margin:6px 0 10px;border-left:2px solid var(--border2);padding-left:0}
 /* แต่ละบรรทัดใช้ grid: [indent=20px] [=sign=18px] [content] */
 .calc-line1,.calc-line2,.calc-line3{
-  font-family:var(--mono);font-size:11px;
+  font-family:var(--sans);font-size:12px;
   display:grid;grid-template-columns:20px 18px 1fr;align-items:baseline;
   padding:2px 0;
 }
 /* บรรทัด 1: สมการ — ชิดซ้าย span ทั้ง 3 column */
-.calc-line1{color:var(--cyan)}
+.calc-line1{color:#fff}
 .calc-line1 .cl-ind{display:none}
 .calc-line1 .cl-eq{display:none}
 .calc-line1 .cl-body{grid-column:1/4}
 /* บรรทัด 2: แทนค่า */
-.calc-line2{color:var(--yellow)}
+.calc-line2{color:#fff}
 .calc-line2 .cl-ind{display:block}
 /* บรรทัด 3: ผลลัพธ์ */
 .calc-line3{
-  background:linear-gradient(90deg,rgba(74,144,217,.1),transparent);
-  border-left:2px solid var(--blue);
+  background:transparent;
+  border-left:2px solid rgba(255,255,255,0.3);
   padding:3px 0;margin-top:1px;
 }
 .calc-line3 .cl-ind{display:block}
 /* = sign */
-.cl-eq{color:var(--dim);text-align:center;font-weight:500}
-.calc-line3 .cl-eq{color:var(--blue)}
+.cl-eq{color:#fff;text-align:center;font-weight:500;font-family:var(--mono)}
+.calc-line3 .cl-eq{color:#fff}
 /* content */
 .cl-body{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
 .calc-lbl{color:var(--muted);font-size:11px}
-.calc-val{font-size:14px;font-weight:700;color:var(--blue)}
-.calc-unit{font-size:10px;color:var(--dim)}
+.calc-val{font-size:14px;font-weight:700;color:#fff;font-family:var(--sans)}
+.calc-unit{font-size:10px;color:rgba(255,255,255,0.5);font-family:var(--sans)}
 </style>
 </head>
 <body>
@@ -168,30 +178,30 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <div class="sidebar">
   <div class="sg">
     <div class="sg-title">ขนาดหน้าตัด</div>
-    <div class="inp-row"><span class="lbl">H</span><span class="sym">=</span><input id="inp_H" type="number" value="100" step="1"><span class="unit">mm</span></div>
-    <div class="inp-row"><span class="lbl">B (W)</span><span class="sym">=</span><input id="inp_B" type="number" value="50" step="1"><span class="unit">mm</span></div>
-    <div class="inp-row"><span class="lbl">C</span><span class="sym">=</span><input id="inp_C" type="number" value="20" step="1"><span class="unit">mm</span></div>
-    <div class="inp-row"><span class="lbl">r</span><span class="sym">=</span><input id="inp_r" type="number" value="2.3" step="0.1"><span class="unit">mm</span></div>
-    <div class="inp-row"><span class="lbl">t</span><span class="sym">=</span><input id="inp_t" type="number" value="2.3" step="0.1"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">H</span><span class="sym">=</span><input id="inp_H" type="text" inputmode="decimal" value="100" step="1"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">B (W)</span><span class="sym">=</span><input id="inp_B" type="text" inputmode="decimal" value="50" step="1"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">C</span><span class="sym">=</span><input id="inp_C" type="text" inputmode="decimal" value="20" step="1"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">r</span><span class="sym">=</span><input id="inp_r" type="text" inputmode="decimal" value="2.3" step="0.1"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">t</span><span class="sym">=</span><input id="inp_t" type="text" inputmode="decimal" value="2.3" step="0.1"><span class="unit">mm</span></div>
   </div>
   <div class="sg">
     <div class="sg-title">วัสดุ</div>
-    <div class="inp-row"><span class="lbl">F<sub>y</sub></span><span class="sym">=</span><input id="inp_Fy" type="number" value="2400" step="100"><span class="unit">ksc</span></div>
-    <div class="inp-row"><span class="lbl">E</span><span class="sym">=</span><input id="inp_E" type="number" value="2000000" step="50000"><span class="unit">ksc</span></div>
-    <div class="inp-row"><span class="lbl">G</span><span class="sym">=</span><input id="inp_G" type="number" value="795000" step="10000"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">F<sub>y</sub></span><span class="sym">=</span><input id="inp_Fy" type="text" inputmode="decimal" value="2400" step="100"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">E</span><span class="sym">=</span><input id="inp_E" type="text" inputmode="decimal" value="2000000" step="50000"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">G</span><span class="sym">=</span><input id="inp_G" type="text" inputmode="decimal" value="795000" step="10000"><span class="unit">ksc</span></div>
   </div>
   <div class="sg">
     <div class="sg-title">Unbraced Length</div>
-    <div class="inp-row"><span class="lbl">L<sub>x</sub></span><span class="sym">=</span><input id="inp_Lx" type="number" value="500" step="10"><span class="unit">cm</span></div>
-    <div class="inp-row"><span class="lbl">L<sub>y</sub></span><span class="sym">=</span><input id="inp_Ly" type="number" value="500" step="10"><span class="unit">cm</span></div>
-    <div class="inp-row"><span class="lbl">L<sub>t</sub></span><span class="sym">=</span><input id="inp_Lt" type="number" value="500" step="10"><span class="unit">cm</span></div>
+    <div class="inp-row"><span class="lbl">L<sub>x</sub></span><span class="sym">=</span><input id="inp_Lx" type="text" inputmode="decimal" value="500" step="10"><span class="unit">cm</span></div>
+    <div class="inp-row"><span class="lbl">L<sub>y</sub></span><span class="sym">=</span><input id="inp_Ly" type="text" inputmode="decimal" value="500" step="10"><span class="unit">cm</span></div>
+    <div class="inp-row"><span class="lbl">L<sub>t</sub></span><span class="sym">=</span><input id="inp_Lt" type="text" inputmode="decimal" value="500" step="10"><span class="unit">cm</span></div>
   </div>
   <div class="sg">
     <div class="sg-title">Parameters</div>
-    <div class="inp-row"><span class="lbl">K<sub>x</sub></span><span class="sym">=</span><input id="inp_Kx" type="number" value="1" step="0.1"><span class="unit"></span></div>
-    <div class="inp-row"><span class="lbl">K<sub>y</sub></span><span class="sym">=</span><input id="inp_Ky" type="number" value="1" step="0.1"><span class="unit"></span></div>
-    <div class="inp-row"><span class="lbl">K<sub>t</sub></span><span class="sym">=</span><input id="inp_Kt" type="number" value="1" step="0.1"><span class="unit"></span></div>
-    <div class="inp-row"><span class="lbl">C<sub>b</sub></span><span class="sym">=</span><input id="inp_Cb" type="number" value="1" step="0.1"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">K<sub>x</sub></span><span class="sym">=</span><input id="inp_Kx" type="text" inputmode="decimal" value="1" step="0.1"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">K<sub>y</sub></span><span class="sym">=</span><input id="inp_Ky" type="text" inputmode="decimal" value="1" step="0.1"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">K<sub>t</sub></span><span class="sym">=</span><input id="inp_Kt" type="text" inputmode="decimal" value="1" step="0.1"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">C<sub>b</sub></span><span class="sym">=</span><input id="inp_Cb" type="text" inputmode="decimal" value="1" step="0.1"><span class="unit"></span></div>
   </div>
   
 </div>
@@ -206,7 +216,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <span class="sec-title">Section</span>
   </div>
   <div style="padding:0;display:flex;justify-content:center;background:var(--bg)">
-    <canvas id="sectionCanvas" width="560" height="420" style="width:560px;height:420px;display:block"></canvas>
+    <canvas id="sectionCanvas" width="720" height="540" style="width:720px;height:540px;display:block"></canvas>
   </div>
 </div>
 
@@ -242,27 +252,33 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     </div>
   </div>
   <!-- Flange Properties + kΦ Values -->
-  <!-- Flange Properties (full width) -->
   <div style="border-top:1px solid var(--border)">
     <div class="rep-col-full">
-      <div class="sdiv">Flange Properties</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
-        <div class="rr"><span class="rr-lbl">A<sub>f</sub></span><span class="rr-val" id="dt_Af">—</span><span class="rr-unit">mm²</span></div>
-        <div class="rr"><span class="rr-lbl">J<sub>f</sub></span><span class="rr-val" id="dt_Jf">—</span><span class="rr-unit">mm⁴</span></div>
-        <div class="rr"><span class="rr-lbl">I<sub>xf</sub></span><span class="rr-val" id="dt_Ixf">—</span><span class="rr-unit">mm⁴</span></div>
-        <div class="rr"><span class="rr-lbl">I<sub>yf</sub></span><span class="rr-val" id="dt_Iyf">—</span><span class="rr-unit">mm⁴</span></div>
-        <div class="rr"><span class="rr-lbl">I<sub>xyf</sub></span><span class="rr-val" id="dt_Ixyf">—</span><span class="rr-unit">mm⁴</span></div>
-        <div class="rr"><span class="rr-lbl">X<sub>of</sub></span><span class="rr-val" id="dt_Xof">—</span><span class="rr-unit">mm</span></div>
-        <div class="rr"><span class="rr-lbl">x<sub>hf</sub></span><span class="rr-val" id="dt_xhf">—</span><span class="rr-unit">mm</span></div>
-        <div class="rr"><span class="rr-lbl">y<sub>of</sub></span><span class="rr-val" id="dt_yof">—</span><span class="rr-unit">mm</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+        <div style="border-right:1px solid var(--border);padding:14px">
+          <div class="sdiv">Flange Properties</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
+            <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">A<sub>f</sub> = <span id="dt_Af" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm²</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">J<sub>f</sub> = <span id="dt_Jf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁴</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I<sub>xf</sub> = <span id="dt_Ixf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁴</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I<sub>yf</sub> = <span id="dt_Iyf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁴</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I<sub>xyf</sub> = <span id="dt_Ixyf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁴</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">X<sub>of</sub> = <span id="dt_Xof" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">x<sub>hf</sub> = <span id="dt_xhf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">y<sub>of</sub> = <span id="dt_yof" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+        
+          </div>
+        </div>
+        <div style="padding:14px">
+          <div class="sdiv">Distortional Half-Wavelength</div>
+          <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">L<sub>m</sub> = <span id="dt_Lm" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">L<sub>crd</sub> = <span id="dt_Lcrd" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">L<sub>d</sub> = <span id="dt_Ld" style="color:var(--yellow);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+        
+        </div>
       </div>
-      <div class="sdiv">Distortional Half-Wavelength</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
-        <div class="rr"><span class="rr-lbl">L<sub>m</sub></span><span class="rr-val" id="dt_Lm">—</span><span class="rr-unit">mm</span></div>
-        <div class="rr"><span class="rr-lbl">L<sub>crd</sub></span><span class="rr-val" id="dt_Lcrd">—</span><span class="rr-unit">mm</span></div>
-        <div class="rr" style="border-left-color:var(--yellow)"><span class="rr-lbl">L<sub>d</sub> = min(L<sub>m</sub>,L<sub>crd</sub>)</span><span class="rr-val" style="color:var(--yellow)" id="dt_Ld">—</span><span class="rr-unit">mm</span></div>
-      </div>
-</div>
+    </div>
+  </div>
 
 <!-- kΦ Values -->
 <div class="sec-block">
@@ -766,7 +782,56 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
 
 const PI=Math.PI;
-function f(v,d=2){return isFinite(v)?v.toFixed(d):'—';}
+function f(v,d=2){
+  if(!isFinite(v)) return '—';
+  // จำกัดทศนิยมไม่เกิน 3 ตำแหน่ง
+  const decimals = Math.min(d, 3);
+  // trim trailing zeros แต่ไม่เกิน decimals
+  let fixed = parseFloat(v.toFixed(decimals)).toString();
+  // ถ้าไม่มีจุดทศนิยมและ decimals > 0 ให้ใส่เลข
+  if(decimals === 0) fixed = Math.round(v).toString();
+  const parts = fixed.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
+}
+
+// แปลง string ที่มี comma กลับเป็น number
+function parseInput(id){
+  const el = document.getElementById(id);
+  if(!el) return 0;
+  return parseFloat(el.value.replace(/,/g,'')) || 0;
+}
+
+// format ตัวเลขใน input box
+function fmtInput(el){
+  const raw = el.value.replace(/,/g,'');
+  const num = parseFloat(raw);
+  if(!isFinite(num)) return;
+  // แยก integer กับ decimal
+  const parts = raw.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  // เก็บ cursor position
+  const formatted = parts.join('.');
+  el.value = formatted;
+}
+
+// setup input formatting
+function setupInputs(){
+  document.querySelectorAll('input[type="text"]').forEach(el => {
+    // format เมื่อ blur
+    el.addEventListener('blur', () => { fmtInput(el); calculate(); });
+    // allow only numbers, dot, comma
+    el.addEventListener('keypress', e => {
+      if(!/[0-9.,]/.test(e.key) && e.key !== 'Backspace') e.preventDefault();
+    });
+    // calculate เมื่อกด Enter
+    el.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ fmtInput(el); calculate(); }
+    });
+    // format ค่าเริ่มต้น
+    fmtInput(el);
+  });
+}
 function s(id,v,d=2){const e=document.getElementById(id);if(e)e.textContent=f(v,d);}
 function sso(id,v,d=2){
   const e=document.getElementById(id);if(!e)return;
@@ -840,6 +905,7 @@ function drawSection(canvasId,H,B,C,r,tt,xc,m){
     ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
     ctx.setLineDash([]);ctx.restore();
   }
+
 
   // ── section path builder ────────────────────────────────────
   // draws the CENTERLINE path of the C-section (open at flange tips)
@@ -1007,16 +1073,26 @@ function drawSection(canvasId,H,B,C,r,tt,xc,m){
   ctx.shadowBlur=0;
   // ── 3. C.G. marker — orange arrows ───────────────────────────
   const cgPx=tx(cgX), cgPy=ty(cgY);
-  const arLen=20;
+  const arLen=26;
   ctx.save(); ctx.strokeStyle='#f0883e'; ctx.lineWidth=1.5;
+  // แกน X (ลูกศรแนวนอน)
   ctx.beginPath(); ctx.moveTo(cgPx,cgPy); ctx.lineTo(cgPx+arLen,cgPy); ctx.stroke();
   ah(cgPx+arLen,cgPy,0,'#e07820',6);
+  // แกน Y (ลูกศรแนวตั้ง)
   ctx.beginPath(); ctx.moveTo(cgPx,cgPy); ctx.lineTo(cgPx,cgPy-arLen); ctx.stroke();
   ah(cgPx,cgPy-arLen,-Math.PI/2,'#e07820',6);
   ctx.restore();
-  ctx.font="bold 10px 'IBM Plex Mono',monospace"; ctx.fillStyle='#f0883e';
+  // label X บนปลายลูกศรแนวนอน
+  ctx.font="bold 11px 'IBM Plex Mono',monospace"; ctx.fillStyle='#f0883e';
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('x', cgPx+arLen+4, cgPy);
+  // label Y บนปลายลูกศรแนวตั้ง
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('y', cgPx, cgPy-arLen-4);
+  // label C.G.
+  ctx.font="bold 10px 'IBM Plex Mono',monospace";
   ctx.textAlign='left'; ctx.textBaseline='bottom';
-  ctx.fillText('C.G.',cgPx+4,cgPy-arLen+4);
+  ctx.fillText('C.G.', cgPx+4, cgPy-arLen-8);
 
   // ── 4. S.C. marker — pink cross ──────────────────────────────
   const scPx=tx(scX), scPy=ty(cgY);
@@ -1031,74 +1107,79 @@ function drawSection(canvasId,H,B,C,r,tt,xc,m){
 
   // ── 5. DIMENSIONS (วัดจาก outer face ถึง outer face) ───────────
 
-  // H dim (left, green, vertical) — outer top to outer bottom
-  const hDimX=tx(0)-halfT-36;
+  // ── H dim (ซ้าย, เขียว, แนวตั้ง) ─────────────────────────
+  const hDimX = Math.min(tx(0) - halfT - 52, tx(scX) - 30);
   extLine(tx(0)-halfT, ty(0)-halfT, hDimX+2, ty(0)-halfT);
   extLine(tx(0)-halfT, ty(H)+halfT, hDimX+2, ty(H)+halfT);
   dimLine(hDimX, ty(0)-halfT, hDimX, ty(H)+halfT, '', '#4ade80', 0, 0);
-  ctx.save(); ctx.translate(hDimX-14, ty(H/2)); ctx.rotate(-Math.PI/2);
-  ctx.font="11px 'IBM Plex Mono',monospace"; ctx.fillStyle='#4ade80';
+  ctx.save(); ctx.translate(hDimX-16, ty(H/2)); ctx.rotate(-Math.PI/2);
+  ctx.font = "bold 11px 'IBM Plex Mono',monospace"; ctx.fillStyle='#4ade80';
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText('H = '+H+' mm', 0, 0); ctx.restore();
 
-  // W dim (bottom, gray) — outer web face to outer flange tip
-  const wDimY=ty(H)+halfT+32;
+  // ── W dim (ล่าง, เทา, แนวนอน) ──────────────────────────────
+  const wDimY = ty(H) + halfT + 44;
   extLine(tx(0)-halfT, ty(H)+halfT, tx(0)-halfT, wDimY+2);
   extLine(tx(B)+halfT, ty(H)+halfT, tx(B)+halfT, wDimY+2);
-  dimLine(tx(0)-halfT, wDimY, tx(B)+halfT, wDimY, 'W = '+B+' mm', '#7a8aaa', 0, 11, 10);
+  dimLine(tx(0)-halfT, wDimY, tx(B)+halfT, wDimY, 'W = '+B+' mm', '#aaa', 0, 13, 11);
 
-  // C dim (right, red, vertical) — outer flange top to outer lip bottom
-  const cDimX=tx(B)+halfT+28;
-  extLine(tx(B)+halfT, ty(0)-halfT, cDimX-2, ty(0)-halfT);
-  extLine(tx(B)+halfT, ty(C)+halfT, cDimX-2, ty(C)+halfT);
-  dimLine(cDimX, ty(0)-halfT, cDimX, ty(C)+halfT, '', '#e05252', 0, 0);
-  ctx.font="10px 'IBM Plex Mono',monospace"; ctx.fillStyle='#e05252';
+  // ── C dim (ขวา, แดง, แนวตั้ง) ───────────────────────────────
+  // ปลาย lip = outer edge = tx(B)+halfT แนวตั้ง
+  // บน: ty(0)-halfT  ล่าง: ty(C)+halfT (centerline end + half thickness)
+  const cDimX = tx(B) + halfT + 44;
+  const cTop  = ty(0) - halfT;
+  const cBot  = ty(C);   // ปลาย lip — open end ไม่มี halfT
+  extLine(tx(B)+halfT, cTop, cDimX-2, cTop);
+  extLine(tx(B)+halfT, cBot, cDimX-2, cBot);
+  dimLine(cDimX, cTop, cDimX, cBot, '', '#e05252', 0, 0);
+  ctx.font = "bold 11px 'IBM Plex Mono',monospace"; ctx.fillStyle='#e05252';
   ctx.textAlign='left'; ctx.textBaseline='middle';
-  ctx.fillText('C = '+C+' mm', cDimX+6, ty(C/2));
+  ctx.fillText('C = '+C+' mm', cDimX+8, ty(C/2));
 
-  // t dim (right, blue)
-  const tLineY=ty(H*0.76);
-  const fi=tx(B)-halfT, fo=tx(B)+halfT;
-  ctx.save(); ctx.strokeStyle='#4a90d9'; ctx.lineWidth=0.9;
-  ctx.beginPath(); ctx.moveTo(fi,tLineY-7); ctx.lineTo(fi,tLineY+7); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(fo,tLineY-7); ctx.lineTo(fo,tLineY+7); ctx.stroke();
+  // ── t dim (ขวา, ฟ้า) แสดงบนแฟลนจ์กลาง ────────────────────
+  const tLineY = ty(H - C/2);  // กึ่งกลาง lip ล่าง
+  const fi = tx(B)-halfT, fo = tx(B)+halfT;
+  ctx.save(); ctx.strokeStyle='#4a90d9'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(fi,tLineY-8); ctx.lineTo(fi,tLineY+8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(fo,tLineY-8); ctx.lineTo(fo,tLineY+8); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(fi,tLineY); ctx.lineTo(fo,tLineY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(fo,tLineY); ctx.lineTo(tx(B)+32,tLineY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(fo,tLineY); ctx.lineTo(tx(B)+42,tLineY); ctx.stroke();
   ctx.restore();
-  ctx.font="10px 'IBM Plex Mono',monospace"; ctx.fillStyle='#4a90d9';
+  ctx.font = "bold 11px 'IBM Plex Mono',monospace"; ctx.fillStyle='#4a90d9';
   ctx.textAlign='left'; ctx.textBaseline='middle';
-  ctx.fillText('t = '+tt+' mm',tx(B)+34,tLineY);
+  ctx.fillText('t = '+tt+' mm', tx(B)+44, tLineY);
 
-  // 21.88 dim (SC to web, black)
-  if(scX<0){
-    const dy1=ty(cgY)+16;
-    extLine(tx(scX),ty(cgY),tx(scX),dy1+2);
-    extLine(tx(0),  ty(cgY),tx(0),  dy1+2);
-    dimLine(tx(scX),dy1,tx(0),dy1,Math.abs(scX).toFixed(2),'#7a8aaa',0,10,10);
+  // ── xc dim (web → CG, ส้ม) แนวนอนใต้ CG ──────────────────
+  const xcDimY = ty(H*0.72);
+  extLine(tx(0),   ty(cgY), tx(0),   xcDimY+2, '#f0883e');
+  extLine(tx(cgX), ty(cgY), tx(cgX), xcDimY+2, '#f0883e');
+  dimLine(tx(0), xcDimY, tx(cgX), xcDimY, cgX.toFixed(2), '#f0883e', 0, 12, 10);
+
+  // ── SC dim (web → SC, ม่วง) แนวนอน แยกออกมา ──────────────
+  if(scX < 0){
+    const scDimY = ty(H*0.85);
+    extLine(tx(scX), ty(cgY), tx(scX), scDimY+2, '#a78bfa');
+    extLine(tx(0),   ty(cgY), tx(0),   scDimY+2, '#a78bfa');
+    dimLine(tx(scX), scDimY, tx(0), scDimY, Math.abs(scX).toFixed(2), '#a78bfa', 0, 12, 10);
   }
-  // xc dim (web to CG, black)
-  const dy2=ty(cgY)+(scX<0?16:10);
-  extLine(tx(0),   ty(cgY),tx(0),   dy2+2,'#bbb');
-  extLine(tx(cgX), ty(cgY),tx(cgX), dy2+2,'#bbb');
-  dimLine(tx(0),dy2+10,tx(cgX),dy2+10,cgX.toFixed(2),'#7a8aaa',0,10,10);
 }
 
 function calculate(){
-  const H=+document.getElementById('inp_H').value;
-  const B=+document.getElementById('inp_B').value;
-  const C=+document.getElementById('inp_C').value;
-  const tt=+document.getElementById('inp_t').value;
-  const r=+document.getElementById('inp_r').value;
-  const Fy=+document.getElementById('inp_Fy').value;
-  const E=+document.getElementById('inp_E').value;
-  const G=+document.getElementById('inp_G').value;
-  const Lx=+document.getElementById('inp_Lx').value;
-  const Ly=+document.getElementById('inp_Ly').value;
-  const Lt=+document.getElementById('inp_Lt').value;
-  const Kx=+document.getElementById('inp_Kx').value;
-  const Ky=+document.getElementById('inp_Ky').value;
-  const Kt=+document.getElementById('inp_Kt').value;
-  const Cb=+document.getElementById('inp_Cb').value;
+  const H=parseInput('inp_H');
+  const B=parseInput('inp_B');
+  const C=parseInput('inp_C');
+  const tt=parseInput('inp_t');
+  const r=parseInput('inp_r');
+  const Fy=parseInput('inp_Fy');
+  const E=parseInput('inp_E');
+  const G=parseInput('inp_G');
+  const Lx=parseInput('inp_Lx');
+  const Ly=parseInput('inp_Ly');
+  const Lt=parseInput('inp_Lt');
+  const Kx=parseInput('inp_Kx');
+  const Ky=parseInput('inp_Ky');
+  const Kt=parseInput('inp_Kt');
+  const Cb=parseInput('inp_Cb');
 
   const J1=H-tt,J2=B-tt,J3=C-tt/2;
   const P1=J1-2*r,P2=J2-2*r,P3=J3-r,P4=PI*r/2;
@@ -1338,7 +1419,7 @@ function calculate(){
   const Vcr2=Fcr*Aw;
   t('sh_Aw_sub',`${H} × ${tt} / 100`);s('sh_Aw',Aw,3);
   t('sh_Vy_sub',`0.6 × ${f(Aw,3)} × ${Fy}`);s('sh_Vy',Vy,0);
-  t('sh_Vcr_sub',`π²×${E}×${kv}×${H/10}×${tt/10} / [12×0.91×(${H}/${tt})²]`);s('sh_Vcr',Vcr,0);
+  t('sh_Vcr_sub',`π²×${f(E,0)}×${kv}×${f(H/10,3)}×${f(tt/10,3)} / [12×0.91×(${H}/${tt})²]`);s('sh_Vcr',Vcr,0);
   t('sh_lv_sub',`√(${f(Vy,0)} / ${f(Vcr,0)})`);s('sh_lv',lv,3);
   t('sh_lv_cond',lv<=0.587?`λv = ${f(lv,3)} ≤ 0.587  →  Vn = Vy = ${f(Vy,0)} kg`:`λv = ${f(lv,3)} > 0.587  →  Vn = [1−0.25(Vcr/Vy)^0.65]×(Vcr/Vy)^0.65×Vy`);
   sso('sh_Vn',Vn,0);s('sh_Fcr',Fcr,0);s('sh_Vcr2',Vcr2,0);
@@ -1415,7 +1496,7 @@ function calculate(){
 }
 
 
-document.querySelectorAll('input').forEach(el=>el.addEventListener('input',calculate));
+setupInputs();
 // Redraw canvas เมื่อ zoom หรือ resize
 if(window.ResizeObserver){
   const ro=new ResizeObserver(()=>calculate());
@@ -1423,7 +1504,7 @@ if(window.ResizeObserver){
   if(cvs)ro.observe(cvs);
 }
 window.addEventListener('resize',calculate);
-window.addEventListener('load',calculate);
+window.addEventListener('load',()=>{ setupInputs(); calculate(); });
 
 
 </script>
