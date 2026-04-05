@@ -98,6 +98,18 @@ canvas{width:100%;display:block;border-radius:3px;}
 .nlb{color:#c8d0e8;margin:0 2px;font-family:'Space Mono',monospace;font-size:11px;}
 
 .err{background:rgba(255,77,109,.09);border:1px solid rgba(255,77,109,.28);color:#ff4d6d;padding:9px 12px;border-radius:6px;font-size:16px;margin-bottom:10px;}
+.cb-block{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;margin-bottom:12px;}
+.cb-title{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#c8d0e8;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.cb-span-row{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;margin-bottom:8px;}
+.cb-span-hd{font-family:'Space Mono',monospace;font-size:13px;color:var(--accent4);margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;}
+.cb-val{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--accent3);}
+.cb-sub{font-size:12px;color:var(--muted);margin-top:2px;font-family:'Space Mono',monospace;}
+.cb-detail{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px;}
+.cb-m{text-align:center;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:5px;padding:5px 4px;}
+.cb-ml{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;}
+.cb-mv{font-size:13px;font-weight:700;color:var(--accent);font-family:'Space Mono',monospace;}
+.cb-note{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:6px;padding:5px 8px;background:rgba(192,132,252,.06);border-radius:5px;border-left:2px solid var(--accent4);}
+.cb-warn{color:#ffa500;font-size:12px;font-family:'Space Mono',monospace;}
 .cv-tooltip{position:fixed;background:rgba(13,15,14,0.92);border:1px solid rgba(255,255,255,0.15);color:#e8ecf4;font-family:'Space Mono',monospace;font-size:11px;padding:5px 9px;border-radius:5px;pointer-events:none;display:none;z-index:999;white-space:nowrap;line-height:1.6;}
 
 .rxn-row{display:flex;align-items:stretch;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
@@ -160,6 +172,134 @@ canvas{width:100%;display:block;border-radius:3px;}
 </div>
 </div>
 <script>
+// ── Cb — Lateral-Torsional Buckling Factor (AISC 360 Eq. F1-1) ──────────
+// Automatically computed per span between consecutive supports.
+// Cb = 12.5·Mmax / (2.5·Mmax + 3·MA + 4·MB + 3·MC)
+
+function calcCbForSpan(xs, Marr, x1, x2) {
+  // Collect |M| values within [x1, x2]
+  var pts = [];
+  for (var i = 0; i < xs.length; i++) {
+    if (xs[i] >= x1 - 1e-9 && xs[i] <= x2 + 1e-9)
+      pts.push({x: xs[i], M: Math.abs(Marr[i])});
+  }
+  if (pts.length < 2) return null;
+
+  var Lb = x2 - x1;
+  var Mmax = 0;
+  for (var i = 0; i < pts.length; i++) if (pts[i].M > Mmax) Mmax = pts[i].M;
+  if (Mmax < 1e-9) return {Cb: null, Mmax:0, MA:0, MB:0, MC:0, note:'M ≈ 0 ตลอดช่วง'};
+
+  function interpM(xq) {
+    for (var i = 0; i < pts.length-1; i++) {
+      if (pts[i].x <= xq + 1e-9 && xq <= pts[i+1].x + 1e-9) {
+        var t = (xq - pts[i].x) / (pts[i+1].x - pts[i].x);
+        return pts[i].M + t*(pts[i+1].M - pts[i].M);
+      }
+    }
+    return pts[pts.length-1].M;
+  }
+
+  var MA = interpM(x1 + Lb*0.25);
+  var MB = interpM(x1 + Lb*0.50);
+  var MC = interpM(x1 + Lb*0.75);
+  var denom = 2.5*Mmax + 3*MA + 4*MB + 3*MC;
+  var Cb = denom < 1e-12 ? null : 12.5*Mmax / denom;
+  return {Cb:Cb, Mmax:Mmax, MA:MA, MB:MB, MC:MC, Lb:Lb};
+}
+
+function renderCbResults(xs, Marr, slist, L) {
+  var block = document.getElementById('cb-results-block');
+  if (!block) return;
+
+  // Build Lb boundaries from LATERAL bracing supports only (pin, fixed) + beam ends
+  // Roller does NOT provide lateral restraint → excluded
+  var LATERAL_TYPES = {pin:1, fixed:1, pin_r:1, lateral:1};
+  var bpts = [0];
+  for (var i = 0; i < slist.length; i++) {
+    var s = slist[i];
+    if (LATERAL_TYPES[s.type] && s.x > 1e-9 && s.x < L - 1e-9) bpts.push(s.x);
+  }
+  bpts.push(L);
+  bpts.sort(function(a,b){return a-b;});
+  bpts = bpts.filter(function(v,i,a){return i===0||Math.abs(v-a[i-1])>1e-9;});
+
+  var spans = [];
+  for (var i = 0; i < bpts.length-1; i++)
+    spans.push({x1: bpts[i], x2: bpts[i+1]});
+
+  if (spans.length === 0) { block.innerHTML = ''; return; }
+
+  var html = '<div class="cb-block">' +
+    '<div class="cb-title">&#9670; C<sub>b</sub> — Lateral-Torsional Buckling Modification Factor' +
+    '<span style="font-size:11px;color:var(--muted);letter-spacing:0;text-transform:none;font-family:sans-serif;margin-left:6px;">AISC 360 Eq. F1-1</span></div>' +
+    '<div style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted);margin-bottom:10px;padding:6px 9px;background:rgba(0,229,255,.04);border-radius:5px;border-left:2px solid var(--accent);">' +
+    'C<sub>b</sub> = 12.5·M<sub>max</sub> / (2.5·M<sub>max</sub> + 3·M<sub>A</sub> + 4·M<sub>B</sub> + 3·M<sub>C</sub>)' +
+    '</div>';
+
+  var cbSumRows = '';
+  for (var si = 0; si < spans.length; si++) {
+    var sp = spans[si];
+    var r = calcCbForSpan(xs, Marr, sp.x1, sp.x2);
+    var spanLabel = 'Span ' + (si+1) + '  (x = ' + sp.x1.toFixed(2) + ' → ' + sp.x2.toFixed(2) + ' m,  Lb = ' + (sp.x2-sp.x1).toFixed(3) + ' m)';
+
+    html += '<div class="cb-span-row">';
+    html += '<div class="cb-span-hd"><span>' + spanLabel + '</span>';
+
+    if (!r) {
+      html += '<span class="cb-warn">⚠ ไม่พบข้อมูล</span></div></div>';
+      continue;
+    }
+    if (r.note) {
+      html += '</div><div style="color:var(--muted);font-size:12px;font-family:Space Mono,monospace;">'+r.note+'</div></div>';
+      continue;
+    }
+
+    // Status badge
+    var statusNote = '';
+    if (r.Cb !== null) {
+      if      (r.Cb < 1.0)              statusNote = '<span style="color:#ff4d6d;font-size:11px;font-family:Space Mono,monospace;">⚠ Cb &lt; 1.0</span>';
+      else if (r.Cb <= 1.67)            statusNote = '<span style="color:var(--accent3);font-size:11px;font-family:Space Mono,monospace;">✓ Conservative</span>';
+      else if (r.Cb <= 2.3)             statusNote = '<span style="color:#ffd60a;font-size:11px;font-family:Space Mono,monospace;">↑ High Cb</span>';
+      else                              statusNote = '<span style="color:#ffa500;font-size:11px;font-family:Space Mono,monospace;">⚠ Cb &gt; 2.3</span>';
+    }
+    html += statusNote + '</div>';
+
+    var cbColor = r.Cb===null ? 'var(--muted)' : (r.Cb<1?'#ff4d6d':r.Cb<=2.3?'var(--accent3)':'#ffa500');
+    html += '<div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:8px;">';
+    html += '<div><div class="cb-sub">C<sub>b</sub></div><div class="cb-val" style="color:'+cbColor+';">'+(r.Cb!==null?r.Cb.toFixed(4):'N/A')+'</div></div>';
+    html += '</div>';
+
+    html += '<div class="cb-detail">' +
+      '<div class="cb-m"><div class="cb-ml">M<sub>max</sub></div><div class="cb-mv">'+r.Mmax.toFixed(2)+'</div><div class="cb-ml">kg·m</div></div>' +
+      '<div class="cb-m"><div class="cb-ml">M<sub>A</sub> (¼L)</div><div class="cb-mv">'+r.MA.toFixed(2)+'</div><div class="cb-ml">kg·m</div></div>' +
+      '<div class="cb-m"><div class="cb-ml">M<sub>B</sub> (½L)</div><div class="cb-mv">'+r.MB.toFixed(2)+'</div><div class="cb-ml">kg·m</div></div>' +
+      '<div class="cb-m"><div class="cb-ml">M<sub>C</sub> (¾L)</div><div class="cb-mv">'+r.MC.toFixed(2)+'</div><div class="cb-ml">kg·m</div></div>' +
+      '</div>';
+    html += '</div>';
+
+    cbSumRows += '<tr class="hr"><td>C<sub>b</sub> Span '+(si+1)+' ('+sp.x1.toFixed(2)+'–'+sp.x2.toFixed(2)+'m)</td>' +
+      '<td class="n">'+(r.Cb!==null?r.Cb.toFixed(4):'—')+'</td>' +
+      '<td style="text-align:right;color:#c8d0e8;">—</td></tr>';
+  }
+
+  html += '<div class="cb-note">&#9432; Lb = ระยะระหว่างจุดค้ำยันด้านข้าง (Lateral Bracing) &nbsp;|&nbsp; ' +
+    'นับเฉพาะ <strong style="color:var(--accent)">Pin</strong> และ <strong style="color:var(--accent)">Fixed</strong> เท่านั้น &nbsp;|&nbsp; ' +
+    'C<sub>b</sub> = 1.0 (conservative), C<sub>b</sub> &gt; 1.0 ช่วยเพิ่ม M<sub>n</sub> สูงสุดไม่เกิน M<sub>p</sub></div>';
+  html += '</div>';
+  block.innerHTML = html;
+
+  // Append to summary table
+  var sumTbl = document.querySelector('.sum-table');
+  if (sumTbl && cbSumRows) {
+    var frag = document.createElement('tbody');
+    frag.innerHTML = cbSumRows;
+    while (frag.firstChild) sumTbl.appendChild(frag.firstChild);
+  }
+}
+
+// ── Beam Segments ─────────────────────────────────────────────────────────
+
 // ── Beam Segments ─────────────────────────────────────────────────────────
 var segments={};
 var segCount=0;
@@ -231,8 +371,8 @@ let supportCount=0, loadCount=0;
 
 
 const supports={};
-const TLBL={pin:'Pin',roller:'Roller',fixed:'Fixed',free:'Free',spring:'Spring',vspring:'V-Spring',rspring:'R-Spring',roller_r:'Roller+Rθ',pin_r:'Pin+Rθ',ronly:'Rθ only'};
-const SCOL={pin:'#ffd60a',roller:'#00e5ff',fixed:'#a8ff78',free:'#ff4d6d'};
+const TLBL={pin:'Pin',roller:'Roller',fixed:'Fixed',free:'Free',spring:'Spring',vspring:'V-Spring',rspring:'R-Spring',roller_r:'Roller+Rθ',pin_r:'Pin+Rθ',ronly:'Rθ only',lateral:'Lateral Brace'};
+const SCOL={pin:'#ffd60a',roller:'#00e5ff',fixed:'#a8ff78',free:'#ff4d6d',lateral:'#f9a8d4'};
 
 function addSupport(type,xVal){
   type=type||'pin'; xVal=xVal!=null?xVal:0;
@@ -258,6 +398,7 @@ function addSupport(type,xVal){
     '<option value="ronly"'+(type==='ronly'?' selected':'')+'>↻  R.Spring (kθ)</option>'+
     '<option value="roller_r"'+(type==='roller_r'?' selected':'')+'>○+↻  Roller + R.Spring (v=0, kθ)</option>'+
     '<option value="pin_r"'+(type==='pin_r'?' selected':'')+'>△+↻  Pin + R.Spring (v=0, kθ)</option>'+
+    '<option value="lateral"'+(type==='lateral'?' selected':'')+'>⊠  Lateral Brace Only</option>'+
     '</select>'+
     '</div>'+
     '<div id="vspring-fields-'+id+'" style="display:'+(type==='vspring'?'block':'none')+';margin-bottom:6px">'+
@@ -361,7 +502,7 @@ function drawPreview(){
 }
 
 function updateHeader(){
-  const slist=getSupportList().filter(function(s){return s.type!=='free';});
+  const slist=getSupportList().filter(function(s){return s.type!=='free'&&s.type!=='lateral';});
   const nFixed=slist.filter(function(s){return s.type==='fixed';}).length;
   const nVert=slist.length;
   const doi=nFixed+nVert-2;
@@ -807,9 +948,11 @@ function analyze(){
   if(isNaN(L)||L<=0) return showErr('Beam length must be > 0');
 
   var cl=collectLoads(L);if(cl.err) return showErr(cl.err);
-  // Convert support positions from display units to meters
-  var slist=getSupportList().filter(function(s){return s.type!=='free';});
-  if(slist.length===0) return showErr('Please add at least one support');
+  // Full support list (including lateral braces) — used for Cb only
+  var slistAll=getSupportList().filter(function(s){return s.type!=='free';});
+  // Structural supports only (lateral brace has no vertical/rotational stiffness)
+  var slist=slistAll.filter(function(s){return s.type!=='lateral';});
+  if(slist.length===0) return showErr('Please add at least one structural support');
   // Single non-fixed support (Free/Roller/Pin) = unstable
   if(slist.length===1){
     var t=slist[0].type;
@@ -827,12 +970,12 @@ function analyze(){
   if(xs_set.size!==xs_s.length) return showErr('Two or more supports share the same position');
   var res=matrixSolve(L,segments,slist,cl.loads);
   if(!res.ok) return showErr(res.err);
-  renderResults(L,slist,cl.loads,res);
+  renderResults(L,slist,slistAll,cl.loads,res);
 }
 function showErr(m){document.getElementById('results').innerHTML='<div class="err">&#9888; '+m+'</div>';}
 
 // ---- Render ----
-function renderResults(L,slist,loads,res){
+function renderResults(L,slist,slistAll,loads,res){
   var rxns=res.rxns,nodes=res.nodes,nN=res.nN,nE=res.nE,nDOF=res.nDOF,nC=res.nC,freeDOF=res.freeDOF;
   var xs=res.xs,Varr=res.Varr,Marr=res.Marr,DEF=res.DEF,minDef=res.minDef,maxPosDef=res.maxPosDef,maxDefAbs=res.maxDefAbs,xMaxDef=res.xMaxDef,xMaxPosDef=res.xMaxPosDef;
   var maxV=res.maxV,maxM=res.maxM,maxMp=res.maxMp,minMp=res.minMp;
@@ -878,6 +1021,7 @@ function renderResults(L,slist,loads,res){
     '<div class="dblock"><div class="dtitle">Shear Force Diagram &#8212; SFD</div><canvas id="cs" height="260"></canvas></div>'+
     '<div class="dblock"><div class="dtitle">Bending Moment Diagram &#8212; BMD</div><canvas id="cm" height="260"></canvas></div>'+
     '<div class="dblock"><div class="dtitle">Deflection &#8212; v(x) <span class="dinfo">Double Integration M/EI</span></div><canvas id="cd" height="260"></canvas></div>'+
+    '<div id="cb-results-block"></div>'+
     '<div class="dblock"><div class="dtitle">Summary</div>'+
     '<table class="sum-table"><tr><th>Parameter</th><th style="text-align:right">Value</th><th style="text-align:right">Unit</th></tr>'+
     sumRows+
@@ -904,6 +1048,7 @@ function renderResults(L,slist,loads,res){
     drawDiag('cs',xs,Varr,L,'#ef4444','V (kg)',discXs);
     drawDiag('cm',xs,Marr.map(function(v){return -v;}),L,'#ef4444','M (kg·m)',discXs);
     drawDeflection('cd',xs,DEF,L,maxDefAbs,xMaxDef,slist);
+    renderCbResults(xs,Marr,slistAll,L);
   });
 }
 
@@ -1277,11 +1422,30 @@ function drawFBD(L,slist,loads,rxns){
       ctx.beginPath();ctx.arc(sx,by+bh/2,ar,0.2*Math.PI,1.8*Math.PI);ctx.stroke();
       ctx.fillStyle=col;
       ctx.beginPath();ctx.moveTo(sx+ar,by+bh/2);ctx.lineTo(sx+ar-5,by+bh/2-4);ctx.lineTo(sx+ar-5,by+bh/2+4);ctx.closePath();ctx.fill();
+    } else if(s.type==='lateral'){
+      // Lateral Brace Only: vertical dashed line through beam + X marker + "LB" label
+      var lbCol=SCOL['lateral']||'#f9a8d4';
+      ctx.save();
+      ctx.strokeStyle=lbCol; ctx.lineWidth=1.5;
+      ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(sx,by-18);ctx.lineTo(sx,by+bh+22);ctx.stroke();
+      ctx.setLineDash([]);
+      // X marker above beam
+      var xr=6;
+      ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(sx-xr,by-18-xr);ctx.lineTo(sx+xr,by-18+xr);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(sx+xr,by-18-xr);ctx.lineTo(sx-xr,by-18+xr);ctx.stroke();
+      // Diamond at beam midline
+      ctx.fillStyle=lbCol+'33'; ctx.strokeStyle=lbCol; ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(sx,by+bh/2-6);ctx.lineTo(sx+5,by+bh/2);ctx.lineTo(sx,by+bh/2+6);ctx.lineTo(sx-5,by+bh/2);ctx.closePath();
+      ctx.fill();ctx.stroke();
+      ctx.restore();
     }
     var yLbl=s.type==='fixed'?by+bh+22:
               (s.type==='roller'||s.type==='roller_r')?by+bh+46:
               (s.type==='spring'||s.type==='vspring')?by+bh+50:
-              (s.type==='rspring'||s.type==='ronly'||s.type==='pin_r')?by+bh+22:by+bh+33;
+              (s.type==='rspring'||s.type==='ronly'||s.type==='pin_r')?by+bh+22:
+              s.type==='lateral'?by+bh+28:by+bh+33;
     ctx.fillText(s.x+'m',sx,yLbl);
   }
 }
