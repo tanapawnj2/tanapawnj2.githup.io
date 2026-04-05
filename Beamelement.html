@@ -177,32 +177,35 @@ canvas{width:100%;display:block;border-radius:3px;}
 // Cb = 12.5·Mmax / (2.5·Mmax + 3·MA + 4·MB + 3·MC)
 
 function calcCbForSpan(xs, Marr, x1, x2) {
-  // Collect |M| values within [x1, x2]
+  // Collect raw M values (signed) within [x1, x2]
   var pts = [];
   for (var i = 0; i < xs.length; i++) {
     if (xs[i] >= x1 - 1e-9 && xs[i] <= x2 + 1e-9)
-      pts.push({x: xs[i], M: Math.abs(Marr[i])});
+      pts.push({x: xs[i], M: Marr[i]});
   }
   if (pts.length < 2) return null;
 
   var Lb = x2 - x1;
+
+  // Mmax = max |M| in span
   var Mmax = 0;
-  for (var i = 0; i < pts.length; i++) if (pts[i].M > Mmax) Mmax = pts[i].M;
+  for (var i = 0; i < pts.length; i++) if (Math.abs(pts[i].M) > Mmax) Mmax = Math.abs(pts[i].M);
   if (Mmax < 1e-9) return {Cb: null, Mmax:0, MA:0, MB:0, MC:0, note:'M ≈ 0 ตลอดช่วง'};
 
-  function interpM(xq) {
+  // Interpolate signed M at a given x, then take |M|
+  function interpAbsM(xq) {
     for (var i = 0; i < pts.length-1; i++) {
       if (pts[i].x <= xq + 1e-9 && xq <= pts[i+1].x + 1e-9) {
         var t = (xq - pts[i].x) / (pts[i+1].x - pts[i].x);
-        return pts[i].M + t*(pts[i+1].M - pts[i].M);
+        return Math.abs(pts[i].M + t*(pts[i+1].M - pts[i].M));
       }
     }
-    return pts[pts.length-1].M;
+    return Math.abs(pts[pts.length-1].M);
   }
 
-  var MA = interpM(x1 + Lb*0.25);
-  var MB = interpM(x1 + Lb*0.50);
-  var MC = interpM(x1 + Lb*0.75);
+  var MA = interpAbsM(x1 + Lb*0.25);
+  var MB = interpAbsM(x1 + Lb*0.50);
+  var MC = interpAbsM(x1 + Lb*0.75);
   var denom = 2.5*Mmax + 3*MA + 4*MB + 3*MC;
   var Cb = denom < 1e-12 ? null : 12.5*Mmax / denom;
   return {Cb:Cb, Mmax:Mmax, MA:MA, MB:MB, MC:MC, Lb:Lb};
@@ -734,15 +737,17 @@ function matrixSolve(L,segs,supList,loads){
   var freeDOFs=[];
   for(var i=0;i<nDOF;i++) if(!constrained.has(i)) freeDOFs.push(i);
   var nF=freeDOFs.length;
-  if(nF===0) return {err:'All DOFs constrained — over-constrained system'};
 
-  var Kff=freeDOFs.map(function(fi){return freeDOFs.map(function(fj){return Kg[fi][fj];});});
-  var Ff=freeDOFs.map(function(fi){return F_ext[fi];});
-  var d_free;
-  try{d_free=gaussSolve(Kff,Ff);}catch(e){return {err:'Matrix singular — system unstable: '+e.message};}
-
+  // If all DOFs are constrained (e.g. Fixed-Fixed with only 2 nodes),
+  // displacements are all zero — solve directly from reactions = K·0 - F_ext = -F_ext
   var d=new Array(nDOF).fill(0);
-  for(var i=0;i<nF;i++) d[freeDOFs[i]]=d_free[i];
+  if(nF>0){
+    var Kff=freeDOFs.map(function(fi){return freeDOFs.map(function(fj){return Kg[fi][fj];});});
+    var Ff=freeDOFs.map(function(fi){return F_ext[fi];});
+    var d_free;
+    try{d_free=gaussSolve(Kff,Ff);}catch(e){return {err:'Matrix singular — system unstable: '+e.message};}
+    for(var i=0;i<nF;i++) d[freeDOFs[i]]=d_free[i];
+  }
 
   // Reactions
   var R=new Array(nDOF).fill(0);
