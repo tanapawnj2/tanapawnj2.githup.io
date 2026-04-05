@@ -208,27 +208,31 @@ function calcCbForSpan(xs, Marr, x1, x2) {
   return {Cb:Cb, Mmax:Mmax, MA:MA, MB:MB, MC:MC, Lb:Lb};
 }
 
-function renderCbResults(xs, Marr, slist, L) {
+function renderCbResults(xs, Marr, slistAll, L) {
   var block = document.getElementById('cb-results-block');
   if (!block) return;
 
-  // Build Lb boundaries from LATERAL bracing supports only (pin, fixed) + beam ends
-  // Roller does NOT provide lateral restraint → excluded
-  var LATERAL_TYPES = {pin:1, fixed:1, pin_r:1, lateral:1};
-  var bpts = [0];
-  for (var i = 0; i < slist.length; i++) {
-    var s = slist[i];
-    if (LATERAL_TYPES[s.type] && s.x > 1e-9 && s.x < L - 1e-9) bpts.push(s.x);
+  var STRUCT_TYPES = {pin:1, roller:1, fixed:1, pin_r:1, roller_r:1};
+  var LATERAL_ONLY = {lateral:1};
+
+  // Collect all boundary points: structural supports + lateral braces
+  var allPts = [];
+  for (var i = 0; i < slistAll.length; i++) {
+    var s = slistAll[i];
+    if (STRUCT_TYPES[s.type] || LATERAL_ONLY[s.type]) allPts.push(s.x);
   }
-  bpts.push(L);
-  bpts.sort(function(a,b){return a-b;});
-  bpts = bpts.filter(function(v,i,a){return i===0||Math.abs(v-a[i-1])>1e-9;});
+  allPts.sort(function(a,b){return a-b;});
+  allPts = allPts.filter(function(v,i,a){return i===0||Math.abs(v-a[i-1])>1e-9;});
 
-  var spans = [];
-  for (var i = 0; i < bpts.length-1; i++)
-    spans.push({x1: bpts[i], x2: bpts[i+1]});
+  if (allPts.length < 2) { block.innerHTML = ''; return; }
 
-  if (spans.length === 0) { block.innerHTML = ''; return; }
+  // Build all sub-spans
+  var subSpans = [];
+  for (var i = 0; i < allPts.length-1; i++) {
+    var x1 = allPts[i], x2 = allPts[i+1];
+    var r = calcCbForSpan(xs, Marr, x1, x2);
+    subSpans.push({x1:x1, x2:x2, Lb:x2-x1, result:r});
+  }
 
   var html = '<div class="cb-block">' +
     '<div class="cb-title">&#9670; C<sub>b</sub> — Lateral-Torsional Buckling Modification Factor' +
@@ -238,38 +242,33 @@ function renderCbResults(xs, Marr, slist, L) {
     '</div>';
 
   var cbSumRows = '';
-  for (var si = 0; si < spans.length; si++) {
-    var sp = spans[si];
-    var r = calcCbForSpan(xs, Marr, sp.x1, sp.x2);
-    var spanLabel = 'Span ' + (si+1) + '  (x = ' + sp.x1.toFixed(2) + ' → ' + sp.x2.toFixed(2) + ' m,  Lb = ' + (sp.x2-sp.x1).toFixed(3) + ' m)';
+  for (var si = 0; si < subSpans.length; si++) {
+    var sub = subSpans[si];
+    var r = sub.result;
+    var spanLabel = 'Span '+(si+1)+'  (x = '+sub.x1.toFixed(2)+' → '+sub.x2.toFixed(2)+' m,  Lb = '+sub.Lb.toFixed(3)+' m)';
 
     html += '<div class="cb-span-row">';
-    html += '<div class="cb-span-hd"><span>' + spanLabel + '</span>';
+    html += '<div class="cb-span-hd"><span>'+spanLabel+'</span>';
 
-    if (!r) {
-      html += '<span class="cb-warn">⚠ ไม่พบข้อมูล</span></div></div>';
-      continue;
-    }
-    if (r.note) {
-      html += '</div><div style="color:var(--muted);font-size:12px;font-family:Space Mono,monospace;">'+r.note+'</div></div>';
+    if (!r || r.note) {
+      html += (r&&r.note?'</div><div style="color:var(--muted);font-size:12px;font-family:Space Mono,monospace;">'+r.note+'</div>':'<span class="cb-warn">⚠ ไม่พบข้อมูล</span></div>');
+      html += '</div>';
       continue;
     }
 
-    // Status badge
     var statusNote = '';
     if (r.Cb !== null) {
-      if      (r.Cb < 1.0)              statusNote = '<span style="color:#ff4d6d;font-size:11px;font-family:Space Mono,monospace;">⚠ Cb &lt; 1.0</span>';
-      else if (r.Cb <= 1.67)            statusNote = '<span style="color:var(--accent3);font-size:11px;font-family:Space Mono,monospace;">✓ Conservative</span>';
-      else if (r.Cb <= 2.3)             statusNote = '<span style="color:#ffd60a;font-size:11px;font-family:Space Mono,monospace;">↑ High Cb</span>';
-      else                              statusNote = '<span style="color:#ffa500;font-size:11px;font-family:Space Mono,monospace;">⚠ Cb &gt; 2.3</span>';
+      if      (r.Cb < 1.0)   statusNote = '<span style="color:#ff4d6d;font-size:11px;font-family:Space Mono,monospace;">⚠ Cb &lt; 1.0</span>';
+      else if (r.Cb <= 1.67) statusNote = '<span style="color:var(--accent3);font-size:11px;font-family:Space Mono,monospace;">✓ Conservative</span>';
+      else if (r.Cb <= 2.3)  statusNote = '<span style="color:#ffd60a;font-size:11px;font-family:Space Mono,monospace;">↑ High Cb</span>';
+      else                   statusNote = '<span style="color:#ffa500;font-size:11px;font-family:Space Mono,monospace;">⚠ Cb &gt; 2.3</span>';
     }
     html += statusNote + '</div>';
 
-    var cbColor = r.Cb===null ? 'var(--muted)' : (r.Cb<1?'#ff4d6d':r.Cb<=2.3?'var(--accent3)':'#ffa500');
+    var cbColor = r.Cb===null?'var(--muted)':(r.Cb<1?'#ff4d6d':r.Cb<=2.3?'var(--accent3)':'#ffa500');
     html += '<div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:8px;">';
     html += '<div><div class="cb-sub">C<sub>b</sub></div><div class="cb-val" style="color:'+cbColor+';">'+(r.Cb!==null?r.Cb.toFixed(4):'N/A')+'</div></div>';
     html += '</div>';
-
     html += '<div class="cb-detail">' +
       '<div class="cb-m"><div class="cb-ml">M<sub>max</sub></div><div class="cb-mv">'+r.Mmax.toFixed(2)+'</div><div class="cb-ml">kg·m</div></div>' +
       '<div class="cb-m"><div class="cb-ml">M<sub>A</sub> (¼L)</div><div class="cb-mv">'+r.MA.toFixed(2)+'</div><div class="cb-ml">kg·m</div></div>' +
@@ -278,18 +277,16 @@ function renderCbResults(xs, Marr, slist, L) {
       '</div>';
     html += '</div>';
 
-    cbSumRows += '<tr class="hr"><td>C<sub>b</sub> Span '+(si+1)+' ('+sp.x1.toFixed(2)+'–'+sp.x2.toFixed(2)+'m)</td>' +
+    cbSumRows += '<tr class="hr"><td>C<sub>b</sub> Span '+(si+1)+' ('+sub.x1.toFixed(2)+'–'+sub.x2.toFixed(2)+'m)</td>' +
       '<td class="n">'+(r.Cb!==null?r.Cb.toFixed(4):'—')+'</td>' +
       '<td style="text-align:right;color:#c8d0e8;">—</td></tr>';
   }
 
-  html += '<div class="cb-note">&#9432; Lb = ระยะระหว่างจุดค้ำยันด้านข้าง (Lateral Bracing) &nbsp;|&nbsp; ' +
-    'นับเฉพาะ <strong style="color:var(--accent)">Pin</strong> และ <strong style="color:var(--accent)">Fixed</strong> เท่านั้น &nbsp;|&nbsp; ' +
+  html += '<div class="cb-note">&#9432; แต่ละช่วงแบ่งโดย <strong style="color:var(--accent)">Pin, Roller, Fixed, Pin+Rθ, Roller+Rθ</strong> และ <strong style="color:#f9a8d4">Lateral Brace</strong> &nbsp;|&nbsp; ' +
     'C<sub>b</sub> = 1.0 (conservative), C<sub>b</sub> &gt; 1.0 ช่วยเพิ่ม M<sub>n</sub> สูงสุดไม่เกิน M<sub>p</sub></div>';
   html += '</div>';
   block.innerHTML = html;
 
-  // Append to summary table
   var sumTbl = document.querySelector('.sum-table');
   if (sumTbl && cbSumRows) {
     var frag = document.createElement('tbody');
@@ -498,7 +495,7 @@ function drawPreview(){
     }
     cf=document.getElementById('cf');
   }
-  if(cf) drawFBD(L,slist,loads,[]);
+  if(cf) drawFBD(L,slist,slist,loads,[]);
 }
 
 function updateHeader(){
@@ -1043,7 +1040,7 @@ function renderResults(L,slist,slistAll,loads,res){
       if(ld.type==='point'||ld.type==='moment') discXs.push(ld.x);
       else if(ld.type==='udl'||ld.type==='trap'){discXs.push(ld.x1);discXs.push(ld.x2);}
     }
-    drawFBD(L,slist,loads,rxns);
+    drawFBD(L,slist,slistAll,loads,rxns);
     drawReactions('cr',rxns,L);
     drawDiag('cs',xs,Varr,L,'#ef4444','V (kg)',discXs);
     drawDiag('cm',xs,Marr.map(function(v){return -v;}),L,'#ef4444','M (kg·m)',discXs);
@@ -1195,7 +1192,7 @@ function drawReactions(id, rxns, L) {
 
 
 // ---- Beam Element Diagram (supports + loads, no reactions) ----
-function drawFBD(L,slist,loads,rxns){
+function drawFBD(L,slist,slistAll,loads,rxns){
   var cv=document.getElementById('cf');
   var dpr=window.devicePixelRatio||1;
   var W=cv.parentElement.offsetWidth-32;
@@ -1447,6 +1444,25 @@ function drawFBD(L,slist,loads,rxns){
               (s.type==='rspring'||s.type==='ronly'||s.type==='pin_r')?by+bh+22:
               s.type==='lateral'?by+bh+28:by+bh+33;
     ctx.fillText(s.x+'m',sx,yLbl);
+  }
+
+  // Lateral brace symbols (drawn from slistAll, on top of everything)
+  var lbCol='#f9a8d4';
+  for(var si=0;si<slistAll.length;si++){
+    var s=slistAll[si];
+    if(s.type!=='lateral') continue;
+    var sx=px(s.x);
+    ctx.save();
+    ctx.strokeStyle=lbCol; ctx.lineWidth=2.5;
+    var cr=7, cy=by+bh/2;
+    ctx.beginPath();ctx.moveTo(sx-cr,cy-cr);ctx.lineTo(sx+cr,cy+cr);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(sx+cr,cy-cr);ctx.lineTo(sx-cr,cy+cr);ctx.stroke();
+    // x position label below beam
+    ctx.fillStyle=lbCol;
+    ctx.font='10px Space Mono,monospace';
+    ctx.textAlign='center';
+    ctx.fillText(s.x+'m',sx,by+bh+18);
+    ctx.restore();
   }
 }
 
