@@ -1035,6 +1035,11 @@ function renderResults(L,slist,slistAll,loads,res){
     (maxPosDef>0.0001?'<tr><td>&#948;_max (&#8593;)</td><td class="n">'+maxPosDef.toFixed(5)+'</td><td style="text-align:right;color:#c8d0e8">mm</td></tr>'+
     '<tr><td>x @ &#948;_max (&#8593;)</td><td class="n">'+xMaxPosDef.toFixed(4)+'</td><td style="text-align:right;color:#c8d0e8">m</td></tr>':'')+
     '<tr><td>Beam type</td><td colspan="2" style="text-align:right;color:#c8d0e8;font-size:8.5px">'+beamType+'</td></tr>'+
+    '<tr><td colspan="3" style="padding:0"><div style="border-top:1px solid var(--border);margin:4px 0"></div></td></tr>'+
+    '<tr><td colspan="3" style="padding:6px 8px 2px;font-family:Space Mono,monospace;font-size:11px;letter-spacing:1px;color:#c8d0e8;text-transform:uppercase;">V(x) — Shear Force Equations</td></tr>'+
+    '<tr><td id="sfd-eq-row" colspan="3" style="padding:2px 8px 6px;font-family:Space Mono,monospace;font-size:12px;color:var(--accent);line-height:1.7;">—</td></tr>'+
+    '<tr><td colspan="3" style="padding:6px 8px 2px;font-family:Space Mono,monospace;font-size:11px;letter-spacing:1px;color:#c8d0e8;text-transform:uppercase;">M(x) — Bending Moment Equations</td></tr>'+
+    '<tr><td id="bmd-eq-row" colspan="3" style="padding:2px 8px 6px;font-family:Space Mono,monospace;font-size:12px;color:#f9a8d4;line-height:1.7;">—</td></tr>'+
     '</table></div>';
 
   requestAnimationFrame(function(){
@@ -1047,10 +1052,26 @@ function renderResults(L,slist,slistAll,loads,res){
     }
     drawFBD(L,slist,slistAll,loads,rxns);
     drawReactions('cr',rxns,L);
+
     drawDiag('cs',xs,Varr,L,'#ef4444','V (kg)',discXs);
     drawDiag('cm',xs,Marr.map(function(v){return -v;}),L,'#ef4444','M (kg·m)',discXs);
     drawDeflection('cd',xs,DEF,L,maxDefAbs,xMaxDef,slist);
     renderCbResults(xs,Marr,slistAll,L);
+
+    // Fill equation rows in summary
+    var sfdSegs = buildSFDEquations(loads, rxns, L);
+    var bmdSegs = buildBMDEquations(loads, rxns, L);
+
+    function segsToHtml(segs) {
+      return segs.map(function(s){
+        return '<span style="color:#8896b8;font-size:10px;">'+s.xa.toFixed(2)+' ≤ x ≤ '+s.xb.toFixed(2)+' m</span><br>'+s.eq;
+      }).join('<br><br>');
+    }
+
+    var sfdEl = document.getElementById('sfd-eq-row');
+    var bmdEl = document.getElementById('bmd-eq-row');
+    if (sfdEl) sfdEl.innerHTML = segsToHtml(sfdSegs) || '—';
+    if (bmdEl) bmdEl.innerHTML = segsToHtml(bmdSegs) || '—';
   });
 }
 
@@ -2012,6 +2033,197 @@ function attachTooltip(id,xs,ys,params){
 function hideTooltip(){
   var tip=document.getElementById('cv-tooltip');
   if(tip) tip.style.display='none';
+}
+
+// ---- Piecewise equation builders ----
+// Build breakpoints: all support positions + load start/end positions, sorted
+function getBreakpoints(loads, rxns, L) {
+  var bpts = new Set();
+  bpts.add(0); bpts.add(L);
+  for (var i = 0; i < rxns.length; i++) bpts.add(rxns[i].x);
+  for (var i = 0; i < loads.length; i++) {
+    var ld = loads[i];
+    if (ld.type==='point'||ld.type==='moment') bpts.add(ld.x);
+    else { bpts.add(ld.x1); bpts.add(ld.x2); }
+  }
+  var arr = Array.from(bpts).sort(function(a,b){return a-b;});
+  return arr;
+}
+
+// Format a coefficient for display: returns string like "+3.00", "-3.00", "3.00" (first term)
+function fmtCoef(c, isFirst) {
+  if (Math.abs(c) < 0.0005) return null;
+  var s = c < 0 ? '-' : (isFirst ? '' : '+');
+  return s + Math.abs(c).toFixed(2);
+}
+
+// Format a polynomial term: coef * varStr (e.g. "x", "x²")
+function fmtTerm(c, varStr, isFirst) {
+  var cf = fmtCoef(c, isFirst);
+  if (cf === null) return null;
+  if (varStr === '') return cf;
+  if (Math.abs(Math.abs(c) - 1) < 0.0005) {
+    return (c<0?(isFirst?'-':'-'):(isFirst?'':'+')) + varStr;
+  }
+  return cf + varStr;
+}
+
+// Build V(x) piecewise equations per span segment
+function buildSFDEquations(loads, rxns, L) {
+  var bpts = getBreakpoints(loads, rxns, L);
+  var segments = [];
+
+  for (var si = 0; si < bpts.length - 1; si++) {
+    var xa = bpts[si], xb = bpts[si+1];
+    var xmid = (xa + xb) / 2;
+
+    // Accumulate contributions to V(x) = sum of terms LEFT of cut at position x (within this segment)
+    // V(x) = C0 + C1*x + C2*x² (at most quadratic for UDL)
+    var C0 = 0, C1 = 0, C2 = 0;
+
+    // Reactions left of or at segment
+    for (var i = 0; i < rxns.length; i++) {
+      var r = rxns[i];
+      if (r.x <= xa + 1e-9) C0 += r.Fy;
+    }
+    // Point loads left of or at segment start
+    for (var i = 0; i < loads.length; i++) {
+      var ld = loads[i];
+      if (ld.type === 'point' && ld.x <= xa + 1e-9) C0 -= ld.P;
+    }
+    // UDL active within segment: V(x) decreases linearly
+    for (var i = 0; i < loads.length; i++) {
+      var ld = loads[i];
+      if (ld.type === 'udl') {
+        // Portion of UDL left of cut, that started before this segment
+        if (ld.x1 < xa - 1e-9) {
+          // Full UDL from ld.x1 to xa already counted as constant
+          C0 -= ld.w * (xa - ld.x1);
+        }
+        // UDL that spans into this segment
+        if (ld.x1 <= xa + 1e-9 && ld.x2 >= xb - 1e-9) {
+          // w runs from xa to x: V decreases as -w*(x - xa)
+          C0 += ld.w * xa;  // add back the xa part to make it -w*x form
+          C1 -= ld.w;
+        } else if (ld.x1 > xa - 1e-9 && ld.x1 < xb - 1e-9) {
+          // UDL starts inside this segment (rare, bpts handles this)
+        }
+      }
+      if (ld.type === 'trap') {
+        if (ld.x1 <= xa + 1e-9 && ld.x2 >= xb - 1e-9) {
+          var Lseg = ld.x2 - ld.x1;
+          var w_xa = ld.w1 + (xa - ld.x1) / Lseg * (ld.w2 - ld.w1);
+          var dw = (ld.w2 - ld.w1) / Lseg;
+          C0 -= ld.w1 * (xa - ld.x1) + 0.5 * (w_xa - ld.w1) * (xa - ld.x1);
+          C0 += w_xa * xa;
+          C1 -= w_xa;
+          C1 += dw * xa;
+          C2 -= 0.5 * dw;
+        }
+      }
+    }
+
+    // Build equation string
+    var terms = [];
+    var t2 = fmtTerm(C2, 'x²', terms.length===0);
+    if (t2) terms.push(t2);
+    var t1 = fmtTerm(C1, 'x', terms.length===0);
+    if (t1) terms.push(t1);
+    var t0 = fmtCoef(C0, terms.length===0);
+    if (t0) terms.push(t0);
+    var eqStr = terms.length ? terms.join('') : '0';
+
+    segments.push({xa:xa, xb:xb, eq:'V(x) = ' + eqStr});
+  }
+  return segments;
+}
+
+// Build M(x) piecewise equations per span segment
+function buildBMDEquations(loads, rxns, L) {
+  var bpts = getBreakpoints(loads, rxns, L);
+  var segments = [];
+
+  for (var si = 0; si < bpts.length - 1; si++) {
+    var xa = bpts[si], xb = bpts[si+1];
+
+    // M(x) = sum of moment contributions from LEFT of cut
+    // M(x) = C0 + C1*x + C2*x² + C3*x³
+    var C0 = 0, C1 = 0, C2 = 0, C3 = 0;
+
+    // Reactions
+    for (var i = 0; i < rxns.length; i++) {
+      var r = rxns[i];
+      if (r.x <= xa + 1e-9) {
+        C0 -= r.Fy * r.x;
+        C1 += r.Fy;
+        if (Math.abs(r.Mz) > 1e-9) C0 += r.Mz;
+      }
+    }
+    // Point loads
+    for (var i = 0; i < loads.length; i++) {
+      var ld = loads[i];
+      if (ld.type === 'point' && ld.x <= xa + 1e-9) {
+        C0 += ld.P * ld.x;
+        C1 -= ld.P;
+      }
+      // Applied moments
+      if (ld.type === 'moment' && ld.x <= xa + 1e-9) {
+        C0 -= ld.M;
+      }
+      // UDL
+      if (ld.type === 'udl') {
+        if (ld.x1 < xa - 1e-9 && ld.x2 > xa - 1e-9) {
+          // UDL started before xa, active in this segment
+          var x0 = ld.x1;
+          // Contribution from x0 to xa: constant offset
+          C0 += ld.w * (xa - x0) * (x0 + xa) / 2;
+          C1 -= ld.w * xa;
+          C2 += ld.w / 2;
+        } else if (ld.x2 <= xa + 1e-9) {
+          // Full UDL already passed
+          var cx = (ld.x1 + ld.x2) / 2;
+          C0 += ld.w * (ld.x2 - ld.x1) * cx;
+          C1 -= ld.w * (ld.x2 - ld.x1);
+        }
+      }
+    }
+
+    var terms = [];
+    var t3 = fmtTerm(C3, 'x³', terms.length===0);
+    if (t3) terms.push(t3);
+    var t2 = fmtTerm(C2, 'x²', terms.length===0);
+    if (t2) terms.push(t2);
+    var t1 = fmtTerm(C1, 'x', terms.length===0);
+    if (t1) terms.push(t1);
+    var t0 = fmtCoef(C0, terms.length===0);
+    if (t0) terms.push(t0);
+    var eqStr = terms.length ? terms.join('') : '0';
+
+    segments.push({xa:xa, xb:xb, eq:'M(x) = ' + eqStr});
+  }
+  return segments;
+}
+
+function buildSFDEquationLabel(loads, rxns, L) {
+  var segs = buildSFDEquations(loads, rxns, L);
+  var lines = ['V(x)  [kg]'];
+  for (var i = 0; i < segs.length; i++) {
+    var s = segs[i];
+    lines.push(s.xa.toFixed(2)+'≤x≤'+s.xb.toFixed(2)+'m:');
+    lines.push('  '+s.eq);
+  }
+  return lines.join('\n');
+}
+
+function buildBMDEquationLabel(loads, rxns, L) {
+  var segs = buildBMDEquations(loads, rxns, L);
+  var lines = ['M(x)  [kg·m]'];
+  for (var i = 0; i < segs.length; i++) {
+    var s = segs[i];
+    lines.push(s.xa.toFixed(2)+'≤x≤'+s.xb.toFixed(2)+'m:');
+    lines.push('  '+s.eq);
+  }
+  return lines.join('\n');
 }
 
 // ---- Init ----
