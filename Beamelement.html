@@ -493,7 +493,7 @@ function drawPreview(){
       preview=document.createElement('div');
       preview.id='preview-block';
       preview.className='dblock';
-      preview.innerHTML='<div class="dtitle">Beam Element Diagram</div><canvas id="cf" height="148"></canvas>';
+      preview.innerHTML='<div class="dtitle">Beam Element Diagram</div><canvas id="cf" height="168"></canvas>';
       res.insertBefore(preview, res.firstChild);
     }
     cf=document.getElementById('cf');
@@ -1018,7 +1018,7 @@ function renderResults(L,slist,slistAll,loads,res){
     '<span class="tag mt">[K] '+nDOF+'&#215;'+nDOF+' &#8212; '+nN+' nodes / '+nE+' elem</span>'+
     '</div>'+
     '<div class="rgrid">'+rc+'</div>'+
-    '<div class="dblock"><div class="dtitle">Beam Element Diagram</div><canvas id="cf" height="148"></canvas></div>'+
+    '<div class="dblock"><div class="dtitle">Beam Element Diagram</div><canvas id="cf" height="168"></canvas></div>'+
     '<div class="dblock"><div class="dtitle">Free Body Diagram — Reactions</div><canvas id="cr" height="260"></canvas></div>'+
     '<div class="dblock"><div class="dtitle">Shear Force Diagram &#8212; SFD</div><canvas id="cs" height="260"></canvas></div>'+
     '<div class="dblock"><div class="dtitle">Bending Moment Diagram &#8212; BMD</div><canvas id="cm" height="260"></canvas></div>'+
@@ -1062,16 +1062,21 @@ function renderResults(L,slist,slistAll,loads,res){
     var sfdSegs = buildSFDEquations(loads, rxns, L);
     var bmdSegs = buildBMDEquations(loads, rxns, L);
 
-    function segsToHtml(segs) {
-      return segs.map(function(s){
-        return '<span style="color:#8896b8;font-size:10px;">'+s.xa.toFixed(2)+' ≤ x ≤ '+s.xb.toFixed(2)+' m</span><br>'+s.eq;
+    var SEG_COLORS = ['#00e5ff','#a8ff78','#ffd60a','#f9a8d4','#c084fc','#ff6b35','#38bdf8','#fb923c','#34d399','#e879f9'];
+
+    function segsToHtml(segs, colors) {
+      return segs.map(function(s, i){
+        var col = colors[i % colors.length];
+        return '<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:'+col+';margin-right:5px;vertical-align:middle;"></span>'+
+          '<span style="color:#8896b8;font-size:10px;">'+s.xa.toFixed(2)+' ≤ x ≤ '+s.xb.toFixed(2)+' m</span><br>'+
+          '<span style="color:'+col+';padding-left:15px;">'+s.eq+'</span>';
       }).join('<br><br>');
     }
 
     var sfdEl = document.getElementById('sfd-eq-row');
     var bmdEl = document.getElementById('bmd-eq-row');
-    if (sfdEl) sfdEl.innerHTML = segsToHtml(sfdSegs) || '—';
-    if (bmdEl) bmdEl.innerHTML = segsToHtml(bmdSegs) || '—';
+    if (sfdEl) sfdEl.innerHTML = segsToHtml(sfdSegs, SEG_COLORS) || '—';
+    if (bmdEl) bmdEl.innerHTML = segsToHtml(bmdSegs, SEG_COLORS) || '—';
   });
 }
 
@@ -1222,18 +1227,50 @@ function drawFBD(L,slist,slistAll,loads,rxns){
   var cv=document.getElementById('cf');
   var dpr=window.devicePixelRatio||1;
   var W=cv.parentElement.offsetWidth-32;
-  cv.width=W*dpr; cv.height=148*dpr;
-  cv.style.width=W+'px'; cv.style.height='148px';
+  cv.width=W*dpr; cv.height=168*dpr;
+  cv.style.width=W+'px'; cv.style.height='168px';
   var ctx=cv.getContext('2d');
   ctx.scale(dpr,dpr);
-  var H=148, pad=36, by=62, bh=14, sc=(W-pad*2)/L;
+  var H=168, pad=36, by=52, bh=14, sc=(W-pad*2)/L;
   function px(x){return pad+x*sc;}
 
-  // Beam
-  ctx.fillStyle='#1a3628';
-  ctx.fillRect(pad,by,W-pad*2,bh);
-  ctx.strokeStyle='#a8ff78';ctx.lineWidth=1.5;
-  ctx.strokeRect(pad,by,W-pad*2,bh);
+  var SEG_PALETTE = ['#1a4a3a','#1a3a4a','#3a2a4a','#4a3a1a','#4a1a2a','#1a4a2a','#2a3a4a','#4a2a1a','#1a3a3a','#3a1a4a'];
+  var SEG_STROKE  = ['#a8ff78','#00e5ff','#c084fc','#ffd60a','#f9a8d4','#38bdf8','#fb923c','#34d399','#e879f9','#ff6b35'];
+
+  // Draw beam segments with distinct colors
+  var segKeys2 = Object.keys(segments).map(function(k){return segments[k];}).sort(function(a,b){return a.x1-b.x1;});
+  if(segKeys2.length===0){
+    // Fallback: single beam bar
+    ctx.fillStyle='#1a3628';
+    ctx.fillRect(pad,by,W-pad*2,bh);
+    ctx.strokeStyle='#a8ff78';ctx.lineWidth=1.5;
+    ctx.strokeRect(pad,by,W-pad*2,bh);
+  } else {
+    for(var si2=0;si2<segKeys2.length;si2++){
+      var sg=segKeys2[si2];
+      var sx1=px(sg.x1), sx2=px(sg.x2), sw=sx2-sx1;
+      var fill=SEG_PALETTE[si2%SEG_PALETTE.length];
+      var stroke=SEG_STROKE[si2%SEG_STROKE.length];
+      ctx.fillStyle=fill;
+      ctx.fillRect(sx1,by,sw,bh);
+      ctx.strokeStyle=stroke;ctx.lineWidth=1.5;
+      ctx.strokeRect(sx1,by,sw,bh);
+      // Segment label inside bar
+      ctx.fillStyle=stroke;
+      ctx.font='bold 9px Space Mono,monospace';ctx.textAlign='center';
+      var lx2=(sx1+sx2)/2;
+      if(sw>28) ctx.fillText('S'+(si2+1),lx2,by+bh/2+3.5);
+      // E and I labels below beam
+      ctx.fillStyle=stroke;
+      ctx.font='9px Space Mono,monospace';ctx.textAlign='center';
+      var eLbl='E='+sg.E.toLocaleString()+' kg/cm²';
+      var iLbl='I='+sg.I.toLocaleString()+' cm⁴';
+      if(sw>40){
+        ctx.fillText(eLbl,lx2,by+bh+12);
+        ctx.fillText(iLbl,lx2,by+bh+22);
+      }
+    }
+  }
 
   // Length label
   ctx.setLineDash([3,4]);ctx.strokeStyle='#1e2438';ctx.lineWidth=1;
