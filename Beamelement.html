@@ -305,8 +305,11 @@ var segments={};
 var segCount=0;
 
 function addSegment(x1Val,x2Val,eVal,iVal){
-  segCount++;
-  var id=segCount;
+  var existing=document.querySelectorAll('#segc [id^="segc-"]');
+  var maxId=0;
+  existing.forEach(function(el){var n=parseInt(el.id.split('-')[1]);if(n>maxId)maxId=n;});
+  var id=maxId+1;
+  segCount=id;
   x1Val=x1Val!=null?x1Val:0;
   x2Val=x2Val!=null?x2Val:0;
   eVal=eVal!=null?eVal:2000000;
@@ -376,8 +379,11 @@ const SCOL={pin:'#ffd60a',roller:'#00e5ff',fixed:'#a8ff78',free:'#ff4d6d',latera
 
 function addSupport(type,xVal){
   type=type||'pin'; xVal=xVal!=null?xVal:0;
-  supportCount++;
-  const id=supportCount;
+  var existing=document.querySelectorAll('#sc [id^="sc-"]');
+  var maxId=0;
+  existing.forEach(function(el){var n=parseInt(el.id.split('-')[1]);if(n>maxId)maxId=n;});
+  const id=maxId+1;
+  supportCount=id;
   supports[id]={type,x:xVal};
   const d=document.createElement('div');
   d.className='scard'; d.id='sc-'+id;
@@ -518,8 +524,11 @@ function updateHeader(){
 }
 
 function addLoad(type){
-  loadCount++;
-  const id=loadCount;
+  var existing=document.querySelectorAll('#lc [id^="l-"]');
+  var maxId=0;
+  existing.forEach(function(el){var n=parseInt(el.id.split('-')[1]);if(n>maxId)maxId=n;});
+  const id=maxId+1;
+  loadCount=id;
   const d=document.createElement('div');
   d.className='lrow'; d.id='l-'+id;
   const nm=type==='point'?'Point Load':type==='udl'?'Uniform Load':type==='trap'?'Trap Load':'Moment';
