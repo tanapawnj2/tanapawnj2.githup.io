@@ -206,10 +206,6 @@ select option{background:var(--surf2);}
 <!-- ══════════ CANVAS AREA ══════════ -->
 <div class="canvas-wrap">
   <div class="toolbar">
-    <button class="tbtn" onclick="loadExample('portal')">Portal Frame</button>
-    <button class="tbtn" onclick="loadExample('l-frame')">L-Frame</button>
-    <button class="tbtn" onclick="loadExample('multi')">Multi-Bay</button>
-    <div class="tsep"></div>
     <button class="tbtn on"  id="tb-frame" onclick="setView('frame')">Frame</button>
     <button class="tbtn afd" id="tb-afd"   onclick="setView('afd')">AFD</button>
     <button class="tbtn sfd" id="tb-sfd"   onclick="setView('sfd')">SFD</button>
@@ -1317,82 +1313,13 @@ function resetAll(){
 // ══════════════════════════════════════════════════════════════════════════
 //  EXAMPLE FRAMES
 // ══════════════════════════════════════════════════════════════════════════
-function loadExample(type){
-  resetAll();
-  if(type==='portal'){
-    // Portal frame: 2 fixed supports, 4 nodes
-    addNode(0,0); addNode(0,4); addNode(5,4); addNode(5,0);
-    addMember(1,2,2e6,100,8333);  // left column
-    addMember(2,3,2e6,100,8333);  // beam
-    addMember(3,4,2e6,100,8333);  // right column
-    addSupport(1,'fixed'); addSupport(4,'fixed');
-    addLoad('nodal'); // wind on top-left node
-    loads[1].node=2; loads[1].Fx=1000; loads[1].Fy=0; loads[1].Mz=0;
-    document.getElementById('lnid-1').value=2;
-    document.getElementById('lfx-1').value=1000;
-    addLoad('udl'); // gravity UDL on beam
-    loads[2].mem=2; loads[2].wx=0; loads[2].wy=-300;
-    document.getElementById('lmid-2').value=2;
-    document.getElementById('lwy-2').value=-300;
-  } else if(type==='l-frame'){
-    // L-shaped frame
-    addNode(0,0); addNode(0,5); addNode(4,5);
-    addMember(1,2,2e6,80,5000);
-    addMember(2,3,2e6,80,5000);
-    addSupport(1,'fixed');
-    addLoad('point');
-    loads[1].mem=2; loads[1].a=2; loads[1].Px=0; loads[1].Py=-800;
-    document.getElementById('lmid-1').value=2;
-    document.getElementById('la-1').value=2;
-    document.getElementById('lpy-1').value=-800;
-  } else if(type==='multi'){
-    // 2-bay 2-storey frame
-    addNode(0,0); addNode(4,0); addNode(8,0);
-    addNode(0,3); addNode(4,3); addNode(6,3);
-    addNode(0,6); addNode(4,6); addNode(6,6);
-    // Ground columns
-    addMember(1,4,2e6,120,10000);
-    addMember(2,5,2e6,120,10000);
-    addMember(3,6,2e6,120,10000);
-    // 1st floor beams
-    addMember(4,5,2e6,100,8333);
-    addMember(5,6,2e6,100,8333);
-    // 2nd floor columns
-    addMember(4,7,2e6,100,8333);
-    addMember(5,8,2e6,100,8333);
-    addMember(6,9,2e6,100,8333);
-    // 2nd floor beams
-    addMember(7,8,2e6,80,5000);
-    addMember(8,9,2e6,80,5000);
-    // Fixed supports
-    addSupport(1,'fixed'); addSupport(2,'fixed'); addSupport(3,'fixed');
-    // UDL on floor beams
-    addLoad('udl'); loads[1].mem=4; loads[1].wy=-200;
-    document.getElementById('lmid-1').value=4; document.getElementById('lwy-1').value=-200;
-    addLoad('udl'); loads[2].mem=5; loads[2].wy=-200;
-    document.getElementById('lmid-2').value=5; document.getElementById('lwy-2').value=-200;
-    addLoad('udl'); loads[3].mem=9; loads[3].wy=-150;
-    document.getElementById('lmid-3').value=9; document.getElementById('lwy-3').value=-150;
-    addLoad('udl'); loads[4].mem=10; loads[4].wy=-150;
-    document.getElementById('lmid-4').value=10; document.getElementById('lwy-4').value=-150;
-    addLoad('nodal'); loads[5].node=4; loads[5].Fx=500;
-    document.getElementById('lnid-5').value=4; document.getElementById('lfx-5').value=500;
-  }
-  readAllLoads();
-  fitView();
-  updateHdr();
-}
-
 // ══════════════════════════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded',function(){
   initCanvas();
-  loadExample('portal');
   fitView();
   updateHdr();
-  // Initial solve
-  setTimeout(analyze, 150);
 });
 </script>
 </body>
