@@ -253,6 +253,10 @@ select option{background:var(--surf2);}
 // ══════════════════════════════════════════════════════════════════════════
 var nodes={}, members={}, supports={}, loads={};
 var nCnt=0, mCnt=0, sCnt=0, lCnt=0;
+function nextNodeId(){var ks=Object.keys(nodes).map(Number);return ks.length?Math.max.apply(null,ks)+1:1;}
+function nextMemberId(){var ks=Object.keys(members).map(Number);return ks.length?Math.max.apply(null,ks)+1:1;}
+function nextSupportId(){var ks=Object.keys(supports).map(Number);return ks.length?Math.max.apply(null,ks)+1:1;}
+function nextLoadId(){var ks=Object.keys(loads).map(Number);return ks.length?Math.max.apply(null,ks)+1:1;}
 var solveRes=null, currentView='frame';
 var animating=false, animPhase=0, animRAF=null;
 
@@ -270,7 +274,7 @@ function showSideTab(t){
 //  NODES
 // ══════════════════════════════════════════════════════════════════════════
 function addNode(x,y){
-  nCnt++; var id=nCnt;
+  var id=nextNodeId();
   x=x!=null?x:0; y=y!=null?y:0;
   nodes[id]={x:x,y:y};
   var d=document.createElement('div'); d.className='card'; d.id='nd-'+id;
@@ -289,7 +293,7 @@ function removeNode(id){ delete nodes[id]; var e=document.getElementById('nd-'+i
 //  MEMBERS
 // ══════════════════════════════════════════════════════════════════════════
 function addMember(ni,nj,E,A,I){
-  mCnt++; var id=mCnt;
+  var id=nextMemberId();
   ni=ni||1; nj=nj||2; E=E||2e6; A=A||100; I=I||8333;
   members[id]={ni:ni,nj:nj,E:E,A:A,I:I};
   var d=document.createElement('div'); d.className='card'; d.id='mb-'+id;
@@ -320,7 +324,7 @@ var STYPES={
   free:    {ux:0,uy:0,rz:0, lbl:'✕ Free'}
 };
 function addSupport(nodeId,tk){
-  sCnt++; var id=sCnt;
+  var id=nextSupportId();
   nodeId=nodeId||1; tk=tk||'fixed';
   var t=STYPES[tk];
   supports[id]={node:nodeId,ux:t.ux,uy:t.uy,rz:t.rz,tk:tk};
@@ -342,7 +346,7 @@ function setSuppType(id,tk){ var t=STYPES[tk]; supports[id].ux=t.ux; supports[id
 //  LOADS
 // ══════════════════════════════════════════════════════════════════════════
 function addLoad(type){
-  lCnt++; var id=lCnt;
+  var id=nextLoadId();
   loads[id]={type:type};
   var inner='<button class="crem" onclick="removeLoad('+id+')">✕</button>'+
     '<div class="card-hd"><span class="cnum l">'+id+'</span>'+
