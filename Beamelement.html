@@ -2081,8 +2081,108 @@ function hideTooltip(){
   if(tip) tip.style.display='none';
 }
 
-// ---- Piecewise equation builders ----
-// Build breakpoints: all support positions + load start/end positions, sorted
+// ---- Piecewise equation builders (numerically exact) ----
+// Evaluate V(x) directly from reactions and loads to the LEFT of cut
+function evalV(x, loads, rxns) {
+  var V = 0;
+  for (var i = 0; i < rxns.length; i++) {
+    if (rxns[i].x <= x + 1e-9) V += rxns[i].Fy;
+  }
+  for (var i = 0; i < loads.length; i++) {
+    var ld = loads[i];
+    if (ld.type === 'point' && ld.x <= x + 1e-9) V -= ld.P;
+    if (ld.type === 'udl') {
+      var a = Math.max(ld.x1, 0), b = Math.min(ld.x2, x);
+      if (b > a) V -= ld.w * (b - a);
+    }
+    if (ld.type === 'trap') {
+      var a2 = Math.max(ld.x1, 0), b2 = Math.min(ld.x2, x);
+      if (b2 > a2) {
+        var Ls = ld.x2 - ld.x1;
+        var wa = ld.w1 + (a2 - ld.x1) / Ls * (ld.w2 - ld.w1);
+        var wb = ld.w1 + (b2 - ld.x1) / Ls * (ld.w2 - ld.w1);
+        V -= (wa + wb) / 2 * (b2 - a2);
+      }
+    }
+  }
+  return V;
+}
+
+// Evaluate M(x) directly (sagging positive)
+function evalM(x, loads, rxns) {
+  var M = 0;
+  for (var i = 0; i < rxns.length; i++) {
+    var r = rxns[i];
+    if (r.x <= x + 1e-9) {
+      M += r.Fy * (x - r.x);
+      if (Math.abs(r.Mz) > 1e-9) M -= r.Mz;
+    }
+  }
+  for (var i = 0; i < loads.length; i++) {
+    var ld = loads[i];
+    if (ld.type === 'point' && ld.x <= x + 1e-9) M -= ld.P * (x - ld.x);
+    if (ld.type === 'moment' && ld.x <= x + 1e-9) M -= ld.M;
+    if (ld.type === 'udl') {
+      var a = Math.max(ld.x1, 0), b = Math.min(ld.x2, x);
+      if (b > a) M -= ld.w * (b - a) * (x - (a + b) / 2);
+    }
+    if (ld.type === 'trap') {
+      var a2 = Math.max(ld.x1, 0), b2 = Math.min(ld.x2, x);
+      if (b2 > a2) {
+        var Ls = ld.x2 - ld.x1;
+        var wa = ld.w1 + (a2 - ld.x1) / Ls * (ld.w2 - ld.w1);
+        var wb = ld.w1 + (b2 - ld.x1) / Ls * (ld.w2 - ld.w1);
+        var rect = wa * (b2 - a2), tri = 0.5 * (wb - wa) * (b2 - a2);
+        M -= rect * (x - (a2 + b2) / 2) + tri * (x - (a2 + 2/3 * (b2 - a2)));
+      }
+    }
+  }
+  return M;
+}
+
+// Fit polynomial coefficients [c0,c1,...,cn] to sample points via Gaussian elimination
+function fitPoly(xs, ys) {
+  var n = xs.length;
+  var A = [], b = ys.slice();
+  for (var i = 0; i < n; i++) {
+    A.push([]);
+    for (var j = 0; j < n; j++) A[i].push(Math.pow(xs[i], j));
+  }
+  for (var col = 0; col < n; col++) {
+    var maxR = col;
+    for (var r2 = col+1; r2 < n; r2++) if (Math.abs(A[r2][col]) > Math.abs(A[maxR][col])) maxR = r2;
+    var tmp = A[col]; A[col] = A[maxR]; A[maxR] = tmp;
+    var tb = b[col]; b[col] = b[maxR]; b[maxR] = tb;
+    var piv = A[col][col];
+    if (Math.abs(piv) < 1e-14) continue;
+    for (var r3 = 0; r3 < n; r3++) {
+      if (r3 === col) continue;
+      var f = A[r3][col] / piv;
+      for (var c = col; c < n; c++) A[r3][c] -= f * A[col][c];
+      b[r3] -= f * b[col];
+    }
+  }
+  return A.map(function(row, i) { return b[i] / row[i]; });
+}
+
+// Format polynomial from coefficients [c0,c1,c2,...] → "c2x² + c1x + c0"
+function formatPoly(coeffs) {
+  var powers = ['', 'x', 'x²', 'x³', 'x⁴'];
+  var terms = [];
+  for (var i = coeffs.length - 1; i >= 0; i--) {
+    var c = coeffs[i];
+    if (Math.abs(c) < 0.005) continue;
+    var isFirst = terms.length === 0;
+    var sign = c < 0 ? (isFirst ? '-' : ' - ') : (isFirst ? '' : ' + ');
+    var absC = Math.abs(c).toFixed(2);
+    var pwr = i < powers.length ? powers[i] : 'x^'+i;
+    if (i === 0) terms.push(sign + absC);
+    else if (Math.abs(Math.abs(c) - 1) < 0.005) terms.push(sign + (isFirst && c < 0 ? '-' : '') + pwr);
+    else terms.push(sign + absC + pwr);
+  }
+  return terms.length ? terms.join('') : '0';
+}
+
 function getBreakpoints(loads, rxns, L) {
   var bpts = new Set();
   bpts.add(0); bpts.add(L);
@@ -2092,171 +2192,60 @@ function getBreakpoints(loads, rxns, L) {
     if (ld.type==='point'||ld.type==='moment') bpts.add(ld.x);
     else { bpts.add(ld.x1); bpts.add(ld.x2); }
   }
-  var arr = Array.from(bpts).sort(function(a,b){return a-b;});
-  return arr;
+  return Array.from(bpts).sort(function(a,b){return a-b;});
 }
 
-// Format a coefficient for display: returns string like "+3.00", "-3.00", "3.00" (first term)
-function fmtCoef(c, isFirst) {
-  if (Math.abs(c) < 0.0005) return null;
-  var s = c < 0 ? '-' : (isFirst ? '' : '+');
-  return s + Math.abs(c).toFixed(2);
-}
-
-// Format a polynomial term: coef * varStr (e.g. "x", "x²")
-function fmtTerm(c, varStr, isFirst) {
-  var cf = fmtCoef(c, isFirst);
-  if (cf === null) return null;
-  if (varStr === '') return cf;
-  if (Math.abs(Math.abs(c) - 1) < 0.0005) {
-    return (c<0?(isFirst?'-':'-'):(isFirst?'':'+')) + varStr;
+function segVDegree(loads, xa, xb) {
+  for (var i = 0; i < loads.length; i++) {
+    var ld = loads[i];
+    if (ld.type === 'trap' && ld.x1 < xb - 1e-9 && ld.x2 > xa + 1e-9) return 2;
+    if (ld.type === 'udl'  && ld.x1 < xb - 1e-9 && ld.x2 > xa + 1e-9) return 1;
   }
-  return cf + varStr;
+  return 0;
 }
 
-// Build V(x) piecewise equations per span segment
 function buildSFDEquations(loads, rxns, L) {
   var bpts = getBreakpoints(loads, rxns, L);
-  var segments = [];
-
+  var result = [];
   for (var si = 0; si < bpts.length - 1; si++) {
     var xa = bpts[si], xb = bpts[si+1];
-    var xmid = (xa + xb) / 2;
-
-    // Accumulate contributions to V(x) = sum of terms LEFT of cut at position x (within this segment)
-    // V(x) = C0 + C1*x + C2*x² (at most quadratic for UDL)
-    var C0 = 0, C1 = 0, C2 = 0;
-
-    // Reactions left of or at segment
-    for (var i = 0; i < rxns.length; i++) {
-      var r = rxns[i];
-      if (r.x <= xa + 1e-9) C0 += r.Fy;
+    var deg = segVDegree(loads, xa, xb);
+    var nPts = deg + 1;
+    var sxs = [], sys = [];
+    for (var k = 0; k < nPts; k++) {
+      var xk = xa + (k + 0.5) / nPts * (xb - xa);
+      sxs.push(xk); sys.push(evalV(xk, loads, rxns));
     }
-    // Point loads left of or at segment start
-    for (var i = 0; i < loads.length; i++) {
-      var ld = loads[i];
-      if (ld.type === 'point' && ld.x <= xa + 1e-9) C0 -= ld.P;
-    }
-    // UDL active within segment: V(x) decreases linearly
-    for (var i = 0; i < loads.length; i++) {
-      var ld = loads[i];
-      if (ld.type === 'udl') {
-        // Portion of UDL left of cut, that started before this segment
-        if (ld.x1 < xa - 1e-9) {
-          // Full UDL from ld.x1 to xa already counted as constant
-          C0 -= ld.w * (xa - ld.x1);
-        }
-        // UDL that spans into this segment
-        if (ld.x1 <= xa + 1e-9 && ld.x2 >= xb - 1e-9) {
-          // w runs from xa to x: V decreases as -w*(x - xa)
-          C0 += ld.w * xa;  // add back the xa part to make it -w*x form
-          C1 -= ld.w;
-        } else if (ld.x1 > xa - 1e-9 && ld.x1 < xb - 1e-9) {
-          // UDL starts inside this segment (rare, bpts handles this)
-        }
-      }
-      if (ld.type === 'trap') {
-        if (ld.x1 <= xa + 1e-9 && ld.x2 >= xb - 1e-9) {
-          var Lseg = ld.x2 - ld.x1;
-          var w_xa = ld.w1 + (xa - ld.x1) / Lseg * (ld.w2 - ld.w1);
-          var dw = (ld.w2 - ld.w1) / Lseg;
-          C0 -= ld.w1 * (xa - ld.x1) + 0.5 * (w_xa - ld.w1) * (xa - ld.x1);
-          C0 += w_xa * xa;
-          C1 -= w_xa;
-          C1 += dw * xa;
-          C2 -= 0.5 * dw;
-        }
-      }
-    }
-
-    // Build equation string
-    var terms = [];
-    var t2 = fmtTerm(C2, 'x²', terms.length===0);
-    if (t2) terms.push(t2);
-    var t1 = fmtTerm(C1, 'x', terms.length===0);
-    if (t1) terms.push(t1);
-    var t0 = fmtCoef(C0, terms.length===0);
-    if (t0) terms.push(t0);
-    var eqStr = terms.length ? terms.join('') : '0';
-
-    segments.push({xa:xa, xb:xb, eq:'V(x) = ' + eqStr});
+    var coeffs = fitPoly(sxs, sys);
+    result.push({xa:xa, xb:xb, eq:'V(x) = ' + formatPoly(coeffs)});
   }
-  return segments;
+  return result;
 }
 
-// Build M(x) piecewise equations per span segment
 function buildBMDEquations(loads, rxns, L) {
   var bpts = getBreakpoints(loads, rxns, L);
-  var segments = [];
-
+  var result = [];
   for (var si = 0; si < bpts.length - 1; si++) {
     var xa = bpts[si], xb = bpts[si+1];
-
-    // M(x) = sum of moment contributions from LEFT of cut
-    // M(x) = C0 + C1*x + C2*x² + C3*x³
-    var C0 = 0, C1 = 0, C2 = 0, C3 = 0;
-
-    // Reactions
-    for (var i = 0; i < rxns.length; i++) {
-      var r = rxns[i];
-      if (r.x <= xa + 1e-9) {
-        C0 -= r.Fy * r.x;
-        C1 += r.Fy;
-        if (Math.abs(r.Mz) > 1e-9) C0 += r.Mz;
-      }
+    var deg = segVDegree(loads, xa, xb) + 1;
+    var nPts = deg + 1;
+    var sxs = [], sys = [];
+    for (var k = 0; k < nPts; k++) {
+      var xk = xa + (k + 0.5) / nPts * (xb - xa);
+      sxs.push(xk); sys.push(evalM(xk, loads, rxns));
     }
-    // Point loads
-    for (var i = 0; i < loads.length; i++) {
-      var ld = loads[i];
-      if (ld.type === 'point' && ld.x <= xa + 1e-9) {
-        C0 += ld.P * ld.x;
-        C1 -= ld.P;
-      }
-      // Applied moments
-      if (ld.type === 'moment' && ld.x <= xa + 1e-9) {
-        C0 -= ld.M;
-      }
-      // UDL
-      if (ld.type === 'udl') {
-        if (ld.x1 < xa - 1e-9 && ld.x2 > xa - 1e-9) {
-          // UDL started before xa, active in this segment
-          var x0 = ld.x1;
-          // Contribution from x0 to xa: constant offset
-          C0 += ld.w * (xa - x0) * (x0 + xa) / 2;
-          C1 -= ld.w * xa;
-          C2 += ld.w / 2;
-        } else if (ld.x2 <= xa + 1e-9) {
-          // Full UDL already passed
-          var cx = (ld.x1 + ld.x2) / 2;
-          C0 += ld.w * (ld.x2 - ld.x1) * cx;
-          C1 -= ld.w * (ld.x2 - ld.x1);
-        }
-      }
-    }
-
-    var terms = [];
-    var t3 = fmtTerm(C3, 'x³', terms.length===0);
-    if (t3) terms.push(t3);
-    var t2 = fmtTerm(C2, 'x²', terms.length===0);
-    if (t2) terms.push(t2);
-    var t1 = fmtTerm(C1, 'x', terms.length===0);
-    if (t1) terms.push(t1);
-    var t0 = fmtCoef(C0, terms.length===0);
-    if (t0) terms.push(t0);
-    var eqStr = terms.length ? terms.join('') : '0';
-
-    segments.push({xa:xa, xb:xb, eq:'M(x) = ' + eqStr});
+    var coeffs = fitPoly(sxs, sys);
+    result.push({xa:xa, xb:xb, eq:'M(x) = ' + formatPoly(coeffs)});
   }
-  return segments;
+  return result;
 }
 
 function buildSFDEquationLabel(loads, rxns, L) {
   var segs = buildSFDEquations(loads, rxns, L);
   var lines = ['V(x)  [kg]'];
   for (var i = 0; i < segs.length; i++) {
-    var s = segs[i];
-    lines.push(s.xa.toFixed(2)+'≤x≤'+s.xb.toFixed(2)+'m:');
-    lines.push('  '+s.eq);
+    lines.push(segs[i].xa.toFixed(2)+'≤x≤'+segs[i].xb.toFixed(2)+'m:');
+    lines.push('  '+segs[i].eq);
   }
   return lines.join('\n');
 }
@@ -2265,12 +2254,12 @@ function buildBMDEquationLabel(loads, rxns, L) {
   var segs = buildBMDEquations(loads, rxns, L);
   var lines = ['M(x)  [kg·m]'];
   for (var i = 0; i < segs.length; i++) {
-    var s = segs[i];
-    lines.push(s.xa.toFixed(2)+'≤x≤'+s.xb.toFixed(2)+'m:');
-    lines.push('  '+s.eq);
+    lines.push(segs[i].xa.toFixed(2)+'≤x≤'+segs[i].xb.toFixed(2)+'m:');
+    lines.push('  '+segs[i].eq);
   }
   return lines.join('\n');
 }
+
 
 // ---- Init ----
 updateHeader();
