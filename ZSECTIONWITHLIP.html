@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<title>Z Section With Lip — AISI S100</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161b25;--bg3:#1c2333;--bg4:#222c3c;
+  --border:#2a3650;--border2:#334166;
+  --text:#ffffff;--muted:#ffffff;--dim:#ffffff;
+  --blue:#4a90d9;--blue2:#2563a8;--blue-glow:rgba(74,144,217,.15);
+  --orange:#f0883e;--red:#e05252;--green:#4ade80;
+  --yellow:#f5c842;--purple:#a78bfa;--cyan:#22d3ee;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{min-width:1372px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+sub,sup{font-size:0.72em;font-weight:600;line-height:0;position:relative;vertical-align:baseline;}
+sub{bottom:-0.3em;}sup{top:-0.4em;}
+
+.hdr{background:linear-gradient(135deg,#0d1520,#1a2540);border-bottom:1px solid var(--border2);
+  padding:0 24px;display:flex;align-items:center;gap:14px;height:52px;
+  position:sticky;top:0;z-index:100;min-width:1280px}
+.hdr-logo{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue);
+  letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--blue2);padding:3px 9px;border-radius:3px}
+.hdr-title{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text);letter-spacing:.04em}
+.hdr-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);margin-left:auto}
+
+.layout{display:flex;min-width:1372px}
+.sidebar{width:360px;min-width:360px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
+.main{width:1012px;min-width:1012px;flex-shrink:0;padding:20px;display:flex;flex-direction:column;gap:0}
+
+.sg{border-bottom:1px solid var(--border);padding:12px 14px}
+.sg-title{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sg-title::after{content:'';flex:1;height:1px;background:var(--border2)}
+.inp-row{display:flex;align-items:center;margin-bottom:7px;gap:6px}
+.inp-row .lbl{font-size:12px;color:#fff;width:80px;font-family:var(--sans);flex-shrink:0;font-weight:500}
+.inp-row .sym{font-size:11px;color:var(--dim);width:12px;text-align:center;flex-shrink:0}
+.inp-row input{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);color:#fff;
+  font-family:var(--sans);font-size:13px;font-weight:600;padding:5px 10px;border-radius:4px;text-align:center;transition:border-color .15s}
+.inp-row input:focus{outline:none;border-color:var(--blue);background:var(--bg4)}
+.inp-row .unit{font-size:11px;color:rgba(255,255,255,0.6);width:36px;flex-shrink:0;font-family:var(--sans)}
+
+.sec-block{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;background:var(--bg2);width:972px;min-width:972px;box-sizing:border-box}
+.sec-hdr{background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:10px}
+.sec-tag{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;padding:2px 7px;border-radius:2px}
+.tag-blue{background:var(--blue2)} .tag-orange{background:#b45309} .tag-green{background:#166534}
+.tag-red{background:#991b1b} .tag-purple{background:#6d28d9} .tag-cyan{background:#0e7490}
+.tag-pink{background:#9d174d}
+.sec-title{font-size:12px;font-weight:600;color:#fff;font-family:var(--sans)}
+.sec-ref{margin-left:auto;font-family:var(--sans);font-size:10px;color:rgba(255,255,255,0.6)}
+.sec-body{padding:14px}
+
+.rep-grid{display:grid;grid-template-columns:486px 486px;gap:0;border-top:1px solid var(--border)}
+.rep-col{padding:14px;border-right:1px solid var(--border)}
+.rep-col:last-child{border-right:none}
+.rep-col-full{padding:14px;border-top:1px solid var(--border)}
+
+.rr{display:flex;align-items:baseline;padding:2.5px 0;gap:4px;font-family:var(--sans);font-size:12px}
+.rr-lbl{color:#fff;font-size:12px;min-width:0;font-family:var(--sans)}
+.rr-eq{color:var(--dim);flex-shrink:0}
+.rr-sub{color:var(--dim);font-size:10px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rr-val{color:#fff;font-weight:600;white-space:nowrap;margin-left:auto;padding-left:8px;font-family:var(--sans)}
+.rr-unit{color:rgba(255,255,255,0.5);font-size:10px;margin-left:3px;flex-shrink:0;font-family:var(--sans)}
+
+.fml{font-family:var(--sans);font-size:12px;color:var(--cyan);background:var(--bg3);
+  border:1px solid var(--border);border-radius:3px;padding:5px 9px;margin:4px 0;line-height:1.7}
+.fml-val{color:var(--yellow);font-weight:600}
+
+.gov{background:linear-gradient(90deg,rgba(245,200,66,.12),transparent);
+  border-left:3px solid #f5c842;padding:8px 12px;margin-top:10px;border-radius:0 4px 4px 0}
+.gov-lbl{font-family:var(--sans);font-size:11px;color:rgba(255,255,255,0.7)}
+.gov-val{font-family:var(--sans);font-size:18px;font-weight:800;color:#f5c842;display:flex;align-items:baseline;gap:6px}
+.gov-unit{font-size:12px;color:rgba(245,200,66,0.7);font-weight:500;font-family:var(--sans)}
+.gov-tag{font-family:var(--sans);font-size:9px;font-weight:700;background:#c47f00;color:#fff;padding:2px 7px;border-radius:2px;letter-spacing:.1em;margin-right:6px}
+
+.sdiv{font-family:var(--sans);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:8px;margin:10px 0 7px}
+.sdiv::before{content:'';width:10px;height:1px;background:var(--border2)}
+.sdiv::after{content:'';flex:1;height:1px;background:var(--border2)}
+
+.loc-tbl{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:11px;margin:8px 0}
+.loc-tbl th{background:var(--bg3);color:var(--muted);font-weight:500;font-size:9px;
+  letter-spacing:.1em;text-transform:uppercase;padding:5px 7px;border:1px solid var(--border);text-align:center}
+.loc-tbl td{padding:5px 7px;border:1px solid var(--border);text-align:center;color:var(--text)}
+.loc-tbl td.lft{text-align:left;color:var(--muted);font-size:10px}
+.slender{color:var(--orange);font-weight:600} .compact{color:var(--green);font-weight:600}
+
+canvas{display:block;border-radius:4px;background:#0f1117}
+
+.calc-block{margin:6px 0 10px;border-left:2px solid var(--border2);padding-left:0}
+.calc-line1,.calc-line2,.calc-line3{
+  font-family:var(--sans);font-size:12px;
+  display:grid;grid-template-columns:20px 18px 1fr;align-items:baseline;padding:2px 0;
+}
+.calc-line1{color:#fff}
+.calc-line1 .cl-ind{display:none}
+.calc-line1 .cl-eq{display:none}
+.calc-line1 .cl-body{grid-column:1/4}
+.calc-line2{color:#fff}
+.calc-line2 .cl-ind{display:block}
+.calc-line3{background:transparent;border-left:2px solid rgba(255,255,255,0.3);padding:3px 0;margin-top:1px;}
+.calc-line3 .cl-ind{display:block}
+.cl-eq{color:#fff;text-align:center;font-weight:500;font-family:var(--mono)}
+.calc-line3 .cl-eq{color:#fff}
+.cl-body{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.calc-lbl{color:var(--muted);font-size:11px}
+.calc-val{font-size:14px;font-weight:700;color:#fff;font-family:var(--sans)}
+.calc-unit{font-size:10px;color:rgba(255,255,255,0.5);font-family:var(--sans)}
+
+/* ══ PRINT ══════════════════════════════════════════════════════ */
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { min-width:0 !important; width:210mm !important; margin:0 !important; padding:0 !important;
+    background:#fff !important; }
+  .hdr,.sidebar,.layout,.pr-screen-only { display:none !important; }
+  .pr-page {
+    display:flex !important;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    width:210mm !important;
+    min-height:297mm !important;
+    margin:0 !important; padding:0 !important;
+    page-break-after: always;
+    box-sizing:border-box;
+    background:#fff !important;
+  }
+  .pr-page:last-of-type { page-break-after: avoid; }
+  .pr-outer {
+    width:196mm !important;
+    margin:8mm 0 !important;
+    box-sizing:border-box;
+    border:1.2px solid #888;
+    background:#fff;
+  }
+  .pr-sec { page-break-after: avoid; }
+}
+@media screen {
+  .pr-page { display:none; }
+}
+
+/* Screen preview */
+.pr-page {
+  width:210mm; margin:20px auto; padding:8mm 7mm;
+  font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+  font-size:13px; color:#000; background:#ccc; box-sizing:border-box;
+  display:flex; flex-direction:column; align-items:center;
+}
+/* outer border */
+.pr-outer { border:1.2px solid #888; margin:0; background:#fff; width:196mm; box-sizing:border-box; }
+/* top title bar */
+.pr-hdr-bar { border-bottom:1px solid #aaa; padding:9px 18px; text-align:center; font-size:13.5px; color:#555; }
+/* content area */
+.pr-body { padding:14px 20px; }
+/* section header — purple/pink bg */
+.pr-sec {
+  background:#b070b8; color:#fff; font-weight:700; font-size:12.5px;
+  letter-spacing:.04em; padding:5px 12px; margin:12px 0 7px;
+}
+.pr-sec2 { background:#c070a0; } /* slightly different pink */
+/* label-value row: "symbol = value unit" */
+.pr-lv { display:flex; align-items:baseline; padding:3px 0; gap:8px; font-size:13px; }
+.pr-lv-sym { width:26px; font-weight:600; flex-shrink:0; }
+.pr-lv-name { flex:1; color:#333; }
+.pr-lv-eq { width:14px; text-align:center; color:#666; flex-shrink:0; }
+.pr-lv-val { font-weight:700; min-width:90px; text-align:right; flex-shrink:0; }
+.pr-lv-unit { color:#555; font-size:10.5px; width:40px; flex-shrink:0; }
+/* equation step rows */
+.pr-eq-block { padding:3px 0 6px 32px; }
+.pr-eq-row { display:flex; align-items:baseline; gap:10px; padding:2px 0; font-size:13px; }
+.pr-eq-lhs { min-width:115px; font-style:italic; }
+.pr-eq-op  { width:12px; text-align:center; color:#666; }
+.pr-eq-rhs { flex:1; }
+.pr-eq-val { font-weight:700; min-width:80px; }
+.pr-eq-unit{ color:#555; font-size:11px; }
+/* "So" result box — pink bg */
+.pr-so {
+  background:#fce8ec; border:1px solid #e0a0a8; border-left:3px solid #c8506a;
+  display:inline-flex; align-items:baseline; gap:6px;
+  padding:5px 14px; margin:6px 0 4px; font-size:13px;
+}
+.pr-so-lbl { color:#555; }
+.pr-so-sym { font-style:italic; font-weight:700; }
+.pr-so-eq  { color:#444; }
+.pr-so-val { font-weight:800; font-size:16px; color:#000; }
+.pr-so-unit{ color:#555; font-size:10.5px; }
+/* 2-column grid */
+.pr-2col { display:grid; grid-template-columns:1fr 1fr; gap:0 24px; }
+.pr-3col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0 12px; }
+/* section properties grid with box outline */
+.pr-propgrid { display:grid; grid-template-columns:1fr 1fr; border:0.7px solid #bbb; }
+.pr-propbox { padding:5px 10px; border-right:0.7px solid #bbb; border-bottom:0.7px solid #bbb; }
+.pr-propbox:nth-child(even) { border-right:none; }
+.pr-propbox-lbl { font-size:9px; color:#555; }
+.pr-propbox-val { font-size:13px; font-weight:700; }
+.pr-propbox-unit{ font-size:9px; color:#777; }
+/* table */
+.pr-tbl { width:100%; border-collapse:collapse; font-size:11.5px; margin:6px 0; }
+.pr-tbl th { background:#ddd; padding:4px 8px; border:0.7px solid #aaa; text-align:center; font-weight:600; font-size:11.5px; }
+.pr-tbl td { padding:4px 8px; border:0.7px solid #bbb; text-align:center; font-size:11.5px; }
+.pr-tbl td.lft { text-align:left; }
+/* canvas for section drawing */
+.pr-canvas-wrap { display:flex; justify-content:center; align-items:center; padding:6px 0; }
+/* input summary table */
+.pr-input-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:0.7px solid #bbb; margin-bottom:6px; }
+.pr-input-cell { padding:4px 10px; border-right:0.7px solid #bbb; border-bottom:0.7px solid #bbb; }
+.pr-input-cell:nth-child(3n){ border-right:none; }
+.pr-input-lbl { font-size:9px; color:#555; }
+.pr-input-val { font-size:11px; font-weight:700; }
+
+/* Page-specific sizing */
+#pp1 .pr-body { padding:10px 16px; }
+#pp1 .pr-lv { padding:1.5px 0; font-size:12px; }
+#pp1 .pr-eq-row { font-size:12px; padding:1px 0; }
+#pp1 .pr-sec { padding:4px 10px; margin:8px 0 5px; font-size:11.5px; }
+#pp1 .pr-lv-unit { font-size:10px; }
+#pp1 .pr-divider { margin:5px 0; }
+#pp1 .pr-hdr-bar { padding:7px 16px; }
+/* divider line */
+.pr-divider { border:none; border-top:0.8px solid #bbb; margin:8px 0; }
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-logo">AISI S100</div>
+  <div class="hdr-title">Z Section With Lip</div>
+  <button onclick="window.print()" style="margin-left:auto;background:#2563a8;color:#fff;border:1px solid #4a90d9;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;padding:6px 14px;cursor:pointer;text-transform:uppercase">⎙ PRINT</button>
+  <div class="hdr-dot" style="margin-left:12px"></div>
+</div>
+
+<div class="layout">
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar">
+  <div class="sg">
+    <div class="sg-title">ขนาดหน้าตัด</div>
+    <div class="inp-row"><span class="lbl">H</span><span class="sym">=</span><input id="inp_H" type="text" inputmode="decimal" value="100"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">B (W)</span><span class="sym">=</span><input id="inp_B" type="text" inputmode="decimal" value="25"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">C</span><span class="sym">=</span><input id="inp_C" type="text" inputmode="decimal" value="20"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">r</span><span class="sym">=</span><input id="inp_r" type="text" inputmode="decimal" value="1.5"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">t</span><span class="sym">=</span><input id="inp_t" type="text" inputmode="decimal" value="1.5"><span class="unit">mm</span></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">วัสดุ</div>
+    <div class="inp-row"><span class="lbl">F<sub>y</sub></span><span class="sym">=</span><input id="inp_Fy" type="text" inputmode="decimal" value="2400"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">E</span><span class="sym">=</span><input id="inp_E" type="text" inputmode="decimal" value="2000000"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">G</span><span class="sym">=</span><input id="inp_G" type="text" inputmode="decimal" value="795000"><span class="unit">ksc</span></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Unbraced Length</div>
+    <div class="inp-row"><span class="lbl">L<sub>x</sub></span><span class="sym">=</span><input id="inp_Lx" type="text" inputmode="decimal" value="500"><span class="unit">cm</span></div>
+    <div class="inp-row"><span class="lbl">L<sub>y</sub></span><span class="sym">=</span><input id="inp_Ly" type="text" inputmode="decimal" value="500"><span class="unit">cm</span></div>
+    <div class="inp-row"><span class="lbl">L<sub>t</sub></span><span class="sym">=</span><input id="inp_Lt" type="text" inputmode="decimal" value="500"><span class="unit">cm</span></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Parameters</div>
+    <div class="inp-row"><span class="lbl">K<sub>x</sub></span><span class="sym">=</span><input id="inp_Kx" type="text" inputmode="decimal" value="1"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">K<sub>y</sub></span><span class="sym">=</span><input id="inp_Ky" type="text" inputmode="decimal" value="1"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">K<sub>t</sub></span><span class="sym">=</span><input id="inp_Kt" type="text" inputmode="decimal" value="1"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">C<sub>b</sub></span><span class="sym">=</span><input id="inp_Cb" type="text" inputmode="decimal" value="1"><span class="unit"></span></div>
+  </div>
+</div>
+
+<!-- ══ MAIN REPORT ══ -->
+<div class="main">
+
+<!-- ① SECTION CANVAS -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-blue">Section</span>
+    <span class="sec-title">Z Section With Lip — หน้าตัด</span>
+  </div>
+  <div style="padding:0;display:flex;justify-content:center;background:var(--bg)">
+    <canvas id="sectionCanvas" width="720" height="540" style="width:720px;height:540px;display:block"></canvas>
+  </div>
+</div>
+
+<!-- ① SECTION PROPERTIES -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-blue">Section</span>
+    <span class="sec-title">Section Properties — Z Section With Lip</span>
+  </div>
+  <div class="rep-col-full">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+      <div style="border-right:1px solid var(--border);padding:14px">
+        <div class="sdiv">Geometric</div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">A = <span id="m_A" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm²</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I<sub>x</sub> = <span id="m_Ix" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">cm⁴</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I<sub>y</sub> = <span id="m_Iy" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">cm⁴</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I<sub>xy</sub> = <span id="m_Ixy" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">cm⁴</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">r<sub>o</sub> = <span id="m_ro" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+      </div>
+      <div style="border-right:1px solid var(--border);padding:14px">
+        <div class="sdiv">Section Modulus</div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">S<sub>fx</sub> = <span id="m_Sfx" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">cm³</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">S<sub>fy</sub> = <span id="m_Sfy" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">cm³</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">θ (principal) = <span id="m_theta" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">°</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">r<sub>x</sub> = <span id="m_rx" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">r<sub>y</sub> = <span id="m_ry" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+      </div>
+      <div style="padding:14px">
+        <div class="sdiv">Torsion Constants</div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">J = <span id="m_J" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁴</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">C<sub>w</sub> = <span id="m_Cw" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁶</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">P<sub>t</sub> = <span id="m_Pt" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">kg</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">A<sub>g</sub> = <span id="m_Ag" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">cm²</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--border)">
+    <div class="rep-col-full">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+        <div style="border-right:1px solid var(--border);padding:14px">
+          <div class="sdiv">Flange Properties (for Distortional)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
+            <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">A<sub>f</sub> = <span id="dt_Af" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm²</span></div>
+            <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">J<sub>f</sub> = <span id="dt_Jf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁴</span></div>
+            <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I<sub>xf</sub> = <span id="dt_Ixf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁴</span></div>
+            <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I<sub>yf</sub> = <span id="dt_Iyf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁴</span></div>
+            <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I<sub>xyf</sub> = <span id="dt_Ixyf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm⁴</span></div>
+            <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">X<sub>of</sub> = <span id="dt_Xof" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+            <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">x<sub>hf</sub> = <span id="dt_xhf" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+            <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">y<sub>of</sub> = <span id="dt_yof" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+          </div>
+        </div>
+        <div style="padding:14px">
+          <div class="sdiv">Distortional Half-Wavelength</div>
+          <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">L<sub>m</sub> = <span id="dt_Lm" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+          <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">L<sub>crd</sub> = <span id="dt_Lcrd" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+          <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">L<sub>d</sub> = <span id="dt_Ld" style="color:var(--yellow);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">mm</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- kΦ Values -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-purple">k<sub>Φ</sub></span>
+    <span class="sec-title">k<sub>Φ</sub> Values — Rotational Stiffness</span>
+    <span class="sec-ref">AISI S100 Appendix 1</span>
+  </div>
+  <div class="rep-col-full">
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body">k<sub>Φfe</sub> = Elastic Rotational stiffness provided by flange to the flange/web juncture</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="dt_kfe">—</span><span class="calc-unit">kg</span></span></div>
+    </div>
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body">k<sub>Φwe</sub> = Elastic Rotational stiffness provided by the web to flange/web juncture</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="dt_kwe">—</span><span class="calc-unit">kg</span></span></div>
+    </div>
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body">k<sub>Φ</sub> = 0.00 (ไม่มีการยึดรั้ง)</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val">0.00</span><span class="calc-unit">kg</span></span></div>
+    </div>
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body">k<sub>Φfg</sub> = Geometric rotational stiffness demanded by flange from flange/web juncture</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="dt_kfg">—</span><span class="calc-unit">mm²</span></span></div>
+    </div>
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body">k<sub>Φwg</sub> = Geometric rotational stiffness demanded by web from flange/web juncture</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="dt_kwg">—</span><span class="calc-unit">mm²</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ② FLEXURE LTB -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-blue">Flexure</span>
+    <span class="sec-title">Flexural Yielding and Lateral Torsional Buckling</span>
+    <span class="sec-ref">AISI S100 §F2</span>
+  </div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Major Axis — X</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">S<sub>fx</sub> = I<sub>x</sub> / (H/2) / 1000</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Sfx_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Sfx">—</span><span class="calc-unit">cm³</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>y-x</sub> = S<sub>fx</sub> × F<sub>y</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Myx_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Myx">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>ey</sub> = π²·E·I<sub>y</sub> / (K<sub>y</sub>·L<sub>y</sub>)² × (1/10000)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Pey_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Pey">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>t</sub> = (1/r<sub>o</sub>²) × [G·J + π²·E·C<sub>w</sub>/(K<sub>t</sub>·L<sub>t</sub>)²]</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Pt_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Pt">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>cre-x</sub> = C<sub>b</sub> × r<sub>o</sub> × √(P<sub>ey</sub> × P<sub>t</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Mcre_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Mcre">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">F<sub>cre-x</sub> = M<sub>cre-x</sub> × 100 / S<sub>fx</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Fcre_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Fcre">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body" id="fx_Fn_cond">—</span></div>
+        <div class="calc-line1"><span class="cl-body" id="fx_Fn_formula">—</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Fn_sub2">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Fn">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">M<sub>ne-x</sub> = S<sub>fx</sub> × F<sub>n-x</sub> / 100</div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="fx_Mne">—</span><span class="gov-unit">kg-m</span></div></div>
+      <div class="sdiv">Local Buckling</div>
+      <div class="gov"><div class="gov-lbl">M<sub>nl-x</sub> = S<sub>fx</sub> × F<sub>n-x</sub> / 100</div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="fx_Mnl">—</span><span class="gov-unit">kg-m</span></div></div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Minor Axis — Y</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">S<sub>fy</sub> = I<sub>y</sub> / B / 1000</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Sfy_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Sfy">—</span><span class="calc-unit">cm³</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>y-y</sub> = S<sub>fy</sub> × F<sub>y</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Myy_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Myy">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>ex</sub> = π²·E·I<sub>x</sub> / (K<sub>x</sub>·L<sub>x</sub>)² × (1/10000)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Pex_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Pex">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>cre-y</sub> = C<sub>b</sub> × r<sub>o</sub> × √(P<sub>ex</sub> × P<sub>t</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Mcre_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Mcre">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">F<sub>cre-y</sub> = M<sub>cre-y</sub> × 100 / S<sub>fy</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Fcre_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Fcre">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body" id="fy_Fn_cond2">—</span></div>
+        <div class="calc-line1"><span class="cl-body" id="fy_Fn_formula">—</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Fn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Fn">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">M<sub>ne-y</sub> = S<sub>fy</sub> × F<sub>n-y</sub> / 100</div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="fy_Mne">—</span><span class="gov-unit">kg-m</span></div></div>
+      <div class="sdiv">Local Buckling</div>
+      <div class="gov"><div class="gov-lbl">M<sub>nl-y</sub> = S<sub>fy</sub> × F<sub>n-y</sub> / 100</div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="fy_Mnl">—</span><span class="gov-unit">kg-m</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ③ FLEXURE DISTORTIONAL -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-pink">Flex-Dist</span>
+    <span class="sec-title">Flexural Distortional Buckling</span>
+    <span class="sec-ref">AISI S100 §F4</span>
+  </div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Major Axis — X</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>crd-x</sub> = S<sub>fx</sub> × F<sub>crd</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Mcrdx_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Mcrdx">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ<sub>dx</sub> = √(M<sub>y-x</sub> / M<sub>crd-x</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_ldx_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_ldx">—</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body" id="fx_ldx_cond">—</span></div>
+        <div class="calc-line1"><span class="cl-body" id="fx_Mndx_formula">—</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Mndx_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Mndx">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">M<sub>nd-x</sub></div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="fx_Mndx_gov">—</span><span class="gov-unit">kg-m</span></div></div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Minor Axis — Y</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>crd-y</sub> = S<sub>fy</sub> × F<sub>crd</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Mcrdy_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Mcrdy">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ<sub>dy</sub> = √(M<sub>y-y</sub> / M<sub>crd-y</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_ldy_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_ldy">—</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body" id="fy_ldy_cond">—</span></div>
+        <div class="calc-line1"><span class="cl-body" id="fy_Mndy_formula">—</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Mndy_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Mndy">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">M<sub>nd-y</sub></div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="fy_Mndy_gov">—</span><span class="gov-unit">kg-m</span></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ③b FLEXURE LOCAL BUCKLING -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-orange">Flex-Local</span>
+    <span class="sec-title">Member in Flexure — Local Buckling (Effective Section)</span>
+    <span class="sec-ref">AISI S100 §F3</span>
+  </div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Major Axis — X (I<sub>x-eff</sub>)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">I<sub>x-eff</sub> = 2t·(0.0417·b<sub>e,web</sub>³ + b<sub>e,fl</sub>·(H/2+r)² + P₄·(H/2+0.637r)² + 0.149r³ + arc·r³ + P₅·(H/2+r·sinγ/γ)² + b<sub>e,lip</sub>³·sin²γ/12 + b<sub>e,lip</sub>·(H/2+r·cosγ−b<sub>e,lip</sub>/2·sinγ)²)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Ixeff">—</span><span class="calc-unit">mm⁴</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">S<sub>ec-x</sub> = I<sub>x-eff</sub> / (H/2) / 1000</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_Secx_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Secx">—</span><span class="calc-unit">cm³</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>nl-x</sub> = S<sub>ec-x</sub> × F<sub>y</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_Mnlx_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Mnlx">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">M<sub>nl-x</sub></div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="fl_Mnlx_gov">—</span><span class="gov-unit">kg-m</span></div></div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Minor Axis — Y (I<sub>y-eff</sub>)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">I<sub>y-eff</sub> = (b<sub>e,fl</sub>·(b<sub>e,fl</sub>/2+r)²+b<sub>e,fl</sub>³/12+0.356r³ + b<sub>e,lip</sub>·(b<sub>e,fl</sub>+r(1+sinγ)+b<sub>e,lip</sub>/2·cosγ)² + b<sub>e,lip</sub>³·cos²γ/12 + P₅·(b<sub>e,fl</sub>+r+r(1−cosγ)/γ)² + arc·r³)·2t</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Iyeff">—</span><span class="calc-unit">mm⁴</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">S<sub>ec-y</sub> = I<sub>y-eff</sub> / B / 1000</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_Secy_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Secy">—</span><span class="calc-unit">cm³</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>nl-y</sub> = S<sub>ec-y</sub> × F<sub>y</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_Mnly_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Mnly">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">M<sub>nl-y</sub></div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="fl_Mnly_gov">—</span><span class="gov-unit">kg-m</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ④ LOCAL BUCKLING -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-purple">Local</span>
+    <span class="sec-title">Compression Local Buckling — Effective Width Method</span>
+    <span class="sec-ref">AISI S100 §E3/B4</span>
+  </div>
+  <div class="rep-col-full">
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body">F<sub>n</sub> = min(F<sub>n-x</sub>, F<sub>n-y</sub>)</span></div>
+      <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="l_Fn_sub">—</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_Fn">—</span><span class="calc-unit">ksc</span></span></div>
+    </div>
+    <table class="loc-tbl">
+      <thead><tr>
+        <th style="text-align:left">Element</th>
+        <th>λ = dim/t</th><th>λ<sub>r</sub></th><th>λ<sub>r</sub>√(F<sub>y</sub>/F<sub>n</sub>)</th>
+        <th>c<sub>1</sub></th><th>c<sub>2</sub></th>
+        <th>F<sub>el</sub> (ksc)</th><th>b<sub>e</sub> (cm)</th><th>Status</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="lft">Web a'/t</td><td id="l_lWeb">—</td><td id="l_lrWeb">—</td><td id="l_lrfnWeb">—</td><td>0.18</td><td>1.31</td><td id="l_FelWeb">—</td><td id="l_beWeb">—</td><td id="l_stWeb">—</td></tr>
+        <tr><td class="lft">Flange b'/t</td><td id="l_lFl">—</td><td id="l_lrFl">—</td><td id="l_lrfnFl">—</td><td>0.18</td><td>1.31</td><td id="l_FelFl">—</td><td id="l_beFl">—</td><td id="l_stFl">—</td></tr>
+        <tr><td class="lft">Lip c'/t</td><td id="l_lLip">—</td><td id="l_lrLip">—</td><td id="l_lrfnLip">—</td><td>0.22</td><td>1.49</td><td id="l_FelLip">—</td><td id="l_beLip">—</td><td id="l_stLip">—</td></tr>
+      </tbody>
+    </table>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px">
+      <div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">A<sub>e</sub> = 2b<sub>e,lip</sub>·t/10 + 2b<sub>e,fl</sub>·t/10 + b<sub>e,web</sub>·t/10</span></div>
+          <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="l_Ae_sub">—</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_Ae">—</span><span class="calc-unit">cm²</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">P<sub>nl</sub> = A<sub>e</sub> · F<sub>n</sub></span></div>
+          <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="l_Pnl_sub">—</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_Pnl_val">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = global compression</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_Pn">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+      </div>
+      <div>
+        <div class="gov"><div class="gov-lbl">P<sub>nl</sub> govern = min(P<sub>nl</sub>, P<sub>n</sub>)</div>
+          <div class="gov-val"><span class="gov-tag">so</span><span id="l_Pnl_gov">—</span><span class="gov-unit">kg</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ COMPRESSION GLOBAL -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-green">Compr</span>
+    <span class="sec-title">Compression Yielding — Global Buckling</span>
+    <span class="sec-ref">AISI S100 §E2</span>
+  </div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Axis X</div>
+      <div class="calc-block">
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">F<sub>cre-x</sub> = <span id="cx_Fcre" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">ksc</span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ<sub>c-x</sub> = √(F<sub>y</sub> / F<sub>cre-x</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="cx_lc_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="cx_lc">—</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body" id="cx_lc_cond">—</span></div>
+        <div class="calc-line1"><span class="cl-body" id="cx_Fn_formula">—</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="cx_Fn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="cx_Fn">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>ne-x</sub> = A<sub>g</sub> × F<sub>n-x</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="cx_Pne_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="cx_Pne">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Axis Y</div>
+      <div class="calc-block">
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">F<sub>cre-y</sub> = <span id="cy_Fcre" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">ksc</span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ<sub>c-y</sub> = √(F<sub>y</sub> / F<sub>cre-y</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="cy_lc_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="cy_lc">—</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body" id="cy_lc_cond">—</span></div>
+        <div class="calc-line1"><span class="cl-body" id="cy_Fn_formula">—</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="cy_Fn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="cy_Fn">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>ne-y</sub> = A<sub>g</sub> × F<sub>n-y</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="cy_Pne_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="cy_Pne">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">P<sub>n</sub> = min(P<sub>ne-x</sub>, P<sub>ne-y</sub>)</div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="cy_Pn">—</span><span class="gov-unit">kg</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑥ COMPRESSION DISTORTIONAL -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-purple">Compr-Dist</span>
+    <span class="sec-title">Compression Distortional Buckling</span>
+    <span class="sec-ref">AISI S100 §E4 / Appendix 1</span>
+  </div>
+  <div class="rep-col-full" style="border-top:1px solid var(--border)">
+    <div class="sdiv">F<sub>crd</sub> and P<sub>nd</sub></div>
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body">F<sub>crd</sub> = (k<sub>Φfe</sub>+k<sub>Φwe</sub>) / (k<sub>Φfg</sub>+k<sub>Φwg</sub>) × 100</span></div>
+      <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="dt_Fcrd_sub">—</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="dt_Fcrd">—</span><span class="calc-unit">ksc</span></span></div>
+    </div>
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body">P<sub>y</sub> = A<sub>g</sub>·F<sub>y</sub>/100 &nbsp;|&nbsp; P<sub>crd</sub> = A<sub>g</sub>·F<sub>crd</sub>/100</span></div>
+      <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="dt_PyPcrd_sub">—</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="dt_Py">—</span><span class="calc-unit">kg</span>
+        <span class="calc-lbl" style="margin-left:12px">P<sub>crd</sub></span><span class="calc-val" id="dt_Pcrd">—</span><span class="calc-unit">kg</span>
+      </span></div>
+    </div>
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body">λ<sub>d</sub> = √(P<sub>y</sub> / P<sub>crd</sub>)</span></div>
+      <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="dt_ld_sub">—</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="dt_ld">—</span></span></div>
+    </div>
+    <div class="calc-block">
+      <div class="calc-line1"><span class="cl-body" id="dt_ld_cond">—</span></div>
+      <div class="calc-line1"><span class="cl-body" id="dt_Pnd_formula">—</span></div>
+      <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="dt_Pnd_sub">—</span></div>
+      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="dt_Pnd">—</span><span class="calc-unit">kg</span></span></div>
+    </div>
+    <div class="gov"><div class="gov-lbl">P<sub>nd</sub></div>
+      <div class="gov-val"><span class="gov-tag">so</span><span id="dt_Pnd_gov">—</span><span class="gov-unit">kg</span></div></div>
+  </div>
+</div>
+
+<!-- ⑦ SHEAR -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-red">Shear</span>
+    <span class="sec-title">Shear Strength of Webs Without Holes</span>
+    <span class="sec-ref">AISI S100 §G2</span>
+  </div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Shear Buckling</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">A<sub>w</sub> = H × t / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_Aw_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Aw">—</span><span class="calc-unit">cm²</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">V<sub>y</sub> = 0.6 × A<sub>w</sub> × F<sub>y</sub> &nbsp;|&nbsp; k<sub>v</sub> = 5.34</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_Vy_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Vy">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">V<sub>cr</sub> = π²·E·k<sub>v</sub>·(h/10)·(t/10) / [12(1−ν²)(h/t)²]</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_Vcr_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Vcr">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ<sub>v</sub> = √(V<sub>y</sub> / V<sub>cr</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_lv_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_lv">—</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body" id="sh_lv_cond">—</span></div>
+        <div class="calc-line1"><span class="cl-body" id="sh_Vn_formula">—</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_Vn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Vn">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="gov" style="margin-top:4px">
+        <div class="gov-lbl">V<sub>n</sub></div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="sh_Vn_gov">—</span><span class="gov-unit">kg</span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Web Elastic Critical Shear Buckling</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">F<sub>cr</sub> = π²·E·k<sub>v</sub> / (12(1−ν²)(h/t)²)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_Fcr_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">V<sub>cr</sub> = A<sub>w</sub> · F<sub>cr</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_Vcr2_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Vcr2">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑧ SUMMARY -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-cyan">Summary</span>
+    <span class="sec-title">Summary</span>
+  </div>
+  <div class="rep-col-full">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden">
+      <div style="border-right:1px solid var(--border);padding:14px">
+        <div class="sdiv">M<sub>n-x</sub> — Major Axis</div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">LTB (Lateral Torsional Buckling)</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Mnex">—</span><span class="calc-unit">kg-m</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">Local Buckling</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Mnlx">—</span><span class="calc-unit">kg-m</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">Distortional Buckling</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Mndx">—</span><span class="calc-unit">kg-m</span></span></div>
+        </div>
+        <div class="gov">
+          <div class="gov-lbl">M<sub>n-x</sub> = min(M<sub>ne</sub>, M<sub>nl</sub>, M<sub>nd</sub>)</div>
+          <div class="gov-val"><span class="gov-tag">so</span><span id="sum_Mnx_gov">—</span><span class="gov-unit">kg-m</span></div>
+        </div>
+        <div style="font-size:10px;color:var(--orange);margin-top:4px" id="sum_Mnx_mode"></div>
+      </div>
+      <div style="border-right:1px solid var(--border);padding:14px">
+        <div class="sdiv">M<sub>n-y</sub> — Minor Axis</div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">LTB (Lateral Torsional Buckling)</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Mney">—</span><span class="calc-unit">kg-m</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">Local Buckling</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Mnly">—</span><span class="calc-unit">kg-m</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">Distortional Buckling</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Mndy">—</span><span class="calc-unit">kg-m</span></span></div>
+        </div>
+        <div class="gov">
+          <div class="gov-lbl">M<sub>n-y</sub> = min(M<sub>ne</sub>, M<sub>nl</sub>, M<sub>nd</sub>)</div>
+          <div class="gov-val"><span class="gov-tag">so</span><span id="sum_Mny_gov">—</span><span class="gov-unit">kg-m</span></div>
+        </div>
+        <div style="font-size:10px;color:var(--orange);margin-top:4px" id="sum_Mny_mode"></div>
+      </div>
+      <div style="border-right:1px solid var(--border);padding:14px">
+        <div class="sdiv">P<sub>n</sub> — Compression</div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">P<sub>ey</sub> — Euler Y</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Pey">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">P<sub>ex</sub> — Euler X</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Pex">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">P<sub>t</sub> — Torsional</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Pt">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">Global Buckling</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Pn">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">Local Buckling</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Pnl">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">Distortional Buckling</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Pnd">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+        <div class="gov">
+          <div class="gov-lbl">P<sub>n</sub> = min(P<sub>n</sub>, P<sub>nl</sub>, P<sub>nd</sub>)</div>
+          <div class="gov-val"><span class="gov-tag">so</span><span id="sum_Pn_gov">—</span><span class="gov-unit">kg</span></div>
+        </div>
+        <div style="font-size:10px;color:var(--orange);margin-top:4px" id="sum_Pn_mode"></div>
+      </div>
+      <div style="padding:14px">
+        <div class="sdiv">V<sub>n</sub> — Shear</div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body" id="sum_Vn_mode">—</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sum_Vn">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+        <div class="gov">
+          <div class="gov-lbl">V<sub>n</sub></div>
+          <div class="gov-val"><span class="gov-tag">so</span><span id="sum_Vn_gov">—</span><span class="gov-unit">kg</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+</div><!-- /layout -->
+
+<!-- ══ PRINT PAGES ══════════════════════════════════════════════ -->
+
+</div><!-- /layout -->
+
+<!-- ══ PRINT PAGES ══ -->
+
+<!-- PAGE 1 -->
+<div class="pr-page" id="pp1">
+<div class="pr-outer">
+<div class="pr-hdr-bar">Z Section With Lip — AISI S100 &nbsp;|&nbsp; Beam Section Analysis</div>
+<div class="pr-body">
+<!-- Material + Inputs -->
+  <div class="pr-sec">Material Properties &amp; Parameters</div>
+  <div class="pr-2col" style="margin-bottom:6px">
+    <div>
+      <div class="pr-lv"><span class="pr-lv-sym">E</span><span class="pr-lv-name">Modulus of Elasticity</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_E"></span><span class="pr-lv-unit">ksc</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">G</span><span class="pr-lv-name">Shear Modulus</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_G"></span><span class="pr-lv-unit">ksc</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Fy</span><span class="pr-lv-name">Yield Strength</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Fy"></span><span class="pr-lv-unit">ksc</span></div>
+    </div>
+    <div>
+      <div class="pr-lv"><span class="pr-lv-sym">Kx</span><span class="pr-lv-name"></span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Kx"></span><span class="pr-lv-unit"></span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Ky</span><span class="pr-lv-name"></span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Ky"></span><span class="pr-lv-unit"></span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Kt</span><span class="pr-lv-name"></span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Kt"></span><span class="pr-lv-unit"></span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Cb</span><span class="pr-lv-name"></span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Cb"></span><span class="pr-lv-unit"></span></div>
+    </div>
+  </div>
+
+  <!-- Section + Drawing -->
+  <div class="pr-sec">Section Properties</div>
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:0 18px;align-items:start">
+    <div>
+      <div class="pr-lv"><span class="pr-lv-sym">H</span><span class="pr-lv-name">Depth of Section</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_H"></span><span class="pr-lv-unit">mm</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">W</span><span class="pr-lv-name">Width of Section</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_W"></span><span class="pr-lv-unit">mm</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">C</span><span class="pr-lv-name">Lip Length</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_C"></span><span class="pr-lv-unit">mm</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">t</span><span class="pr-lv-name">Thickness</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_t"></span><span class="pr-lv-unit">mm</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">r</span><span class="pr-lv-name">Corner Radius</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_r"></span><span class="pr-lv-unit">mm</span></div>
+      <hr class="pr-divider">
+      <div class="pr-lv"><span class="pr-lv-sym">A</span><span class="pr-lv-name">Section Area</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_A"></span><span class="pr-lv-unit">mm²</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Ix</span><span class="pr-lv-name">Moment of Inertia X</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Ix"></span><span class="pr-lv-unit">mm⁴</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Iy</span><span class="pr-lv-name">Moment of Inertia Y</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Iy"></span><span class="pr-lv-unit">mm⁴</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Ixy</span><span class="pr-lv-name">Product of Inertia</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Ixy"></span><span class="pr-lv-unit">mm⁴</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">J</span><span class="pr-lv-name">St.Venant Torsion Constant</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_J"></span><span class="pr-lv-unit">mm⁴</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Cw</span><span class="pr-lv-name">Warping Constant</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Cw"></span><span class="pr-lv-unit">mm⁶</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">ro</span><span class="pr-lv-name">Polar Radius of Gyration</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_ro"></span><span class="pr-lv-unit">mm</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">θ</span><span class="pr-lv-name">Angle — Minor Principal Axis</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_theta"></span><span class="pr-lv-unit">°</span></div>
+      <hr class="pr-divider">
+      <div class="pr-lv"><span class="pr-lv-sym">Lx</span><span class="pr-lv-name">Unbraced Length X</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Lx"></span><span class="pr-lv-unit">cm</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Ly</span><span class="pr-lv-name">Unbraced Length Y</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Ly"></span><span class="pr-lv-unit">cm</span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Lt</span><span class="pr-lv-name">Unbraced Length Torsion</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Lt"></span><span class="pr-lv-unit">cm</span></div>
+    </div>
+    <div style="border:0.7px solid #bbb;padding:4px">
+      <canvas id="pr-canvas" width="310" height="340" style="width:310px;height:340px;display:block"></canvas>
+    </div>
+  </div>
+
+  <!-- kΦ -->
+  <div class="pr-sec">Distortional Buckling — Rotational Stiffness</div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φfe</sub></span><span style="flex:1">= Elastic Rotational stiffness provided by flange to the flange/web juncture</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_kfe"></span><span class="pr-eq-unit">kg</span></div></div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φwe</sub></span><span style="flex:1">= Elastic Rotational stiffness provided by the web to flange/web juncture</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_kwe"></span><span class="pr-eq-unit">kg</span></div></div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φ</sub></span><span style="flex:1">= Continuous Rotational stiffness (restrains rotation about flange/web juncture)</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val">0.00</span><span class="pr-eq-unit">kg</span></div></div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φfg</sub></span><span style="flex:1">= Geometric rotational stiffness demanded by flange from flange/web juncture</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_kfg"></span><span class="pr-eq-unit">mm²</span></div></div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φwg</sub></span><span style="flex:1">= Geometric rotational stiffness demanded by web from flange/web juncture</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_kwg"></span><span class="pr-eq-unit">mm²</span></div></div>
+  <div style="margin-top:4px">
+    <div class="pr-eq-row"><span style="font-style:italic;width:36px">F<sub>crd</sub></span><span class="pr-eq-op">=</span><span>(k<sub>Φfe</sub>+k<sub>Φwe</sub>+k<sub>Φ</sub>)/(k<sub>Φfg</sub>+k<sub>Φwg</sub>)</span></div>
+    <div class="pr-eq-block">
+      <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p1_Fcrd_sub"></span></div>
+      <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_Fcrd"></span><span class="pr-eq-unit">ksc</span></div>
+    </div>
+  </div>
+  <div style="margin-top:3px"><span style="font-size:8.5px;color:#666">Lm = <b id="p1_Lm"></b> mm &nbsp;|&nbsp; Lcrd = <b id="p1_Lcrd"></b> mm &nbsp;|&nbsp; Ld = min(Lm,Lcrd) = <b id="p1_Ld"></b> mm</span></div>
+
+</div><!-- /pr-body -->
+</div><!-- /pr-outer -->
+</div><!-- /pr-page -->
+
+<!-- PAGE 2 -->
+<div class="pr-page" id="pp2">
+<div class="pr-outer">
+<div class="pr-hdr-bar">Z Section With Lip — AISI S100 &nbsp;|&nbsp; Beam Section Analysis</div>
+<div class="pr-body">
+<!-- Flexure LTB -->
+  <div class="pr-sec">Flexural Yielding and Lateral Torsional Buckling</div>
+  <div class="pr-2col">
+    <div>
+      <div style="font-weight:700;margin-bottom:3px">S<sub>fx</sub> = Ix / (H/2) / 1000</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Sfx_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Sfx"></span><span class="pr-eq-unit">cm³</span></div>
+      </div>
+      <div style="margin-top:3px">M<sub>y-x</sub> = Ix × Fy / 10000 / 100</div>
+      <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Myx"></span><span class="pr-eq-unit">kg-m</span></div></div>
+      <div>P<sub>ey</sub> = π²EIy / (KyLy)²</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Pey_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Pey"></span><span class="pr-eq-unit">kg</span></div>
+      </div>
+      <div>P<sub>t</sub> = 1/ro²[GJ + π²ECw/(KtLt)²]</div>
+      <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Pt"></span><span class="pr-eq-unit">kg</span></div></div>
+      <div>M<sub>cre-x</sub> = Cb·ro·√(Pey·Pt)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Mcrex_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Mcrex"></span><span class="pr-eq-unit">kg-m</span></div>
+      </div>
+      <div>F<sub>cre-x</sub> = Mcre-x / Sfx</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Fcrex_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Fcrex"></span><span class="pr-eq-unit">ksc</span></div>
+      </div>
+      <div>F<sub>n-x</sub> = <span id="p2_Fnx"></span> ksc</div>
+      <div class="pr-so" style="margin-top:4px">
+        <span class="pr-so-lbl">M<sub>ne-x</sub> = Sfx·Fn-x / 100 =</span>
+        <span class="pr-so-val" id="p2_Mnex"></span><span class="pr-so-unit">kg-m</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-weight:700;margin-bottom:3px">S<sub>fy</sub> = Iy / B / 1000</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Sfy_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Sfy"></span><span class="pr-eq-unit">cm³</span></div>
+      </div>
+      <div>M<sub>y-y</sub> = Iy × Fy / 10000 / 100</div>
+      <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Myy"></span><span class="pr-eq-unit">kg-m</span></div></div>
+      <div>P<sub>ex</sub> = π²EIx / (KxLx)²</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Pex_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Pex"></span><span class="pr-eq-unit">kg</span></div>
+      </div>
+      <div>M<sub>cre-y</sub> = Cb·ro·√(Pex·Pt)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Mcrey_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Mcrey"></span><span class="pr-eq-unit">kg-m</span></div>
+      </div>
+      <div>F<sub>cre-y</sub> = Mcre-y / Sfy</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Fcrey_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Fcrey"></span><span class="pr-eq-unit">ksc</span></div>
+      </div>
+      <div>F<sub>n-y</sub> = <span id="p2_Fny"></span> ksc</div>
+      <div class="pr-so" style="margin-top:4px">
+        <span class="pr-so-lbl">M<sub>ne-y</sub> = Sfy·Fn-y / 100 =</span>
+        <span class="pr-so-val" id="p2_Mney"></span><span class="pr-so-unit">kg-m</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flexure Local -->
+  <div class="pr-sec pr-sec2">Flexural Local Buckling — Effective Width Method</div>
+  <div class="pr-2col">
+    <div>
+      <div>S<sub>ec-x</sub> = Ix-eff / (H/2) / 1000 = <b id="p2_Secx"></b> cm³</div>
+      <div class="pr-so" style="margin-top:4px">
+        <span class="pr-so-lbl">M<sub>nl-x</sub> = Sec-x·Fy / 100 =</span>
+        <span class="pr-so-val" id="p2_Mnlx"></span><span class="pr-so-unit">kg-m</span>
+      </div>
+    </div>
+    <div>
+      <div>S<sub>ec-y</sub> = Iy-eff / B / 1000 = <b id="p2_Secy"></b> cm³</div>
+      <div class="pr-so" style="margin-top:4px">
+        <span class="pr-so-lbl">M<sub>nl-y</sub> = Sec-y·Fy / 100 =</span>
+        <span class="pr-so-val" id="p2_Mnly"></span><span class="pr-so-unit">kg-m</span>
+      </div>
+    </div>
+  </div>
+
+<!-- Flexure Distortional -->
+  <div class="pr-sec">Flexural Distortional Buckling</div>
+  <div class="pr-2col">
+    <div>
+      <div>M<sub>crd-x</sub> = Sfx × Fcrd / 100</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Mcrdx_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Mcrdx"></span><span class="pr-eq-unit">kg-m</span></div>
+      </div>
+      <div>λ<sub>dx</sub> = √(My-x / Mcrd-x)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_ldx_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_ldx"></span> &nbsp;<span id="p2_ldx_cond"></span>&nbsp; 0.673</div>
+      </div>
+      <div class="pr-so"><span class="pr-so-lbl">M<sub>nd-x</sub> =</span><span class="pr-so-val" id="p2_Mndx"></span><span class="pr-so-unit">kg-m</span></div>
+    </div>
+    <div>
+      <div>M<sub>crd-y</sub> = Sfy × Fcrd / 100</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Mcrdy_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Mcrdy"></span><span class="pr-eq-unit">kg-m</span></div>
+      </div>
+      <div>λ<sub>dy</sub> = √(My-y / Mcrd-y)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_ldy_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_ldy"></span> &nbsp;<span id="p2_ldy_cond"></span>&nbsp; 0.673</div>
+      </div>
+      <div class="pr-so"><span class="pr-so-lbl">M<sub>nd-y</sub> =</span><span class="pr-so-val" id="p2_Mndy"></span><span class="pr-so-unit">kg-m</span></div>
+    </div>
+  </div>
+  <div style="margin-top:5px;display:flex;gap:16px">
+    <div class="pr-so"><span class="pr-so-lbl" style="font-weight:700">So &nbsp; M<sub>n-x</sub> =</span><span class="pr-so-val" id="p2_Mnx_gov"></span><span class="pr-so-unit">kg-m</span></div>
+    <div class="pr-so"><span class="pr-so-lbl" style="font-weight:700">So &nbsp; M<sub>n-y</sub> =</span><span class="pr-so-val" id="p2_Mny_gov"></span><span class="pr-so-unit">kg-m</span></div>
+  </div>
+
+</div><!-- /pr-body -->
+</div><!-- /pr-outer -->
+</div><!-- /pr-page -->
+
+<!-- PAGE 3 -->
+<div class="pr-page" id="pp3">
+<div class="pr-outer">
+<div class="pr-hdr-bar">Z Section With Lip — AISI S100 &nbsp;|&nbsp; Beam Section Analysis</div>
+<div class="pr-body">
+<!-- Compression Local -->
+  <div class="pr-sec">Compression Local Buckling — Effective Width Method</div>
+  <div>F<sub>n</sub> = min(Fn-x, Fn-y) = <b id="p3_Fn"></b> ksc</div>
+  <table class="pr-tbl" style="margin:6px 0">
+    <thead><tr>
+      <th class="lft">Section</th><th>λ</th><th>λr</th><th>λr√(Fy/Fn)</th>
+      <th>c₁</th><th>c₂</th><th>Fel (ksc)</th><th>b</th><th>be (cm)</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="lft">Lip</td><td id="p3_lLip"></td><td id="p3_lrLip"></td><td id="p3_lrfnLip"></td><td>0.22</td><td>1.49</td><td id="p3_FelLip"></td><td id="p3_bLip"></td><td id="p3_beLip"></td></tr>
+      <tr><td class="lft">Flange</td><td id="p3_lFl"></td><td id="p3_lrFl"></td><td id="p3_lrfnFl"></td><td>0.18</td><td>1.31</td><td id="p3_FelFl"></td><td id="p3_bFl"></td><td id="p3_beFl"></td></tr>
+      <tr><td class="lft">Web</td><td id="p3_lWeb"></td><td id="p3_lrWeb"></td><td id="p3_lrfnWeb"></td><td>0.18</td><td>1.31</td><td id="p3_FelWeb"></td><td id="p3_bWeb"></td><td id="p3_beWeb"></td></tr>
+    </tbody>
+  </table>
+  <div>A<sub>e</sub> = <b id="p3_Ae"></b> cm² &nbsp;&nbsp; P<sub>nl</sub> = Ae·Fn</div>
+  <div class="pr-eq-block">
+    <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_Pnl_sub"></span></div>
+    <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_Pnl_val"></span> &lt; <span id="p3_Pn_global"></span> kg</div>
+  </div>
+  <div class="pr-so"><span class="pr-so-lbl">P<sub>nl</sub> =</span><span class="pr-so-val" id="p3_Pnl"></span><span class="pr-so-unit">kg</span></div>
+
+  <!-- Compression Distortional -->
+  <div class="pr-sec">Compression Distortional Buckling</div>
+  <div class="pr-2col">
+    <div>
+      <div>P<sub>y</sub> = Ag·Fy</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_Py_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p3_Py"></span><span class="pr-eq-unit">kg</span></div>
+      </div>
+      <div>L<sub>m</sub> = <b id="p3_Lm"></b> mm &nbsp;&nbsp; L<sub>crd</sub> = <b id="p3_Lcrd"></b> mm &nbsp;&nbsp; L<sub>d</sub> = <b id="p3_Ld"></b> mm</div>
+    </div>
+    <div>
+      <div>P<sub>crd</sub> = Ag·Fcrd</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_Pcrd_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p3_Pcrd"></span><span class="pr-eq-unit">kg</span></div>
+      </div>
+      <div>λ<sub>d</sub> = √(Py / Pcrd)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_ld_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_ld"></span>&nbsp;<span id="p3_ld_cond"></span>&nbsp;0.561</div>
+      </div>
+      <div class="pr-so"><span class="pr-so-lbl">P<sub>nd</sub> =</span><span class="pr-so-val" id="p3_Pnd"></span><span class="pr-so-unit">kg</span></div>
+    </div>
+  </div>
+
+
+<!-- Compression Global -->
+  <div class="pr-sec">Compression Yielding — Global Buckling</div>
+  <div class="pr-2col">
+    <div>
+      <div>F<sub>cre-x</sub> = <b id="p3_Fcrex"></b> ksc</div>
+      <div>λ<sub>c-x</sub> = √(Fy/Fcre-x)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_lcx_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_lcx"></span>&nbsp;<span id="p3_lcx_cond"></span>&nbsp;1.5</div>
+      </div>
+      <div>F<sub>n-x</sub> = <b id="p3_Fncx"></b> ksc</div>
+      <div class="pr-so"><span class="pr-so-lbl">P<sub>ne-x</sub> = Ag·Fn-x =</span><span class="pr-so-val" id="p3_Pnex"></span><span class="pr-so-unit">kg</span></div>
+    </div>
+    <div>
+      <div>F<sub>cre-y</sub> = <b id="p3_Fcrey"></b> ksc</div>
+      <div>λ<sub>c-y</sub> = √(Fy/Fcre-y)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_lcy_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_lcy"></span>&nbsp;<span id="p3_lcy_cond"></span>&nbsp;1.5</div>
+      </div>
+      <div>F<sub>n-y</sub> = <b id="p3_Fncy"></b> ksc</div>
+      <div class="pr-so"><span class="pr-so-lbl">P<sub>ne-y</sub> = Ag·Fn-y =</span><span class="pr-so-val" id="p3_Pney"></span><span class="pr-so-unit">kg</span></div>
+    </div>
+  </div>
+
+
+</div><!-- /pr-body -->
+</div><!-- /pr-outer -->
+</div><!-- /pr-page -->
+
+<!-- PAGE 4 -->
+<div class="pr-page" id="pp4">
+<div class="pr-outer">
+<div class="pr-hdr-bar">Z Section With Lip — AISI S100 &nbsp;|&nbsp; Beam Section Analysis</div>
+<div class="pr-body">
+
+  <!-- Shear -->
+  <div style="page-break-inside:avoid">
+  <div class="pr-sec pr-sec2">Shear Strength of Webs</div>
+  <div class="pr-2col">
+    <div>
+      <div class="pr-lv"><span style="width:28px;font-style:italic">Aw</span><span class="pr-lv-eq">=</span><span>H × t / 100 = <b id="p3_Aw"></b> cm²</span></div>
+      <div class="pr-lv"><span style="width:28px;font-style:italic">Vy</span><span class="pr-lv-eq">=</span><span>0.6·Aw·Fy = <b id="p3_Vy"></b> kg</span></div>
+      <div class="pr-lv"><span style="width:28px;font-style:italic">kv</span><span class="pr-lv-eq">=</span><span>5.34</span></div>
+      <div>Vcr = π²Ekv(h/10)(t/10) / [12(1-ν²)(h/t)²]</div>
+      <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p3_Vcr"></span><span class="pr-eq-unit">kg</span></div></div>
+      <div>λ<sub>v</sub> = √(Vy/Vcr) = <b id="p3_lv"></b> &nbsp;<span id="p3_lv_cond"></span>&nbsp; 0.587</div>
+      <div class="pr-so" style="margin-top:4px"><span class="pr-so-lbl" style="font-weight:700">So &nbsp; Vn =</span><span class="pr-so-val" id="p3_Vn"></span><span class="pr-so-unit">kg</span></div>
+    </div>
+    <div>
+      <div style="font-weight:700;margin-bottom:4px">Summary — Governing Strength</div>
+      <div class="pr-lv"><span style="flex:1">M<sub>n-x</sub></span><span style="font-weight:700"><span id="p3_Mnx_gov"></span> kg-m</span></div>
+      <div class="pr-lv"><span style="flex:1">M<sub>n-y</sub></span><span style="font-weight:700"><span id="p3_Mny_gov"></span> kg-m</span></div>
+      <div class="pr-lv"><span style="flex:1">Vn</span><span style="font-weight:700"><span id="p3_Vn2"></span> kg</span></div>
+    </div>
+  </div>
+  </div><!-- /avoid shear break -->
+
+
+</div><!-- /pr-body -->
+</div><!-- /pr-outer -->
+</div><!-- /pr-page -->
+
+<script>
+const PI=Math.PI;
+function f(v,d=2){
+  const n=Number(v);
+  if(v===null||v===undefined||typeof v==='string'||!isFinite(n)||isNaN(n))return '—';
+  const decimals=Math.min(Math.max(0,Math.floor(d)),3);
+  let fixed;
+  if(decimals===0){fixed=Math.round(n).toString();}
+  else{fixed=parseFloat(n.toFixed(decimals)).toString();}
+  const parts=fixed.split('.');
+  parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return parts.join('.');
+}
+function parseInput(id){
+  const el=document.getElementById(id);
+  if(!el)return 0;
+  return parseFloat(el.value.replace(/,/g,''))||0;
+}
+function fmtInput(el){
+  const raw=el.value.replace(/,/g,'');
+  const num=parseFloat(raw);
+  if(!isFinite(num))return;
+  const parts=raw.split('.');
+  parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  el.value=parts.join('.');
+}
+function setupInputs(){
+  document.querySelectorAll('input[type="text"]').forEach(el=>{
+    el.addEventListener('blur',()=>{fmtInput(el);calculate();});
+    el.addEventListener('keypress',e=>{if(!/[0-9.,]/.test(e.key)&&e.key!=='Backspace')e.preventDefault();});
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'){fmtInput(el);calculate();}});
+    fmtInput(el);
+  });
+}
+function s(id,v,d=2){const e=document.getElementById(id);if(e)e.textContent=f(v,d);}
+function t(id,txt){const e=document.getElementById(id);if(e)e.textContent=txt;}
+function h(id,html){const e=document.getElementById(id);if(e)e.innerHTML=html;}
+
+// ── Draw Z-Section ──────────────────────────────────────────────
+function drawSection(canvasId,H,B,C,r,tt,theta_deg){
+  const isPrint = canvasId==='pr-canvas';
+  const cvs=document.getElementById(canvasId);if(!cvs)return;
+  const ctx=cvs.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  const W=cvs.offsetWidth||720,Hc=cvs.offsetHeight||540;
+  cvs.width=W*dpr;cvs.height=Hc*dpr;
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,Hc);
+
+  // Z-section: web vertical, top flange goes RIGHT, bottom flange goes LEFT
+  // Centerline layout (in mm, origin = bottom-left of web):
+  //   Web: x=0, y=0..H
+  //   Bottom flange: x=-B..0, y=0
+  //   Bottom lip: x=-B, y=0..C
+  //   Top flange: x=0..B, y=H
+  //   Top lip: x=B, y=H..H-C
+
+  const pad=80;
+  const xSpan=B*2+H*0.3;
+  const sc=Math.min((W-pad*2)/xSpan,(Hc-pad*2)/H)*0.75;
+
+  // Center the Z around the web center
+  const ox=W/2;
+  const oy=Hc/2+H*sc/2;
+  function tx(x){return ox+x*sc;}
+  function ty(y){return oy-y*sc;}
+
+  // Draw dark bg + dots
+  ctx.fillStyle=isPrint?'#ffffff':'#0f1117';ctx.fillRect(0,0,W,Hc);
+  ctx.fillStyle=isPrint?'#eeeeee':'#1c2333';
+  const gStep=30;
+  for(let gx=gStep/2;gx<W;gx+=gStep)
+    for(let gy=gStep/2;gy<Hc;gy+=gStep){
+      ctx.beginPath();ctx.arc(gx,gy,0.8,0,PI*2);ctx.fill();
+    }
+
+  // Arrow helper
+  function ah(x,y,angle,color,size=6){
+    ctx.save();ctx.fillStyle=color;ctx.translate(x,y);ctx.rotate(angle);
+    ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-size,-size/2);ctx.lineTo(-size,size/2);ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
+  function extLine(x1,y1,x2,y2,col='#555'){
+    ctx.save();ctx.strokeStyle=col;ctx.lineWidth=0.7;ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  }
+  function dimLine(x1,y1,x2,y2,label,col='#aaa',rot=0,offX=0,fontSize=11){
+    ctx.save();ctx.strokeStyle=col;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    // arrowheads
+    if(x1===x2){ah(x1,y1,rot-PI/2,col,5);ah(x2,y2,rot+PI/2,col,5);}
+    else{ah(x1,y1,PI,col,5);ah(x2,y2,0,col,5);}
+    const mx=(x1+x2)/2+offX,my=(y1+y2)/2;
+    if(label){
+      ctx.font=`bold ${fontSize}px 'IBM Plex Mono',monospace`;
+      ctx.fillStyle=col;ctx.textAlign='center';ctx.textBaseline='middle';
+      if(rot!==0){ctx.translate(mx,my);ctx.rotate(rot);ctx.fillText(label,0,0);}
+      else ctx.fillText(label,mx,my);
+    }
+    ctx.restore();
+  }
+
+  const rp=r*sc;
+  const halfT=(tt*sc)/2;
+
+  // Build Z centerline path
+  // Z: bottom-left lip tip → bottom lip → corner → bottom flange → corner → web → corner → top flange → corner → top lip → tip
+  function buildZCenterline(){
+    const path=new Path2D();
+    // start: bottom lip inner end (bottom-left)
+    path.moveTo(tx(-B),ty(C));         // bottom lip lower end
+    path.lineTo(tx(-B),ty(r));          // bottom lip going down
+    path.arcTo(tx(-B),ty(0),tx(-B+r),ty(0),rp);  // corner bot-left
+    path.lineTo(tx(-r),ty(0));          // bottom flange going right
+    path.arcTo(tx(0),ty(0),tx(0),ty(r),rp);       // corner bot-right (web/flange)
+    path.lineTo(tx(0),ty(H-r));         // web going up
+    path.arcTo(tx(0),ty(H),tx(r),ty(H),rp);       // corner top-left (web/flange)
+    path.lineTo(tx(B-r),ty(H));         // top flange going right
+    path.arcTo(tx(B),ty(H),tx(B),ty(H-r),rp);     // corner top-right
+    path.lineTo(tx(B),ty(H-C));        // top lip going down
+    return path;
+  }
+
+  const cl=buildZCenterline();
+
+  // Filled section
+  ctx.save();
+  ctx.strokeStyle=isPrint?'#999999':'#d8d8d8';
+  ctx.lineWidth=tt*sc;
+  ctx.lineCap='butt';
+  ctx.lineJoin='round';
+  ctx.stroke(cl);
+  ctx.restore();
+
+  // Outer boundary
+  const rOut=r*sc+halfT;
+  const rIn=Math.max(r*sc-halfT,0.5);
+  function drawZOuter(){
+    const p=new Path2D();
+    p.moveTo(tx(-B)-halfT,ty(C));
+    p.lineTo(tx(-B)-halfT,ty(rOut));
+    p.arcTo(tx(-B)-halfT,ty(0)-halfT,tx(-B+rOut),ty(0)-halfT,rOut);
+    p.lineTo(tx(-rOut),ty(0)-halfT);
+    p.arcTo(tx(0)+halfT,ty(0)-halfT,tx(0)+halfT,ty(rOut),rOut);
+    p.lineTo(tx(0)+halfT,ty(H-rOut));
+    p.arcTo(tx(0)+halfT,ty(H)+halfT,tx(rOut),ty(H)+halfT,rOut);
+    p.lineTo(tx(B-rOut),ty(H)+halfT);
+    p.arcTo(tx(B)+halfT,ty(H)+halfT,tx(B)+halfT,ty(H-rOut),rOut);
+    p.lineTo(tx(B)+halfT,ty(H-C));
+    return p;
+  }
+  function drawZInner(){
+    const ri=rIn;
+    const p=new Path2D();
+    p.moveTo(tx(-B)+halfT,ty(C));
+    p.lineTo(tx(-B)+halfT,ty(ri));
+    p.arcTo(tx(-B)+halfT,ty(0)+halfT,tx(-B+ri),ty(0)+halfT,ri);
+    p.lineTo(tx(-ri),ty(0)+halfT);
+    p.arcTo(tx(0)-halfT,ty(0)+halfT,tx(0)-halfT,ty(ri),ri);
+    p.lineTo(tx(0)-halfT,ty(H-ri));
+    p.arcTo(tx(0)-halfT,ty(H)-halfT,tx(ri),ty(H)-halfT,ri);
+    p.lineTo(tx(B-ri),ty(H)-halfT);
+    p.arcTo(tx(B)-halfT,ty(H)-halfT,tx(B)-halfT,ty(H-ri),ri);
+    p.lineTo(tx(B)-halfT,ty(H-C));
+    return p;
+  }
+  const bndColor=isPrint?'#222':'#111';
+  ctx.save();ctx.strokeStyle=bndColor;ctx.lineWidth=1.1;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.stroke(drawZOuter());ctx.restore();
+  ctx.save();ctx.strokeStyle=bndColor;ctx.lineWidth=1.1;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.stroke(drawZInner());ctx.restore();
+
+  // Centerline dashed
+  ctx.save();ctx.strokeStyle='#1a6aaa';ctx.lineWidth=0.7;ctx.setLineDash([6,4]);ctx.lineJoin='round';
+  ctx.stroke(cl);ctx.setLineDash([]);ctx.restore();
+
+  // CG at H/2, x=0 (symmetric about web)
+  const cgX=0,cgY=H/2;
+  const cgPx=tx(cgX),cgPy=ty(cgY);
+  const arLen=26;
+  ctx.save();ctx.strokeStyle='#f0883e';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(cgPx,cgPy);ctx.lineTo(cgPx+arLen,cgPy);ctx.stroke();
+  ah(cgPx+arLen,cgPy,0,isPrint?'#c05000':'#e07820',6);
+  ctx.beginPath();ctx.moveTo(cgPx,cgPy);ctx.lineTo(cgPx,cgPy-arLen);ctx.stroke();
+  ah(cgPx,cgPy-arLen,-PI/2,isPrint?'#c05000':'#e07820',6);
+  ctx.restore();
+  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle=isPrint?'#c05000':'#f0883e';
+  ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('x',cgPx+arLen+4,cgPy);
+  ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('y',cgPx,cgPy-arLen-4);
+  ctx.font="bold 10px 'IBM Plex Mono',monospace";ctx.textAlign='left';ctx.textBaseline='bottom';
+  ctx.fillText('C.G.',cgPx+4,cgPy-arLen-8);
+
+
+  // ── Principal Axis lines ─────────────────────────────────────
+  if(theta_deg!=null && isFinite(theta_deg)){
+    const theta_rad = theta_deg * PI / 180;
+    const axLen = Math.min(W, Hc) * 0.32;
+    ctx.save();
+    ctx.strokeStyle = isPrint?'#6040a0':'#a78bfa';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([7, 4]);
+    // Minor principal axis (at angle theta from X)
+    ctx.beginPath();
+    ctx.moveTo(cgPx - Math.cos(theta_rad)*axLen, cgPy + Math.sin(theta_rad)*axLen);
+    ctx.lineTo(cgPx + Math.cos(theta_rad)*axLen, cgPy - Math.sin(theta_rad)*axLen);
+    ctx.stroke();
+    // Major principal axis (perpendicular)
+    const theta2 = theta_rad - PI/2;
+    ctx.strokeStyle = isPrint?'#008080':'#22d3ee';
+    ctx.beginPath();
+    ctx.moveTo(cgPx - Math.cos(theta2)*axLen, cgPy + Math.sin(theta2)*axLen);
+    ctx.lineTo(cgPx + Math.cos(theta2)*axLen, cgPy - Math.sin(theta2)*axLen);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    // Labels
+    ctx.font = "bold 10px 'IBM Plex Mono',monospace";
+    // Minor axis label
+    ctx.fillStyle = isPrint?'#6040a0':'#a78bfa';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    const lx1 = cgPx + Math.cos(theta_rad)*axLen + 4;
+    const ly1 = cgPy - Math.sin(theta_rad)*axLen;
+    ctx.fillText('u (θ='+theta_deg.toFixed(1)+'°)', lx1, ly1);
+    // Major axis label
+    ctx.fillStyle = isPrint?'#008080':'#22d3ee';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    const lx2 = cgPx + Math.cos(theta2)*axLen;
+    const ly2 = cgPy - Math.sin(theta2)*axLen - 4;
+    ctx.fillText('v', lx2, ly2);
+  }
+  // Dimensions
+  // H dim (left side)
+  const hDimX=tx(-B)-halfT-48;
+  extLine(tx(0)-halfT,ty(0)-halfT,hDimX+2,ty(0)-halfT);
+  extLine(tx(0)-halfT,ty(H)+halfT,hDimX+2,ty(H)+halfT);
+  dimLine(hDimX,ty(0)-halfT,hDimX,ty(H)+halfT,'','#4ade80',0,0);
+  ctx.save();ctx.translate(hDimX-16,ty(H/2));ctx.rotate(-PI/2);
+  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle='#4ade80';
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('H = '+H+' mm',0,0);ctx.restore();
+
+  // B dim top flange (top) — above section
+  const bDimY=ty(H)-halfT-40;
+  extLine(tx(0)-halfT,ty(H)-halfT,tx(0)-halfT,bDimY-2);
+  extLine(tx(B)+halfT,ty(H)-halfT,tx(B)+halfT,bDimY-2);
+  dimLine(tx(0)-halfT,bDimY,tx(B)+halfT,bDimY,'',isPrint?'#555':'#aaa',0,0,11);
+  ctx.font="bold 11px 'IBM Plex Mono',monospace"; ctx.fillStyle='#aaa';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('W = '+B+' mm',(tx(0)-halfT+tx(B)+halfT)/2, bDimY-4);
+
+  // C dim top lip (right)
+  const cDimX=tx(B)+halfT+44;
+  extLine(tx(B)+halfT,ty(H)+halfT,cDimX-2,ty(H)+halfT);
+  extLine(tx(B)+halfT,ty(H-C),cDimX-2,ty(H-C));
+  dimLine(cDimX,ty(H)+halfT,cDimX,ty(H-C),'',isPrint?'#a03030':'#e05252',0,0);
+  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle='#e05252';
+  ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('C = '+C+' mm',cDimX+8,ty(H-C/2));
+
+  // t dim — on web (x=0), at mid-height of bottom lip (y=C/2)
+  const tLineY=ty(C/2);
+  const ti=tx(0)-halfT, to=tx(0)+halfT;
+  ctx.save();ctx.strokeStyle=isPrint?'#1a5090':'#4a90d9';ctx.lineWidth=1;
+  // tick marks top and bottom of thickness
+  ctx.beginPath();ctx.moveTo(ti-8,tLineY);ctx.lineTo(ti+8,tLineY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(to-8,tLineY);ctx.lineTo(to+8,tLineY);ctx.stroke();
+  // horizontal arrow line across web thickness
+  ctx.beginPath();ctx.moveTo(ti,tLineY);ctx.lineTo(to,tLineY);ctx.stroke();
+  // leader line going right
+  ctx.beginPath();ctx.moveTo(to,tLineY);ctx.lineTo(tx(0)+44,tLineY);ctx.stroke();
+  ctx.restore();
+  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle=isPrint?'#1a5090':'#4a90d9';
+  ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('t = '+tt+' mm',tx(0)+46,tLineY);
+}
+
+// ── CALCULATE ───────────────────────────────────────────────────
+function calculate(){
+  const H=parseInput('inp_H');
+  const B=parseInput('inp_B');
+  const C=parseInput('inp_C');
+  const tt=parseInput('inp_t');
+  const r=parseInput('inp_r');
+  const Fy=parseInput('inp_Fy');
+  const E=parseInput('inp_E');
+  const G=parseInput('inp_G');
+  const Lx=parseInput('inp_Lx');
+  const Ly=parseInput('inp_Ly');
+  const Lt=parseInput('inp_Lt');
+  const Kx=parseInput('inp_Kx');
+  const Ky=parseInput('inp_Ky');
+  const Kt=parseInput('inp_Kt');
+  const Cb=parseInput('inp_Cb');
+
+  // Flat lengths (centerline, as in Excel: J1=H-t, J2=B-t, J3=C-t/2)
+  const J1=H-tt, J2=B-tt, J3=C-tt/2;
+  const P1=J1-2*r, P2=J2-2*r, P3=J3-r, P4=PI*r/2, P5=PI*r/2; // arc at gamma=90
+
+  // Section area: A = t*(a+2b+2u1+2c+2u2) 
+  // From Excel X9: =D5*(P1+2*P2+2*P4+2*P3+2*P5) where P4=P5=pi*r/2
+  const A=tt*(P1+2*P2+2*P4+2*P3+2*P4);
+
+  // Moments of inertia (from Excel X10, X11, X12 - Z section with gamma=90deg)
+  // Ix = 2*t*(0.0417*P1^3 + P2*(P1/2+r)^2 + P4*(P1/2+0.637r)^2 + 0.149r^3 
+  //          + ((gamma+sin(gamma)cos(gamma))/2 - sin^2(gamma)/gamma)*r^3
+  //          + P5*(P1/2+r*sin(gamma)/gamma)^2 + P3^3*sin^2(gamma)/12 + P3*(P1/2+r*cos(gamma)-P3/2*sin(gamma))^2)
+  // For gamma=PI/2: sin=1, cos=0
+  const g=PI/2;
+  const sg=Math.sin(g),cg=Math.cos(g);
+  const Ix_coeff=(g+sg*cg)/2-(sg**2)/g; // = (PI/2+0)/2 - 1/(PI/2) = PI/4 - 2/PI
+  const Ix=2*tt*(0.0417*(P1**3)+P2*(P1/2+r)**2+P4*(P1/2+0.637*r)**2+0.149*(r**3)
+            +Ix_coeff*(r**3)+P4*(P1/2+r*sg/g)**2+(P3**3)*(sg**2)/12+P3*(P1/2+r*cg-P3/2*sg)**2);
+
+  // Iy (from Excel X11): Z section Iy uses flange contribution
+  // =(P2*(P2/2+r)^2+P2^3/12+0.356r^3 + P3*(P2+r*(1+sin)+P3/2*cos)^2 + P3^3*cos^2/12 + P5*(P2+r+r*(1-cos)/g)^2
+  //   + ((g-sg*cg)/2 - (1-cg)^2/g)*r^3)*2*t
+  const Iy_coeff=(g-sg*cg)/2-(1-cg)**2/g;
+  const Iy=(P2*(P2/2+r)**2+(P2**3)/12+0.356*(r**3)
+            +P3*(P2+r*(1+sg)+P3/2*cg)**2+(P3**3)*(cg**2)/12
+            +P4*(P2+r+r*(1-cg)/g)**2+Iy_coeff*(r**3))*2*tt;
+
+  // Ixy (from Excel X12): product of inertia
+  // =(P2*(P1/2+r)*(P2/2+r)+0.5r^3+0.285*P1*r^2 + P3*(P2+r*(1+sin)+P3/2*cos)*(P1/2+r*cos-P3/2*sin)
+  //   + ((sin^2/2+sin*(cos-1)/g))*r^3 - P3^3*sin*cos/12 + P5*(P2+r+r*(1-cos)/g)*(P1/2+r*sin/g))*2*t
+  const Ixy_coeff=(sg**2)/2+sg*(cg-1)/g;
+  // Note: Excel Z5 uses SIN(G5) where G5=0, not G6=PI/2 — so sin(G5)=0
+  const Ixy=(P2*(P1/2+r)*(P2/2+r)+0.5*(r**3)+0.285*P1*(r**2)
+             +P3*(P2+r*(1+sg)+P3/2*cg)*(P1/2+r*cg-P3/2*Math.sin(0))
+             +Ixy_coeff*(r**3)-(P3**3)*sg*cg/12
+             +P4*(P2+r+r*(1-cg)/g)*(P1/2+r*sg/g))*2*tt;
+
+  // Torsional constant J (from Excel X20)
+  const Jt=tt**3/3*(P1+2*P2+2*P4+2*P3+2*P4);
+
+  // Warping constant Cw (from Excel X21 - Z section formula)
+  // =D5/12*(J1^2*J2^3*(2*J1+J2)+J2^2*(4*J3^4+16*J2*J3^3+6*J1^3*J3+4*J1^2*J2*J3+8*J1*J3^3)+6*J1*J2*J3^2*(J1+J2)*(2*J2))/(J1+2*(J2+J3))
+  const CwNum=J1**2*(J2**3)*(2*J1+J2)+(J2**2)*(4*(J3**4)+16*J2*(J3**3)+6*(J1**3)*J3+4*(J1**2)*J2*J3+8*J1*(J3**3))+6*J1*J2*(J3**2)*(J1+J2)*(2*J2);
+  const Cw=tt/12*CwNum/(J1+2*(J2+J3));
+
+  // Section moduli (Z section: symmetric about centroid x=0, y=H/2)
+  const Sfx=Ix/(H/2)/1000;   // cm³
+  const Sfy=Iy/B/1000;       // cm³ (distance to extreme fiber = B, Excel J27=X11/D2/1000)
+
+  // Polar radius of gyration (from Excel X22)
+  // ro = sqrt((Ix+Iy)/A + X26^2) - for Z section X0=0 (shear center at origin)
+  // Actually for Z section, we need shear center - approximate as 0 for doubly symmetric Z
+  const ro=Math.sqrt((Ix+Iy)/A);  // X0=0 for symmetric Z
+  const ro_safe=ro>0?ro:1e-9;
+
+  // Ag in cm²
+  const Ag=A/100;
+
+  // Display section properties
+  s('m_A',A,1);s('m_Ix',Ix/1e4,2);s('m_Iy',Iy/1e4,2);s('m_Ixy',Ixy/1e4,2);s('m_ro',ro_safe,2);
+  s('m_Sfx',Sfx);s('m_Sfy',Sfy);
+  const theta=(PI/2+0.5*Math.atan(2*Ixy/(Iy-Ix)))*180/PI;
+  s('m_theta',theta,1);
+  s('m_rx',Math.sqrt(Ix/A),2);s('m_ry',Math.sqrt(Iy/A),2);
+  s('m_J',Jt,1);s('m_Cw',Cw,0);s('m_Ag',Ag,2);
+
+  // Flange properties (for distortional buckling) - same formula as Excel AD-AH
+  const Af=(J2+J3)*tt;
+  const Jf=1/3*(J2*(tt**3))+1/3*(J3*(tt**3));
+  const Ixf=tt*((tt**2)*(J2**2)+4*J2*(J3**3)+(tt**2)*J2*J3+(J3**4))/(12*(J2+J3));
+  const Iyf=tt*((J2**4)+4*(J2**3)*J3)/(12*(J2+J3));
+  const Ixyf=tt*(J2**2)*(J3**2)/(4*(J2+J3));
+  const Cwf=0;
+  const Xof=(J2**2)/(2*(J2+J3));
+  const xhf=-((J2**2)+2*J2*J3)/(2*J2+J3);  // Excel AF16
+  const yof=-(J3**2)/(2*(J2+J3));
+
+  s('dt_Af',Af,2);s('dt_Jf',Jf,4);s('dt_Ixf',Ixf,4);s('dt_Iyf',Iyf,4);
+  s('dt_Ixyf',Ixyf,4);s('dt_Xof',Xof,3);s('dt_xhf',xhf,3);s('dt_yof',yof,3);
+
+  // Distortional half-wavelength
+  const Lm=Ly*10;
+  const nu2=1-0.3**2;
+  const dT=Cwf+Ixf*(Xof-xhf)**2*(1-Ixyf**2/(Ixf*Iyf));
+  const Lcrd=PI*H*(6*nu2/(tt**3*(H**3))*dT)**0.25;
+  const Ld=Math.min(Lm,Lcrd);
+  s('dt_Lm',Lm,0);s('dt_Lcrd',Lcrd,1);s('dt_Ld',Ld,1);
+
+  // Rotational stiffness
+  const kfe=(PI/Ld)**4*(Fy/100*Cwf+Fy/100*Ixf*(Xof-xhf)**2*(1-Ixyf**2/(Ixf*Iyf)))+(PI/Ld)**2*E*Jf/100;  // Excel D62
+  const kwe=E/100*(tt**3)/(12*nu2)*(2/H);
+  const kfg=(PI/Ld)**2*(Ixf+Iyf+Af*(xhf**2+yof**2-2*yof*(Xof-xhf)*(Ixyf/Iyf)+(Xof-xhf)**2*(Ixyf/Iyf)**2));
+  const kwg=(PI/Ld)**2*tt*(H**3)/60;
+  const Fcrd=(kfe+kwe)/(kfg+kwg)*100;
+
+  s('dt_kfe',kfe,6);s('dt_kwe',kwe,6);s('dt_kfg',kfg,6);s('dt_kwg',kwg,6);
+
+  // Euler buckling loads
+  const Pey=(PI**2)*E*Iy/10000/(Ky*Ly)**2;
+  const Pex=(PI**2)*E*Ix/10000/(Kx*Lx)**2;
+  const Pt=1/(ro_safe/10)**2*(G*Jt/10000+(PI**2)*E*Cw/1000000/(Kt*Lt)**2);
+  s('m_Pt',Pt,0);
+
+  // Mcre — LTB (Z section uses same formula)
+  const Mcre_x=Cb*(ro_safe/1000)*Math.sqrt(Pey*Pt);
+  const Fcre_x=Mcre_x*100/Sfx;
+  const Mcre_y=Cb*(ro_safe/1000)*Math.sqrt(Pex*Pt);
+  const Fcre_y=Mcre_y*100/Sfy;
+
+  const Fn278=2.78*Fy,Fn056=0.56*Fy;
+  const fnCalc=Fc=>{if(Fc>=Fn278)return Fy;if(Fc>Fn056)return 10/9*Fy*(1-10*Fy/(36*Fc));return Fc;};
+  const Fn_x=fnCalc(Fcre_x),Fn_y=fnCalc(Fcre_y);
+  const Mne_x=Sfx*Fn_x/100,Mne_y=Sfy*Fn_y/100;
+  const My_x=Ix/10000*Fy/100;  // Excel Q42: X10/10000*Fy/100 (mm4→cm4, ksc→kg-m)
+  const My_y=Iy/10000*Fy/100;  // Excel V42: X11/10000*Fy/100
+  const Mnlx=Sfx*Fn_x/100;
+  const Mnly=Sfy*Fn_y/100;
+
+  // Flexure X
+  s('fx_Sfx',Sfx);t('fx_Sfx_sub',`${f(Ix/1e4,2)} / ${f(H/2/10,2)}`);
+  t('fx_Myx_sub',`${f(Ix/1e4,2)} × ${Fy} / 100`);s('fx_Myx',My_x);
+  t('fx_Pey_sub',`π²×${E}×${f(Iy/1e4)} / (${Ky}×${Ly})² × 1/10000`);s('fx_Pey',Pey,0);
+  t('fx_Pt_sub',`[1/(${f(ro/10,2)})²] × [${G}×${f(Jt/1e3,2)} + π²×${E}×${f(Cw/1e6,2)}/(${Kt}×${Lt})²]`);s('fx_Pt',Pt,0);
+  t('fx_Mcre_sub',`${Cb}×${f(ro/1000,4)}×√(${f(Pey,0)}×${f(Pt,0)})`);s('fx_Mcre',Mcre_x);
+  t('fx_Fcre_sub',`${f(Mcre_x,2)}×100/${f(Sfx,2)}`);s('fx_Fcre',Fcre_x,0);
+  const fn_cond_x=Fcre_x>=Fn278?`F<sub>cre-x</sub>=${f(Fcre_x,0)} ≥ 2.78Fy=${f(Fn278,0)} ksc`:Fcre_x>Fn056?`0.56Fy=${f(Fn056,0)} < F<sub>cre-x</sub>=${f(Fcre_x,0)} < 2.78Fy=${f(Fn278,0)} ksc`:`F<sub>cre-x</sub>=${f(Fcre_x,0)} ≤ 0.56Fy=${f(Fn056,0)} ksc`;
+  const fn_form_x=Fcre_x>=Fn278?`F<sub>n-x</sub>=F<sub>y</sub>`:Fcre_x>Fn056?`F<sub>n-x</sub>=(10/9)·F<sub>y</sub>·[1−10Fy/(36·F<sub>cre-x</sub>)]`:`F<sub>n-x</sub>=F<sub>cre-x</sub>`;
+  const fn_sub_x=Fcre_x>=Fn278?`${Fy}`:Fcre_x>Fn056?`(10/9)×${Fy}×[1−10×${Fy}/(36×${f(Fcre_x,0)})]`:`${f(Fcre_x,0)}`;
+  h('fx_Fn_cond',fn_cond_x);h('fx_Fn_formula',fn_form_x);t('fx_Fn_sub2',fn_sub_x);s('fx_Fn',Fn_x,0);
+  s('fx_Mne',Mne_x);s('fx_Mnl',Mnlx);
+
+  // Flexure Y
+  s('fy_Sfy',Sfy);t('fy_Sfy_sub',`${f(Iy/1e4,2)} / ${f(B/10,2)}`);  // B not J2
+  t('fy_Myy_sub',`${f(Iy/1e4,2)} × ${Fy} / 100`);s('fy_Myy',My_y);
+  t('fy_Pex_sub',`π²×${E}×${f(Ix/1e4)} / (${Kx}×${Lx})² × 1/10000`);s('fy_Pex',Pex,0);
+  t('fy_Mcre_sub',`${Cb}×${f(ro/1000,4)}×√(${f(Pex,0)}×${f(Pt,0)})`);s('fy_Mcre',Mcre_y);
+  t('fy_Fcre_sub',`${f(Mcre_y,2)}×100/${f(Sfy,2)}`);s('fy_Fcre',Fcre_y,0);
+  const fn_cond_y=Fcre_y>=Fn278?`F<sub>cre-y</sub>=${f(Fcre_y,0)} ≥ 2.78Fy=${f(Fn278,0)} ksc`:Fcre_y>Fn056?`0.56Fy=${f(Fn056,0)} < F<sub>cre-y</sub>=${f(Fcre_y,0)} < 2.78Fy=${f(Fn278,0)} ksc`:`F<sub>cre-y</sub>=${f(Fcre_y,0)} ≤ 0.56Fy=${f(Fn056,0)} ksc`;
+  const fn_form_y=Fcre_y>=Fn278?`F<sub>n-y</sub>=F<sub>y</sub>`:Fcre_y>Fn056?`F<sub>n-y</sub>=(10/9)·F<sub>y</sub>·[1−10Fy/(36·F<sub>cre-y</sub>)]`:`F<sub>n-y</sub>=F<sub>cre-y</sub>`;
+  const fn_sub_y=Fcre_y>=Fn278?`${Fy}`:Fcre_y>Fn056?`(10/9)×${Fy}×[1−10×${Fy}/(36×${f(Fcre_y,0)})]`:`${f(Fcre_y,0)}`;
+  h('fy_Fn_cond2',fn_cond_y);h('fy_Fn_formula',fn_form_y);t('fy_Fn_sub',fn_sub_y);s('fy_Fn',Fn_y,0);
+  s('fy_Mne',Mne_y);s('fy_Mnl',Mnly);
+
+
+  // Flexure Distortional
+  s('dt_Fcrd_sub',`${f(kfe,4)}`); // placeholder
+  t('dt_Fcrd_sub',`(${f(kfe,4)} + ${f(kwe,4)}) / (${f(kfg,4)} + ${f(kwg,4)}) × 100`);
+  s('dt_Fcrd',Fcrd,0);
+
+  const Mcrdx=Sfx*Fcrd/100,ldx=Math.sqrt(My_x/Mcrdx);
+  const Mndx=ldx<=0.673?My_x:(1-0.22*Math.sqrt(Mcrdx/My_x))*Math.sqrt(Mcrdx/My_x)*My_x;
+  t('fx_Mcrdx_sub',`${f(Sfx,2)} × ${f(Fcrd,0)} / 100`);s('fx_Mcrdx',Mcrdx);
+  t('fx_ldx_sub',`√(${f(My_x,2)} / ${f(Mcrdx,2)})`);s('fx_ldx',ldx,3);
+  h('fx_ldx_cond',ldx<=0.673?`λ<sub>dx</sub>=${f(ldx,3)} ≤ 0.673`:`λ<sub>dx</sub>=${f(ldx,3)} > 0.673`);
+  h('fx_Mndx_formula',ldx<=0.673?`M<sub>nd-x</sub>=M<sub>y-x</sub>`:`M<sub>nd-x</sub>=[1−0.22·(M<sub>crd-x</sub>/M<sub>y-x</sub>)<sup>0.5</sup>]·(M<sub>crd-x</sub>/M<sub>y-x</sub>)<sup>0.5</sup>·M<sub>y-x</sub>`);
+  h('fx_Mndx_sub',ldx<=0.673?`${f(My_x,2)}`:`[1−0.22×√(${f(Mcrdx,2)}/${f(My_x,2)})]×√(${f(Mcrdx,2)}/${f(My_x,2)})×${f(My_x,2)}`);
+  s('fx_Mndx',Mndx);s('fx_Mndx_gov',Mndx);
+
+  const Mcrdy=Sfy*Fcrd/100,ldy=Math.sqrt(My_y/Mcrdy);
+  const Mndy=ldy<=0.673?My_y:(1-0.22*Math.sqrt(Mcrdy/My_y))*Math.sqrt(Mcrdy/My_y)*My_y;
+  t('fy_Mcrdy_sub',`${f(Sfy,2)} × ${f(Fcrd,0)} / 100`);s('fy_Mcrdy',Mcrdy);
+  t('fy_ldy_sub',`√(${f(My_y,2)} / ${f(Mcrdy,2)})`);s('fy_ldy',ldy,3);
+  h('fy_ldy_cond',ldy<=0.673?`λ<sub>dy</sub>=${f(ldy,3)} ≤ 0.673`:`λ<sub>dy</sub>=${f(ldy,3)} > 0.673`);
+  h('fy_Mndy_formula',ldy<=0.673?`M<sub>nd-y</sub>=M<sub>y-y</sub>`:`M<sub>nd-y</sub>=[1−0.22·(M<sub>crd-y</sub>/M<sub>y-y</sub>)<sup>0.5</sup>]·(M<sub>crd-y</sub>/M<sub>y-y</sub>)<sup>0.5</sup>·M<sub>y-y</sub>`);
+  h('fy_Mndy_sub',ldy<=0.673?`${f(My_y,2)}`:`[1−0.22×√(${f(Mcrdy,2)}/${f(My_y,2)})]×√(${f(Mcrdy,2)}/${f(My_y,2)})×${f(My_y,2)}`);
+  s('fy_Mndy',Mndy);s('fy_Mndy_gov',Mndy);
+
+  // Local Buckling (Effective Width)
+  const Fn_min=Math.min(Fn_x,Fn_y);
+  s('l_Fn',Fn_min,0);
+  const lc=(slD,flatD,lrC,c1,c2)=>{
+    const lam=slD/tt,lr=lrC*Math.sqrt(E/Fy),lrFn=lr*Math.sqrt(Fy/Fn_min);
+    const Fel=(c2*lr/lam)**2*Fy;
+    const sl=lam>lrFn;
+    const be=sl?flatD/10*(1-c1*Math.sqrt(Fel/Fn_min))*Math.sqrt(Fel/Fn_min):flatD/10;
+    return{lam,lr,lrFn,Fel,be,sl};
+  };
+  const lip=lc(J3,P3,0.45,0.22,1.49);
+  const fl=lc(J2,P2,1.49,0.18,1.31);
+  const wb=lc(J1,P1,1.49,0.18,1.31);
+  const Ae=2*lip.be*tt/10+2*fl.be*tt/10+wb.be*tt/10;
+  const stL=sl=>`<span class="${sl?'slender':'compact'}">${sl?'Slender':'Compact'}</span>`;
+  const ids=['Lip','Fl','Web'],arr=[lip,fl,wb];
+  ids.forEach((id,i)=>{
+    s('l_l'+id,arr[i].lam);s('l_lr'+id,arr[i].lr);s('l_lrfn'+id,arr[i].lrFn);
+    s('l_Fel'+id,arr[i].Fel,0);s('l_be'+id,arr[i].be,3);
+    h('l_st'+id,stL(arr[i].sl));
+  });
+  t('l_Fn_sub',`min(${f(Fn_x,0)}, ${f(Fn_y,0)})`);
+  s('l_Ae',Ae,4);
+  t('l_Ae_sub',`2×${f(lip.be,3)}×${tt}/10 + 2×${f(fl.be,3)}×${tt}/10 + ${f(wb.be,3)}×${tt}/10`);
+
+  const lc_x=Math.sqrt(Fy/Fcre_x),lc_y=Math.sqrt(Fy/Fcre_y);
+  const Fn_cx=lc_x>1.5?0.877*Fy/(lc_x**2):(0.658**(lc_x**2))*Fy;
+  const Fn_cy=lc_y>1.5?0.877*Fy/(lc_y**2):(0.658**(lc_y**2))*Fy;
+  const Pne_x=Fn_cx*A/100,Pne_y=Fn_cy*A/100,Pn=Math.min(Pne_x,Pne_y);
+  const Fn_c=Math.min(Fn_cx,Fn_cy);
+  const Pnl_val=Ae*Fn_c,Pnl=Math.min(Pnl_val,Pn);
+  t('l_Pnl_sub',`${f(Ae,4)} × ${f(Fn_c,0)}`);s('l_Pnl_val',Pnl_val,0);s('l_Pn',Pn,0);
+  s('l_Pnl_gov',Pnl,0);
+
+  // Flexure Local Buckling — Effective Section (Excel Q33, V33)
+  // Ix-eff: same as Ix formula but using be_lip, be_fl, be_web instead of P3, P2, P1
+  const be_lip_mm = lip.be * 10;  // convert cm back to mm
+  const be_fl_mm  = fl.be  * 10;
+  const be_web_mm = wb.be  * 10;
+  const Ixeff = 2*tt*(0.0417*(be_web_mm**3)
+    + be_fl_mm*(P1/2+r)**2 + P4*(P1/2+0.637*r)**2 + 0.149*(r**3)
+    + Ix_coeff*(r**3) + P4*(P1/2+r*sg/g)**2
+    + (be_lip_mm**3)*(sg**2)/12 + be_lip_mm*(P1/2+r*cg-be_lip_mm/2*sg)**2);
+  // Iy-eff: same as Iy formula but using be_lip, be_fl
+  const Iyeff = (be_fl_mm*(be_fl_mm/2+r)**2+(be_fl_mm**3)/12+0.356*(r**3)
+    + be_lip_mm*(be_fl_mm+r*(1+sg)+be_lip_mm/2*cg)**2+(be_lip_mm**3)*(cg**2)/12
+    + P4*(be_fl_mm+r+r*(1-cg)/g)**2+Iy_coeff*(r**3))*2*tt;
+
+  const Secx = Ixeff/(H/2)/1000;
+  const Secy = Iyeff/B/1000;  // B not J2, same as Excel
+  const Mnlx_flex = Secx*Fy/100;
+  const Mnly_flex = Secy*Fy/100;
+
+  s('fl_Ixeff', Ixeff, 0);
+  t('fl_Secx_sub', `${f(Ixeff/1e4,2)} / ${f(H/2/10,2)}`);
+  s('fl_Secx', Secx);
+  t('fl_Mnlx_sub', `${f(Secx,2)} × ${Fy} / 100`);
+  s('fl_Mnlx', Mnlx_flex); s('fl_Mnlx_gov', Mnlx_flex);
+  s('fl_Iyeff', Iyeff, 0);
+  t('fl_Secy_sub', `${f(Iyeff/1e4,2)} / ${f(B/10,2)}`);  // B not J2
+  s('fl_Secy', Secy);
+  t('fl_Mnly_sub', `${f(Secy,2)} × ${Fy} / 100`);
+  s('fl_Mnly', Mnly_flex); s('fl_Mnly_gov', Mnly_flex);
+
+  // Override Mnlx/Mnly in summary with effective section values
+  const Mnlx_final = Mnlx_flex;
+  const Mnly_final = Mnly_flex;
+
+
+  // Compression global
+  s('cx_Fcre',Fcre_x,0);
+  t('cx_lc_sub',`√(${Fy} / ${f(Fcre_x,0)})`);s('cx_lc',lc_x,3);
+  h('cx_lc_cond',lc_x<=1.5?`λ<sub>c-x</sub>=${f(lc_x,3)} ≤ 1.5 → Inelastic`:`λ<sub>c-x</sub>=${f(lc_x,3)} > 1.5 → Elastic`);
+  t('cx_Fn_formula',lc_x<=1.5?`Fn=0.658^(λc²)×Fy`:`Fn=0.877×Fy/λc²`);
+  t('cx_Fn_sub',lc_x<=1.5?`0.658^(${f(lc_x,3)}²)×${Fy}`:`0.877×${Fy}/${f(lc_x,3)}²`);
+  s('cx_Fn',Fn_cx,0);t('cx_Pne_sub',`${f(A/100,2)}×${f(Fn_cx,0)}`);s('cx_Pne',Pne_x,0);
+  s('cy_Fcre',Fcre_y,0);
+  t('cy_lc_sub',`√(${Fy} / ${f(Fcre_y,0)})`);s('cy_lc',lc_y,3);
+  h('cy_lc_cond',lc_y<=1.5?`λ<sub>c-y</sub>=${f(lc_y,3)} ≤ 1.5 → Inelastic`:`λ<sub>c-y</sub>=${f(lc_y,3)} > 1.5 → Elastic`);
+  t('cy_Fn_formula',lc_y<=1.5?`Fn=0.658^(λc²)×Fy`:`Fn=0.877×Fy/λc²`);
+  t('cy_Fn_sub',lc_y<=1.5?`0.658^(${f(lc_y,3)}²)×${Fy}`:`0.877×${Fy}/${f(lc_y,3)}²`);
+  s('cy_Fn',Fn_cy,0);t('cy_Pne_sub',`${f(A/100,2)}×${f(Fn_cy,0)}`);s('cy_Pne',Pne_y,0);s('cy_Pn',Pn,0);
+
+  // Compression distortional
+  const Py=A/100*Fy,Pcrd=A/100*Fcrd;
+  const ld=Math.sqrt(Py/Pcrd);
+  const Pnd=ld>0.561?(1-0.25*(Pcrd/Py)**0.6)*(Pcrd/Py)**0.6*Py:Py;
+  t('dt_PyPcrd_sub',`Py=${f(A/100,2)}×${Fy}  |  Pcrd=${f(A/100,2)}×${f(Fcrd,0)}`);
+  s('dt_Py',Py,0);s('dt_Pcrd',Pcrd,0);
+  t('dt_ld_sub',`√(${f(Py,0)} / ${f(Pcrd,0)})`);s('dt_ld',ld,3);
+  t('dt_ld_cond',ld<=0.561?`λd=${f(ld,3)} ≤ 0.561 → Pnd=Py=${f(Py,0)} kg`:`λd=${f(ld,3)} > 0.561 → Pnd=[1−0.25×(${f(Pcrd,0)}/${f(Py,0)})^0.6]×...`);
+  h('dt_Pnd_formula',ld<=0.561?`P<sub>nd</sub>=P<sub>y</sub>`:`P<sub>nd</sub>=[1−0.25·(P<sub>crd</sub>/P<sub>y</sub>)<sup>0.6</sup>]·(P<sub>crd</sub>/P<sub>y</sub>)<sup>0.6</sup>·P<sub>y</sub>`);
+  h('dt_Pnd_sub',ld<=0.561?`${f(Py,0)}`:`[1−0.25×(${f(Pcrd,0)}/${f(Py,0)})<sup>0.6</sup>]×(${f(Pcrd,0)}/${f(Py,0)})<sup>0.6</sup>×${f(Py,0)}`);
+  s('dt_Pnd',Pnd,0);s('dt_Pnd_gov',Pnd,0);
+
+  // Shear
+  const Aw=H*tt/100,Vy=Aw*Fy*0.6,kv=5.34;
+  const Vcr=(PI**2)*E*kv*(H/10)*(tt/10)/(12*nu2*(H/tt)**2);
+  const lv=Math.sqrt(Vy/Vcr);
+  const Vn=lv>0.587?(1-0.25*(Vcr/Vy)**0.65)*(Vcr/Vy)**0.65*Vy:Vy;
+  const Fcr=(PI**2)*E*kv/(12*nu2*(H/tt)**2);
+  const Vcr2=Fcr*Aw;
+  t('sh_Aw_sub',`${H}×${tt}/100`);s('sh_Aw',Aw,3);
+  t('sh_Vy_sub',`0.6×${f(Aw,3)}×${Fy}`);s('sh_Vy',Vy,0);
+  t('sh_Vcr_sub',`π²×${f(E,0)}×${kv}×${f(H/10,2)}×${f(tt/10,3)}/[12×0.91×(${H}/${tt})²]`);s('sh_Vcr',Vcr,0);
+  t('sh_lv_sub',`√(${f(Vy,0)}/${f(Vcr,0)})`);s('sh_lv',lv,3);
+  t('sh_lv_cond',lv<=0.587?`λv=${f(lv,3)} ≤ 0.587 → Vn=Vy=${f(Vy,0)} kg`:`λv=${f(lv,3)} > 0.587 → Vn=[1−0.25(Vcr/Vy)^0.65]×...`);
+  h('sh_Vn_formula',lv<=0.587?`V<sub>n</sub>=V<sub>y</sub>`:`V<sub>n</sub>=[1−0.25·(V<sub>cr</sub>/V<sub>y</sub>)<sup>0.65</sup>]·(V<sub>cr</sub>/V<sub>y</sub>)<sup>0.65</sup>·V<sub>y</sub>`);
+  h('sh_Vn_sub',lv<=0.587?`${f(Vy,0)}`:`[1−0.25×(${f(Vcr,0)}/${f(Vy,0)})^0.65]×(${f(Vcr,0)}/${f(Vy,0)})^0.65×${f(Vy,0)}`);
+  s('sh_Vn',Vn,0);s('sh_Vn_gov',Vn,0);
+  t('sh_Fcr_sub',`π²×${E}×${kv}/(12×0.91×(${H}/${tt})²)`);s('sh_Fcr',Fcr,0);
+  t('sh_Vcr2_sub',`${f(Aw,3)}×${f(Fcr,0)}`);s('sh_Vcr2',Vcr2,0);
+
+  // Summary
+  s('sum_Mnex',Mne_x);s('sum_Mnlx',Mnlx_final);s('sum_Mndx',Mndx);
+  s('sum_Mney',Mne_y);s('sum_Mnly',Mnly_final);s('sum_Mndy',Mndy);
+  s('sum_Pey',Pey,0);s('sum_Pex',Pex,0);s('sum_Pt',Pt,0);
+  s('sum_Pn',Pn,0);s('sum_Pnl',Pnl,0);s('sum_Pnd',Pnd,0);
+  s('sum_Vn',Vn,0);s('sum_Vn_gov',Vn,0);
+
+  const mnx_min=Math.min(Mne_x,Mnlx_final,Mndx);
+  s('sum_Mnx_gov',mnx_min);
+  t('sum_Mnx_mode',mnx_min===Mndx?'Distortional Buckling governs':mnx_min===Mnlx_final?'Local Buckling governs':'LTB governs');
+  const mny_min=Math.min(Mne_y,Mnly_final,Mndy);
+  s('sum_Mny_gov',mny_min);
+  t('sum_Mny_mode',mny_min===Mndy?'Distortional Buckling governs':mny_min===Mnly_final?'Local Buckling governs':'LTB governs');
+  const pn_min=Math.min(Pey,Pex,Pt,Pn,Pnl,Pnd);
+  s('sum_Pn_gov',pn_min,0);
+  t('sum_Pn_mode',pn_min===Pnd?'Pnd Distortional governs':pn_min===Pnl?'Pnl Local Buckling governs':pn_min===Pn?'Pn Global Buckling governs':pn_min===Pey?'Pey Euler Y governs':pn_min===Pex?'Pex Euler X governs':'Pt Torsional governs');
+  h('sum_Vn_mode',lv<=0.587?`Yielding governs (λ<sub>v</sub>=${f(lv,3)} ≤ 0.587)`:`Shear Buckling governs (λ<sub>v</sub>=${f(lv,3)} > 0.587)`);
+
+
+
+  // ── Populate print pages ──────────────────────────────────────
+  const ps=(id,v,d=2)=>{const e=document.getElementById(id);if(e)e.textContent=f(v,d);};
+  const pt=(id,txt)=>{const e=document.getElementById(id);if(e)e.textContent=txt;};
+  const ph=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
+
+  // Page 1 — inputs
+  ps('p1_E',E,0);ps('p1_G',G,0);ps('p1_Fy',Fy,0);
+  ps('p1_Kx',Kx,2);ps('p1_Ky',Ky,2);ps('p1_Kt',Kt,2);ps('p1_Cb',Cb,2);
+  ps('p1_H',H,1);ps('p1_W',B,1);ps('p1_C',C,1);ps('p1_t',tt,2);ps('p1_r',r,2);
+  ps('p1_Lx',Lx,0);ps('p1_Ly',Ly,0);ps('p1_Lt',Lt,0);
+  // Page 1 — section props
+  ps('p1_A',A,1);
+  ps('p1_Ix',Ix,0);ps('p1_Iy',Iy,0);ps('p1_Ixy',Ixy,0);
+  ps('p1_J',Jt,1);ps('p1_Cw',Cw,0);
+  ps('p1_ro',ro_safe,2);ps('p1_theta',theta,2);
+  // Page 1 — kΦ
+  ps('p1_kfe',kfe,2);ps('p1_kwe',kwe,2);ps('p1_kfg',kfg,2);ps('p1_kwg',kwg,2);
+  ps('p1_Lm',Lm,0);ps('p1_Lcrd',Lcrd,1);ps('p1_Ld',Ld,1);ps('p1_Fcrd',Fcrd,0);
+  pt('p1_Fcrd_sub','('+f(kfe,2)+' + '+f(kwe,2)+' + 0.00) / ('+f(kfg,2)+' + '+f(kwg,2)+') × 100');
+  // Draw print canvas
+  drawSection('pr-canvas',H,B,C,r,tt,theta);  // print canvas
+
+  // Page 2 — Flexure LTB
+  ps('p2_Sfx',Sfx);pt('p2_Sfx_sub',f(Ix/1e4,2)+' / '+f(H/2/10,0));
+  ps('p2_Sfy',Sfy);pt('p2_Sfy_sub',f(Iy/1e4,2)+' / '+f(B/10,1));
+  ps('p2_Myx',My_x);ps('p2_Myy',My_y);
+  ps('p2_Pey',Pey,0);pt('p2_Pey_sub','π²×'+f(E,0)+'×'+f(Iy/1e4,2)+' / ('+Ky+'×'+Ly+')²×(1/10000)');
+  ps('p2_Pex',Pex,0);pt('p2_Pex_sub','π²×'+f(E,0)+'×'+f(Ix/1e4,2)+' / ('+Kx+'×'+Lx+')²×(1/10000)');
+  ps('p2_Pt',Pt,0);
+  ps('p2_Mcrex',Mcre_x);pt('p2_Mcrex_sub',Cb+'×'+f(ro_safe/1000,4)+'×√('+f(Pey,0)+'×'+f(Pt,0)+')');
+  ps('p2_Mcrey',Mcre_y);pt('p2_Mcrey_sub',Cb+'×'+f(ro_safe/1000,4)+'×√('+f(Pex,0)+'×'+f(Pt,0)+')');
+  ps('p2_Fcrex',Fcre_x,0);pt('p2_Fcrex_sub',f(Mcre_x,2)+'×100/'+f(Sfx,2));
+  ps('p2_Fcrey',Fcre_y,0);pt('p2_Fcrey_sub',f(Mcre_y,2)+'×100/'+f(Sfy,2));
+  ps('p2_Fnx',Fn_x,0);ps('p2_Fny',Fn_y,0);
+  ps('p2_Mnex',Mne_x);ps('p2_Mney',Mne_y);
+  // Page 2 — Flexure Local
+  ps('p2_Secx',Secx);ps('p2_Secy',Secy);
+  ps('p2_Mnlx',Mnlx_flex);ps('p2_Mnly',Mnly_flex);
+  // Page 2 — Flexure Distortional
+  ps('p2_Mcrdx',Mcrdx);pt('p2_Mcrdx_sub',f(Sfx,2)+'×'+f(Fcrd,0)+'/100');
+  ps('p2_Mcrdy',Mcrdy);pt('p2_Mcrdy_sub',f(Sfy,2)+'×'+f(Fcrd,0)+'/100');
+  ps('p2_ldx',ldx,3);pt('p2_ldx_sub','√('+f(My_x,2)+' / '+f(Mcrdx,2)+')');
+  ps('p2_ldy',ldy,3);pt('p2_ldy_sub','√('+f(My_y,2)+' / '+f(Mcrdy,2)+')');
+  pt('p2_ldx_cond',ldx<=0.673?'≤':'>' );pt('p2_ldy_cond',ldy<=0.673?'≤':'>');
+  ps('p2_Mndx',Mndx);ps('p2_Mndy',Mndy);
+  ps('p2_Mnx_gov',mnx_min);ps('p2_Mny_gov',mny_min);
+
+  // Page 3 — Compression Local
+  ps('p3_Fn',Fn_min,0);
+  ps('p3_lLip',lip.lam);ps('p3_lrLip',lip.lr);ps('p3_lrfnLip',lip.lrFn);ps('p3_FelLip',lip.Fel,0);pt('p3_bLip',f(P3,2));ps('p3_beLip',lip.be,3);
+  ps('p3_lFl',fl.lam);ps('p3_lrFl',fl.lr);ps('p3_lrfnFl',fl.lrFn);ps('p3_FelFl',fl.Fel,0);pt('p3_bFl',f(P2,2));ps('p3_beFl',fl.be,3);
+  ps('p3_lWeb',wb.lam);ps('p3_lrWeb',wb.lr);ps('p3_lrfnWeb',wb.lrFn);ps('p3_FelWeb',wb.Fel,0);pt('p3_bWeb',f(P1,2));ps('p3_beWeb',wb.be,3);
+  ps('p3_Ae',Ae,4);
+  pt('p3_Pnl_sub',f(Ae,4)+'×'+f(Fn_c,0));ps('p3_Pnl_val',Pnl_val,0);ps('p3_Pn_global',Pn,0);ps('p3_Pnl',Pnl,0);
+  // Page 3 — Compression Distortional
+  ps('p3_Py',Py,0);pt('p3_Py_sub',f(A/100,2)+'×'+Fy);
+  ps('p3_Pcrd',Pcrd,0);pt('p3_Pcrd_sub',f(A/100,2)+'×'+f(Fcrd,0));
+  ps('p3_Lm',Lm,0);ps('p3_Lcrd',Lcrd,1);ps('p3_Ld',Ld,1);
+  ps('p3_ld',ld,3);pt('p3_ld_sub','√('+f(Py,0)+' / '+f(Pcrd,0)+')');
+  pt('p3_ld_cond',ld<=0.561?'≤':'>');ps('p3_Pnd',Pnd,0);ps('p3_Pn_gov',pn_min,0);
+  // Page 3 — Compression Global
+  ps('p3_Fcrex',Fcre_x,0);ps('p3_Fcrey',Fcre_y,0);
+  ps('p3_lcx',lc_x,3);pt('p3_lcx_sub','√('+Fy+'/'+f(Fcre_x,0)+')');
+  pt('p3_lcx_cond',lc_x<=1.5?'≤':'>');
+  ps('p3_lcy',lc_y,3);pt('p3_lcy_sub','√('+Fy+'/'+f(Fcre_y,0)+')');
+  pt('p3_lcy_cond',lc_y<=1.5?'≤':'>');
+  ps('p3_Fncx',Fn_cx,0);ps('p3_Fncy',Fn_cy,0);ps('p3_Pnex',Pne_x,0);ps('p3_Pney',Pne_y,0);
+  // Page 3 — Shear
+  ps('p3_Aw',Aw,3);ps('p3_Vy',Vy,0);ps('p3_Vcr',Vcr,0);
+  ps('p3_lv',lv,3);pt('p3_lv_cond',lv<=0.587?'≤':'>');ps('p3_Vn',Vn,0);ps('p3_Vn2',Vn,0);
+  // Page 3 — Summary
+  ps('p3_Mnx_gov',mnx_min);ps('p3_Mny_gov',mny_min);ps('p3_Pn_gov2',pn_min,0);
+
+  drawSection('sectionCanvas',H,B,C,r,tt,theta);
+}
+
+setupInputs();
+if(window.ResizeObserver){
+  const ro2=new ResizeObserver(()=>calculate());
+  const cvs=document.getElementById('sectionCanvas');
+  if(cvs)ro2.observe(cvs);
+}
+window.addEventListener('resize',calculate);
+window.addEventListener('load',()=>{setupInputs();calculate();});
+</script>
+</div></div>
+</body>
+</html>
