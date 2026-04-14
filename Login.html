@@ -152,7 +152,7 @@
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" defer></script><script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -212,7 +212,7 @@
 
   // ── Auth state ──
   onAuthStateChanged(auth, user => {
-    if (user) {
+    if (user && user.emailVerified) {
       window.location.href = "CChannelwithLip.html";
     } else {
       document.getElementById("auth-card").style.display = "block";
@@ -272,3 +272,13 @@
     signInWithPopup(auth, provider).catch(e => showMsg(getErrorMsg(e.code), "error"));
   }
   document.getElementById("btn-google-login").addEventListener("click", handleGoogle)
+  document.getElementById("btn-google-register").addEventListener("click", handleGoogle);
+
+  // ── Logout ──
+  window.handleLogout = async function() {
+    await signOut(auth);
+  };
+</script>
+
+</body>
+</html>
