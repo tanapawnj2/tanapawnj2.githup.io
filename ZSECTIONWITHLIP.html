@@ -122,18 +122,6 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   html, body { min-width:0 !important; width:210mm !important; margin:0 !important; padding:0 !important;
     background:#fff !important; }
-  /* Override dark-theme color vars to black for print */
-  :root {
-    --text: #000 !important;
-    --muted: #333 !important;
-    --dim: #555 !important;
-    --bg: #fff !important;
-    --bg2: #fff !important;
-    --bg3: #f5f5f5 !important;
-    --bg4: #eee !important;
-    --border: #bbb !important;
-    --border2: #999 !important;
-  }
   .hdr,.sidebar,.layout,.pr-screen-only { display:none !important; }
   .pr-page {
     display:flex !important;
@@ -155,29 +143,30 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     border:1.2px solid #888;
     background:#fff;
   }
-  /* Force all text to dark in print pages */
-  .pr-page, .pr-page * {
-    color: #000 !important;
-    background-color: transparent !important;
-  }
-  /* Restore specific colored backgrounds */
-  .pr-sec  { background:#b070b8 !important; color:#fff !important; }
-  .pr-sec2 { background:#c070a0 !important; color:#fff !important; }
-  .pr-so   { background:#fce8ec !important; }
-  .pr-so-val { color:#000 !important; }
-  .pr-outer  { background:#fff !important; }
-  .pr-tbl th { background:#ddd !important; }
   .pr-sec { page-break-after: avoid; }
+  /* Page 3 — tighter spacing to fit all content */
+  #pp3 .pr-body { padding:8px 16px !important; }
+  #pp3 .pr-sec  { padding:3px 10px !important; margin:6px 0 4px !important; font-size:11px !important; }
+  #pp3 .pr-so   { padding:3px 10px !important; margin:3px 0 !important; font-size:12px !important; }
+  #pp3 .pr-so-val { font-size:14px !important; }
+  #pp3 .pr-lv   { padding:1px 0 !important; font-size:12px !important; }
+  #pp3 .pr-eq-block { margin:1px 0 2px !important; }
+  #pp3 .pr-eq-row { font-size:12px !important; padding:0 !important; }
+  #pp3 .pr-tbl  { margin:3px 0 !important; font-size:10.5px !important; }
+  #pp3 .pr-tbl th, #pp3 .pr-tbl td { padding:2px 5px !important; }
+  #pp3 .pr-2col { gap:0 16px !important; }
+  #pp3 .pr-outer { margin:5mm 0 !important; }
 }
 @media screen {
-  .pr-page {
-    visibility: hidden;
-    position: absolute;
-    left: -9999px;
-    top: 0;
-    pointer-events: none;
-    width: 210mm;
-  }
+  .pr-page { display:none; }
+}
+
+/* Screen preview */
+.pr-page {
+  width:210mm; margin:20px auto; padding:8mm 7mm;
+  font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+  font-size:13px; color:#000; background:#ccc; box-sizing:border-box;
+  display:flex; flex-direction:column; align-items:center;
 }
 /* outer border */
 .pr-outer { border:1.2px solid #888; margin:0; background:#fff; width:196mm; box-sizing:border-box; }
@@ -198,16 +187,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 .pr-lv-eq { width:14px; text-align:center; color:#666; flex-shrink:0; }
 .pr-lv-val { font-weight:700; min-width:90px; text-align:right; flex-shrink:0; }
 .pr-lv-unit { color:#555; font-size:10.5px; width:40px; flex-shrink:0; }
-/* equation step rows — grid-aligned so "=" signs stack in one column */
-.pr-eq-group { display:grid; grid-template-columns:62px 16px 1fr; align-items:baseline; row-gap:0; margin:2px 0 6px 0; }
-.pr-eq-group .pr-eq-sym  { font-style:italic; font-size:13px; grid-column:1; padding:2px 0; }
-.pr-eq-group .pr-eq-op   { grid-column:2; text-align:center; color:#666; font-size:13px; padding:2px 0; }
-.pr-eq-group .pr-eq-rhs  { grid-column:3; font-size:13px; padding:2px 0; }
-.pr-eq-group .pr-eq-val  { font-weight:700; }
-.pr-eq-group .pr-eq-unit { color:#555; font-size:11px; margin-left:4px; }
-#pp1 .pr-eq-group { font-size:12px; }
-#pp1 .pr-eq-group .pr-eq-sym, #pp1 .pr-eq-group .pr-eq-op, #pp1 .pr-eq-group .pr-eq-rhs { font-size:12px; }
-/* legacy — kept for screen portion, not used in print */
+/* equation step rows */
 .pr-eq-block { padding:3px 0 6px 32px; }
 .pr-eq-row { display:flex; align-items:baseline; gap:10px; padding:2px 0; font-size:13px; }
 .pr-eq-lhs { min-width:115px; font-style:italic; }
@@ -905,6 +885,10 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
 </div><!-- /layout -->
 
+<!-- ══ PRINT PAGES ══════════════════════════════════════════════ -->
+
+</div><!-- /layout -->
+
 <!-- ══ PRINT PAGES ══ -->
 
 <!-- PAGE 1 -->
@@ -921,10 +905,10 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       <div class="pr-lv"><span class="pr-lv-sym">Fy</span><span class="pr-lv-name">Yield Strength</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Fy"></span><span class="pr-lv-unit">ksc</span></div>
     </div>
     <div>
-      <div class="pr-lv"><span class="pr-lv-sym">Kx</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Kx" style="text-align:left"></span></div>
-      <div class="pr-lv"><span class="pr-lv-sym">Ky</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Ky" style="text-align:left"></span></div>
-      <div class="pr-lv"><span class="pr-lv-sym">Kt</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Kt" style="text-align:left"></span></div>
-      <div class="pr-lv"><span class="pr-lv-sym">Cb</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Cb" style="text-align:left"></span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Kx</span><span class="pr-lv-name"></span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Kx"></span><span class="pr-lv-unit"></span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Ky</span><span class="pr-lv-name"></span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Ky"></span><span class="pr-lv-unit"></span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Kt</span><span class="pr-lv-name"></span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Kt"></span><span class="pr-lv-unit"></span></div>
+      <div class="pr-lv"><span class="pr-lv-sym">Cb</span><span class="pr-lv-name"></span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Cb"></span><span class="pr-lv-unit"></span></div>
     </div>
   </div>
 
@@ -952,37 +936,29 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       <div class="pr-lv"><span class="pr-lv-sym">Lt</span><span class="pr-lv-name">Unbraced Length Torsion</span><span class="pr-lv-eq">=</span><span class="pr-lv-val" id="p1_Lt"></span><span class="pr-lv-unit">cm</span></div>
     </div>
     <div style="border:0.7px solid #bbb;padding:4px">
-      <div id="pr-canvas" style="width:310px;height:340px;display:block"></div>
+      <div id="pr-canvas" style="width:310px;height:340px;display:block;line-height:0"></div>
     </div>
   </div>
 
   <!-- kΦ -->
   <div class="pr-sec">Distortional Buckling — Rotational Stiffness</div>
-  <div class="pr-eq-group">
-  <span class="pr-eq-sym" style="font-style:italic">k<sub>Φfe</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Elastic rotational stiffness — flange to flange/web juncture</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p1_kfe"></span><span class="pr-eq-unit">kg</span></span>
-</div>
-  <div class="pr-eq-group">
-  <span class="pr-eq-sym" style="font-style:italic">k<sub>Φwe</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Elastic rotational stiffness — web to flange/web juncture</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p1_kwe"></span><span class="pr-eq-unit">kg</span></span>
-</div>
-  <div class="pr-eq-group">
-  <span class="pr-eq-sym" style="font-style:italic">k<sub>Φ</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Continuous rotational stiffness (restrains rotation about flange/web juncture)</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val">0.00</span><span class="pr-eq-unit">kg</span></span>
-</div>
-  <div class="pr-eq-group">
-  <span class="pr-eq-sym" style="font-style:italic">k<sub>Φfg</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Geometric rotational stiffness — flange demand at flange/web juncture</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p1_kfg"></span><span class="pr-eq-unit">mm²</span></span>
-</div>
-  <div class="pr-eq-group">
-  <span class="pr-eq-sym" style="font-style:italic">k<sub>Φwg</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Geometric rotational stiffness — web demand at flange/web juncture</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p1_kwg"></span><span class="pr-eq-unit">mm²</span></span>
-</div>
-  <div class="pr-eq-group">
-  <span class="pr-eq-sym" style="font-style:italic">F<sub>crd</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">(k<sub>Φfe</sub>+k<sub>Φwe</sub>+k<sub>Φ</sub>) / (k<sub>Φfg</sub>+k<sub>Φwg</sub>)</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p1_Fcrd_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p1_Fcrd"></span><span class="pr-eq-unit">ksc</span></span>
-</div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φfe</sub></span><span style="flex:1">= Elastic Rotational stiffness provided by flange to the flange/web juncture</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_kfe"></span><span class="pr-eq-unit">kg</span></div></div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φwe</sub></span><span style="flex:1">= Elastic Rotational stiffness provided by the web to flange/web juncture</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_kwe"></span><span class="pr-eq-unit">kg</span></div></div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φ</sub></span><span style="flex:1">= Continuous Rotational stiffness (restrains rotation about flange/web juncture)</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val">0.00</span><span class="pr-eq-unit">kg</span></div></div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φfg</sub></span><span style="flex:1">= Geometric rotational stiffness demanded by flange from flange/web juncture</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_kfg"></span><span class="pr-eq-unit">mm²</span></div></div>
+  <div class="pr-lv"><span style="width:50px;font-style:italic">k<sub>Φwg</sub></span><span style="flex:1">= Geometric rotational stiffness demanded by web from flange/web juncture</span></div>
+  <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_kwg"></span><span class="pr-eq-unit">mm²</span></div></div>
+  <div style="margin-top:4px">
+    <div class="pr-eq-row"><span style="font-style:italic;width:36px">F<sub>crd</sub></span><span class="pr-eq-op">=</span><span>(k<sub>Φfe</sub>+k<sub>Φwe</sub>+k<sub>Φ</sub>)/(k<sub>Φfg</sub>+k<sub>Φwg</sub>)</span></div>
+    <div class="pr-eq-block">
+      <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p1_Fcrd_sub"></span></div>
+      <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p1_Fcrd"></span><span class="pr-eq-unit">ksc</span></div>
+    </div>
+  </div>
   <div style="margin-top:3px"><span style="font-size:8.5px;color:#666">Lm = <b id="p1_Lm"></b> mm &nbsp;|&nbsp; Lcrd = <b id="p1_Lcrd"></b> mm &nbsp;|&nbsp; Ld = min(Lm,Lcrd) = <b id="p1_Ld"></b> mm</span></div>
 
 </div><!-- /pr-body -->
@@ -998,34 +974,30 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   <div class="pr-sec">Flexural Yielding and Lateral Torsional Buckling</div>
   <div class="pr-2col">
     <div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym" style="font-weight:700">S<sub>fx</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Ix / (H/2) / 1000</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Sfx_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Sfx"></span><span class="pr-eq-unit">cm³</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">M<sub>y-x</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Ix × Fy / 10000 / 100</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Myx"></span><span class="pr-eq-unit">kg-m</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">P<sub>ey</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">π²EIy / (KyLy)²</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Pey_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Pey"></span><span class="pr-eq-unit">kg</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">P<sub>t</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">1/ro²[GJ + π²ECw/(KtLt)²]</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Pt"></span><span class="pr-eq-unit">kg</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">M<sub>cre-x</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Cb·ro·√(Pey·Pt)</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Mcrex_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Mcrex"></span><span class="pr-eq-unit">kg-m</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">F<sub>cre-x</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Mcre-x / Sfx</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Fcrex_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Fcrex"></span><span class="pr-eq-unit">ksc</span></span>
-</div>
+      <div style="font-weight:700;margin-bottom:3px">S<sub>fx</sub> = Ix / (H/2) / 1000</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Sfx_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Sfx"></span><span class="pr-eq-unit">cm³</span></div>
+      </div>
+      <div style="margin-top:3px">M<sub>y-x</sub> = Ix × Fy / 10000 / 100</div>
+      <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Myx"></span><span class="pr-eq-unit">kg-m</span></div></div>
+      <div>P<sub>ey</sub> = π²EIy / (KyLy)²</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Pey_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Pey"></span><span class="pr-eq-unit">kg</span></div>
+      </div>
+      <div>P<sub>t</sub> = 1/ro²[GJ + π²ECw/(KtLt)²]</div>
+      <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Pt"></span><span class="pr-eq-unit">kg</span></div></div>
+      <div>M<sub>cre-x</sub> = Cb·ro·√(Pey·Pt)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Mcrex_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Mcrex"></span><span class="pr-eq-unit">kg-m</span></div>
+      </div>
+      <div>F<sub>cre-x</sub> = Mcre-x / Sfx</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Fcrex_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Fcrex"></span><span class="pr-eq-unit">ksc</span></div>
+      </div>
       <div>F<sub>n-x</sub> = <span id="p2_Fnx"></span> ksc</div>
       <div class="pr-so" style="margin-top:4px">
         <span class="pr-so-lbl">M<sub>ne-x</sub> = Sfx·Fn-x / 100 =</span>
@@ -1033,30 +1005,28 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       </div>
     </div>
     <div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym" style="font-weight:700">S<sub>fy</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Iy / B / 1000</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Sfy_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Sfy"></span><span class="pr-eq-unit">cm³</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">M<sub>y-y</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Iy × Fy / 10000 / 100</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Myy"></span><span class="pr-eq-unit">kg-m</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">P<sub>ex</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">π²EIx / (KxLx)²</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Pex_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Pex"></span><span class="pr-eq-unit">kg</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">M<sub>cre-y</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Cb·ro·√(Pex·Pt)</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Mcrey_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Mcrey"></span><span class="pr-eq-unit">kg-m</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">F<sub>cre-y</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Mcre-y / Sfy</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Fcrey_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Fcrey"></span><span class="pr-eq-unit">ksc</span></span>
-</div>
+      <div style="font-weight:700;margin-bottom:3px">S<sub>fy</sub> = Iy / B / 1000</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Sfy_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Sfy"></span><span class="pr-eq-unit">cm³</span></div>
+      </div>
+      <div>M<sub>y-y</sub> = Iy × Fy / 10000 / 100</div>
+      <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Myy"></span><span class="pr-eq-unit">kg-m</span></div></div>
+      <div>P<sub>ex</sub> = π²EIx / (KxLx)²</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Pex_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Pex"></span><span class="pr-eq-unit">kg</span></div>
+      </div>
+      <div>M<sub>cre-y</sub> = Cb·ro·√(Pex·Pt)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Mcrey_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Mcrey"></span><span class="pr-eq-unit">kg-m</span></div>
+      </div>
+      <div>F<sub>cre-y</sub> = Mcre-y / Sfy</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Fcrey_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Fcrey"></span><span class="pr-eq-unit">ksc</span></div>
+      </div>
       <div>F<sub>n-y</sub> = <span id="p2_Fny"></span> ksc</div>
       <div class="pr-so" style="margin-top:4px">
         <span class="pr-so-lbl">M<sub>ne-y</sub> = Sfy·Fn-y / 100 =</span>
@@ -1088,29 +1058,29 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   <div class="pr-sec">Flexural Distortional Buckling</div>
   <div class="pr-2col">
     <div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">M<sub>crd-x</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Sfx × Fcrd / 100</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Mcrdx_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Mcrdx"></span><span class="pr-eq-unit">kg-m</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">λ<sub>dx</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">√(My-x / Mcrd-x)</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_ldx_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_ldx"></span> &nbsp;<span id="p2_ldx_cond"></span>&nbsp; 0.673</span>
-</div>
+      <div>M<sub>crd-x</sub> = Sfx × Fcrd / 100</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Mcrdx_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Mcrdx"></span><span class="pr-eq-unit">kg-m</span></div>
+      </div>
+      <div>λ<sub>dx</sub> = √(My-x / Mcrd-x)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_ldx_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_ldx"></span> &nbsp;<span id="p2_ldx_cond"></span>&nbsp; 0.673</div>
+      </div>
       <div class="pr-so"><span class="pr-so-lbl">M<sub>nd-x</sub> =</span><span class="pr-so-val" id="p2_Mndx"></span><span class="pr-so-unit">kg-m</span></div>
     </div>
     <div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">M<sub>crd-y</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Sfy × Fcrd / 100</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Mcrdy_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Mcrdy"></span><span class="pr-eq-unit">kg-m</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">λ<sub>dy</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">√(My-y / Mcrd-y)</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_ldy_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_ldy"></span> &nbsp;<span id="p2_ldy_cond"></span>&nbsp; 0.673</span>
-</div>
+      <div>M<sub>crd-y</sub> = Sfy × Fcrd / 100</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_Mcrdy_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p2_Mcrdy"></span><span class="pr-eq-unit">kg-m</span></div>
+      </div>
+      <div>λ<sub>dy</sub> = √(My-y / Mcrd-y)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_ldy_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p2_ldy"></span> &nbsp;<span id="p2_ldy_cond"></span>&nbsp; 0.673</div>
+      </div>
       <div class="pr-so"><span class="pr-so-lbl">M<sub>nd-y</sub> =</span><span class="pr-so-val" id="p2_Mndy"></span><span class="pr-so-unit">kg-m</span></div>
     </div>
   </div>
@@ -1142,103 +1112,106 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       <tr><td class="lft">Web</td><td id="p3_lWeb"></td><td id="p3_lrWeb"></td><td id="p3_lrfnWeb"></td><td>0.18</td><td>1.31</td><td id="p3_FelWeb"></td><td id="p3_bWeb"></td><td id="p3_beWeb"></td></tr>
     </tbody>
   </table>
-  <div class="pr-eq-group">
-  <span class="pr-eq-sym">A<sub>e</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><b id="p3_Ae"></b> cm² &nbsp;&nbsp; P<sub>nl</sub> = Ae·Fn</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_Pnl_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_Pnl_val"></span> &lt; <span id="p3_Pn_global"></span> kg</span>
-</div>
+  <div>A<sub>e</sub> = <b id="p3_Ae"></b> cm² &nbsp;&nbsp; P<sub>nl</sub> = Ae·Fn</div>
+  <div class="pr-eq-block">
+    <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_Pnl_sub"></span></div>
+    <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_Pnl_val"></span> &lt; <span id="p3_Pn_global"></span> kg</div>
+  </div>
   <div class="pr-so"><span class="pr-so-lbl">P<sub>nl</sub> =</span><span class="pr-so-val" id="p3_Pnl"></span><span class="pr-so-unit">kg</span></div>
 
   <!-- Compression Distortional -->
   <div class="pr-sec">Compression Distortional Buckling</div>
   <div class="pr-2col">
     <div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">P<sub>y</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Ag·Fy</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_Py_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p3_Py"></span><span class="pr-eq-unit">kg</span></span>
-</div>
+      <div>P<sub>y</sub> = Ag·Fy</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_Py_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p3_Py"></span><span class="pr-eq-unit">kg</span></div>
+      </div>
       <div>L<sub>m</sub> = <b id="p3_Lm"></b> mm &nbsp;&nbsp; L<sub>crd</sub> = <b id="p3_Lcrd"></b> mm &nbsp;&nbsp; L<sub>d</sub> = <b id="p3_Ld"></b> mm</div>
     </div>
     <div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">P<sub>crd</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Ag·Fcrd</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_Pcrd_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p3_Pcrd"></span><span class="pr-eq-unit">kg</span></span>
-</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">λ<sub>d</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">√(Py / Pcrd)</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_ld_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_ld"></span>&nbsp;<span id="p3_ld_cond"></span>&nbsp;0.561</span>
-</div>
+      <div>P<sub>crd</sub> = Ag·Fcrd</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_Pcrd_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p3_Pcrd"></span><span class="pr-eq-unit">kg</span></div>
+      </div>
+      <div>λ<sub>d</sub> = √(Py / Pcrd)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_ld_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_ld"></span>&nbsp;<span id="p3_ld_cond"></span>&nbsp;0.561</div>
+      </div>
       <div class="pr-so"><span class="pr-so-lbl">P<sub>nd</sub> =</span><span class="pr-so-val" id="p3_Pnd"></span><span class="pr-so-unit">kg</span></div>
     </div>
   </div>
-
+  <div class="pr-so" style="margin-top:3px">
+    <span class="pr-so-lbl" style="font-weight:700">So &nbsp; F<sub>n</sub> = min(Pey,Pex,Pt,Pn,Pnl,Pnd) / Ag =</span>
+    <span class="pr-so-val" id="p3_Pn_gov"></span><span class="pr-so-unit">kg</span>
+  </div>
 
 <!-- Compression Global -->
   <div class="pr-sec">Compression Yielding — Global Buckling</div>
   <div class="pr-2col">
     <div>
       <div>F<sub>cre-x</sub> = <b id="p3_Fcrex"></b> ksc</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">λ<sub>c-x</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">√(Fy/Fcre-x)</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_lcx_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_lcx"></span>&nbsp;<span id="p3_lcx_cond"></span>&nbsp;1.5</span>
-</div>
+      <div>λ<sub>c-x</sub> = √(Fy/Fcre-x)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_lcx_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_lcx"></span>&nbsp;<span id="p3_lcx_cond"></span>&nbsp;1.5</div>
+      </div>
       <div>F<sub>n-x</sub> = <b id="p3_Fncx"></b> ksc</div>
       <div class="pr-so"><span class="pr-so-lbl">P<sub>ne-x</sub> = Ag·Fn-x =</span><span class="pr-so-val" id="p3_Pnex"></span><span class="pr-so-unit">kg</span></div>
     </div>
     <div>
       <div>F<sub>cre-y</sub> = <b id="p3_Fcrey"></b> ksc</div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">λ<sub>c-y</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">√(Fy/Fcre-y)</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_lcy_sub"></span></span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p3_lcy"></span>&nbsp;<span id="p3_lcy_cond"></span>&nbsp;1.5</span>
-</div>
+      <div>λ<sub>c-y</sub> = √(Fy/Fcre-y)</div>
+      <div class="pr-eq-block">
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_lcy_sub"></span></div>
+        <div class="pr-eq-row"><span class="pr-eq-op">=</span><span id="p3_lcy"></span>&nbsp;<span id="p3_lcy_cond"></span>&nbsp;1.5</div>
+      </div>
       <div>F<sub>n-y</sub> = <b id="p3_Fncy"></b> ksc</div>
       <div class="pr-so"><span class="pr-so-lbl">P<sub>ne-y</sub> = Ag·Fn-y =</span><span class="pr-so-val" id="p3_Pney"></span><span class="pr-so-unit">kg</span></div>
     </div>
   </div>
 
-
-</div><!-- /pr-body -->
-</div><!-- /pr-outer -->
-</div><!-- /pr-page -->
-
-<!-- PAGE 4 -->
-<div class="pr-page" id="pp4">
-<div class="pr-outer">
-<div class="pr-hdr-bar">Z Section With Lip — AISI S100 &nbsp;|&nbsp; Beam Section Analysis</div>
-<div class="pr-body">
-
-  <!-- Shear -->
-  <div style="page-break-inside:avoid">
-  <div class="pr-sec pr-sec2">Shear Strength of Webs</div>
-  <div class="pr-2col">
+  <!-- Shear + Summary -->
+  <div class="pr-sec pr-sec2" style="margin-top:6px">Shear Strength of Webs</div>
+  <div class="pr-2col" style="gap:0 28px">
+    <!-- Shear left -->
     <div>
-      <div class="pr-lv"><span style="width:28px;font-style:italic">Aw</span><span class="pr-lv-eq">=</span><span>H × t / 100 = <b id="p3_Aw"></b> cm²</span></div>
-      <div class="pr-lv"><span style="width:28px;font-style:italic">Vy</span><span class="pr-lv-eq">=</span><span>0.6·Aw·Fy = <b id="p3_Vy"></b> kg</span></div>
-      <div class="pr-lv"><span style="width:28px;font-style:italic">kv</span><span class="pr-lv-eq">=</span><span>5.34</span></div>
-      <div class="pr-eq-group">
-  <span class="pr-eq-sym">Vcr</span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">π²Ekv(h/10)(t/10) / [12(1-ν²)(h/t)²]</span>
-  <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p3_Vcr"></span><span class="pr-eq-unit">kg</span></span>
-</div>
-      <div>λ<sub>v</sub> = √(Vy/Vcr) = <b id="p3_lv"></b> &nbsp;<span id="p3_lv_cond"></span>&nbsp; 0.587</div>
-      <div class="pr-so" style="margin-top:4px"><span class="pr-so-lbl" style="font-weight:700">So &nbsp; Vn =</span><span class="pr-so-val" id="p3_Vn"></span><span class="pr-so-unit">kg</span></div>
+      <div class="pr-lv"><span style="width:36px;font-style:italic">Aw</span><span class="pr-lv-eq">=</span><span>H × t / 100 = <b id="p3_Aw"></b> cm²</span></div>
+      <div class="pr-lv"><span style="width:36px;font-style:italic">Vy</span><span class="pr-lv-eq">=</span><span>0.6·Aw·Fy = <b id="p3_Vy"></b> kg</span></div>
+      <div class="pr-lv"><span style="width:36px;font-style:italic">kv</span><span class="pr-lv-eq">=</span><span>5.34</span></div>
+      <div class="pr-lv"><span style="width:36px;font-style:italic">Vcr</span><span class="pr-lv-eq">=</span><span>π²Ekv(h/10)(t/10) / [12(1-ν²)(h/t)²]</span></div>
+      <div class="pr-eq-block"><div class="pr-eq-row"><span class="pr-eq-op">=</span><span class="pr-eq-val" id="p3_Vcr"></span><span class="pr-eq-unit">kg</span></div></div>
+      <div style="font-size:12px">λ<sub>v</sub> = √(Vy/Vcr) = <b id="p3_lv"></b> &nbsp;<span id="p3_lv_cond"></span>&nbsp; 0.587</div>
+      <div class="pr-so" style="margin-top:6px"><span class="pr-so-lbl" style="font-weight:700">So &nbsp; V<sub>n</sub> =</span><span class="pr-so-val" id="p3_Vn"></span><span class="pr-so-unit">kg</span></div>
     </div>
+    <!-- Summary right -->
     <div>
-      <div style="font-weight:700;margin-bottom:4px">Summary — Governing Strength</div>
-      <div class="pr-lv"><span style="flex:1">M<sub>n-x</sub></span><span style="font-weight:700"><span id="p3_Mnx_gov"></span> kg-m</span></div>
-      <div class="pr-lv"><span style="flex:1">M<sub>n-y</sub></span><span style="font-weight:700"><span id="p3_Mny_gov"></span> kg-m</span></div>
-      <hr class="pr-divider" style="margin:5px 0">
-      <div class="pr-lv"><span style="flex:1">P<sub>n</sub></span><span style="font-weight:700"><span id="p3_Pn_gov2_sum"></span> kg</span></div>
-      <hr class="pr-divider" style="margin:5px 0">
-      <div class="pr-lv"><span style="flex:1">V<sub>n</sub></span><span style="font-weight:700"><span id="p3_Vn2"></span> kg</span></div>
+      <div style="font-weight:700;font-size:13px;margin-bottom:6px">Summary — Governing Strength</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <tbody>
+          <tr style="border-bottom:1px solid #ddd">
+            <td style="padding:6px 4px">M<sub>n-x</sub></td>
+            <td style="padding:6px 4px;text-align:right;font-weight:700"><span id="p3_Mnx_gov"></span> kg-m</td>
+          </tr>
+          <tr style="border-bottom:1px solid #ddd">
+            <td style="padding:6px 4px">M<sub>n-y</sub></td>
+            <td style="padding:6px 4px;text-align:right;font-weight:700"><span id="p3_Mny_gov"></span> kg-m</td>
+          </tr>
+          <tr style="border-bottom:2px solid #aaa">
+            <td style="padding:6px 4px">P<sub>n</sub></td>
+            <td style="padding:6px 4px;text-align:right;font-weight:700"><span id="p3_Pn_gov2"></span> kg</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 4px">V<sub>n</sub></td>
+            <td style="padding:6px 4px;text-align:right;font-weight:700"><span id="p3_Vn2"></span> kg</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-  </div><!-- /avoid shear break -->
-
 
 </div><!-- /pr-body -->
 </div><!-- /pr-outer -->
@@ -1287,10 +1260,13 @@ function drawSection(canvasId,H,B,C,r,tt,theta_deg){
   const isPrint = canvasId==='pr-canvas';
   const cvs=document.getElementById(canvasId);if(!cvs)return;
   const ctx=cvs.getContext('2d');
-  const dpr=window.devicePixelRatio||1;
-  const W=cvs.offsetWidth||720,Hc=cvs.offsetHeight||540;
-  cvs.width=W*dpr;cvs.height=Hc*dpr;
-  ctx.scale(dpr,dpr);
+  // For print canvas: use CSS size for layout, but draw at 2× for crispness
+  const W = isPrint ? 310 : (cvs.offsetWidth||720);
+  const Hc = isPrint ? 340 : (cvs.offsetHeight||540);
+  const scale = isPrint ? 2 : (window.devicePixelRatio||1);
+  cvs.width = W * scale;
+  cvs.height = Hc * scale;
+  ctx.scale(scale, scale);
   ctx.clearRect(0,0,W,Hc);
 
   // Z-section: web vertical, top flange goes RIGHT, bottom flange goes LEFT
@@ -1311,9 +1287,10 @@ function drawSection(canvasId,H,B,C,r,tt,theta_deg){
   function tx(x){return ox+x*sc;}
   function ty(y){return oy-y*sc;}
 
-  // Draw dark bg + dots
-  ctx.fillStyle=isPrint?'#ffffff':'#0f1117';ctx.fillRect(0,0,W,Hc);
-  ctx.fillStyle=isPrint?'#eeeeee':'#1c2333';
+  // Draw bg
+  ctx.fillStyle = isPrint ? '#ffffff' : '#0f1117';
+  ctx.fillRect(0,0,W,Hc);
+  ctx.fillStyle = isPrint ? '#e8e8e8' : '#1c2333';
   const gStep=30;
   for(let gx=gStep/2;gx<W;gx+=gStep)
     for(let gy=gStep/2;gy<Hc;gy+=gStep){
@@ -1326,14 +1303,15 @@ function drawSection(canvasId,H,B,C,r,tt,theta_deg){
     ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-size,-size/2);ctx.lineTo(-size,size/2);ctx.closePath();ctx.fill();
     ctx.restore();
   }
-  function extLine(x1,y1,x2,y2,col='#555'){
-    ctx.save();ctx.strokeStyle=col;ctx.lineWidth=0.7;ctx.setLineDash([3,3]);
+  function extLine(x1,y1,x2,y2,col){
+    col = col || (isPrint?'#999':'#555');
+    ctx.save();ctx.strokeStyle=col;ctx.lineWidth=isPrint?1:0.7;ctx.setLineDash([3,3]);
     ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
   }
-  function dimLine(x1,y1,x2,y2,label,col='#aaa',rot=0,offX=0,fontSize=11){
-    ctx.save();ctx.strokeStyle=col;ctx.lineWidth=1;
+  function dimLine(x1,y1,x2,y2,label,col,rot,offX,fontSize){
+    col=col||(isPrint?'#333':'#aaa'); rot=rot||0; offX=offX||0; fontSize=fontSize||11;
+    ctx.save();ctx.strokeStyle=col;ctx.lineWidth=isPrint?1.2:1;
     ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-    // arrowheads
     if(x1===x2){ah(x1,y1,rot-PI/2,col,5);ah(x2,y2,rot+PI/2,col,5);}
     else{ah(x1,y1,PI,col,5);ah(x2,y2,0,col,5);}
     const mx=(x1+x2)/2+offX,my=(y1+y2)/2;
@@ -1369,10 +1347,10 @@ function drawSection(canvasId,H,B,C,r,tt,theta_deg){
 
   const cl=buildZCenterline();
 
-  // Filled section
+  // Filled section body
   ctx.save();
-  ctx.strokeStyle=isPrint?'#999999':'#d8d8d8';
-  ctx.lineWidth=tt*sc;
+  ctx.strokeStyle = isPrint ? '#c8c8c8' : '#d8d8d8';
+  ctx.lineWidth = tt*sc;
   ctx.lineCap='butt';
   ctx.lineJoin='round';
   ctx.stroke(cl);
@@ -1410,27 +1388,31 @@ function drawSection(canvasId,H,B,C,r,tt,theta_deg){
     p.lineTo(tx(B)-halfT,ty(H-C));
     return p;
   }
-  const bndColor=isPrint?'#222':'#111';
-  ctx.save();ctx.strokeStyle=bndColor;ctx.lineWidth=1.1;ctx.lineJoin='round';ctx.lineCap='round';
+  const bndColor = isPrint ? '#222' : '#111';
+  const bndWidth = isPrint ? 1.8 : 1.1;
+  ctx.save();ctx.strokeStyle=bndColor;ctx.lineWidth=bndWidth;ctx.lineJoin='round';ctx.lineCap='round';
   ctx.stroke(drawZOuter());ctx.restore();
-  ctx.save();ctx.strokeStyle=bndColor;ctx.lineWidth=1.1;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.save();ctx.strokeStyle=bndColor;ctx.lineWidth=bndWidth;ctx.lineJoin='round';ctx.lineCap='round';
   ctx.stroke(drawZInner());ctx.restore();
 
   // Centerline dashed
-  ctx.save();ctx.strokeStyle='#1a6aaa';ctx.lineWidth=0.7;ctx.setLineDash([6,4]);ctx.lineJoin='round';
+  const clColor = isPrint ? '#2255aa' : '#1a6aaa';
+  const clWidth = isPrint ? 1.2 : 0.7;
+  ctx.save();ctx.strokeStyle=clColor;ctx.lineWidth=clWidth;ctx.setLineDash([6,4]);ctx.lineJoin='round';
   ctx.stroke(cl);ctx.setLineDash([]);ctx.restore();
 
   // CG at H/2, x=0 (symmetric about web)
   const cgX=0,cgY=H/2;
   const cgPx=tx(cgX),cgPy=ty(cgY);
   const arLen=26;
-  ctx.save();ctx.strokeStyle='#f0883e';ctx.lineWidth=1.5;
+  const cgColor = isPrint ? '#c05000' : '#f0883e';
+  ctx.save();ctx.strokeStyle=cgColor;ctx.lineWidth=isPrint?2:1.5;
   ctx.beginPath();ctx.moveTo(cgPx,cgPy);ctx.lineTo(cgPx+arLen,cgPy);ctx.stroke();
-  ah(cgPx+arLen,cgPy,0,isPrint?'#c05000':'#e07820',6);
+  ah(cgPx+arLen,cgPy,0,cgColor,6);
   ctx.beginPath();ctx.moveTo(cgPx,cgPy);ctx.lineTo(cgPx,cgPy-arLen);ctx.stroke();
-  ah(cgPx,cgPy-arLen,-PI/2,isPrint?'#c05000':'#e07820',6);
+  ah(cgPx,cgPy-arLen,-PI/2,cgColor,6);
   ctx.restore();
-  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle=isPrint?'#c05000':'#f0883e';
+  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle=cgColor;
   ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('x',cgPx+arLen+4,cgPy);
   ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('y',cgPx,cgPy-arLen-4);
   ctx.font="bold 10px 'IBM Plex Mono',monospace";ctx.textAlign='left';ctx.textBaseline='bottom';
@@ -1441,34 +1423,31 @@ function drawSection(canvasId,H,B,C,r,tt,theta_deg){
   if(theta_deg!=null && isFinite(theta_deg)){
     const theta_rad = theta_deg * PI / 180;
     const axLen = Math.min(W, Hc) * 0.32;
+    const minorCol = isPrint ? '#6040a0' : '#a78bfa';
+    const majorCol = isPrint ? '#007070' : '#22d3ee';
     ctx.save();
-    ctx.strokeStyle = isPrint?'#6040a0':'#a78bfa';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = minorCol;
+    ctx.lineWidth = isPrint ? 2 : 1.5;
     ctx.setLineDash([7, 4]);
-    // Minor principal axis (at angle theta from X)
     ctx.beginPath();
     ctx.moveTo(cgPx - Math.cos(theta_rad)*axLen, cgPy + Math.sin(theta_rad)*axLen);
     ctx.lineTo(cgPx + Math.cos(theta_rad)*axLen, cgPy - Math.sin(theta_rad)*axLen);
     ctx.stroke();
-    // Major principal axis (perpendicular)
     const theta2 = theta_rad - PI/2;
-    ctx.strokeStyle = isPrint?'#008080':'#22d3ee';
+    ctx.strokeStyle = majorCol;
     ctx.beginPath();
     ctx.moveTo(cgPx - Math.cos(theta2)*axLen, cgPy + Math.sin(theta2)*axLen);
     ctx.lineTo(cgPx + Math.cos(theta2)*axLen, cgPy - Math.sin(theta2)*axLen);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
-    // Labels
     ctx.font = "bold 10px 'IBM Plex Mono',monospace";
-    // Minor axis label
-    ctx.fillStyle = isPrint?'#6040a0':'#a78bfa';
+    ctx.fillStyle = minorCol;
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     const lx1 = cgPx + Math.cos(theta_rad)*axLen + 4;
     const ly1 = cgPy - Math.sin(theta_rad)*axLen;
     ctx.fillText('u (θ='+theta_deg.toFixed(1)+'°)', lx1, ly1);
-    // Major axis label
-    ctx.fillStyle = isPrint?'#008080':'#22d3ee';
+    ctx.fillStyle = majorCol;
     ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
     const lx2 = cgPx + Math.cos(theta2)*axLen;
     const ly2 = cgPy - Math.sin(theta2)*axLen - 4;
@@ -1476,194 +1455,207 @@ function drawSection(canvasId,H,B,C,r,tt,theta_deg){
   }
   // Dimensions
   // H dim (left side)
+  const hDimCol = isPrint ? '#228822' : '#4ade80';
   const hDimX=tx(-B)-halfT-48;
   extLine(tx(0)-halfT,ty(0)-halfT,hDimX+2,ty(0)-halfT);
   extLine(tx(0)-halfT,ty(H)+halfT,hDimX+2,ty(H)+halfT);
-  dimLine(hDimX,ty(0)-halfT,hDimX,ty(H)+halfT,'','#4ade80',0,0);
+  dimLine(hDimX,ty(0)-halfT,hDimX,ty(H)+halfT,'',hDimCol,0,0);
   ctx.save();ctx.translate(hDimX-16,ty(H/2));ctx.rotate(-PI/2);
-  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle='#4ade80';
+  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle=hDimCol;
   ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('H = '+H+' mm',0,0);ctx.restore();
 
   // B dim top flange (top) — above section
+  const bDimCol = isPrint ? '#555' : '#aaa';
   const bDimY=ty(H)-halfT-40;
   extLine(tx(0)-halfT,ty(H)-halfT,tx(0)-halfT,bDimY-2);
   extLine(tx(B)+halfT,ty(H)-halfT,tx(B)+halfT,bDimY-2);
-  dimLine(tx(0)-halfT,bDimY,tx(B)+halfT,bDimY,'',isPrint?'#555':'#aaa',0,0,11);
-  ctx.font="bold 11px 'IBM Plex Mono',monospace"; ctx.fillStyle='#aaa';
+  dimLine(tx(0)-halfT,bDimY,tx(B)+halfT,bDimY,'',bDimCol,0,0,11);
+  ctx.font="bold 11px 'IBM Plex Mono',monospace"; ctx.fillStyle=bDimCol;
   ctx.textAlign='center'; ctx.textBaseline='bottom';
   ctx.fillText('W = '+B+' mm',(tx(0)-halfT+tx(B)+halfT)/2, bDimY-4);
 
   // C dim top lip (right)
+  const cDimCol = isPrint ? '#a03030' : '#e05252';
   const cDimX=tx(B)+halfT+44;
   extLine(tx(B)+halfT,ty(H)+halfT,cDimX-2,ty(H)+halfT);
   extLine(tx(B)+halfT,ty(H-C),cDimX-2,ty(H-C));
-  dimLine(cDimX,ty(H)+halfT,cDimX,ty(H-C),'',isPrint?'#a03030':'#e05252',0,0);
-  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle='#e05252';
+  dimLine(cDimX,ty(H)+halfT,cDimX,ty(H-C),'',cDimCol,0,0);
+  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle=cDimCol;
   ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('C = '+C+' mm',cDimX+8,ty(H-C/2));
 
   // t dim — on web (x=0), at mid-height of bottom lip (y=C/2)
+  const tDimCol = isPrint ? '#1a5090' : '#4a90d9';
   const tLineY=ty(C/2);
   const ti=tx(0)-halfT, to=tx(0)+halfT;
-  ctx.save();ctx.strokeStyle=isPrint?'#1a5090':'#4a90d9';ctx.lineWidth=1;
-  // tick marks top and bottom of thickness
+  ctx.save();ctx.strokeStyle=tDimCol;ctx.lineWidth=isPrint?1.5:1;
   ctx.beginPath();ctx.moveTo(ti-8,tLineY);ctx.lineTo(ti+8,tLineY);ctx.stroke();
   ctx.beginPath();ctx.moveTo(to-8,tLineY);ctx.lineTo(to+8,tLineY);ctx.stroke();
-  // horizontal arrow line across web thickness
   ctx.beginPath();ctx.moveTo(ti,tLineY);ctx.lineTo(to,tLineY);ctx.stroke();
-  // leader line going right
   ctx.beginPath();ctx.moveTo(to,tLineY);ctx.lineTo(tx(0)+44,tLineY);ctx.stroke();
   ctx.restore();
-  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle=isPrint?'#1a5090':'#4a90d9';
+  ctx.font="bold 11px 'IBM Plex Mono',monospace";ctx.fillStyle=tDimCol;
   ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('t = '+tt+' mm',tx(0)+46,tLineY);
 }
 
-// ── Draw Z-Section as SVG (for print — resolution-independent) ──
-function drawSectionSVG(containerId,H,B,C,r,tt,theta_deg){
-  const el=document.getElementById(containerId);if(!el)return;
-  const W=310,Hc=340;
-  const PI=Math.PI;
-  const pad=72;
-  const xSpan=B*2+H*0.3;
-  const sc=Math.min((W-pad*2)/xSpan,(Hc-pad*2)/H)*0.75;
-  const ox=W/2, oy=Hc/2+H*sc/2;
-  const tx=x=>ox+x*sc, ty=y=>oy-y*sc;
-  const rp=r*sc, halfT=(tt*sc)/2;
+// ── Draw Z-Section as SVG (vector, crisp on print) ───────────────
+function drawSectionSVG(containerId, H, B, C, r, tt, theta_deg){
+  const el = document.getElementById(containerId); if(!el) return;
+  const W = 310, Hc = 340;
+  const pad = 80, xSpan = B*2 + H*0.3;
+  const sc = Math.min((W-pad*2)/xSpan, (Hc-pad*2)/H) * 0.75;
+  const ox = W/2, oy = Hc/2 + H*sc/2;
+  const tx = x => ox + x*sc;
+  const ty = y => oy - y*sc;
+  const rp = r*sc, halfT = (tt*sc)/2;
+  const n = v => v.toFixed(2);
 
-  let s='';
-  // background
-  s+=`<rect width="${W}" height="${Hc}" fill="#fff"/>`;
-  // dot grid
-  const gStep=30;
-  for(let gx=gStep/2;gx<W;gx+=gStep)
-    for(let gy=gStep/2;gy<Hc;gy+=gStep)
-      s+=`<circle cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="0.8" fill="#ddd"/>`;
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${Hc}" viewBox="0 0 ${W} ${Hc}">`;
 
-  // Z centerline path string
-  function zCL(){
-    const rr=rp;
-    // Using SVG arc: A rx ry x-rot large-arc sweep ex ey
-    // arcTo(cx,cy,ex,ey,r) → quadrant arc approximated with SVG A
-    // We'll trace the same path as canvas
-    let d=`M ${tx(-B).toFixed(2)} ${ty(C).toFixed(2)}`;
-    d+=` L ${tx(-B).toFixed(2)} ${ty(rr/sc).toFixed(2)}`;
-    // corner bot-left: from (-B,r) arc to (-B+r,0)
-    d+=` A ${rr.toFixed(2)} ${rr.toFixed(2)} 0 0 1 ${tx(-B+r).toFixed(2)} ${ty(0).toFixed(2)}`;
-    d+=` L ${tx(-r).toFixed(2)} ${ty(0).toFixed(2)}`;
-    // corner bot-right: from (-r,0) arc to (0,r)
-    d+=` A ${rr.toFixed(2)} ${rr.toFixed(2)} 0 0 1 ${tx(0).toFixed(2)} ${ty(r).toFixed(2)}`;
-    d+=` L ${tx(0).toFixed(2)} ${ty(H-r).toFixed(2)}`;
-    // corner top-left: from (0,H-r) arc to (r,H)
-    d+=` A ${rr.toFixed(2)} ${rr.toFixed(2)} 0 0 1 ${tx(r).toFixed(2)} ${ty(H).toFixed(2)}`;
-    d+=` L ${tx(B-r).toFixed(2)} ${ty(H).toFixed(2)}`;
-    // corner top-right: from (B-r,H) arc to (B,H-r)
-    d+=` A ${rr.toFixed(2)} ${rr.toFixed(2)} 0 0 1 ${tx(B).toFixed(2)} ${ty(H-r).toFixed(2)}`;
-    d+=` L ${tx(B).toFixed(2)} ${ty(H-C).toFixed(2)}`;
-    return d;
+  // White background
+  s += `<rect width="${W}" height="${Hc}" fill="#fff"/>`;
+
+  // Dot grid
+  const gStep = 30;
+  for(let gx=gStep/2; gx<W; gx+=gStep)
+    for(let gy=gStep/2; gy<Hc; gy+=gStep)
+      s += `<circle cx="${n(gx)}" cy="${n(gy)}" r="0.8" fill="#e0e0e0"/>`;
+
+  // ── Z centerline path helper ──────────────────────────────────
+  function zCLPath(){
+    const rr = rp;
+    return [
+      `M ${n(tx(-B))} ${n(ty(C))}`,
+      `L ${n(tx(-B))} ${n(ty(r))}`,
+      `A ${n(rr)} ${n(rr)} 0 0 1 ${n(tx(-B+r))} ${n(ty(0))}`,
+      `L ${n(tx(-r))} ${n(ty(0))}`,
+      `A ${n(rr)} ${n(rr)} 0 0 1 ${n(tx(0))} ${n(ty(r))}`,
+      `L ${n(tx(0))} ${n(ty(H-r))}`,
+      `A ${n(rr)} ${n(rr)} 0 0 1 ${n(tx(r))} ${n(ty(H))}`,
+      `L ${n(tx(B-r))} ${n(ty(H))}`,
+      `A ${n(rr)} ${n(rr)} 0 0 1 ${n(tx(B))} ${n(ty(H-r))}`,
+      `L ${n(tx(B))} ${n(ty(H-C))}`
+    ].join(' ');
   }
 
-  // Outer boundary path
-  function zOuter(){
-    const ro=rp+halfT;
-    let d=`M ${(tx(-B)-halfT).toFixed(2)} ${ty(C).toFixed(2)}`;
-    d+=` L ${(tx(-B)-halfT).toFixed(2)} ${(ty(0)+ro).toFixed(2)}`;
-    d+=` A ${ro.toFixed(2)} ${ro.toFixed(2)} 0 0 1 ${(tx(-B)+ro-halfT).toFixed(2)} ${(ty(0)-halfT).toFixed(2)}`;
-    d+=` L ${(tx(0)-ro+halfT).toFixed(2)} ${(ty(0)-halfT).toFixed(2)}`;
-    d+=` A ${ro.toFixed(2)} ${ro.toFixed(2)} 0 0 1 ${(tx(0)+halfT).toFixed(2)} ${(ty(0)+ro).toFixed(2)}`;
-    d+=` L ${(tx(0)+halfT).toFixed(2)} ${(ty(H)-ro).toFixed(2)}`;
-    d+=` A ${ro.toFixed(2)} ${ro.toFixed(2)} 0 0 1 ${(tx(0)+ro-halfT).toFixed(2)} ${(ty(H)+halfT).toFixed(2)}`;
-    d+=` L ${(tx(B)-ro+halfT).toFixed(2)} ${(ty(H)+halfT).toFixed(2)}`;
-    d+=` A ${ro.toFixed(2)} ${ro.toFixed(2)} 0 0 1 ${(tx(B)+halfT).toFixed(2)} ${(ty(H)-ro).toFixed(2)}`;
-    d+=` L ${(tx(B)+halfT).toFixed(2)} ${ty(H-C).toFixed(2)}`;
-    return d;
-  }
-  function zInner(){
-    const ri=Math.max(rp-halfT,0.5);
-    let d=`M ${(tx(-B)+halfT).toFixed(2)} ${ty(C).toFixed(2)}`;
-    d+=` L ${(tx(-B)+halfT).toFixed(2)} ${(ty(0)+ri).toFixed(2)}`;
-    d+=` A ${ri.toFixed(2)} ${ri.toFixed(2)} 0 0 0 ${(tx(-B)+ri+halfT).toFixed(2)} ${(ty(0)+halfT).toFixed(2)}`;
-    d+=` L ${(tx(0)-ri-halfT).toFixed(2)} ${(ty(0)+halfT).toFixed(2)}`;
-    d+=` A ${ri.toFixed(2)} ${ri.toFixed(2)} 0 0 0 ${(tx(0)-halfT).toFixed(2)} ${(ty(0)+ri).toFixed(2)}`;
-    d+=` L ${(tx(0)-halfT).toFixed(2)} ${(ty(H)-ri).toFixed(2)}`;
-    d+=` A ${ri.toFixed(2)} ${ri.toFixed(2)} 0 0 0 ${(tx(0)+ri-halfT).toFixed(2)} ${(ty(H)-halfT).toFixed(2)}`;
-    d+=` L ${(tx(B)-ri-halfT).toFixed(2)} ${(ty(H)-halfT).toFixed(2)}`;
-    d+=` A ${ri.toFixed(2)} ${ri.toFixed(2)} 0 0 0 ${(tx(B)-halfT).toFixed(2)} ${(ty(H)-ri).toFixed(2)}`;
-    d+=` L ${(tx(B)-halfT).toFixed(2)} ${ty(H-C).toFixed(2)}`;
-    return d;
+  // ── Outer boundary path ───────────────────────────────────────
+  function zOuterPath(){
+    const ro2 = rp + halfT;
+    return [
+      `M ${n(tx(-B)-halfT)} ${n(ty(C))}`,
+      `L ${n(tx(-B)-halfT)} ${n(ty(ro2))}`,
+      `A ${n(ro2)} ${n(ro2)} 0 0 1 ${n(tx(-B+ro2))} ${n(ty(0)-halfT)}`,
+      `L ${n(tx(-ro2))} ${n(ty(0)-halfT)}`,
+      `A ${n(ro2)} ${n(ro2)} 0 0 1 ${n(tx(0)+halfT)} ${n(ty(ro2))}`,
+      `L ${n(tx(0)+halfT)} ${n(ty(H-ro2))}`,
+      `A ${n(ro2)} ${n(ro2)} 0 0 1 ${n(tx(ro2))} ${n(ty(H)+halfT)}`,
+      `L ${n(tx(B-ro2))} ${n(ty(H)+halfT)}`,
+      `A ${n(ro2)} ${n(ro2)} 0 0 1 ${n(tx(B)+halfT)} ${n(ty(H-ro2))}`,
+      `L ${n(tx(B)+halfT)} ${n(ty(H-C))}`
+    ].join(' ');
   }
 
-  // Filled section (stroke centerline with thickness)
-  s+=`<path d="${zCL()}" fill="none" stroke="#bbb" stroke-width="${(tt*sc).toFixed(2)}" stroke-linecap="butt" stroke-linejoin="round"/>`;
-  // Outer + inner boundary
-  s+=`<path d="${zOuter()}" fill="none" stroke="#222" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>`;
-  s+=`<path d="${zInner()}" fill="none" stroke="#222" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>`;
+  // ── Inner boundary path ───────────────────────────────────────
+  function zInnerPath(){
+    const ri = Math.max(rp - halfT, 0.5);
+    return [
+      `M ${n(tx(-B)+halfT)} ${n(ty(C))}`,
+      `L ${n(tx(-B)+halfT)} ${n(ty(ri))}`,
+      `A ${n(ri)} ${n(ri)} 0 0 0 ${n(tx(-B+ri))} ${n(ty(0)+halfT)}`,
+      `L ${n(tx(-ri))} ${n(ty(0)+halfT)}`,
+      `A ${n(ri)} ${n(ri)} 0 0 0 ${n(tx(0)-halfT)} ${n(ty(ri))}`,
+      `L ${n(tx(0)-halfT)} ${n(ty(H-ri))}`,
+      `A ${n(ri)} ${n(ri)} 0 0 0 ${n(tx(ri))} ${n(ty(H)-halfT)}`,
+      `L ${n(tx(B-ri))} ${n(ty(H)-halfT)}`,
+      `A ${n(ri)} ${n(ri)} 0 0 0 ${n(tx(B)-halfT)} ${n(ty(H-ri))}`,
+      `L ${n(tx(B)-halfT)} ${n(ty(H-C))}`
+    ].join(' ');
+  }
+
+  const cl = zCLPath();
+  // Section fill (stroke centerline at thickness)
+  s += `<path d="${cl}" fill="none" stroke="#c8c8c8" stroke-width="${n(tt*sc)}" stroke-linecap="butt" stroke-linejoin="round"/>`;
+  // Outer & inner boundary
+  s += `<path d="${zOuterPath()}" fill="none" stroke="#222" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  s += `<path d="${zInnerPath()}" fill="none" stroke="#222" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
   // Centerline dashed
-  s+=`<path d="${zCL()}" fill="none" stroke="#1a6aaa" stroke-width="0.7" stroke-dasharray="6 4" stroke-linejoin="round"/>`;
+  s += `<path d="${cl}" fill="none" stroke="#2255aa" stroke-width="1" stroke-dasharray="6 4" stroke-linejoin="round"/>`;
 
-  // CG axes
-  const cgPx=tx(0), cgPy=ty(H/2), arLen=26;
-  s+=`<line x1="${cgPx}" y1="${cgPy}" x2="${cgPx+arLen}" y2="${cgPy}" stroke="#c05000" stroke-width="1.5"/>`;
-  s+=`<polygon points="${cgPx+arLen},${cgPy} ${cgPx+arLen-6},${cgPy-3} ${cgPx+arLen-6},${cgPy+3}" fill="#c05000"/>`;
-  s+=`<line x1="${cgPx}" y1="${cgPy}" x2="${cgPx}" y2="${cgPy-arLen}" stroke="#c05000" stroke-width="1.5"/>`;
-  s+=`<polygon points="${cgPx},${cgPy-arLen} ${cgPx-3},${cgPy-arLen+6} ${cgPx+3},${cgPy-arLen+6}" fill="#c05000"/>`;
-  s+=`<text x="${cgPx+arLen+4}" y="${cgPy+4}" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="bold" fill="#c05000">x</text>`;
-  s+=`<text x="${cgPx}" y="${cgPy-arLen-6}" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="bold" fill="#c05000" text-anchor="middle">y</text>`;
-  s+=`<text x="${cgPx+4}" y="${cgPy-arLen-14}" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="bold" fill="#c05000">C.G.</text>`;
+  // ── CG marker ─────────────────────────────────────────────────
+  const cgPx = tx(0), cgPy = ty(H/2), arLen = 22;
+  const cgCol = '#c05000';
+  // x-axis arrow
+  s += `<line x1="${n(cgPx)}" y1="${n(cgPy)}" x2="${n(cgPx+arLen)}" y2="${n(cgPy)}" stroke="${cgCol}" stroke-width="1.5"/>`;
+  s += `<polygon points="${n(cgPx+arLen)},${n(cgPy)} ${n(cgPx+arLen-6)},${n(cgPy-3)} ${n(cgPx+arLen-6)},${n(cgPy+3)}" fill="${cgCol}"/>`;
+  // y-axis arrow
+  s += `<line x1="${n(cgPx)}" y1="${n(cgPy)}" x2="${n(cgPx)}" y2="${n(cgPy-arLen)}" stroke="${cgCol}" stroke-width="1.5"/>`;
+  s += `<polygon points="${n(cgPx)},${n(cgPy-arLen)} ${n(cgPx-3)},${n(cgPy-arLen+6)} ${n(cgPx+3)},${n(cgPy-arLen+6)}" fill="${cgCol}"/>`;
+  s += `<text x="${n(cgPx+arLen+4)}" y="${n(cgPy+4)}" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="bold" fill="${cgCol}">x</text>`;
+  s += `<text x="${n(cgPx)}" y="${n(cgPy-arLen-5)}" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="bold" fill="${cgCol}" text-anchor="middle">y</text>`;
+  s += `<text x="${n(cgPx+4)}" y="${n(cgPy-arLen-14)}" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="bold" fill="${cgCol}">C.G.</text>`;
 
-  // Principal axes
-  if(theta_deg!=null&&isFinite(theta_deg)){
-    const tr=theta_deg*PI/180;
-    const axLen=Math.min(W,Hc)*0.32;
-    const cos=Math.cos(tr),sin=Math.sin(tr);
-    s+=`<line x1="${(cgPx-cos*axLen).toFixed(1)}" y1="${(cgPy+sin*axLen).toFixed(1)}" x2="${(cgPx+cos*axLen).toFixed(1)}" y2="${(cgPy-sin*axLen).toFixed(1)}" stroke="#6040a0" stroke-width="1.5" stroke-dasharray="7 4"/>`;
-    const t2=tr-PI/2, cos2=Math.cos(t2), sin2=Math.sin(t2);
-    s+=`<line x1="${(cgPx-cos2*axLen).toFixed(1)}" y1="${(cgPy+sin2*axLen).toFixed(1)}" x2="${(cgPx+cos2*axLen).toFixed(1)}" y2="${(cgPy-sin2*axLen).toFixed(1)}" stroke="#008080" stroke-width="1.5" stroke-dasharray="7 4"/>`;
-    s+=`<text x="${(cgPx+cos*axLen+4).toFixed(1)}" y="${(cgPy-sin*axLen+4).toFixed(1)}" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="bold" fill="#6040a0">u (θ=${theta_deg.toFixed(1)}°)</text>`;
-    s+=`<text x="${(cgPx+cos2*axLen).toFixed(1)}" y="${(cgPy-sin2*axLen-5).toFixed(1)}" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="bold" fill="#008080" text-anchor="middle">v</text>`;
+  // ── Principal axis lines ───────────────────────────────────────
+  if(theta_deg != null && isFinite(theta_deg)){
+    const tr = theta_deg * Math.PI / 180;
+    const axLen = Math.min(W,Hc) * 0.30;
+    const t2 = tr - Math.PI/2;
+    const minCol = '#6040a0', majCol = '#007070';
+    s += `<line x1="${n(cgPx-Math.cos(tr)*axLen)}" y1="${n(cgPy+Math.sin(tr)*axLen)}" x2="${n(cgPx+Math.cos(tr)*axLen)}" y2="${n(cgPy-Math.sin(tr)*axLen)}" stroke="${minCol}" stroke-width="1.5" stroke-dasharray="7 4"/>`;
+    s += `<line x1="${n(cgPx-Math.cos(t2)*axLen)}" y1="${n(cgPy+Math.sin(t2)*axLen)}" x2="${n(cgPx+Math.cos(t2)*axLen)}" y2="${n(cgPy-Math.sin(t2)*axLen)}" stroke="${majCol}" stroke-width="1.5" stroke-dasharray="7 4"/>`;
+    const ux = cgPx+Math.cos(tr)*axLen+4, uy = cgPy-Math.sin(tr)*axLen;
+    s += `<text x="${n(ux)}" y="${n(uy+4)}" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="bold" fill="${minCol}">u (θ=${theta_deg.toFixed(1)}°)</text>`;
+    const vx = cgPx+Math.cos(t2)*axLen, vy = cgPy-Math.sin(t2)*axLen-5;
+    s += `<text x="${n(vx)}" y="${n(vy)}" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="bold" fill="${majCol}" text-anchor="middle">v</text>`;
   }
 
-  // Dimension helpers
-  function arrowH(x,y,dir,col){// dir: 1=right,-1=left
-    const d=dir>0?`M${x},${y} L${x-6},${y-3} L${x-6},${y+3}Z`:`M${x},${y} L${x+6},${y-3} L${x+6},${y+3}Z`;
-    return `<path d="${d}" fill="${col}"/>`;
+  // ── Helper: arrow polygon ──────────────────────────────────────
+  function arrowH(x,y,dir,col){ // dir: +1=right, -1=left
+    const px = x, tip = x + dir*6;
+    return `<polygon points="${n(tip)},${n(y)} ${n(px)},${n(y-3)} ${n(px)},${n(y+3)}" fill="${col}"/>`;
   }
-  function arrowV(x,y,dir,col){// dir: 1=up,-1=down
-    const d=dir>0?`M${x},${y} L${x-3},${y+6} L${x+3},${y+6}Z`:`M${x},${y} L${x-3},${y-6} L${x+3},${y-6}Z`;
-    return `<path d="${d}" fill="${col}"/>`;
+  function arrowV(x,y,dir,col){ // dir: +1=down, -1=up
+    const py = y, tip = y + dir*6;
+    return `<polygon points="${n(x)},${n(tip)} ${n(x-3)},${n(py)} ${n(x+3)},${n(py)}" fill="${col}"/>`;
   }
 
-  // H dimension (left)
-  const hDimX=tx(-B)-halfT-48;
-  s+=`<line x1="${tx(0)-halfT}" y1="${ty(0)-halfT}" x2="${hDimX+2}" y2="${ty(0)-halfT}" stroke="#555" stroke-width="0.7" stroke-dasharray="3 3"/>`;
-  s+=`<line x1="${tx(0)-halfT}" y1="${ty(H)+halfT}" x2="${hDimX+2}" y2="${ty(H)+halfT}" stroke="#555" stroke-width="0.7" stroke-dasharray="3 3"/>`;
-  s+=`<line x1="${hDimX}" y1="${ty(0)-halfT}" x2="${hDimX}" y2="${ty(H)+halfT}" stroke="#4ade80" stroke-width="1"/>`;
-  s+=arrowV(hDimX,ty(0)-halfT,1,'#4ade80')+arrowV(hDimX,ty(H)+halfT,-1,'#4ade80');
-  s+=`<text transform="translate(${hDimX-14},${ty(H/2)}) rotate(-90)" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="bold" fill="#4ade80" text-anchor="middle">H = ${H} mm</text>`;
+  // ── H dimension (left, green) ─────────────────────────────────
+  const hCol = '#228822';
+  const hDimX = tx(-B) - halfT - 38;
+  s += `<line x1="${n(tx(0)-halfT)}" y1="${n(ty(0)-halfT)}" x2="${n(hDimX+2)}" y2="${n(ty(0)-halfT)}" stroke="#999" stroke-width="0.7" stroke-dasharray="3 3"/>`;
+  s += `<line x1="${n(tx(0)-halfT)}" y1="${n(ty(H)+halfT)}" x2="${n(hDimX+2)}" y2="${n(ty(H)+halfT)}" stroke="#999" stroke-width="0.7" stroke-dasharray="3 3"/>`;
+  s += `<line x1="${n(hDimX)}" y1="${n(ty(0)-halfT)}" x2="${n(hDimX)}" y2="${n(ty(H)+halfT)}" stroke="${hCol}" stroke-width="1"/>`;
+  s += arrowV(hDimX, ty(0)-halfT, -1, hCol) + arrowV(hDimX, ty(H)+halfT, 1, hCol);
+  s += `<text transform="translate(${n(hDimX-13)},${n(ty(H/2))}) rotate(-90)" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="bold" fill="${hCol}" text-anchor="middle">H = ${H} mm</text>`;
 
-  // W dimension (top)
-  const bDimY=ty(H)+halfT-40;
-  s+=`<line x1="${tx(0)-halfT}" y1="${ty(H)+halfT}" x2="${tx(0)-halfT}" y2="${bDimY-2}" stroke="#555" stroke-width="0.7" stroke-dasharray="3 3"/>`;
-  s+=`<line x1="${tx(B)+halfT}" y1="${ty(H)+halfT}" x2="${tx(B)+halfT}" y2="${bDimY-2}" stroke="#555" stroke-width="0.7" stroke-dasharray="3 3"/>`;
-  s+=`<line x1="${tx(0)-halfT}" y1="${bDimY}" x2="${tx(B)+halfT}" y2="${bDimY}" stroke="#888" stroke-width="1"/>`;
-  s+=arrowH(tx(0)-halfT,bDimY,-1,'#888')+arrowH(tx(B)+halfT,bDimY,1,'#888');
-  s+=`<text x="${((tx(0)-halfT+tx(B)+halfT)/2).toFixed(1)}" y="${bDimY-5}" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="bold" fill="#888" text-anchor="middle">W = ${B} mm</text>`;
+  // ── W dimension (top, gray) ────────────────────────────────────
+  const wCol = '#555';
+  const wDimY = ty(H) - halfT - 34;
+  s += `<line x1="${n(tx(0)-halfT)}" y1="${n(ty(H)-halfT)}" x2="${n(tx(0)-halfT)}" y2="${n(wDimY-2)}" stroke="#999" stroke-width="0.7" stroke-dasharray="3 3"/>`;
+  s += `<line x1="${n(tx(B)+halfT)}" y1="${n(ty(H)-halfT)}" x2="${n(tx(B)+halfT)}" y2="${n(wDimY-2)}" stroke="#999" stroke-width="0.7" stroke-dasharray="3 3"/>`;
+  s += `<line x1="${n(tx(0)-halfT)}" y1="${n(wDimY)}" x2="${n(tx(B)+halfT)}" y2="${n(wDimY)}" stroke="${wCol}" stroke-width="1"/>`;
+  s += arrowH(tx(0)-halfT, wDimY, -1, wCol) + arrowH(tx(B)+halfT, wDimY, 1, wCol);
+  s += `<text x="${n((tx(0)+tx(B))/2)}" y="${n(wDimY-5)}" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="bold" fill="${wCol}" text-anchor="middle">W = ${B} mm</text>`;
 
-  // C dimension (right)
-  const cDimX=tx(B)+halfT+44;
-  s+=`<line x1="${tx(B)+halfT}" y1="${ty(H)+halfT}" x2="${cDimX-2}" y2="${ty(H)+halfT}" stroke="#555" stroke-width="0.7" stroke-dasharray="3 3"/>`;
-  s+=`<line x1="${tx(B)+halfT}" y1="${ty(H-C)}" x2="${cDimX-2}" y2="${ty(H-C)}" stroke="#555" stroke-width="0.7" stroke-dasharray="3 3"/>`;
-  s+=`<line x1="${cDimX}" y1="${ty(H)+halfT}" x2="${cDimX}" y2="${ty(H-C)}" stroke="#e05252" stroke-width="1"/>`;
-  s+=arrowV(cDimX,ty(H)+halfT,1,'#e05252')+arrowV(cDimX,ty(H-C),-1,'#e05252');
-  s+=`<text x="${cDimX+8}" y="${ty(H-C/2)+4}" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="bold" fill="#e05252">C = ${C} mm</text>`;
+  // ── C dimension (right, red) ──────────────────────────────────
+  const cCol = '#a03030';
+  const cDimX = tx(B) + halfT + 38;
+  s += `<line x1="${n(tx(B)+halfT)}" y1="${n(ty(H)+halfT)}" x2="${n(cDimX-2)}" y2="${n(ty(H)+halfT)}" stroke="#999" stroke-width="0.7" stroke-dasharray="3 3"/>`;
+  s += `<line x1="${n(tx(B)+halfT)}" y1="${n(ty(H-C))}" x2="${n(cDimX-2)}" y2="${n(ty(H-C))}" stroke="#999" stroke-width="0.7" stroke-dasharray="3 3"/>`;
+  s += `<line x1="${n(cDimX)}" y1="${n(ty(H)+halfT)}" x2="${n(cDimX)}" y2="${n(ty(H-C))}" stroke="${cCol}" stroke-width="1"/>`;
+  s += arrowV(cDimX, ty(H)+halfT, -1, cCol) + arrowV(cDimX, ty(H-C), 1, cCol);
+  s += `<text x="${n(cDimX+6)}" y="${n(ty(H-C/2)+4)}" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="bold" fill="${cCol}">C=${C}</text>`;
 
-  // t dimension (on web, at mid-lip height)
-  const tLineY=ty(C/2), ti=tx(0)-halfT, to2=tx(0)+halfT;
-  s+=`<line x1="${ti-8}" y1="${tLineY}" x2="${ti+8}" y2="${tLineY}" stroke="#1a5090" stroke-width="1"/>`;
-  s+=`<line x1="${to2-8}" y1="${tLineY}" x2="${to2+8}" y2="${tLineY}" stroke="#1a5090" stroke-width="1"/>`;
-  s+=`<line x1="${ti}" y1="${tLineY}" x2="${to2+44}" y2="${tLineY}" stroke="#1a5090" stroke-width="1"/>`;
-  s+=arrowH(ti,tLineY,-1,'#1a5090')+arrowH(to2,tLineY,1,'#1a5090');
-  s+=`<text x="${to2+46}" y="${tLineY+4}" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="bold" fill="#1a5090">t = ${tt} mm</text>`;
+  // ── t dimension (web mid, blue) ───────────────────────────────
+  const tCol = '#1a5090';
+  const tY = ty(C/2);
+  const ti = tx(0)-halfT, to2 = tx(0)+halfT;
+  s += `<line x1="${n(ti-7)}" y1="${n(tY)}" x2="${n(ti+7)}" y2="${n(tY)}" stroke="${tCol}" stroke-width="1.2"/>`;
+  s += `<line x1="${n(to2-7)}" y1="${n(tY)}" x2="${n(to2+7)}" y2="${n(tY)}" stroke="${tCol}" stroke-width="1.2"/>`;
+  s += `<line x1="${n(ti)}" y1="${n(tY)}" x2="${n(to2+38)}" y2="${n(tY)}" stroke="${tCol}" stroke-width="1"/>`;
+  s += arrowH(ti, tY, -1, tCol) + arrowH(to2, tY, 1, tCol);
+  s += `<text x="${n(to2+40)}" y="${n(tY+4)}" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="bold" fill="${tCol}">t = ${tt} mm</text>`;
 
-  el.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${Hc}" viewBox="0 0 ${W} ${Hc}">${s}</svg>`;
+  s += `</svg>`;
+  el.innerHTML = s;
 }
 
 // ── CALCULATE ───────────────────────────────────────────────────
@@ -2003,8 +1995,8 @@ function calculate(){
   ps('p1_kfe',kfe,2);ps('p1_kwe',kwe,2);ps('p1_kfg',kfg,2);ps('p1_kwg',kwg,2);
   ps('p1_Lm',Lm,0);ps('p1_Lcrd',Lcrd,1);ps('p1_Ld',Ld,1);ps('p1_Fcrd',Fcrd,0);
   pt('p1_Fcrd_sub','('+f(kfe,2)+' + '+f(kwe,2)+' + 0.00) / ('+f(kfg,2)+' + '+f(kwg,2)+') × 100');
-  // Draw print canvas
-  drawSectionSVG('pr-canvas',H,B,C,r,tt,theta);  // print SVG (resolution-independent)
+  // Draw print canvas as SVG (vector — crisp at any resolution)
+  drawSectionSVG('pr-canvas',H,B,C,r,tt,theta);
 
   // Page 2 — Flexure LTB
   ps('p2_Sfx',Sfx);pt('p2_Sfx_sub',f(Ix/1e4,2)+' / '+f(H/2/10,0));
@@ -2054,11 +2046,8 @@ function calculate(){
   // Page 3 — Shear
   ps('p3_Aw',Aw,3);ps('p3_Vy',Vy,0);ps('p3_Vcr',Vcr,0);
   ps('p3_lv',lv,3);pt('p3_lv_cond',lv<=0.587?'≤':'>');ps('p3_Vn',Vn,0);ps('p3_Vn2',Vn,0);
-  // Page 3/4 — Summary
+  // Page 3 — Summary
   ps('p3_Mnx_gov',mnx_min);ps('p3_Mny_gov',mny_min);ps('p3_Pn_gov2',pn_min,0);
-  // Page 4 — Compression summary (new)
-  ps('p3_sum_Pn_gov',Pn,0);ps('p3_sum_Pnl_gov',Pnl,0);ps('p3_sum_Pnd_gov',Pnd,0);
-  ps('p3_Pn_gov2_sum',pn_min,0);
 
   drawSection('sectionCanvas',H,B,C,r,tt,theta);
 }
@@ -2071,8 +2060,7 @@ if(window.ResizeObserver){
 }
 window.addEventListener('resize',calculate);
 window.addEventListener('load',()=>{setupInputs();calculate();});
-window.addEventListener('beforeprint',()=>{ calculate(); });
-
 </script>
+</div></div>
 </body>
 </html>
