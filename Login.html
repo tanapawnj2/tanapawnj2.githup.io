@@ -219,11 +219,15 @@
       const loginTime = localStorage.getItem(SESSION_KEY);
       const now = Date.now();
 
-      if (loginTime && (now - parseInt(loginTime)) < SESSION_LIMIT) {
+      if (!loginTime) {
+        // ไม่มีเวลา login → บันทึกไว้แล้ว redirect (กรณี Google login หรือ session เก่า)
+        localStorage.setItem(SESSION_KEY, now.toString());
+        window.location.href = "Main.html";
+      } else if ((now - parseInt(loginTime)) < SESSION_LIMIT) {
         // session ยังไม่หมด → redirect
         window.location.href = "Beamelement.html";
       } else {
-        // session หมดหรือไม่มีข้อมูล → logout บังคับ
+        // session หมดอายุ → logout บังคับ
         await signOut(auth);
         localStorage.removeItem(SESSION_KEY);
         document.getElementById("auth-card").style.display = "block";
