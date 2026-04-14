@@ -213,7 +213,7 @@
   // ── Auth state ──
   onAuthStateChanged(auth, user => {
     if (user && user.emailVerified) {
-      window.location.href = "CChannelwithLip.html";
+      window.location.href = "Main.html";
     } else {
       document.getElementById("auth-card").style.display = "block";
     }
