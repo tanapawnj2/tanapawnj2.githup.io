@@ -210,10 +210,25 @@
     document.getElementById("msg-box").className = "msg";
   }
 
+  const SESSION_KEY = "login_time";
+  const SESSION_LIMIT = 24 * 60 * 60 * 1000; // 24 ชั่วโมง
+
   // ── Auth state ──
-  onAuthStateChanged(auth, user => {
+  onAuthStateChanged(auth, async user => {
     if (user && user.emailVerified) {
-      window.location.href = "Beamelement.html";
+      const loginTime = localStorage.getItem(SESSION_KEY);
+      const now = Date.now();
+
+      if (loginTime && (now - parseInt(loginTime)) < SESSION_LIMIT) {
+        // session ยังไม่หมด → redirect
+        window.location.href = "Beamelement.html";
+      } else {
+        // session หมดหรือไม่มีข้อมูล → logout บังคับ
+        await signOut(auth);
+        localStorage.removeItem(SESSION_KEY);
+        document.getElementById("auth-card").style.display = "block";
+        showMsg("session หมดอายุ กรุณาเข้าสู่ระบบใหม่", "error");
+      }
     } else {
       document.getElementById("auth-card").style.display = "block";
     }
@@ -260,6 +275,8 @@
         showMsg("กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ ตรวจสอบ inbox ของคุณ", "error");
         return;
       }
+      // บันทึกเวลา login
+      localStorage.setItem(SESSION_KEY, Date.now().toString());
     } catch (e) {
       showMsg(getErrorMsg(e.code), "error");
     } finally {
@@ -269,7 +286,9 @@
 
   // ── Google ──
   function handleGoogle() {
-    signInWithPopup(auth, provider).catch(e => showMsg(getErrorMsg(e.code), "error"));
+    signInWithPopup(auth, provider)
+      .then(() => localStorage.setItem(SESSION_KEY, Date.now().toString()))
+      .catch(e => showMsg(getErrorMsg(e.code), "error"));
   }
   document.getElementById("btn-google-login").addEventListener("click", handleGoogle)
   document.getElementById("btn-google-register").addEventListener("click", handleGoogle);
