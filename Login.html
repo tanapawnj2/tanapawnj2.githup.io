@@ -152,22 +152,7 @@
   </div>
 </div>
 
-<div class="auth-card" id="dashboard">
-  <div class="avatar-circle" id="avatar-circle">U</div>
-  <div class="user-name" id="dash-name">ชื่อผู้ใช้</div>
-  <div class="user-email" id="dash-email">email@example.com</div>
-  <div class="info-box">
-    <div class="ilabel">สถานะบัญชี</div>
-    <div class="ivalue" id="dash-verified">—</div>
-  </div>
-  <div class="info-box">
-    <div class="ilabel">UID</div>
-    <div class="ivalue" id="dash-uid" style="font-family:monospace;font-size:0.78rem;word-break:break-all;">—</div>
-  </div>
-  <button class="btn-outline" id="btn-logout">ออกจากระบบ</button>
-</div>
-
-<script type="module">
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" defer></script><script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -225,25 +210,12 @@
     document.getElementById("msg-box").className = "msg";
   }
 
-  function showDashboard(user) {
-    document.getElementById("auth-card").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-    const name = user.displayName || user.email.split("@")[0];
-    document.getElementById("dash-name").textContent     = name;
-    document.getElementById("dash-email").textContent    = user.email;
-    document.getElementById("avatar-circle").textContent = name.charAt(0).toUpperCase();
-    document.getElementById("dash-uid").textContent      = user.uid;
-    document.getElementById("dash-verified").textContent =
-      user.emailVerified ? "✓ ยืนยันอีเมลแล้ว" : "⚠ ยังไม่ได้ยืนยันอีเมล";
-  }
-
   // ── Auth state ──
   onAuthStateChanged(auth, user => {
     if (user) {
-      showDashboard(user);
+      window.location.href = "CChannelwithLip.html";
     } else {
       document.getElementById("auth-card").style.display = "block";
-      document.getElementById("dashboard").style.display = "none";
     }
   });
 
@@ -299,12 +271,4 @@
   function handleGoogle() {
     signInWithPopup(auth, provider).catch(e => showMsg(getErrorMsg(e.code), "error"));
   }
-  document.getElementById("btn-google-login").addEventListener("click", handleGoogle);
-  document.getElementById("btn-google-register").addEventListener("click", handleGoogle);
-
-  // ── Logout ──
-  document.getElementById("btn-logout").addEventListener("click", () => signOut(auth));
-</script>
-
-</body>
-</html>
+  document.getElementById("btn-google-login").addEventListener("click", handleGoogle)
