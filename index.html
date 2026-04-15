@@ -375,12 +375,11 @@
         localStorage.setItem(SESSION_KEY, now.toString());
         window.location.href = "Main.html";
       } else if ((now - parseInt(loginTime)) < SESSION_LIMIT) {
-        window.location.href = "Beamelement.html";
+        window.location.href = "Main.html";
       } else {
         await signOut(auth);
         localStorage.removeItem(SESSION_KEY);
-        document.getElementById("auth-card").style.display = "block";
-        showMsg("session หมดอายุ กรุณาเข้าสู่ระบบใหม่", "error");
+        window.location.href = "index.html";
       }
     } else {
       document.getElementById("auth-card").style.display = "block";
