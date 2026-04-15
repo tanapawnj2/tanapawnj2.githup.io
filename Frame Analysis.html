@@ -171,14 +171,14 @@ select option{background:var(--surf2);}
       const name = user.displayName || user.email.split("@")[0];
       document.getElementById("user-name").textContent = name;
     } else {
-      window.location.href = "Login.html";
+      window.location.href = "index.html";
     }
   });
 
   document.getElementById("btn-logout").addEventListener("click", async () => {
     localStorage.removeItem("login_time");
     await signOut(auth);
-    window.location.href = "Login.html";
+    window.location.href = "index.html";
   });
 </script>
 </head>
