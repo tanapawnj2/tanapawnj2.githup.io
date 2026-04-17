@@ -459,7 +459,7 @@
   </div>
 
   <div class="donation-divider"></div>
-  <div class="donation-cta-label">อยากสนับสนุนการพัฒนา?<br>ช่วยได้เลยผ่าน PromptPay หรือ Ko-fi ครับ<br>ท่านใดที่บริจาคผ่าน QR Code ให้ส่งสลิปการโอนเงินมาที่ civiltoolkits@gmail.com ได้เลยครับ</div>
+  <div class="donation-cta-label">อยากสนับสนุนการพัฒนา?<br>ช่วยได้เลยผ่าน PromptPay หรือ Ko-fi ครับ<br>หากท่านใดโอนเงินให้ผมผ่าน QR Code ให้ส่ง Slip การโอนเงินมาที่ civiltoolkits@gmail.com ได้เลยครับ</div>
   <a class="btn-donate kofi-button" href='https://ko-fi.com/tanapawnjardrit' target='_blank'>
     <img src='https://storage.ko-fi.com/cdn/cup-border.png' alt='Ko-fi' style='height:20px;width:auto;vertical-align:middle;margin-right:6px;'/>
     Support me
@@ -496,8 +496,8 @@
   // ── Real-time donor list from Firestore ──
   const donorQ = query(
     collection(db, "donors"),
-    orderBy("timestamp", "desc"),
-    limit(5)
+    orderBy("amount", "desc"),
+    limit(20)
   );
 
   onSnapshot(donorQ, (snapshot) => {
