@@ -2,269 +2,329 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=0.1">
+<meta name="viewport" content="width=1280, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
 <title>Reinforced Concrete Beam Analysis</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0d0f14;
-  --surface: #161922;
-  --surface2: #1e222d;
-  --border: #2a2f3e;
-  --accent: #00e5ff;
-  --accent2: #ff6b35;
-  --accent3: #ffd60a;
-  --purple: #b482ff;
-  --green: #00ff88;
-  --text: #e8ecf4;
-  --text-dim: #8892aa;
-  --text-muted: #4a5570;
-  --danger: #ff4d6d;
-  --success: #00ff88;
+/* ── CSS Variables (C-Channel palette) ── */
+:root{
+  --bg:#0f1117;--bg2:#161b25;--bg3:#1c2333;--bg4:#222c3c;
+  --border:#2a3650;--border2:#334166;
+  --text:#ffffff;--muted:#ffffff;--dim:#ffffff;
+  --blue:#4a90d9;--blue2:#2563a8;--blue-glow:rgba(74,144,217,.15);
+  --orange:#f0883e;--red:#e05252;--green:#4ade80;
+  --yellow:#f5c842;--purple:#a78bfa;--cyan:#22d3ee;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+  /* compat aliases for JS that uses old var names */
+  --surface:var(--bg2);--surface2:var(--bg3);
+  --accent:var(--cyan);--accent2:var(--orange);--accent3:var(--yellow);
+  --text-dim:rgba(255,255,255,0.55);--text-muted:rgba(255,255,255,0.35);
+  --danger:var(--red);--success:var(--green);
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Syne','Sarabun',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:24px 24px 80px;}
-/* Header */
-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--border);}
-.tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;background:rgba(79,158,255,.1);border:1px solid rgba(79,158,255,.2);padding:3px 10px;border-radius:2px;display:inline-block;margin-bottom:8px;}
-h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:.04em;line-height:1.2;}
-h1 span{color:var(--accent);}
-.subtitle{color:var(--text-dim);font-size:12px;margin-top:4px;font-family:'Space Mono',monospace;}
-.version{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);}
-/* Card */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;}
-.card:hover{border-color:rgba(0,229,255,.3);box-shadow:0 4px 20px rgba(0,0,0,.3);}
-.card-hd{padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.ico{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
-.ico-b{background:rgba(0,229,255,.15);color:var(--accent);}
-.ico-g{background:rgba(0,255,136,.12);color:var(--green);}
-.ico-y{background:rgba(255,214,10,.12);color:var(--accent3);}
-.ico-p{background:rgba(255,107,53,.12);color:var(--accent2);}
-.card-ttl{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);}
-.card-bd{padding:16px 18px;}
-/* Grid */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-/* Form */
-.fld{display:flex;flex-direction:column;gap:4px;}
-label{font-family:'DM Mono',monospace;font-size:13px;font-weight:400;color:var(--text-dim);}
-label .sy{color:var(--accent);font-style:normal;}
-.iw{position:relative;display:flex;align-items:center;}
-input[type=number],select{width:100%;background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.25);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:14px;padding:7px 36px 7px 11px;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;-webkit-appearance:none;appearance:none;}
-input[type=number]:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,.12);background:rgba(0,229,255,0.07);}
-input.hi{border-color:rgba(0,229,255,.35);background:rgba(0,229,255,0.06);}
-input[readonly]{opacity:.5;cursor:default;}
-.un{position:absolute;right:8px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text-dim);pointer-events:none;}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237a8aaa' d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer;}
-/* SVG dimension labels */
-.svg-dim-label { fill: #ffffff; font-size: 12px; }
+*{box-sizing:border-box;margin:0;padding:0}
+html{min-width:1372px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+sub,sup{font-size:0.72em;font-weight:600;line-height:0;position:relative;vertical-align:baseline;}
+sub{bottom:-0.3em;}sup{top:-0.4em;}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,#0d1520,#1a2540);border-bottom:1px solid var(--border2);
+  padding:0 24px;display:flex;align-items:center;gap:14px;height:52px;
+  position:sticky;top:0;z-index:100;min-width:1280px}
+.hdr-logo{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue);
+  letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--blue2);padding:3px 9px;border-radius:3px}
+.hdr-title{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text);letter-spacing:.04em}
+.hdr-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* ── LAYOUT: sidebar + main ── */
+.layout{display:flex;min-width:1372px}
+.sidebar{width:360px;min-width:360px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
+.main{flex:1;min-width:0;padding:20px;display:flex;flex-direction:column;gap:0}
+
+/* ── SIDEBAR GROUPS ── */
+.sg{border-bottom:1px solid var(--border);padding:12px 14px}
+.sg-title{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sg-title::after{content:'';flex:1;height:1px;background:var(--border2)}
+
+/* ── FORM INPUTS (sidebar) ── */
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:7px}
+label{font-family:var(--mono);font-size:11px;font-weight:500;color:rgba(255,255,255,0.6);letter-spacing:.04em}
+label .sy{color:var(--blue);font-style:normal}
+.iw{position:relative;display:flex;align-items:center}
+input[type=number],select{
+  width:100%;background:var(--bg3);border:1px solid var(--border);color:#fff;
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  padding:5px 36px 5px 10px;border-radius:4px;text-align:left;
+  outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
+input[type=number]:focus,select:focus{border-color:var(--blue);background:var(--bg4)}
+input.hi{border-color:rgba(74,144,217,.4);background:rgba(74,144,217,.06)}
+input[readonly]{opacity:.45;cursor:default}
+.un{position:absolute;right:8px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.45);pointer-events:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%234a90d9' d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer;padding-right:28px;text-align:left}
+
+/* ── SECTION BLOCKS (main area) ── */
+.sec-block{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;background:var(--bg2)}
+.sec-hdr{background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:10px}
+.sec-tag{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;padding:2px 7px;border-radius:2px}
+.tag-blue{background:var(--blue2)}.tag-orange{background:#b45309}.tag-green{background:#166534}
+.tag-red{background:#991b1b}.tag-purple{background:#6d28d9}.tag-cyan{background:#0e7490}
+.tag-pink{background:#9d174d}.tag-yellow{background:#854d0e}
+.sec-title{font-size:12px;font-weight:600;color:#fff;font-family:var(--sans)}
+.sec-ref{margin-left:auto;font-family:var(--sans);font-size:10px;color:rgba(255,255,255,0.5)}
+.sec-body{padding:14px}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.card-bd{padding:14px}
+
+/* ── SECTION DIVIDER ── */
+.dv,.sdiv{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,0.5);display:flex;align-items:center;gap:8px;margin:10px 0 8px}
+.dv span,.sdiv span{white-space:nowrap}
+.dv::before,.sdiv::before{content:'';width:10px;height:1px;background:var(--border2);flex-shrink:0}
+.dv::after,.sdiv::after{content:'';flex:1;height:1px;background:var(--border2)}
+
+/* ── STRIP LABELS ── */
+.slbl{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 9px;border-radius:2px;display:inline-block;margin-bottom:10px}
+.slbl-c{background:rgba(74,144,217,.15);color:var(--blue);border:1px solid rgba(74,144,217,.3)}
+.slbl-m{background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
+
+/* ── STIRRUP ROW ── */
+.sr{display:grid;grid-template-columns:1fr 26px 1fr;align-items:end;gap:8px;margin-bottom:10px}
+.at{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,0.4);text-align:center;padding-bottom:6px}
+
+/* ── LAYER ROW ── */
+.lr{display:grid;grid-template-columns:42px 1fr 1fr;gap:8px;align-items:end;margin-bottom:7px}
+.ltag{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--orange);text-align:right;padding-bottom:7px}
+
+/* ── RESULT BLOCKS (rb) ── */
+.rb{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:12px 14px;margin-bottom:10px}
+.rb-ttl{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px}
+.rb-ttl::before{content:'';width:10px;height:1px;background:var(--blue)}
+.rp{font-family:var(--sans);font-size:12px;color:#fff;line-height:2.1}
+.v{font-family:var(--sans);font-weight:700;font-size:12px}
+.vb{color:var(--cyan)}.vg{color:var(--green)}.vy{color:var(--yellow)}
+.vr{color:var(--red)}.vp{color:var(--purple)}
+.lbl{font-family:var(--sans);font-size:12px;font-weight:400;color:rgba(255,255,255,0.7)}
+.rhi{background:rgba(74,144,217,.08);border:1px solid rgba(74,144,217,.2);border-radius:4px;padding:8px 12px}
+.rbig{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--blue);line-height:1.2}
+.rbig-lbl{font-family:var(--sans);font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px}
+
+/* ── DIAGRAMS ── */
+.dia-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dia-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.5)}
+.dia-stirrup{font-family:var(--sans);font-size:12px;font-weight:500;color:rgba(255,255,255,0.8);text-align:center;margin-top:2px}
+canvas,svg{display:block;border-radius:4px}
+.svg-dim-label{fill:#ffffff;font-size:12px}
+
+/* ── CALCULATION STEPS ── */
+.steps-wrap{display:flex;flex-direction:column;gap:8px}
+.step-group{background:var(--bg3);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.step-group-title{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--blue);background:var(--bg4);padding:6px 12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px}
+.step-group-title::before{content:'';width:3px;height:12px;background:var(--blue);border-radius:2px;flex-shrink:0}
+.step-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;
+  padding:6px 12px;border-bottom:1px solid rgba(42,54,80,.5);font-family:var(--sans);font-size:12px}
+.step-row:last-child{border-bottom:none}
+.step-lhs{display:flex;flex-direction:column;gap:1px}
+.step-name{color:#fff;font-size:12px}
+.step-formula{color:rgba(255,255,255,0.45);font-size:10px;margin-top:1px}
+.step-val{font-weight:600;white-space:nowrap;text-align:right;color:#fff;font-size:12px}
+.step-val.ok{color:var(--green)}
+.step-val.warn{color:var(--yellow)}
+.step-val.bad{color:var(--red)}
+.step-val.hi{font-size:14px;font-weight:800;color:var(--cyan)}
+.step-note{font-size:10px;color:var(--yellow);grid-column:1/-1;
+  padding:4px 8px;background:rgba(245,200,66,.06);border-left:2px solid var(--yellow);
+  border-radius:0 3px 3px 0;margin-top:3px}
+
+/* ── ACTION BUTTONS ── */
+.ab{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.btn{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:7px 18px;border-radius:4px;border:none;cursor:pointer;transition:all .15s}
+.btn-s{background:transparent;border:1px solid var(--border2);color:rgba(255,255,255,0.5)}
+.btn-s:hover{border-color:var(--blue);color:var(--blue)}
+.btn-p{background:var(--blue2);color:#fff;border:1px solid var(--blue)}
+.btn-p:hover{background:var(--blue)}
+
+/* ── NOTIFY ── */
+.noti{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--blue);border-radius:4px;
+  padding:8px 16px;font-family:var(--mono);font-size:11px;color:var(--blue);
+  transform:translateY(60px);opacity:0;transition:all .3s;z-index:200}
+.noti.show{transform:translateY(0);opacity:1}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ══ PRINT STYLES ══════════════════════════════════════════════════════ */
 @media print {
+  @page { size: A4 portrait; margin: 0; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { min-width:0 !important; width:210mm !important; margin:0 !important; padding:0 !important;
+    background:#fff !important; }
+  :root {
+    --text: #000 !important; --muted: #333 !important; --dim: #555 !important;
+    --bg: #fff !important; --bg2: #fff !important; --bg3: #f5f5f5 !important;
+    --bg4: #eeeeee !important; --border: #bbbbbb !important; --border2: #999999 !important;
+  }
+  .hdr, .sidebar, .layout { display:none !important; }
   .svg-dim-label { fill: #111111 !important; }
-  /* Calculation Steps — keep on same page */
-  .print-steps-card {
-    page-break-before: always !important;
-    break-before: page !important;
+
+  /* each print page */
+  .pr-page {
+    display:flex !important; flex-direction:column; align-items:center;
+    justify-content:flex-start; width:210mm !important; min-height:297mm !important;
+    margin:0 !important; padding:0 !important; page-break-after:always;
+    box-sizing:border-box; background:#fff !important;
   }
-  .print-steps-card .step-group {
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
-  }
-}
-.steps-wrap{display:flex;flex-direction:column;gap:10px;}
-.step-group{background:var(--bg);border:1px solid var(--border);border-radius:7px;overflow:hidden;}
-.step-group-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text);background:var(--surface2);padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.step-group-title::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px;flex-shrink:0;box-shadow:0 0 6px rgba(0,229,255,.4);}
-.step-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;padding:9px 14px;border-bottom:1px solid rgba(42,48,69,.4);}
-.step-row:last-child{border-bottom:none;}
-.step-lhs{display:flex;flex-direction:column;gap:2px;}
-.step-name{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:var(--text);}
-.step-formula{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:var(--text);margin-top:1px;}
-.step-val{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:var(--text);text-align:right;white-space:nowrap;}
-.step-val.ok{color:var(--success);}
-.step-val.warn{color:var(--accent3);}
-.step-val.bad{color:var(--danger);}
-.step-val.hi{font-size:14px;color:var(--text);font-weight:400;}
-.step-note{font-family:'Sarabun',sans-serif;font-size:13px;color:var(--accent3);grid-column:1/-1;padding:5px 10px;background:rgba(245,200,66,.05);border-left:3px solid var(--accent3);border-radius:0 4px 4px 0;margin-top:3px;}
-/* Divider */
-.dv{display:flex;align-items:center;gap:10px;margin:12px 0 10px;}
-.dv span{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;}
-.dv::before,.dv::after{content:'';flex:1;height:1px;background:var(--border);}
-/* Strip label */
-.slbl{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;padding:3px 10px;border-radius:3px;display:inline-block;margin-bottom:12px;}
-.slbl-c{background:rgba(0,229,255,.10);color:var(--accent);border:1px solid rgba(0,229,255,.25);}
-.slbl-m{background:rgba(255,107,53,.10);color:var(--accent2);border:1px solid rgba(255,107,53,.25);}
-/* Stirrup row */
-.sr{display:grid;grid-template-columns:1fr 26px 1fr;align-items:end;gap:10px;margin-bottom:12px;}
-.at{font-family:'Sarabun',sans-serif;font-size:13px;color:var(--text-muted);text-align:center;padding-bottom:7px;}
-/* Layer row */
-.lr{display:grid;grid-template-columns:54px 1fr 1fr;gap:10px;align-items:end;margin-bottom:9px;}
-.ltag{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:var(--accent2);text-align:right;padding-bottom:8px;}
-/* ====== RESULT PARAGRAPH ====== */
-.rb{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:12px;}
-.rb-ttl{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.rb-ttl::before{content:'';width:10px;height:1px;background:var(--accent);}
-.rp{font-family:'Sarabun',sans-serif;font-size:14px;color:#fff;line-height:2.2;}
-.v{font-family:'Sarabun',sans-serif;font-weight:700;font-size:14px;}
-.vb{color:var(--accent);} .vg{color:var(--green);} .vy{color:var(--accent3);}
-.vr{color:var(--danger);} .vp{color:var(--purple);}
-.lbl{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:#fff;}
-.rhi{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.15);border-radius:6px;padding:10px 14px;}
-.rbig{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--accent);line-height:1.2;}
-.rbig-lbl{font-family:'Sarabun',sans-serif;font-size:14px;color:var(--text-muted);margin-top:2px;}
-/* Diagrams */
-.dia-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;}
-.dia-lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
-.dia-stirrup{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;color:#fff;text-align:center;margin-top:2px;}
-/* Actions */
-.ab{display:flex;justify-content:flex-end;gap:12px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
-.btn{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:9px 20px;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
-.btn-s{background:transparent;border:1px solid rgba(0,229,255,.25);color:var(--text-dim);}
-.btn-s:hover{border-color:var(--accent);color:var(--accent);}
-.btn-p{background:var(--accent);color:#0a0f1a;}
-.btn-p:hover{background:#6fb0ff;transform:translateY(-1px);box-shadow:0 4px 18px rgba(79,158,255,.3);}
-/* Notify */
-.noti{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--accent);border-radius:6px;padding:10px 18px;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);transform:translateY(60px);opacity:0;transition:all .3s;z-index:100;}
-.noti.show{transform:translateY(0);opacity:1;}
-::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  .pr-page:last-of-type { page-break-after:avoid; }
+  .pr-outer { width:196mm !important; margin:6mm 0 !important; box-sizing:border-box;
+    border:1.2px solid #888; background:#fff; }
+  .pr-page, .pr-page * { color:#000 !important; background-color:transparent !important; }
+  .pr-sec  { background:#2563a8 !important; color:#fff !important; margin:6px 0 4px !important; }
+  .pr-sec2 { background:#1a4a8a !important; color:#fff !important; }
+  .pr-so   { background:#e8f0fe !important; }
+  .pr-so-val { color:#000 !important; font-weight:800 !important; }
+  .pr-outer { background:#fff !important; }
+  .pr-tbl th { background:#ddd !important; }
+  .pr-body { padding:6px 10px !important; }
 
-
-/* ===== PRINT STYLES ===== */
-@media print {
-  @page { size:A4 portrait; margin:12mm 10mm 12mm 10mm; }
-
-  *,*::before,*::after { background:#fff !important; color:#111 !important; box-shadow:none !important; text-shadow:none !important; border-color:#ccc !important; }
-  body { background:#fff !important; font-family:'Sarabun',sans-serif; font-size:9pt; line-height:1.45; }
-  body::before { display:none !important; }
-  .wrap { padding:0 !important; max-width:100% !important; }
-
-  /* Hide screen-only elements */
+  /* Print overlay: show */
+  #print-overlay { display:block !important; }
+  /* Hide screen body */
   .ab,.noti,.btn,.tag,#print-body,#input-params,#assign-reinforce { display:none !important; }
-  /* Show cloned assign-reinforce inside overlay */
   #print-overlay #assign-reinforce { display:block !important; }
 
-  /* Show print overlay */
-  #print-overlay { display:block !important; }
+  /* ── 2-col print grid (JS uses these classes) ── */
+  .pgrid { display:grid !important; grid-template-columns:1fr 1fr !important; gap:2mm !important; align-items:start !important; }
+  .pcol  { display:flex !important; flex-direction:column !important; gap:1.5mm !important; }
 
-  @page { size:A4 portrait; margin:12mm 10mm 12mm 10mm; }
-
-  /* Print page structure */
-  .print-page { display:block; }
-  .print-page-header {
-    display:flex !important;
-    justify-content:space-between !important;
-    align-items:center !important;
-    border-bottom:1.5px solid #222 !important;
-    margin-bottom:4mm !important;
-    padding-bottom:2mm !important;
-  }
-  .print-page-content { display:block; }
-  /* Page number: fixed bottom-right */
-  .print-page-footer {
-    position:fixed !important;
-    bottom:5mm !important;
-    right:10mm !important;
-    font-family:'Sarabun',sans-serif !important;
-    font-size:9pt !important;
-    color:#555 !important;
-    z-index:9999;
-  }
-  /* Each page footer shows only its own number via nth-child */
-  .print-page-footer { display:none !important; }
-  .print-page:nth-child(1) .print-page-footer-1 { display:block !important; }
-  .print-page:nth-child(2) .print-page-footer-2 { display:block !important; }
-  .print-page:nth-child(3) .print-page-footer-3 { display:block !important; }
-  .print-page:nth-child(4) .print-page-footer-4 { display:block !important; }
-  /* Hide original screen header on print */
-  header { display:none !important; }
-
-  /* 2-column print grid */
-  .pgrid { display:grid !important; grid-template-columns:1fr 1fr !important; gap:6mm !important; align-items:start !important; }
-  .pcol  { display:flex !important; flex-direction:column !important; gap:3mm !important; }
-
-  /* Cards */
-  .card { border:1px solid #ccc !important; border-radius:3px !important; break-inside:avoid !important; page-break-inside:avoid !important; margin:0 !important; }
-  .card-hd { background:#efefef !important; padding:3px 8px !important; border-bottom:1px solid #ccc !important; }
-  .card-ttl { font-size:9pt !important; font-weight:700 !important; color:#111 !important; }
+  /* ── Cards in print ── */
+  .card { border:1px solid #bbb !important; border-radius:2px !important; break-inside:avoid !important; page-break-inside:avoid !important; margin:0 !important; }
+  .card-hd { background:#e8eef8 !important; padding:2px 8px !important; border-bottom:1px solid #bbb !important; }
+  .card-ttl { font-size:7.5pt !important; font-weight:700 !important; color:#1a3a7a !important; letter-spacing:.03em !important; }
   .ico { display:none !important; }
-  .card-bd { padding:5px 8px !important; }
+  .card-bd { padding:3px 6px !important; }
   .g2,.g3 { display:block !important; }
+  .card-bd .g2 { display:grid !important; grid-template-columns:1fr 1fr !important; gap:4px !important; }
 
-  /* Divider */
-  .dv { margin:2mm 0 !important; border-bottom:1px solid #ccc !important; }
-  .dv span { font-size:8pt !important; color:#555 !important; }
+  /* ── Dividers ── */
+  .dv,.sdiv { margin:1mm 0 !important; border-bottom:0.5px solid #ccc !important; }
+  .dv span,.sdiv span { font-size:6.5pt !important; color:#555 !important; }
+  .dv::before,.dv::after,.sdiv::before,.sdiv::after { display:none !important; }
 
-  /* Result blocks */
-  .rb { background:#f7f7f7 !important; border:1px solid #ddd !important; border-radius:3px !important; padding:4px 8px !important; margin-bottom:2mm !important; break-inside:avoid !important; }
-  .rb-ttl { font-size:8pt !important; font-weight:700 !important; border-bottom:1px solid #ccc !important; padding-bottom:2px !important; margin-bottom:3px !important; }
+  /* ── Strip labels ── */
+  .slbl { font-size:7pt !important; padding:1px 6px !important; margin-bottom:2px !important; }
+  .slbl-c { background:#dceeff !important; color:#1a3a7a !important; border:1px solid #99b !important; }
+  .slbl-m { background:#ede8ff !important; color:#3a1a7a !important; border:1px solid #aab !important; }
+
+  /* ── Result blocks ── */
+  .rb { background:#f5f8ff !important; border:1px solid #cdd6ee !important; border-radius:2px !important; padding:3px 6px !important; margin-bottom:1mm !important; break-inside:avoid !important; }
+  .rb-ttl { font-size:7pt !important; font-weight:700 !important; color:#1a3a7a !important; border-bottom:0.5px solid #ccc !important; padding-bottom:1px !important; margin-bottom:2px !important; }
   .rb-ttl::before { display:none !important; }
-  .rp { font-size:8pt !important; line-height:1.75 !important; }
-  .v  { font-size:8.5pt !important; font-weight:700 !important; }
+  .rp { font-size:7.5pt !important; line-height:1.35 !important; }
+  .v  { font-size:8pt !important; font-weight:700 !important; }
   .vb,.vg,.vy,.vr,.vp { color:#111 !important; }
-  .lbl { color:#555 !important; font-size:7.5pt !important; }
-  .rhi { background:#eef3ff !important; border:1px solid #aac !important; padding:4px 6px !important; }
-  .rbig { font-size:12pt !important; font-weight:700 !important; }
-  .rbig-lbl { font-size:7.5pt !important; color:#555 !important; }
+  .lbl { color:#444 !important; font-size:7pt !important; }
+  .rhi { background:#e8f0fe !important; border:1px solid #90b4f0 !important; border-left:3px solid #2563a8 !important; padding:2px 6px !important; }
+  .rbig { font-size:11pt !important; font-weight:800 !important; color:#1a3a7a !important; line-height:1.2 !important; }
+  .rbig-lbl { font-size:6.5pt !important; color:#555 !important; margin-top:0 !important; }
 
-  /* Diagrams */
-  .dia-wrap { break-inside:avoid !important; }
-  .dia-lbl  { font-size:8pt !important; font-weight:700 !important; color:#333 !important; }
-  .dia-stirrup { font-size:8pt !important; color:#111 !important; }
-  svg { width:100% !important; height:auto !important; }
+  /* ── Diagrams — ห้ามตัดข้ามหน้า ── */
+  .dia-wrap { break-inside:avoid !important; page-break-inside:avoid !important; }
+  .dia-lbl  { font-size:7pt !important; font-weight:700 !important; color:#333 !important; }
+  .dia-stirrup { font-size:7.5pt !important; color:#111 !important; }
+  svg { width:100% !important; max-height:230px !important; height:auto !important; }
+  .dia-section { break-inside:avoid !important; page-break-inside:avoid !important; }
 
-  /* Steps */
-  .steps-wrap { gap:2px !important; }
-  .step-group { border:1px solid #ccc !important; border-radius:3px !important; break-inside:avoid !important; page-break-inside:avoid !important; margin:0 !important; }
-  .step-group-title { background:#efefef !important; font-size:7.5pt !important; font-weight:700 !important; padding:3px 8px !important; border-bottom:1px solid #ccc !important; }
-  .step-group-title::before { background:#555 !important; width:2px !important; height:10px !important; }
-  .step-row { padding:2px 8px !important; border-bottom:1px solid #eee !important; gap:6px !important; }
-  .step-name    { font-size:8pt !important; }
-  .step-formula { font-size:7pt !important; color:#444 !important; }
-  .step-val     { font-size:8pt !important; }
-  .step-val.ok  { color:#1a6a1a !important; }
-  .step-val.warn{ color:#7a5500 !important; }
-  .step-val.bad { color:#aa1111 !important; }
-  .step-val.hi  { font-weight:700 !important; }
-  .step-note    { font-size:7pt !important; color:#7a5500 !important; background:#fffbee !important; border-left:2px solid #cc9900 !important; padding:2px 6px !important; }
-  /* inner g2 inside cards → keep as grid */
-  .card-bd .g2 { display:grid !important; grid-template-columns:1fr 1fr !important; gap:6px !important; }
+  /* ── Calculation Steps ── */
+  .steps-wrap { gap:1px !important; }
+  .step-group { border:1px solid #bbb !important; border-radius:2px !important; break-inside:avoid !important; page-break-inside:avoid !important; margin:0 !important; }
+  .step-group-title { background:#e8eef8 !important; font-size:7pt !important; font-weight:700 !important; color:#1a3a7a !important; padding:2px 8px !important; border-bottom:0.5px solid #bbb !important; }
+  .step-group-title::before { background:#2563a8 !important; width:2px !important; height:8px !important; }
+  .step-row { padding:1.5px 7px !important; border-bottom:0.5px solid #e8e8e8 !important; gap:4px !important; }
+  .step-name    { font-size:7.5pt !important; }
+  .step-formula { font-size:6.5pt !important; color:#555 !important; }
+  .step-val     { font-size:7.5pt !important; }
+  .step-val.ok  { color:#155a1a !important; }
+  .step-val.warn{ color:#7a4800 !important; }
+  .step-val.bad { color:#991111 !important; }
+  .step-val.hi  { font-size:8.5pt !important; font-weight:800 !important; color:#1a3a7a !important; }
+  .step-note    { font-size:6.5pt !important; color:#7a4800 !important; background:#fffbee !important; border-left:2px solid #c47f00 !important; padding:1px 4px !important; }
 
-  /* ── Page 1: Parameters compact ── */
+  /* ── Strip headers (JS-injected) ── */
+  .print-strip-hdr { font-size:8pt !important; font-weight:700 !important; padding:2px 7px !important; border-radius:2px !important; margin-bottom:1.5mm !important; display:block !important; }
+  .print-strip-hdr-c { background:#dceeff !important; color:#1a3a7a !important; border:1px solid #99b !important; }
+  .print-strip-hdr-m { background:#ede8ff !important; color:#3a1a7a !important; border:1px solid #aab !important; }
+
+  /* ── Input params overlay ── */
   #print-overlay #input-params { display:grid !important; grid-template-columns:1fr 1fr !important; gap:4mm !important; margin-bottom:4mm !important; }
   #print-overlay #input-params .card,
   #print-overlay #assign-reinforce { margin-bottom:0 !important; }
-  #print-overlay #assign-reinforce .card-bd { padding:6px 12px !important; }
+  #print-overlay #assign-reinforce .card-bd,
+  #print-overlay #input-params .card-bd { padding:5px 10px !important; }
   #print-overlay #input-params .card-hd,
-  #print-overlay #assign-reinforce .card-hd { padding:4px 12px !important; }
-  #print-overlay #input-params .card-ttl,
-  #print-overlay #assign-reinforce .card-ttl { font-size:10.5pt !important; }
-  #print-overlay #input-params .card-bd { padding:6px 12px !important; }
+  #print-overlay #assign-reinforce .card-hd { padding:3px 10px !important; }
   #print-overlay #input-params label,
-  #print-overlay #assign-reinforce label { font-size:10pt !important; margin-bottom:1px !important; }
+  #print-overlay #assign-reinforce label { font-size:8.5pt !important; color:#333 !important; display:block !important; }
   #print-overlay #input-params input,
   #print-overlay #assign-reinforce input,
   #print-overlay #input-params select,
-  #print-overlay #assign-reinforce select { font-size:10pt !important; padding:3px 28px 3px 7px !important; }
+  #print-overlay #assign-reinforce select {
+    font-size:8.5pt !important; padding:2px 6px !important;
+    color:#000 !important; background:#fff !important;
+    border:0.7px solid #aaa !important; border-radius:2px !important;
+    display:block !important; width:100% !important;
+    -webkit-appearance:none !important; appearance:none !important;
+  }
   #print-overlay #input-params .un,
-  #print-overlay #assign-reinforce .un { font-size:9.5pt !important; }
+  #print-overlay #assign-reinforce .un { font-size:8pt !important; color:#555 !important; display:block !important; }
+  #print-overlay #input-params .iw,
+  #print-overlay #assign-reinforce .iw { display:flex !important; align-items:center !important; gap:4px !important; }
   #print-overlay #input-params .fld,
-  #print-overlay #assign-reinforce .fld { gap:2px !important; margin-bottom:6px !important; }
-  #print-overlay #input-params .g2 { gap:6px !important; }
-  #print-overlay #assign-reinforce .g2 { display:grid !important; grid-template-columns:1fr 1fr !important; gap:5mm !important; }
-  #print-overlay #input-params .dv,
-  #print-overlay #assign-reinforce .dv { margin:2.5mm 0 !important; }
-  #print-overlay #input-params .dv span,
-  #print-overlay #assign-reinforce .dv span { font-size:9pt !important; }
-  #print-overlay #assign-reinforce .slbl { font-size:10pt !important; padding:2px 8px !important; margin-bottom:5px !important; }
-  #print-overlay #assign-reinforce .lr { gap:6px !important; margin-bottom:4px !important; }
-  #print-overlay #assign-reinforce .ltag { font-size:9.5pt !important; padding-bottom:6px !important; }
-  #print-overlay #assign-reinforce .sr { gap:6px !important; margin-bottom:5px !important; }
-  #print-overlay #assign-reinforce .at { font-size:13px !important; padding-bottom:6px !important; }
-  .print-strip-hdr { font-size:11pt !important; font-weight:700 !important; padding:4px 8px !important; border-radius:3px !important; margin-bottom:3mm !important; display:block !important; }
-  .print-strip-hdr-c { background:#e8f0ff !important; color:#1a3a7a !important; border:1px solid #aac !important; }
-  .print-strip-hdr-m { background:#f0e8ff !important; color:#3a1a7a !important; border:1px solid #caa !important; }
+  #print-overlay #assign-reinforce .fld { gap:1px !important; margin-bottom:4px !important; display:flex !important; flex-direction:column !important; }
+  #print-overlay #assign-reinforce .g2 { display:grid !important; grid-template-columns:1fr 1fr !important; gap:4mm !important; }
+  #print-overlay #assign-reinforce .lr { display:grid !important; grid-template-columns:42px 1fr 1fr !important; gap:5px !important; margin-bottom:3px !important; align-items:end !important; }
+  #print-overlay #assign-reinforce .ltag { font-size:8.5pt !important; color:#b45309 !important; padding-bottom:5px !important; text-align:right !important; }
+  #print-overlay #assign-reinforce .sr { display:grid !important; grid-template-columns:1fr 20px 1fr !important; gap:5px !important; margin-bottom:5px !important; align-items:end !important; }
+  #print-overlay #assign-reinforce .at { font-size:8.5pt !important; color:#555 !important; padding-bottom:5px !important; text-align:center !important; }
+  #print-overlay .slbl { display:inline-block !important; font-size:8pt !important; padding:2px 7px !important; margin-bottom:4px !important; }
+  #print-overlay .slbl-c { background:#dceeff !important; color:#1a3a7a !important; border:1px solid #99b !important; }
+  #print-overlay .slbl-m { background:#ede8ff !important; color:#3a1a7a !important; border:1px solid #aab !important; }
+  #print-overlay .dv, #print-overlay .sdiv { display:flex !important; border-bottom:0.7px solid #ccc !important; margin:3mm 0 2mm !important; }
+  #print-overlay .dv span, #print-overlay .sdiv span { font-size:7pt !important; color:#555 !important; }
 }
+
+/* ── Print page outer components (used in JS-built overlay) ── */
+.pr-outer { border:1.2px solid #888; margin:0; background:#fff; width:196mm; box-sizing:border-box; }
+.pr-hdr-bar { border-bottom:1px solid #aaa; padding:9px 18px; text-align:center; font-size:13.5px; color:#555; font-family:sans-serif; }
+.pr-body { padding:14px 20px; font-family:sans-serif; }
+.pr-sec { background:#2563a8; color:#fff; font-weight:700; font-size:12px;
+  letter-spacing:.04em; padding:5px 12px; margin:10px 0 5px; }
+.pr-sec2 { background:#1a4a8a; }
+.pr-so { background:#e8f0fe; border:1px solid #90b4f0; border-left:3px solid #2563a8;
+  display:inline-flex; align-items:baseline; gap:6px; padding:4px 12px; margin:5px 0 3px; font-size:12px; }
+.pr-so-lbl { color:#555; font-size:11px; }
+.pr-so-val { font-weight:800; font-size:15px; color:#000; }
+.pr-so-unit { color:#555; font-size:10px; }
+.pr-tbl { width:100%; border-collapse:collapse; font-size:11px; margin:5px 0; }
+.pr-tbl th { background:#ddd; padding:3px 7px; border:0.7px solid #aaa; text-align:center; font-weight:600; }
+.pr-tbl td { padding:3px 7px; border:0.7px solid #bbb; text-align:center; }
+.pr-tbl td.lft { text-align:left; }
+.print-page-header { display:flex; justify-content:space-between; align-items:center;
+  border-bottom:1.5px solid #2563a8; margin-bottom:5mm; padding-bottom:2mm; }
 </style>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -299,249 +359,320 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 </script>
 </head>
 <body>
-<div class="wrap">
 
-<!-- Header -->
-<header style="position:relative;z-index:1;padding:24px 0 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;margin-bottom:28px;">
-  <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--accent),#0099bb);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:#000;flex-shrink:0;">RC</div>
-  <div>
-    <h1>REINFORCED CONCRETE <span>BEAM ANALYSIS</span></h1>
-    <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text-dim);margin-top:3px;display:block;">ACI / SDM Method</span>
-  </div>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
-    <div style="background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;padding:4px 12px;border-radius:4px;letter-spacing:1px;">v2.0</div>
-    <div class="version" id="clock" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-dim);"></div>
-    <span id="user-name" style="font-size:0.82rem;color:#e8d5a3;font-family:monospace;"></span>
-    <button id="btn-logout" style="font-size:0.78rem;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#8896b8;padding:4px 12px;cursor:pointer;font-family:monospace;">LOGOUT</button>
-  </div>
-</header>
+<!-- ══ STICKY HEADER ══ -->
+<div class="hdr">
+  <div class="hdr-logo">ACI / SDM</div>
+  <div class="hdr-title">Reinforced Concrete Beam Analysis</div>
+  <button onclick="printAt120()" style="margin-left:auto;margin-right:8px;background:var(--blue2);color:#fff;border:1px solid var(--blue);border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;padding:5px 14px;cursor:pointer;text-transform:uppercase">⎙ Print</button>
+  <div class="hdr-dot"></div>
+  <span id="user-name" style="font-size:0.78rem;color:#e8d5a3;font-family:monospace;margin-left:16px;"></span>
+  <button id="btn-logout" style="font-size:0.78rem;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#8896b8;padding:3px 10px;cursor:pointer;font-family:monospace;margin-left:8px;">LOGOUT</button>
+</div>
 
-<!-- Parameters Row -->
-<div class="g2" id="input-params">
-  <div>
-    <div class="card">
-      <div class="card-hd"><div class="ico ico-b">⬛</div><div class="card-ttl">Beam Parameters</div></div>
-      <div class="card-bd">
-        <div class="g3">
-          <div class="fld"><label><span class="sy">H</span> ความลึก</label><div class="iw"><input type="number" id="H" value="50" min="1" class="hi"><span class="un">cm</span></div></div>
-          <div class="fld"><label><span class="sy">W</span> ความกว้าง</label><div class="iw"><input type="number" id="W" value="25" min="1" class="hi"><span class="un">cm</span></div></div>
-          <div class="fld"><label><span class="sy">c</span> ระยะหุ้ม</label><div class="iw"><input type="number" id="c" value="3" min="1" class="hi"><span class="un">cm</span></div></div>
-        </div>
-      </div>
+<!-- ══ LAYOUT ══ -->
+<div class="layout">
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar">
+
+  <!-- Beam Parameters -->
+  <div class="sg">
+    <div class="sg-title">Beam Parameters</div>
+    <div class="fld"><label><span class="sy">H</span> ความลึก</label><div class="iw"><input type="number" id="H" value="50" min="1" class="hi"><span class="un">cm</span></div></div>
+    <div class="fld"><label><span class="sy">W</span> ความกว้าง</label><div class="iw"><input type="number" id="W" value="25" min="1" class="hi"><span class="un">cm</span></div></div>
+    <div class="fld"><label><span class="sy">c</span> ระยะหุ้ม</label><div class="iw"><input type="number" id="c" value="3" min="1" class="hi"><span class="un">cm</span></div></div>
+  </div>
+
+  <!-- Concrete Parameters -->
+  <div class="sg">
+    <div class="sg-title">คอนกรีต</div>
+    <div class="fld"><label><span class="sy">fc'</span> กำลังอัดคอนกรีต</label><div class="iw"><input type="number" id="fc" value="240" min="1" class="hi"><span class="un">ksc</span></div></div>
+    <div class="fld"><label><span class="sy">β₁</span></label><div class="iw"><input type="number" id="beta1" readonly><span class="un">—</span></div></div>
+    <div class="fld"><label><span class="sy">Ec</span> Young's Modulus</label><div class="iw"><input type="number" id="Ec" readonly><span class="un">ksc</span></div></div>
+    <div class="fld"><label><span class="sy">φ</span> Strength Reduction</label><div class="iw"><input type="number" id="phi" value="0.9" step="0.01" class="hi"><span class="un">—</span></div></div>
+  </div>
+
+  <!-- Main Steel -->
+  <div class="sg">
+    <div class="sg-title">เหล็กเสริมหลัก</div>
+    <div class="fld"><label>Steel Grade</label><div class="iw"><select id="mainGrade" class="hi"><option value="SR24">SR24</option><option value="SD30">SD30</option><option value="SD40" selected>SD40</option><option value="SD50">SD50</option></select></div></div>
+    <div class="fld"><label><span class="sy">Fy</span> Yield Strength</label><div class="iw"><input type="number" id="mainFy" readonly><span class="un">ksc</span></div></div>
+    <div class="fld"><label><span class="sy">s</span> Spacing ระหว่างชั้น</label><div class="iw"><input type="number" id="spacing_layer" value="2" min="1" class="hi"><span class="un">cm</span></div></div>
+  </div>
+
+  <!-- Stirrup Steel -->
+  <div class="sg">
+    <div class="sg-title">เหล็กปลอก (Stirrup)</div>
+    <div class="fld"><label>Steel Grade</label><div class="iw"><select id="stirrupGrade" class="hi"><option value="SR24" selected>SR24</option><option value="SD30">SD30</option><option value="SD40">SD40</option><option value="SD50">SD50</option></select></div></div>
+    <div class="fld"><label><span class="sy">Fys</span> Yield Strength</label><div class="iw"><input type="number" id="stirrupFy" readonly><span class="un">ksc</span></div></div>
+  </div>
+
+  <!-- Column Strip Reinforcement -->
+  <div class="sg">
+    <div class="sg-title" style="color:var(--blue)">Column Strip — เหล็กเสริม</div>
+    <div class="dv"><span>Stirrup</span></div>
+    <div class="sr">
+      <div class="fld"><label>Dia</label><div class="iw"><input type="number" id="col_stirrup_dia" value="9" min="6" class="hi"><span class="un">mm</span></div></div>
+      <div class="at">@</div>
+      <div class="fld"><label>Spacing</label><div class="iw"><input type="number" id="col_stirrup_sp" value="10" min="1" class="hi"><span class="un">cm</span></div></div>
     </div>
-    <div class="card">
-      <div class="card-hd"><div class="ico ico-g">◈</div><div class="card-ttl">Concrete Parameters</div></div>
-      <div class="card-bd">
-        <div class="g2" style="gap:11px">
-          <div class="fld"><label><span class="sy">fc'</span> กำลังอัดคอนกรีต</label><div class="iw"><input type="number" id="fc" value="240" min="1" class="hi"><span class="un">ksc</span></div></div>
-          <div class="fld"><label><span class="sy">β₁</span></label><div class="iw"><input type="number" id="beta1" readonly><span class="un">—</span></div></div>
-          <div class="fld"><label><span class="sy">Ec</span> Young's Modulus of Concrete</label><div class="iw"><input type="number" id="Ec" readonly><span class="un">ksc</span></div></div>
-          <div class="fld"><label><span class="sy">φ</span> Strength Reduction Factor</label><div class="iw"><input type="number" id="phi" value="0.9" step="0.01" class="hi"><span class="un">—</span></div></div>
-        </div>
+    <div class="dv"><span>Top Steel (Tension)</span></div>
+    <div class="lr"><div class="ltag">L1</div><div class="fld"><label>n เส้น</label><div class="iw"><input type="number" id="col_top1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia mm</label><div class="iw"><input type="number" id="col_top1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="col_top2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_top2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="col_top3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_top3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="dv"><span>Bot Steel (Compression)</span></div>
+    <div class="lr"><div class="ltag">L1</div><div class="fld"><label>n เส้น</label><div class="iw"><input type="number" id="col_bot1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia mm</label><div class="iw"><input type="number" id="col_bot1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="col_bot2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_bot2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="col_bot3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_bot3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+  </div>
+
+  <!-- Middle Strip Reinforcement -->
+  <div class="sg">
+    <div class="sg-title" style="color:var(--purple)">Middle Strip — เหล็กเสริม</div>
+    <div class="dv"><span>Stirrup</span></div>
+    <div class="sr">
+      <div class="fld"><label>Dia</label><div class="iw"><input type="number" id="mid_stirrup_dia" value="9" min="6" class="hi"><span class="un">mm</span></div></div>
+      <div class="at">@</div>
+      <div class="fld"><label>Spacing</label><div class="iw"><input type="number" id="mid_stirrup_sp" value="10" min="1" class="hi"><span class="un">cm</span></div></div>
+    </div>
+    <div class="dv"><span>Top Steel (Compression)</span></div>
+    <div class="lr"><div class="ltag">L1</div><div class="fld"><label>n เส้น</label><div class="iw"><input type="number" id="mid_top1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia mm</label><div class="iw"><input type="number" id="mid_top1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="mid_top2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_top2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="mid_top3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_top3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="dv"><span>Bot Steel (Tension)</span></div>
+    <div class="lr"><div class="ltag">L1</div><div class="fld"><label>n เส้น</label><div class="iw"><input type="number" id="mid_bot1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia mm</label><div class="iw"><input type="number" id="mid_bot1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="mid_bot2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_bot2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+    <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="mid_bot3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_bot3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
+  </div>
+
+  <!-- Reset button -->
+  <div style="padding:12px 14px">
+    <button class="btn btn-s" onclick="resetDefaults()" style="width:100%;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;padding:7px;border-radius:4px;background:transparent;border:1px solid var(--border2);color:rgba(255,255,255,0.5);cursor:pointer;text-transform:uppercase">↺ Reset Defaults</button>
+  </div>
+
+</div><!-- /sidebar -->
+
+<!-- ══ MAIN REPORT ══ -->
+<div class="main">
+
+<!-- Hidden containers required by JS (input-params + assign-reinforce) - used for print overlay only -->
+<div id="input-params" style="display:none">
+  <div class="card">
+    <div class="card-hd"><div class="card-ttl">Beam Parameters</div></div>
+    <div class="card-bd">
+      <div class="g3">
+        <div class="fld"><label><span class="sy">H</span> ความลึก</label><div class="iw"><input type="number" id="_H_pr" readonly><span class="un">cm</span></div></div>
+        <div class="fld"><label><span class="sy">W</span> ความกว้าง</label><div class="iw"><input type="number" id="_W_pr" readonly><span class="un">cm</span></div></div>
+        <div class="fld"><label><span class="sy">c</span> ระยะหุ้ม</label><div class="iw"><input type="number" id="_c_pr" readonly><span class="un">cm</span></div></div>
       </div>
     </div>
   </div>
-  <div>
-    <div class="card">
-      <div class="card-hd"><div class="ico ico-y">⬡</div><div class="card-ttl">Main Steel Parameters</div></div>
-      <div class="card-bd">
-        <div class="g2" style="gap:11px;align-items:end">
-          <div class="fld"><label>Steel Grade</label><select id="mainGrade" class="hi"><option value="SR24">SR24</option><option value="SD30">SD30</option><option value="SD40" selected>SD40</option><option value="SD50">SD50</option></select></div>
-          <div class="fld"><label><span class="sy">Fy</span> Yield Strength of Steel</label><div class="iw"><input type="number" id="mainFy" readonly><span class="un">ksc</span></div></div>
-          <div class="fld" style="grid-column:span 2"><label><span class="sy">s</span> Spacing ระหว่างชั้น</label><div class="iw"><input type="number" id="spacing_layer" value="2" min="1" class="hi"><span class="un">cm</span></div></div>
-        </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-ttl">Concrete &amp; Steel</div></div>
+    <div class="card-bd">
+      <div class="g2" style="gap:8px">
+        <div class="fld"><label><span class="sy">fc'</span></label><div class="iw"><input type="number" id="_fc_pr" readonly><span class="un">ksc</span></div></div>
+        <div class="fld"><label><span class="sy">β₁</span></label><div class="iw"><input type="number" id="_b1_pr" readonly><span class="un">—</span></div></div>
+        <div class="fld"><label><span class="sy">Ec</span></label><div class="iw"><input type="number" id="_Ec_pr" readonly><span class="un">ksc</span></div></div>
+        <div class="fld"><label><span class="sy">φ</span></label><div class="iw"><input type="number" id="_phi_pr" readonly><span class="un">—</span></div></div>
+        <div class="fld"><label><span class="sy">Fy</span> Main Steel</label><div class="iw"><input type="number" id="_Fy_pr" readonly><span class="un">ksc</span></div></div>
+        <div class="fld"><label><span class="sy">Fys</span> Stirrup</label><div class="iw"><input type="number" id="_Fys_pr" readonly><span class="un">ksc</span></div></div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-hd"><div class="ico ico-p">⬢</div><div class="card-ttl">Stirrup Steel Parameters</div></div>
-      <div class="card-bd">
-        <div class="g2" style="gap:11px;align-items:end">
-          <div class="fld"><label>Steel Grade</label><select id="stirrupGrade" class="hi"><option value="SR24" selected>SR24</option><option value="SD30">SD30</option><option value="SD40">SD40</option><option value="SD50">SD50</option></select></div>
-          <div class="fld"><label><span class="sy">Fys</span> Yield Strength of Steel</label><div class="iw"><input type="number" id="stirrupFy" readonly><span class="un">ksc</span></div></div>
+  </div>
+</div>
+<div id="assign-reinforce" style="display:none">
+  <div class="card">
+    <div class="card-hd"><div class="card-ttl">Assign Reinforcement Steel</div></div>
+    <div class="card-bd">
+      <div class="g2" style="gap:20px">
+        <div>
+          <div class="slbl slbl-c">Column Strip</div>
+          <div class="dv"><span>Stirrup</span></div>
+          <div class="sr"><div class="fld"><label>Dia</label><div class="iw"><input type="number" id="_col_s_dia_pr" readonly><span class="un">mm</span></div></div><div class="at">@</div><div class="fld"><label>Spacing</label><div class="iw"><input type="number" id="_col_s_sp_pr" readonly><span class="un">cm</span></div></div></div>
+          <div class="dv"><span>Top Steel (Tension)</span></div>
+          <div class="lr"><div class="ltag">L1</div><div class="fld"><label>n</label><div class="iw"><input type="number" id="_c_t1n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><label>Dia</label><div class="iw"><input type="number" id="_c_t1d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="_c_t2n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="_c_t2d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="_c_t3n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="_c_t3d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="dv"><span>Bot Steel (Compression)</span></div>
+          <div class="lr"><div class="ltag">L1</div><div class="fld"><label>n</label><div class="iw"><input type="number" id="_c_b1n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><label>Dia</label><div class="iw"><input type="number" id="_c_b1d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="_c_b2n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="_c_b2d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="_c_b3n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="_c_b3d_pr" readonly><span class="un">mm</span></div></div></div>
+        </div>
+        <div>
+          <div class="slbl slbl-m">Middle Strip</div>
+          <div class="dv"><span>Stirrup</span></div>
+          <div class="sr"><div class="fld"><label>Dia</label><div class="iw"><input type="number" id="_mid_s_dia_pr" readonly><span class="un">mm</span></div></div><div class="at">@</div><div class="fld"><label>Spacing</label><div class="iw"><input type="number" id="_mid_s_sp_pr" readonly><span class="un">cm</span></div></div></div>
+          <div class="dv"><span>Top Steel (Compression)</span></div>
+          <div class="lr"><div class="ltag">L1</div><div class="fld"><label>n</label><div class="iw"><input type="number" id="_m_t1n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><label>Dia</label><div class="iw"><input type="number" id="_m_t1d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="_m_t2n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="_m_t2d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="_m_t3n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="_m_t3d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="dv"><span>Bot Steel (Tension)</span></div>
+          <div class="lr"><div class="ltag">L1</div><div class="fld"><label>n</label><div class="iw"><input type="number" id="_m_b1n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><label>Dia</label><div class="iw"><input type="number" id="_m_b1d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="_m_b2n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="_m_b2d_pr" readonly><span class="un">mm</span></div></div></div>
+          <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="_m_b3n_pr" readonly><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="_m_b3d_pr" readonly><span class="un">mm</span></div></div></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Reinforcement Assignment (side-by-side) -->
-<div class="card" id="assign-reinforce">
-  <div class="card-hd"><div class="ico ico-b">⬤</div><div class="card-ttl">Assign Reinforcement Steel</div></div>
-  <div class="card-bd">
-    <div class="g2" style="gap:28px">
 
-      <!-- Column Strip -->
-      <div>
-        <div class="slbl slbl-c">Column Strip</div>
-        <div class="dv"><span>Stirrup</span></div>
-        <div class="sr">
-          <div class="fld"><label>Dia</label><div class="iw"><input type="number" id="col_stirrup_dia" value="9" min="6" class="hi"><span class="un">mm</span></div></div>
-          <div class="at">@</div>
-          <div class="fld"><label>Spacing</label><div class="iw"><input type="number" id="col_stirrup_sp" value="10" min="1" class="hi"><span class="un">cm</span></div></div>
-        </div>
-        <div class="dv"><span>Main Top Steel — Tension</span></div>
-        <div class="lr"><div class="ltag">L1</div><div class="fld"><label>จำนวนเส้น</label><div class="iw"><input type="number" id="col_top1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia (mm)</label><div class="iw"><input type="number" id="col_top1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="col_top2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_top2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="col_top3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_top3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="dv"><span>Main Bottom Steel — Compression</span></div>
-        <div class="lr"><div class="ltag">L1</div><div class="fld"><label>จำนวนเส้น</label><div class="iw"><input type="number" id="col_bot1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia (mm)</label><div class="iw"><input type="number" id="col_bot1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="col_bot2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_bot2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="col_bot3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="col_bot3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
-      </div>
-
-      <!-- Middle Strip -->
-      <div>
-        <div class="slbl slbl-m">Middle Strip</div>
-        <div class="dv"><span>Stirrup</span></div>
-        <div class="sr">
-          <div class="fld"><label>Dia</label><div class="iw"><input type="number" id="mid_stirrup_dia" value="9" min="6" class="hi"><span class="un">mm</span></div></div>
-          <div class="at">@</div>
-          <div class="fld"><label>Spacing</label><div class="iw"><input type="number" id="mid_stirrup_sp" value="10" min="1" class="hi"><span class="un">cm</span></div></div>
-        </div>
-        <div class="dv"><span>Main Top Steel — Compression</span></div>
-        <div class="lr"><div class="ltag">L1</div><div class="fld"><label>จำนวนเส้น</label><div class="iw"><input type="number" id="mid_top1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia (mm)</label><div class="iw"><input type="number" id="mid_top1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="mid_top2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_top2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="mid_top3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_top3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="dv"><span>Main Bottom Steel — Tension</span></div>
-        <div class="lr"><div class="ltag">L1</div><div class="fld"><label>จำนวนเส้น</label><div class="iw"><input type="number" id="mid_bot1_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><label>Dia (mm)</label><div class="iw"><input type="number" id="mid_bot1_d" value="12" min="6" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="lr"><div class="ltag">L2</div><div class="fld"><div class="iw"><input type="number" id="mid_bot2_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_bot2_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
-        <div class="lr"><div class="ltag">L3</div><div class="fld"><div class="iw"><input type="number" id="mid_bot3_n" value="2" min="0" class="hi"><span class="un">เส้น</span></div></div><div class="fld"><div class="iw"><input type="number" id="mid_bot3_d" value="12" min="0" class="hi"><span class="un">mm</span></div></div></div>
-      </div>
-
-    </div>
-    <div class="ab">
-      <button class="btn btn-s" onclick="resetDefaults()">↺ Reset</button>
-      <button class="btn btn-s" onclick="printAt120()">🖨 Print</button>
-    </div>
+<!-- ① RESULTS -->
+<div class="sec-block" id="print-body">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-blue">Results</span>
+    <span class="sec-title">Calculation Results</span>
   </div>
-</div>
 
-<!-- Results -->
-<div id="print-body">
-<div class="card">
-  <div class="card-hd"><div class="ico ico-g">◉</div><div class="card-ttl">Calculation Results</div></div>
-  <div class="card-bd">
-    <div class="g2" style="gap:28px">
-
-      <!-- Column Strip -->
-      <div id="print-col-results">
-        <div class="slbl slbl-c">Column Strip</div>
-
-        <div class="rb">
-          <div class="rb-ttl">หน้าตัดเหล็กเสริม</div>
-          <div class="rp">
-            As (Tension) = <span class="v vb" id="rc_As">—</span> <span class="lbl">cm²</span> &nbsp;·&nbsp; A's (Comp.) = <span class="v vb" id="rc_As2">—</span> <span class="lbl">cm²</span><br>
-            d = <span class="v vg" id="rc_d">—</span> <span class="lbl">cm</span> &nbsp;·&nbsp; d' = <span class="v vg" id="rc_dp">—</span> <span class="lbl">cm</span><br>
-            Stirrup = <span class="v" id="rc_stirrup">—</span>
-          </div>
-        </div>
-
-        <div class="rb">
-          <div class="rb-ttl">อัตราส่วนเหล็กเสริม</div>
-          <div class="rp">
-            ρ = As/(b·d) = <span class="v vb" id="rc_rho">—</span><br>
-            ρ' = A's/(b·d) = <span class="v vb" id="rc_rho2">—</span><br>
-            ρ − ρ' = <span class="v" id="rc_rhodiff">—</span><br>
-            (ρ − ρ')min = <span class="v" id="rc_rhodiffmin">—</span>
-          </div>
-        </div>
-
-        <div class="rb">
-          <div class="rb-ttl">Neutral Axis &amp; Stress Block &nbsp;<span id="rc_mode" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);font-weight:700"></span></div>
-          <div class="rp">
-            a = <span class="v vy" id="rc_a">—</span> <span class="lbl">cm</span><br>
-            c = <span class="v vy" id="rc_c">—</span> <span class="lbl">cm</span><br>
-            fs' = <span class="v vy" id="rc_fs2">—</span> <span class="lbl">kg/cm²</span><br>
-            <span id="rc_compbeh" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2)"></span>
-          </div>
-        </div>
-
-        <div class="rb">
-          <div class="rb-ttl">กำลังรับแรง</div>
-          <div class="g2" style="gap:10px;margin-bottom:10px">
-            <div class="rhi"><div class="rbig" id="rc_Mn">—</div><div class="rbig-lbl">φMn (kg-m)</div></div>
-            <div class="rhi" style="background:rgba(127,212,184,.06);border-color:rgba(127,212,184,.2)"><div class="rbig" id="rc_Vb" style="color:var(--accent2)">—</div><div class="rbig-lbl">φVb (kg)</div></div>
-          </div>
-          <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent3)" id="rc_beh"></div>
-        </div>
-      </div>
-
-      <!-- Middle Strip -->
-      <div id="print-mid-results">
-        <div class="slbl slbl-m">Middle Strip</div>
-
-        <div class="rb">
-          <div class="rb-ttl">หน้าตัดเหล็กเสริม</div>
-          <div class="rp">
-            As (Tension) = <span class="v vp" id="rm_As">—</span> <span class="lbl">cm²</span> &nbsp;·&nbsp; A's (Comp.) = <span class="v vp" id="rm_As2">—</span> <span class="lbl">cm²</span><br>
-            d = <span class="v vg" id="rm_d">—</span> <span class="lbl">cm</span> &nbsp;·&nbsp; d' = <span class="v vg" id="rm_dp">—</span> <span class="lbl">cm</span><br>
-            Stirrup = <span class="v" id="rm_stirrup">—</span>
-          </div>
-        </div>
-
-        <div class="rb">
-          <div class="rb-ttl">อัตราส่วนเหล็กเสริม</div>
-          <div class="rp">
-            ρ = As/(b·d) = <span class="v vp" id="rm_rho">—</span><br>
-            ρ' = A's/(b·d) = <span class="v vp" id="rm_rho2">—</span><br>
-            ρ − ρ' = <span class="v" id="rm_rhodiff">—</span><br>
-            (ρ − ρ')min = <span class="v" id="rm_rhodiffmin">—</span>
-          </div>
-        </div>
-
-        <div class="rb">
-          <div class="rb-ttl">Neutral Axis &amp; Stress Block &nbsp;<span id="rm_mode" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);font-weight:700"></span></div>
-          <div class="rp">
-            a = <span class="v vy" id="rm_a">—</span> <span class="lbl">cm</span><br>
-            c = <span class="v vy" id="rm_c">—</span> <span class="lbl">cm</span><br>
-            fs' = <span class="v vy" id="rm_fs2">—</span> <span class="lbl">kg/cm²</span><br>
-            <span id="rm_compbeh" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2)"></span>
-          </div>
-        </div>
-
-        <div class="rb">
-          <div class="rb-ttl">กำลังรับแรง</div>
-          <div class="g2" style="gap:10px;margin-bottom:10px">
-            <div class="rhi"><div class="rbig" id="rm_Mn">—</div><div class="rbig-lbl">φMn (kg-m)</div></div>
-            <div class="rhi" style="background:rgba(127,212,184,.06);border-color:rgba(127,212,184,.2)"><div class="rbig" id="rm_Vb" style="color:var(--accent2)">—</div><div class="rbig-lbl">φVb (kg)</div></div>
-          </div>
-          <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent3)" id="rm_beh"></div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Diagrams -->
-    <div class="dv" style="margin-top:10px"><span>Cross-Section Diagrams</span></div>
+  <!-- Diagrams — ด้านบนสุด -->
+  <div style="border-bottom:1px solid var(--border);padding:14px">
+    <div class="sdiv"><span>Cross-Section Diagrams</span></div>
     <div class="g2" style="gap:16px">
       <div class="dia-wrap">
-        <div class="dia-lbl" style="color:var(--accent)">Column Strip</div>
-        <svg id="svg-col" width="100%" height="220" viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="dia-lbl" style="color:var(--blue)">Column Strip</div>
+        <svg id="svg-col" width="100%" height="220" viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet" style="background:var(--bg);border-radius:4px"></svg>
         <div class="dia-stirrup">Stirrup : <span id="rc_stirrup_dia">—</span></div>
       </div>
       <div class="dia-wrap">
         <div class="dia-lbl" style="color:var(--purple)">Middle Strip</div>
-        <svg id="svg-mid" width="100%" height="220" viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet"></svg>
+        <svg id="svg-mid" width="100%" height="220" viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet" style="background:var(--bg);border-radius:4px"></svg>
         <div class="dia-stirrup">Stirrup : <span id="rm_stirrup_dia">—</span></div>
       </div>
     </div>
   </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+
+    <!-- Column Strip Results -->
+    <div id="print-col-results" style="padding:14px;border-right:1px solid var(--border)">
+      <div class="slbl slbl-c">Column Strip</div>
+
+      <div class="rb">
+        <div class="rb-ttl">หน้าตัดเหล็กเสริม</div>
+        <div class="rp">
+          As (Tension) = <span class="v vb" id="rc_As">—</span> <span class="lbl">cm²</span> &nbsp;·&nbsp; A's (Comp.) = <span class="v vb" id="rc_As2">—</span> <span class="lbl">cm²</span><br>
+          d = <span class="v vg" id="rc_d">—</span> <span class="lbl">cm</span> &nbsp;·&nbsp; d' = <span class="v vg" id="rc_dp">—</span> <span class="lbl">cm</span><br>
+          Stirrup = <span class="v" id="rc_stirrup">—</span>
+        </div>
+      </div>
+
+      <div class="rb">
+        <div class="rb-ttl">อัตราส่วนเหล็กเสริม</div>
+        <div class="rp">
+          ρ = As/(b·d) = <span class="v vb" id="rc_rho">—</span><br>
+          ρ' = A's/(b·d) = <span class="v vb" id="rc_rho2">—</span><br>
+          ρ − ρ' = <span class="v" id="rc_rhodiff">—</span><br>
+          (ρ − ρ')min = <span class="v" id="rc_rhodiffmin">—</span>
+        </div>
+      </div>
+
+      <div class="rb">
+        <div class="rb-ttl">Neutral Axis &amp; Stress Block &nbsp;<span id="rc_mode" style="font-family:var(--mono);font-size:9px;color:var(--orange);font-weight:700"></span></div>
+        <div class="rp">
+          a = <span class="v vy" id="rc_a">—</span> <span class="lbl">cm</span><br>
+          c = <span class="v vy" id="rc_c">—</span> <span class="lbl">cm</span><br>
+          fs' = <span class="v vy" id="rc_fs2">—</span> <span class="lbl">kg/cm²</span><br>
+          <span id="rc_compbeh" style="font-family:var(--mono);font-size:9px;color:var(--orange)"></span>
+        </div>
+      </div>
+
+      <div class="rb">
+        <div class="rb-ttl">กำลังรับแรง</div>
+        <div class="g2" style="gap:8px;margin-bottom:8px">
+          <div class="rhi"><div class="rbig" id="rc_Mn">—</div><div class="rbig-lbl">φMn (kg-m)</div></div>
+          <div class="rhi" style="border-left:3px solid var(--orange)"><div class="rbig" id="rc_Vb" style="color:var(--orange)">—</div><div class="rbig-lbl">φVb (kg)</div></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--yellow)" id="rc_beh"></div>
+      </div>
+    </div>
+
+    <!-- Middle Strip Results -->
+    <div id="print-mid-results" style="padding:14px">
+      <div class="slbl slbl-m">Middle Strip</div>
+
+      <div class="rb">
+        <div class="rb-ttl">หน้าตัดเหล็กเสริม</div>
+        <div class="rp">
+          As (Tension) = <span class="v vp" id="rm_As">—</span> <span class="lbl">cm²</span> &nbsp;·&nbsp; A's (Comp.) = <span class="v vp" id="rm_As2">—</span> <span class="lbl">cm²</span><br>
+          d = <span class="v vg" id="rm_d">—</span> <span class="lbl">cm</span> &nbsp;·&nbsp; d' = <span class="v vg" id="rm_dp">—</span> <span class="lbl">cm</span><br>
+          Stirrup = <span class="v" id="rm_stirrup">—</span>
+        </div>
+      </div>
+
+      <div class="rb">
+        <div class="rb-ttl">อัตราส่วนเหล็กเสริม</div>
+        <div class="rp">
+          ρ = As/(b·d) = <span class="v vp" id="rm_rho">—</span><br>
+          ρ' = A's/(b·d) = <span class="v vp" id="rm_rho2">—</span><br>
+          ρ − ρ' = <span class="v" id="rm_rhodiff">—</span><br>
+          (ρ − ρ')min = <span class="v" id="rm_rhodiffmin">—</span>
+        </div>
+      </div>
+
+      <div class="rb">
+        <div class="rb-ttl">Neutral Axis &amp; Stress Block &nbsp;<span id="rm_mode" style="font-family:var(--mono);font-size:9px;color:var(--orange);font-weight:700"></span></div>
+        <div class="rp">
+          a = <span class="v vy" id="rm_a">—</span> <span class="lbl">cm</span><br>
+          c = <span class="v vy" id="rm_c">—</span> <span class="lbl">cm</span><br>
+          fs' = <span class="v vy" id="rm_fs2">—</span> <span class="lbl">kg/cm²</span><br>
+          <span id="rm_compbeh" style="font-family:var(--mono);font-size:9px;color:var(--orange)"></span>
+        </div>
+      </div>
+
+      <div class="rb">
+        <div class="rb-ttl">กำลังรับแรง</div>
+        <div class="g2" style="gap:8px;margin-bottom:8px">
+          <div class="rhi" style="border-left:3px solid var(--purple)"><div class="rbig" id="rm_Mn" style="color:var(--purple)">—</div><div class="rbig-lbl">φMn (kg-m)</div></div>
+          <div class="rhi" style="border-left:3px solid var(--orange)"><div class="rbig" id="rm_Vb" style="color:var(--orange)">—</div><div class="rbig-lbl">φVb (kg)</div></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--yellow)" id="rm_beh"></div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<!-- Calculation Steps (outside Results card) -->
-<div class="dv" style="margin-top:20px"><span>Calculation Steps</span></div>
-<div class="g2" style="gap:16px;align-items:start">
-  <div class="card"><div class="card-hd"><div class="ico ico-b">①</div><div class="card-ttl">Column Strip</div></div><div class="card-bd"><div id="steps-col" class="steps-wrap"></div></div></div>
-  <div class="card"><div class="card-hd"><div class="ico ico-p">②</div><div class="card-ttl">Middle Strip</div></div><div class="card-bd"><div id="steps-mid" class="steps-wrap"></div></div></div>
-</div>
-<!-- Steps Part 2: φMn, Shear, Behavior -->
-<div class="g2" style="gap:16px;align-items:start">
-  <div class="card"><div class="card-hd"><div class="ico ico-b">①</div><div class="card-ttl">Column Strip</div></div><div class="card-bd"><div id="steps-col-b" class="steps-wrap"></div></div></div>
-  <div class="card"><div class="card-hd"><div class="ico ico-p">②</div><div class="card-ttl">Middle Strip</div></div><div class="card-bd"><div id="steps-mid-b" class="steps-wrap"></div></div></div>
+<!-- ② CALCULATION STEPS -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-green">Steps ①–④</span>
+    <span class="sec-title">Calculation Steps — Steel Ratio &amp; Neutral Axis</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)">
+    <div style="padding:14px;border-right:1px solid var(--border)">
+      <div class="slbl slbl-c">Column Strip</div>
+      <div id="steps-col" class="steps-wrap"></div>
+    </div>
+    <div style="padding:14px">
+      <div class="slbl slbl-m">Middle Strip</div>
+      <div id="steps-mid" class="steps-wrap"></div>
+    </div>
+  </div>
 </div>
 
-</div><!-- /print-body -->
+<!-- ③ CALCULATION STEPS PART 2 -->
+<div class="sec-block">
+  <div class="sec-hdr">
+    <span class="sec-tag tag-orange">Steps ⑤–⑦</span>
+    <span class="sec-title">Calculation Steps — φMn, Shear &amp; Behavior</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)">
+    <div style="padding:14px;border-right:1px solid var(--border)">
+      <div class="slbl slbl-c">Column Strip</div>
+      <div id="steps-col-b" class="steps-wrap"></div>
+    </div>
+    <div style="padding:14px">
+      <div class="slbl slbl-m">Middle Strip</div>
+      <div id="steps-mid-b" class="steps-wrap"></div>
+    </div>
+  </div>
 </div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
 <div class="noti" id="noti"></div>
 
 <script>
@@ -556,7 +687,7 @@ const fmt=(v,d=2)=>{
 const PI=Math.PI;
 const sA=(n,dmm)=>PI*(dmm/10)**2/4*n;
 
-setInterval(()=>{g('clock').textContent=new Date().toLocaleTimeString('th-TH');},1000);
+// clock removed (element not present in new layout)
 ['fc','mainGrade','stirrupGrade'].forEach(id=>g(id).addEventListener('input',upd));
 
 // Auto-calculate on any input change
@@ -984,6 +1115,90 @@ function showN(m){const n=g('noti');n.textContent=m;n.classList.add('show');setT
 // ── Print: build 2-column layout ──────────────────────────
 let printOverlay = null;
 
+// ── helper: read actual values from sidebar ──
+function buildParamsNode() {
+  const v = id => { const el = g(id); return el ? el.value : ''; };
+  const mainGradeText = v('mainGrade');
+  const stirrupGradeText = v('stirrupGrade');
+
+  const row = (label, val, unit) =>
+    `<div style="display:flex;align-items:baseline;padding:1px 0;font-size:8pt;gap:4px;">
+      <span style="flex:1;color:#333;">${label}</span>
+      <span style="font-weight:700;color:#000;min-width:60px;text-align:right;">${val}</span>
+      <span style="color:#666;width:28px;font-size:7pt;">${unit}</span>
+    </div>`;
+
+  const sec = (title, content) =>
+    `<div style="margin-bottom:2mm;">
+      <div style="background:#e8eef8;border:0.7px solid #bbb;padding:2px 8px;font-size:7.5pt;font-weight:700;color:#1a3a7a;margin-bottom:2px;">${title}</div>
+      <div style="padding:0 3px;">${content}</div>
+    </div>`;
+
+  const sdiv = label =>
+    `<div style="font-size:7pt;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#555;border-bottom:0.5px solid #ccc;padding-bottom:1px;margin:4px 0 3px;">${label}</div>`;
+
+  const slbl = (text, cls) => {
+    const bg = cls==='c' ? '#dceeff' : '#ede8ff';
+    const color = cls==='c' ? '#1a3a7a' : '#3a1a7a';
+    const border = cls==='c' ? '#99b' : '#aab';
+    return `<div style="display:inline-block;background:${bg};color:${color};border:1px solid ${border};font-size:8pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:2px;margin-bottom:4px;">${text}</div>`;
+  };
+
+  const layerRows = (pfx, side) => {
+    let out = '';
+    for (let i=1;i<=3;i++) {
+      const n = v(`${pfx}_${side}${i}_n`);
+      const d = v(`${pfx}_${side}${i}_d`);
+      out += `<div style="display:grid;grid-template-columns:28px 1fr 28px 1fr;gap:3px;align-items:baseline;font-size:8pt;margin-bottom:2px;">
+        <span style="color:#b45309;font-weight:700;text-align:right;">L${i}</span>
+        <div style="display:flex;align-items:center;gap:2px;border:0.5px solid #aaa;border-radius:2px;padding:1px 4px;background:#fff;">
+          <span style="flex:1;font-weight:600;">${n}</span><span style="color:#666;font-size:7pt;">เส้น</span>
+        </div>
+        <span></span>
+        <div style="display:flex;align-items:center;gap:2px;border:0.5px solid #aaa;border-radius:2px;padding:1px 4px;background:#fff;">
+          <span style="flex:1;font-weight:600;">${d}</span><span style="color:#666;font-size:7pt;">mm</span>
+        </div>
+      </div>`;
+    }
+    return out;
+  };
+
+  const stirrupRow = (pfx) =>
+    `<div style="display:flex;align-items:center;gap:6px;font-size:8.5pt;margin-bottom:4px;">
+      <div style="flex:1;border:0.5px solid #aaa;border-radius:2px;padding:1px 6px;background:#fff;display:flex;justify-content:space-between;">
+        <span style="font-weight:600;">${v(pfx+'_stirrup_dia')}</span><span style="color:#666;font-size:7.5pt;">mm</span>
+      </div>
+      <span style="color:#555;">@</span>
+      <div style="flex:1;border:0.5px solid #aaa;border-radius:2px;padding:1px 6px;background:#fff;display:flex;justify-content:space-between;">
+        <span style="font-weight:600;">${v(pfx+'_stirrup_sp')}</span><span style="color:#666;font-size:7.5pt;">cm</span>
+      </div>
+    </div>`;
+
+  // ── Top section: Beam + Concrete only ──
+  const topHTML =
+    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin-bottom:2mm;">
+      ${sec('Beam Parameters',
+        row('H — ความลึก', v('H'), 'cm') +
+        row('W — ความกว้าง', v('W'), 'cm') +
+        row('c — ระยะหุ้ม', v('c'), 'cm')
+      )}
+      ${sec('Concrete &amp; Steel',
+        row("fc'", v('fc'), 'ksc') +
+        row('β₁', v('beta1'), '—') +
+        row('Ec', v('Ec'), 'ksc') +
+        row('φ', v('phi'), '—') +
+        row('Steel Grade (Main)', mainGradeText, '') +
+        row('Fy Main Steel', v('mainFy'), 'ksc') +
+        row('Steel Grade (Stirrup)', stirrupGradeText, '') +
+        row('Fys Stirrup', v('stirrupFy'), 'ksc')
+      )}
+    </div>`;
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = topHTML;
+  return wrapper;
+}
+
 window.addEventListener('beforeprint', () => {
   if (printOverlay) { printOverlay.remove(); printOverlay = null; }
 
@@ -1015,7 +1230,7 @@ window.addEventListener('beforeprint', () => {
   const diaWrapMid = g('svg-mid') ? g('svg-mid').closest('.dia-wrap') : null;
 
   // ── Assemble ──
-  // Grid 1: Results + Diagrams (หน้าแรก)
+  // Grid 1: Results only (ไม่มี diagram)
   const grid1 = document.createElement('div');
   grid1.className = 'pgrid';
 
@@ -1023,16 +1238,61 @@ window.addEventListener('beforeprint', () => {
   col1a.className = 'pcol';
   col1a.appendChild(hdrL.cloneNode(true));
   if (res_col) col1a.appendChild(res_col.cloneNode(true));
-  if (diaWrapCol) col1a.appendChild(diaWrapCol.cloneNode(true));
 
   const col2a = document.createElement('div');
   col2a.className = 'pcol';
   col2a.appendChild(hdrR.cloneNode(true));
   if (res_mid) col2a.appendChild(res_mid.cloneNode(true));
-  if (diaWrapMid) col2a.appendChild(diaWrapMid.cloneNode(true));
 
   grid1.appendChild(col1a);
   grid1.appendChild(col2a);
+
+  // Diagram section — full width, ห้ามตัดข้ามหน้า
+  const diaSection = document.createElement('div');
+  diaSection.style.cssText = 'break-inside:avoid;page-break-inside:avoid;margin-top:2mm;';
+
+  const diaSec = document.createElement('div');
+  diaSec.style.cssText = 'background:#e8eef8;border:0.7px solid #bbb;padding:2px 8px;font-size:7.5pt;font-weight:700;color:#1a3a7a;margin-bottom:3px;';
+  diaSec.textContent = 'Cross-Section Diagrams';
+  diaSection.appendChild(diaSec);
+
+  // คำนวณความสูงที่เหลือใน A4 หลังหักส่วนอื่นแล้ว
+  // A4 = 297mm, pr-outer margin 12mm, hdr-bar ~10mm, pr-body padding 12mm
+  // params ~30mm, results grid ~85mm, diaSection header ~5mm, buffer 5mm
+  const A4_PX = 297 * 3.7795;          // px
+  const USED_PX = (10 + 12 + 30 + 85 + 5 + 5) * 3.7795;
+  const svgH = Math.max(150, Math.min(220, Math.round(A4_PX - USED_PX)));
+
+  // clone + set computed height
+  function cloneDiaWrap(wrap) {
+    if (!wrap) return null;
+    const clone = wrap.cloneNode(true);
+    const svg = clone.querySelector('svg');
+    if (svg) {
+      svg.setAttribute('height', svgH);
+      svg.style.cssText = `width:100%;height:${svgH}px;display:block;`;
+    }
+    // shrink label font
+    const lbl = clone.querySelector('.dia-lbl');
+    if (lbl) lbl.style.cssText = 'font-size:7pt;font-weight:700;color:#333;text-align:center;margin-bottom:2px;letter-spacing:.1em;text-transform:uppercase;';
+    const stir = clone.querySelector('.dia-stirrup');
+    if (stir) stir.style.cssText = 'font-size:7.5pt;color:#111;text-align:center;margin-top:3px;';
+    return clone;
+  }
+
+  const diaGrid = document.createElement('div');
+  diaGrid.className = 'pgrid';
+  const diaCol1 = document.createElement('div');
+  diaCol1.className = 'pcol';
+  const diaClone1 = cloneDiaWrap(diaWrapCol);
+  if (diaClone1) diaCol1.appendChild(diaClone1);
+  const diaCol2 = document.createElement('div');
+  diaCol2.className = 'pcol';
+  const diaClone2 = cloneDiaWrap(diaWrapMid);
+  if (diaClone2) diaCol2.appendChild(diaClone2);
+  diaGrid.appendChild(diaCol1);
+  diaGrid.appendChild(diaCol2);
+  diaSection.appendChild(diaGrid);
 
   // Grid 2: Calculation Steps (ขึ้นหน้าใหม่)
   const pageBreak = document.createElement('div');
@@ -1108,44 +1368,36 @@ window.addEventListener('beforeprint', () => {
   grid3.appendChild(col1c);
   grid3.appendChild(col2c);
 
-  // Input params section at top (full width)
-  const inputParams = g('input-params');
-  const inputClone = inputParams ? inputParams.cloneNode(true) : null;
-  if (inputClone) {
-    inputClone.style.cssText = 'display:grid !important;grid-template-columns:1fr 1fr;gap:4mm;margin-bottom:4mm;';
-  }
-
-  const assignReinforce = g('assign-reinforce');
-  const assignClone = assignReinforce ? assignReinforce.cloneNode(true) : null;
-
   // ── Helper: build a print page with header + footer ──
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
-  const titleHTML = `<div style="font-family:'Syne',sans-serif;font-size:13pt;font-weight:800;color:#111;letter-spacing:-.02em;">REINFORCED CONCRETE <span style="color:#007a99">BEAM</span> ANALYSIS</div>`;
-
   function makePage(contentNodes, pageNum, totalPages) {
     const page = document.createElement('div');
-    page.className = 'print-page';
+    page.className = 'pr-page';
 
-    // Header — left: title+date, right: page number
-    const hdr = document.createElement('div');
-    hdr.className = 'print-page-header';
-    hdr.innerHTML = `
-      <div>
-        ${titleHTML}
-        <div style="font-family:'Sarabun',sans-serif;font-size:9pt;color:#555;margin-top:1px;">${dateStr}</div>
+    const outer = document.createElement('div');
+    outer.className = 'pr-outer';
+
+    // Header bar — C-Channel style
+    const hdrBar = document.createElement('div');
+    hdrBar.className = 'pr-hdr-bar';
+    hdrBar.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+    hdrBar.innerHTML = `
+      <div style="font-family:sans-serif;font-size:12px;font-weight:700;color:#1a3a7a;letter-spacing:.04em;">
+        REINFORCED CONCRETE BEAM ANALYSIS &nbsp;|&nbsp; ACI / SDM Method
       </div>
-      <div style="text-align:right;font-family:'Sarabun',sans-serif;font-size:9pt;color:#333;">
-        ${pageNum}
+      <div style="font-family:sans-serif;font-size:10px;color:#666;">
+        ${dateStr} &nbsp;&nbsp; Page ${pageNum} / ${totalPages}
       </div>`;
-    page.appendChild(hdr);
+    outer.appendChild(hdrBar);
 
     // Content wrapper
-    const content = document.createElement('div');
-    content.className = 'print-page-content';
-    contentNodes.forEach(n => content.appendChild(n));
-    page.appendChild(content);
+    const body = document.createElement('div');
+    body.className = 'pr-body';
+    contentNodes.forEach(n => body.appendChild(n));
+    outer.appendChild(body);
 
+    page.appendChild(outer);
     return page;
   }
 
@@ -1153,29 +1405,21 @@ window.addEventListener('beforeprint', () => {
   printOverlay.id = 'print-overlay';
   printOverlay.style.display = 'none';
 
-  // Page 1: Parameters + Assign Reinforcement
-  const p1nodes = [];
-  if (inputClone) p1nodes.push(inputClone);
-  if (assignClone) p1nodes.push(assignClone);
-  printOverlay.appendChild(makePage(p1nodes, 1, 4));
+  // Page 1: Parameters + Results + Diagrams (รวมกัน)
+  const p1nodes = [buildParamsNode(), grid1, diaSection];
+  printOverlay.appendChild(makePage(p1nodes, 1, 3));
 
-  // Page 2: Results + Diagrams
+  // Page 2: Calculation Steps ①②③④
   const p2break = document.createElement('div');
   p2break.style.cssText = 'page-break-before:always;break-before:page;height:0;';
   printOverlay.appendChild(p2break);
-  printOverlay.appendChild(makePage([grid1], 2, 4));
+  printOverlay.appendChild(makePage([grid2], 2, 3));
 
-  // Page 3: Calculation Steps ①②③④
+  // Page 3: Calculation Steps ⑤⑥⑦
   const p3break = document.createElement('div');
   p3break.style.cssText = 'page-break-before:always;break-before:page;height:0;';
   printOverlay.appendChild(p3break);
-  printOverlay.appendChild(makePage([grid2], 3, 4));
-
-  // Page 4: Calculation Steps ⑤⑥⑦
-  const p4break = document.createElement('div');
-  p4break.style.cssText = 'page-break-before:always;break-before:page;height:0;';
-  printOverlay.appendChild(p4break);
-  printOverlay.appendChild(makePage([grid3], 4, 4));
+  printOverlay.appendChild(makePage([grid3], 3, 3));
 
   document.body.appendChild(printOverlay);
 });
