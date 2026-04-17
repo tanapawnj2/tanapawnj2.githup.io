@@ -241,6 +241,37 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 /* divider line */
 .pr-divider { border:none; border-top:0.8px solid #bbb; margin:8px 0; }
 </style>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBKhes9uVB7tFATNChmYJtkSGXtoV8pGoI",
+    authDomain:        "civiltoolskit.firebaseapp.com",
+    projectId:         "civiltoolskit",
+    storageBucket:     "civiltoolskit.firebasestorage.app",
+    messagingSenderId: "108662763128",
+    appId:             "1:108662763128:web:864248bfaf2fd27c52878d"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      const name = user.displayName || user.email.split("@")[0];
+      document.getElementById("user-name").textContent = name;
+    } else {
+      window.location.href = "Login.html";
+    }
+  });
+
+  document.getElementById("btn-logout").addEventListener("click", async () => {
+    localStorage.removeItem("login_time");
+    await signOut(auth);
+    window.location.href = "Login.html";
+  });
+</script>
 </head>
 <body>
 <div class="hdr">
@@ -248,6 +279,8 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   <div class="hdr-title">Z Section With Lip</div>
   <button onclick="window.print()" style="margin-left:auto;background:#2563a8;color:#fff;border:1px solid #4a90d9;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;padding:6px 14px;cursor:pointer;text-transform:uppercase">⎙ PRINT</button>
   <div class="hdr-dot" style="margin-left:12px"></div>
+  <span id="user-name" style="font-size:0.78rem;color:#e8d5a3;font-family:monospace;margin-left:16px;"></span>
+  <button id="btn-logout" style="font-size:0.78rem;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#8896b8;padding:3px 10px;cursor:pointer;font-family:monospace;margin-left:8px;">LOGOUT</button>
 </div>
 
 <div class="layout">
