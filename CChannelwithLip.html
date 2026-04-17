@@ -229,12 +229,45 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 .calc-val{font-size:14px;font-weight:700;color:#fff;font-family:var(--sans)}
 .calc-unit{font-size:10px;color:rgba(255,255,255,0.5);font-family:var(--sans)}
 </style>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBKhes9uVB7tFATNChmYJtkSGXtoV8pGoI",
+    authDomain:        "civiltoolskit.firebaseapp.com",
+    projectId:         "civiltoolskit",
+    storageBucket:     "civiltoolskit.firebasestorage.app",
+    messagingSenderId: "108662763128",
+    appId:             "1:108662763128:web:864248bfaf2fd27c52878d"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      const name = user.displayName || user.email.split("@")[0];
+      document.getElementById("user-name").textContent = name;
+    } else {
+      window.location.href = "Login.html";
+    }
+  });
+
+  document.getElementById("btn-logout").addEventListener("click", async () => {
+    localStorage.removeItem("login_time");
+    await signOut(auth);
+    window.location.href = "Login.html";
+  });
+</script>
 </head>
 <body>
 <div class="hdr">
   <div class="hdr-logo">AISI S100</div>
   <div class="hdr-title">C Channel Section With Lip</div>
   <button onclick="calculate();document.querySelectorAll('.pr-page').forEach(p=>p.style.display='flex');window.print();" style="margin-left:auto;margin-right:8px;background:#2563a8;color:#fff;border:1px solid #4a90d9;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;padding:5px 14px;cursor:pointer;text-transform:uppercase">⎙ Print</button><div class="hdr-dot"></div>
+  <span id="user-name" style="font-size:0.78rem;color:#e8d5a3;font-family:monospace;margin-left:16px;"></span>
+  <button id="btn-logout" style="font-size:0.78rem;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#8896b8;padding:3px 10px;cursor:pointer;font-family:monospace;margin-left:8px;">LOGOUT</button>
 </div>
 
 <div class="layout">
