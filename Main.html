@@ -62,6 +62,36 @@
     .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
     .theme-toggle-icon { font-size: 0.95rem; }
 
+    /* ── User bar (top right) ── */
+    .user-bar {
+      position: fixed; top: 1rem; right: 1rem; z-index: 100;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .user-chip {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 99px; padding: 0.4rem 0.85rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.78rem;
+      color: var(--text); display: flex; align-items: center; gap: 6px;
+      box-shadow: var(--shadow);
+    }
+    .user-chip-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #86efac; flex-shrink: 0;
+    }
+    .btn-logout {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 99px; padding: 0.4rem 0.85rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.78rem;
+      color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+      transition: border-color 0.2s, color 0.2s;
+      box-shadow: var(--shadow);
+    }
+    .btn-logout:hover { border-color: #f87171; color: #f87171; }
+    .theme-toggle-wrap {
+      position: fixed; top: 1rem; left: 1rem; z-index: 100;
+    }
+
     /* ── Main card ── */
     .card {
       width: 100%;
@@ -173,11 +203,24 @@
 </head>
 <body>
 
+<!-- ── User Bar (top right) ── -->
+<div class="user-bar" id="user-bar" style="display:none;">
+  <div class="user-chip">
+    <span class="user-chip-dot"></span>
+    <span id="user-display-name">...</span>
+  </div>
+  <button class="btn-logout" id="btn-logout">
+    ออกจากระบบ
+  </button>
+</div>
+
 <!-- ── Theme Toggle ── -->
-<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
-  <span class="theme-toggle-icon" id="theme-icon">☀️</span>
-  <span id="theme-label">Light</span>
-</button>
+<div class="theme-toggle-wrap">
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+    <span class="theme-toggle-icon" id="theme-icon">☀️</span>
+    <span id="theme-label">Light</span>
+  </button>
+</div>
 
 <!-- ── Update Panel (Left) ── -->
 <aside class="update-panel">
@@ -252,6 +295,8 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, collection, query, orderBy, limit, onSnapshot }
     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signOut }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey:            "AIzaSyBKhes9uVB7tFATNChmYJtkSGXtoV8pGoI",
@@ -263,7 +308,36 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
+  const db   = getFirestore(app);
+  const auth = getAuth(app);
+
+  // ── User session ──
+  const SESSION_KEY   = "login_time";
+  const SESSION_LIMIT = 24 * 60 * 60 * 1000;
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user && user.emailVerified) {
+      const loginTime = localStorage.getItem(SESSION_KEY);
+      const now = Date.now();
+      if (loginTime && (now - parseInt(loginTime)) >= SESSION_LIMIT) {
+        await signOut(auth);
+        localStorage.removeItem(SESSION_KEY);
+        window.location.href = "index.html";
+        return;
+      }
+      // แสดง user bar
+      document.getElementById("user-display-name").textContent = user.displayName || user.email;
+      document.getElementById("user-bar").style.display = "flex";
+    } else {
+      window.location.href = "index.html";
+    }
+  });
+
+  document.getElementById("btn-logout").addEventListener("click", async () => {
+    await signOut(auth);
+    localStorage.removeItem(SESSION_KEY);
+    window.location.href = "index.html";
+  });
 
   const donorQ = query(collection(db, "donors"), orderBy("amount", "desc"), limit(20));
 
