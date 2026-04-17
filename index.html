@@ -577,7 +577,7 @@
     try {
       await sendPasswordResetEmail(auth, email);
       document.getElementById("success-email-desc").innerHTML =
-        `ระบบส่งลิงก์รีเซ็ตรหัสผ่านไปที่<br><strong style="color:var(--accent)">${email}</strong><br><br>กรุณาตรวจสอบ Inbox และโฟลเดอร์ถังขยะด้วยนะครับ`;
+        `ระบบส่งลิงก์รีเซ็ตรหัสผ่านไปที่<br><strong style="color:var(--accent)">${email}</strong><br><br>กรุณาตรวจสอบ Inbox ของคุณ หากไม่พบอีเมลใน Inbox กรุณาตรวจสอบที่ไฟล์ถังขยะ`;
       showView("view-forgot-success");
       startCountdown();
     } catch (e) {
