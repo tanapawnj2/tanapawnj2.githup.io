@@ -94,6 +94,44 @@
       margin-top: 0.75rem; transition: border-color 0.2s, color 0.2s;
     }
     .btn-outline:hover { border-color: var(--danger); color: var(--danger); }
+    .forgot-link {
+      display: block; text-align: right; font-size: 0.78rem; color: var(--muted);
+      cursor: pointer; margin-top: 0.3rem; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--accent); }
+    .btn-back {
+      display: flex; align-items: center; gap: 5px; background: none; border: none;
+      color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+      cursor: pointer; padding: 0; margin-bottom: 1.5rem; transition: color 0.2s;
+    }
+    .btn-back:hover { color: var(--accent); }
+    .forgot-title { font-family: 'Instrument Serif', serif; font-size: 1.2rem; color: var(--text); margin-bottom: 0.4rem; }
+    .forgot-desc  { font-size: 0.83rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; }
+    /* success state */
+    .success-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(134,239,172,0.08); border: 2px solid rgba(134,239,172,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 1rem;
+    }
+    .success-title { font-family: 'Instrument Serif', serif; font-size: 1.25rem; color: var(--text); margin-bottom: 0.45rem; }
+    .success-desc  { font-size: 0.83rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.25rem; }
+    .countdown-bar-wrap {
+      background: var(--surface2); border-radius: 99px; height: 4px;
+      margin-bottom: 0.6rem; overflow: hidden;
+    }
+    .countdown-bar {
+      height: 100%; background: var(--accent); border-radius: 99px;
+      width: 100%; transition: width 1s linear;
+    }
+    .countdown-text { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.25rem; text-align: center; }
+    .btn-back-login {
+      width: 100%; background: none; border: 1px solid var(--border); border-radius: 9px;
+      padding: 0.7rem; font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      color: var(--muted); cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-back-login:hover { border-color: var(--accent); color: var(--accent); }
 
     /* ── Update Panel ── */
     .update-panel {
@@ -268,6 +306,7 @@
     <div class="form-group">
       <label>รหัสผ่าน</label>
       <input type="password" id="login-password" placeholder="••••••••" />
+      <a class="forgot-link" id="btn-forgot" href="#">ลืมรหัสผ่าน?</a>
     </div>
     <button class="btn-primary" id="btn-login">เข้าสู่ระบบ</button>
     <div class="divider">หรือ</div>
@@ -275,7 +314,7 @@
       <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
       ดำเนินการต่อด้วย Google
     </button>
-    <div class="subtitle"><br>มีปัญหาเรื่องการใช้งาน หรือลืมรหัสผ่าน ให้ส่งอีเมลมาที่ civiltoolkits@gmail.com</div>
+    <div class="subtitle"><br>มีปัญหาเรื่องการใช้งาน ให้ส่งอีเมลมาที่ civiltoolkits@gmail.com</div>
   </div>
 
   <div id="form-register" style="display:none;">
@@ -302,6 +341,35 @@
       สมัครด้วย Google
     </button>
   </div>
+
+  <!-- ── Forgot Password Form ── -->
+  <div id="form-forgot" style="display:none;">
+    <button class="btn-back" id="btn-back-from-forgot">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      กลับหน้าเข้าสู่ระบบ
+    </button>
+    <div class="forgot-title">กู้คืนรหัสผ่าน</div>
+    <div class="forgot-desc">กรอกอีเมลที่ใช้สมัครสมาชิก ระบบจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้ทันที</div>
+    <div class="msg" id="msg-box-forgot"></div>
+    <div class="form-group">
+      <label>อีเมล</label>
+      <input type="email" id="forgot-email" placeholder="youremail@example.com" />
+    </div>
+    <button class="btn-primary" id="btn-send-reset">ส่งลิงก์กู้คืนรหัสผ่าน</button>
+  </div>
+
+  <!-- ── Forgot Password Success ── -->
+  <div id="view-forgot-success" style="display:none;">
+    <div class="success-icon">✉️</div>
+    <div class="success-title">ส่งอีเมลแล้ว!</div>
+    <div class="success-desc" id="success-email-desc">ระบบส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลของคุณแล้ว กรุณาตรวจสอบ Inbox และโฟลเดอร์ถังขยะ</div>
+    <div class="countdown-bar-wrap">
+      <div class="countdown-bar" id="countdown-bar"></div>
+    </div>
+    <div class="countdown-text" id="countdown-text">กลับหน้าเข้าสู่ระบบอัตโนมัติใน 60 วินาที</div>
+    <button class="btn-back-login" id="btn-back-to-login-now">← กลับหน้าเข้าสู่ระบบทันที</button>
+  </div>
+
 </div>
 
 <script type="module">
@@ -309,7 +377,7 @@
   import {
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
     signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged,
-    updateProfile, sendEmailVerification
+    updateProfile, sendEmailVerification, sendPasswordResetEmail
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
@@ -405,7 +473,7 @@
       await updateProfile(cred.user, { displayName: name });
       await sendEmailVerification(cred.user);
       await signOut(auth);
-      showMsg("สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมล และยืนยันอีเมลก่อนเข้าสู่ระบบ หากไม่พบอีเมลใน Inbox กรุณาตรวจสอบที่ไฟล์ถังขยะ", "Success");
+      showMsg("สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมล และยืนยันอีเมลก่อนเข้าสู่ระบบ หากไม่พบอีเมลใน Inbox กรุณาตรวจสอบที่ไฟล์ถังขยะ", "success");
       switchTab("login");
     } catch (e) {
       showMsg(getErrorMsg(e.code), "error");
@@ -443,6 +511,92 @@
   }
   document.getElementById("btn-google-login").addEventListener("click", handleGoogle)
   document.getElementById("btn-google-register").addEventListener("click", handleGoogle);
+
+  // ── View switcher ──
+  const VIEWS = ["form-login", "form-register", "form-forgot", "view-forgot-success"];
+  function showView(id) {
+    VIEWS.forEach(v => document.getElementById(v).style.display = v === id ? "block" : "none");
+    // hide tabs + subtitle when showing forgot views
+    const isForgot = id === "form-forgot" || id === "view-forgot-success";
+    document.querySelector(".tabs").style.display    = isForgot ? "none" : "";
+    document.querySelector(".subtitle").style.display = isForgot ? "none" : "";
+    document.getElementById("msg-box").className = "msg";
+  }
+
+  // open forgot view
+  document.getElementById("btn-forgot").addEventListener("click", e => {
+    e.preventDefault();
+    showView("form-forgot");
+  });
+
+  // back from forgot form → login
+  document.getElementById("btn-back-from-forgot").addEventListener("click", () => {
+    showView("form-login");
+  });
+
+  // ── Send Reset Email ──
+  let countdownTimer = null;
+  function startCountdown() {
+    const TOTAL = 60;
+    let remaining = TOTAL;
+    const bar  = document.getElementById("countdown-bar");
+    const text = document.getElementById("countdown-text");
+    bar.style.width = "100%";
+
+    countdownTimer = setInterval(() => {
+      remaining--;
+      bar.style.width = (remaining / TOTAL * 100) + "%";
+      text.textContent = `กลับหน้าเข้าสู่ระบบอัตโนมัติใน ${remaining} วินาที`;
+      if (remaining <= 0) {
+        clearInterval(countdownTimer);
+        goBackToLogin();
+      }
+    }, 1000);
+  }
+
+  function goBackToLogin() {
+    if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+    document.getElementById("forgot-email").value = "";
+    showView("form-login");
+    switchTab("login");
+  }
+
+  document.getElementById("btn-back-to-login-now").addEventListener("click", goBackToLogin);
+
+  document.getElementById("btn-send-reset").addEventListener("click", async () => {
+    const email = document.getElementById("forgot-email").value.trim();
+    const msgBox = document.getElementById("msg-box-forgot");
+    if (!email) {
+      msgBox.textContent = "กรุณากรอกอีเมลของคุณ";
+      msgBox.className = "msg error show";
+      return;
+    }
+    const btn = document.getElementById("btn-send-reset");
+    btn.disabled  = true;
+    btn.innerHTML = '<span class="spinner"></span> กำลังส่ง...';
+    try {
+      await sendPasswordResetEmail(auth, email);
+      document.getElementById("success-email-desc").innerHTML =
+        `ระบบส่งลิงก์รีเซ็ตรหัสผ่านไปที่<br><strong style="color:var(--accent)">${email}</strong><br><br>กรุณาตรวจสอบ Inbox และโฟลเดอร์ถังขยะด้วยนะครับ`;
+      showView("view-forgot-success");
+      startCountdown();
+    } catch (e) {
+      const map = {
+        "auth/invalid-email":     "รูปแบบอีเมลไม่ถูกต้อง",
+        "auth/user-not-found":    "ไม่พบบัญชีที่ใช้อีเมลนี้",
+        "auth/too-many-requests": "ลองมากเกินไป กรุณารอสักครู่",
+      };
+      msgBox.textContent = map[e.code] || "เกิดข้อผิดพลาด: " + e.code;
+      msgBox.className = "msg error show";
+      btn.disabled  = false;
+      btn.innerHTML = "ส่งลิงก์กู้คืนรหัสผ่าน";
+    }
+  });
+
+  // กด Enter ในช่องอีเมล forgot
+  document.getElementById("forgot-email").addEventListener("keydown", e => {
+    if (e.key === "Enter") document.getElementById("btn-send-reset").click();
+  });
 
   // ── Logout ──
   window.handleLogout = async function() {
