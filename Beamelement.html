@@ -8,6 +8,72 @@
 <style>
 html{overflow-x:auto;}
 :root{--bg:#0b0d12;--surface:#13161e;--surface2:#191d28;--border:#222736;--accent:#00e5ff;--accent2:#ff6b35;--accent3:#a8ff78;--accent4:#c084fc;--text:#e8ecf4;--muted:#8896b8;--r:#ffd60a;--pink:#f9a8d4;}
+/* ── Light Theme (มืดหม่น / warm stone) ── */
+[data-theme="light"]{
+  --bg:#e8e4de;--surface:#d6d1c9;--surface2:#ccc7be;--border:#b5afa6;
+  --accent:#2d6a8a;--accent2:#8b3a1e;--accent3:#2d5a1e;--accent4:#5a2d7a;
+  --text:#1e1c19;--muted:#5c574f;--r:#6b4a1a;--pink:#7a2d4a;
+}
+[data-theme="light"] body::before{background-image:linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.06) 1px,transparent 1px);}
+[data-theme="light"] header{background:#d6d1c9;border-bottom:1px solid #b5afa6;}
+[data-theme="light"] header h1{color:#2d6a8a;}
+[data-theme="light"] #hdr-sub{color:#3d3830;}
+[data-theme="light"] .mbadge{background:rgba(45,106,138,.15);color:#2d6a8a;border-color:rgba(45,106,138,.35);}
+[data-theme="light"] .ibadge{background:rgba(45,90,30,.13);color:#2d5a1e;border-color:rgba(45,90,30,.3);}
+[data-theme="light"] .col-props,[data-theme="light"] .col-supports,[data-theme="light"] .col-loads{background:#d6d1c9;}
+[data-theme="light"] .sec{color:#3d3830;border-bottom-color:#b5afa6;}
+[data-theme="light"] label{color:#3d3830;}
+[data-theme="light"] input[type=number]{background:#ccc7be;border-color:#b5afa6;color:#1e1c19;}
+[data-theme="light"] input[type=number]:focus{border-color:#2d6a8a;box-shadow:0 0 0 2px rgba(45,106,138,.12);}
+[data-theme="light"] .scard{background:#ccc7be;border-color:#b5afa6;}
+[data-theme="light"] .slbl{color:#3d3830;}
+[data-theme="light"] .tbtn{background:#c4bfb6;border-color:#b5afa6;color:#5c574f;}
+[data-theme="light"] .tbtn:hover{border-color:#2d6a8a;color:#1e1c19;}
+[data-theme="light"] .tbtn.on{background:rgba(45,106,138,.18);border-color:#2d6a8a;color:#2d6a8a;}
+[data-theme="light"] .tbtn.on.fx{background:rgba(45,90,30,.15);border-color:#2d5a1e;color:#2d5a1e;}
+[data-theme="light"] .tbtn.on.fr{background:rgba(139,58,30,.13);border-color:#8b3a1e;color:#8b3a1e;}
+[data-theme="light"] .tbtn.on.sp{background:rgba(107,74,26,.13);border-color:#6b4a1a;color:#6b4a1a;}
+[data-theme="light"] .add-supp{background:rgba(45,106,138,.10);border-color:rgba(45,106,138,.35);color:#2d6a8a;}
+[data-theme="light"] .add-supp:hover{background:rgba(45,106,138,.18);border-color:#2d6a8a;}
+[data-theme="light"] .lrow{background:#ccc7be;border-color:#b5afa6;}
+[data-theme="light"] .lbadge{background:rgba(139,58,30,.13);color:#8b3a1e;border-color:rgba(139,58,30,.3);}
+[data-theme="light"] .lbadge.u{background:rgba(45,90,30,.12);color:#2d5a1e;border-color:rgba(45,90,30,.28);}
+[data-theme="light"] .lbadge.m{background:rgba(90,45,122,.12);color:#5a2d7a;border-color:rgba(90,45,122,.28);}
+[data-theme="light"] .abtn{background:rgba(45,106,138,.09);border-color:rgba(45,106,138,.30);color:#2d6a8a;}
+[data-theme="light"] .abtn:hover{background:rgba(45,106,138,.17);border-color:#2d6a8a;}
+[data-theme="light"] .calc-btn{background:#2d6a8a;color:#f0ede8;}
+[data-theme="light"] .calc-btn:hover{background:#235474;box-shadow:0 4px 18px rgba(45,106,138,.30);}
+[data-theme="light"] .dblock{background:#d6d1c9;border-color:#b5afa6;}
+[data-theme="light"] .dtitle{color:#3d3830;}
+[data-theme="light"] .rcard{background:#ccc7be;border-color:#b5afa6;}
+[data-theme="light"] .rv{color:#6b4a1a;}
+[data-theme="light"] .rcard.mc .rv{color:#8b3a1e;}
+[data-theme="light"] .rl{color:#5c574f;}
+[data-theme="light"] .ru{color:#7a7368;}
+[data-theme="light"] .tag.s{color:#2d6a8a;border-color:rgba(45,106,138,.35);background:rgba(45,106,138,.12);}
+[data-theme="light"] .tag.mo{color:#8b3a1e;border-color:rgba(139,58,30,.30);background:rgba(139,58,30,.10);}
+[data-theme="light"] .tag.id{color:#2d5a1e;border-color:rgba(45,90,30,.28);background:rgba(45,90,30,.10);}
+[data-theme="light"] .tag.mt{color:#5a2d7a;border-color:rgba(90,45,122,.28);background:rgba(90,45,122,.10);}
+[data-theme="light"] .tag.pk{color:#7a2d4a;border-color:rgba(122,45,74,.28);background:rgba(122,45,74,.10);}
+[data-theme="light"] .sum-table th{color:#3d3830;border-bottom-color:#b5afa6;}
+[data-theme="light"] .sum-table td{border-bottom-color:#c4bfb6;color:#1e1c19;}
+[data-theme="light"] .sum-table td.n{color:#2d6a8a;}
+[data-theme="light"] .sum-table td.ng{color:#8b3a1e;}
+[data-theme="light"] .sum-table .hr td{background:#ccc7be;}
+[data-theme="light"] .cb-block{background:#d6d1c9;border-color:#b5afa6;}
+[data-theme="light"] .cb-title{color:#3d3830;}
+[data-theme="light"] .cb-span-row{background:#ccc7be;border-color:#b5afa6;}
+[data-theme="light"] .cb-span-hd{color:#5a2d7a;}
+[data-theme="light"] .cb-val{color:#2d5a1e;}
+[data-theme="light"] .cb-ml{color:#5c574f;}
+[data-theme="light"] .cb-mv{color:#2d6a8a;}
+[data-theme="light"] .cb-m{background:rgba(45,106,138,.10);border-color:rgba(45,106,138,.25);}
+[data-theme="light"] .cb-note{color:#5c574f;background:rgba(90,45,122,.08);border-left-color:#5a2d7a;}
+[data-theme="light"] .srem:hover,[data-theme="light"] .xbtn:hover{color:#8b3a1e;}
+[data-theme="light"] .err{background:rgba(139,58,30,.10);border-color:rgba(139,58,30,.28);color:#8b3a1e;}
+[data-theme="light"] #btn-print{background:rgba(45,106,138,.12);border-color:rgba(45,106,138,.40);color:#2d6a8a;}
+[data-theme="light"] #btn-logout{border-color:#b5afa6;color:#5c574f;}
+[data-theme="light"] select{background:#ccc7be;border-color:#b5afa6;color:#1e1c19;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sans-serif;min-height:100vh;min-width:1280px;overflow-x:auto;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
@@ -27,6 +93,7 @@ header h1{font-family:'Space Mono',monospace;font-size:21px;color:var(--accent);
 .field{margin-bottom:9px;}
 label{display:block;font-size:14px;color:#c8d0e8;margin-bottom:3px;font-family:'Space Mono',monospace;}
 input[type=number]{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:5px;font-family:'Space Mono',monospace;font-size:16px;outline:none;transition:border-color .2s;}
+select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:5px;font-family:'Space Mono',monospace;font-size:13px;outline:none;transition:border-color .2s;width:100%;}
 input[type=number]:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,255,.08);}
 .scard{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 10px;margin-bottom:7px;}
 .scard-hd{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
@@ -115,7 +182,22 @@ canvas{width:100%;display:block;border-radius:3px;}
 .rxn-row{display:flex;align-items:stretch;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
 .rxn-bar-wrap{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;}
 
+
+/* ── Print Styles ────────────────────────────────────────────────────── */
+@media print {
+  html,body{min-width:0!important;overflow:visible!important;background:#0b0d12!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body::before{display:none;}
+  header,#print-hide,.col-left,.col-loads,#btn-print,#btn-logout,#user-name,.calc-btn,.ibadge,.mbadge,.welcome,.cv-tooltip{display:none!important;}
+  .main{display:block!important;}
+  .results{padding:0!important;overflow:visible!important;min-height:unset!important;}
+  .results-inner{max-width:100%!important;}
+  .dblock{break-inside:avoid;page-break-inside:avoid;margin-bottom:8px!important;}
+  canvas{max-width:100%;}
+  .tags{flex-wrap:wrap;}
+}
 </style>
+
+</head>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -147,7 +229,6 @@ canvas{width:100%;display:block;border-radius:3px;}
     window.location.href = "index.html";
   });
 </script>
-</head>
 <body>
 <header>
   <h1>&#11035; BEAM ANALYZER</h1>
@@ -155,6 +236,8 @@ canvas{width:100%;display:block;border-radius:3px;}
   <span class="mbadge">MATRIX STIFFNESS METHOD</span>
   <span class="ibadge" id="ibadge">INDETERMINATE</span>
   <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+    <button id="btn-theme" onclick="toggleTheme()" title="Toggle Light/Dark Theme" style="font-size:0.78rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#c8d0e8;padding:4px 14px;cursor:pointer;font-family:Space Mono,monospace;font-weight:700;letter-spacing:1px;">☀ LIGHT</button>
+    <button id="btn-print" onclick="printReport()" style="font-size:0.78rem;background:rgba(0,229,255,0.10);border:1px solid rgba(0,229,255,0.40);border-radius:6px;color:#00e5ff;padding:4px 14px;cursor:pointer;font-family:Space Mono,monospace;font-weight:700;letter-spacing:1px;" title="Print / Export PDF">&#128424; PRINT</button>
     <span id="user-name" style="font-size:0.82rem;color:#e8d5a3;font-family:Space Mono,monospace;"></span>
     <button id="btn-logout" style="font-size:0.78rem;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#8896b8;padding:4px 12px;cursor:pointer;font-family:Space Mono,monospace;">LOGOUT</button>
   </div>
@@ -1152,7 +1235,7 @@ function drawReactions(id, rxns, L) {
   ctx.strokeRect(padL, beamY, plotW, beamH);
 
   // ── Beam length label ──
-  ctx.fillStyle = '#c8d0e8';
+  ctx.fillStyle = '#1e293b';
   ctx.font = '12px Space Mono,monospace';
   ctx.textAlign = 'center';
   ctx.fillText('L = ' + L + ' m', W / 2, H - 8);
@@ -1194,7 +1277,7 @@ function drawReactions(id, rxns, L) {
       // Value label with unit
       var valStr = r.Fy.toFixed(3) + ' kg';
       var lblY = ay2 - dir * 6;
-      ctx.fillStyle = '#e8ecf4';
+      ctx.fillStyle = '#0f172a';
       ctx.font = 'bold 10.7px Space Mono,monospace';
       ctx.textAlign = 'center';
       ctx.fillText(valStr, sx, lblY);
@@ -1239,7 +1322,7 @@ function drawReactions(id, rxns, L) {
       // Value label with unit
       var mStr = (-mv).toFixed(3) + ' kg·m ' + (mv>0?'↻(CW)':'↺(CCW)');
       var mDir = mv > 0 ? 1 : -1;
-      ctx.fillStyle = '#e8ecf4';
+      ctx.fillStyle = '#0f172a';
       ctx.font = '11px Space Mono,monospace';
       ctx.textAlign = 'center';
       ctx.fillText(mStr, sx, arcY - arcR - 6);
@@ -1253,7 +1336,7 @@ function drawReactions(id, rxns, L) {
     ctx.font = 'bold 9.7px Space Mono,monospace';
     ctx.textAlign = 'center';
     ctx.fillText(TLBL[r.type], sx, beamY + beamH + 16);
-    ctx.fillStyle = '#c8d0e8';
+    ctx.fillStyle = '#1e293b';
     ctx.font = '11px Space Mono,monospace';
     ctx.fillText('x = ' + r.x + ' m', sx, beamY + beamH + 28);
   }
@@ -1320,7 +1403,7 @@ function drawFBD(L,slist,slistAll,loads,rxns){
   ctx.setLineDash([3,4]);ctx.strokeStyle='#1e2438';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(pad,H-16);ctx.lineTo(W-pad,H-16);ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle='#c8d0e8';ctx.font='16px Space Mono,monospace';ctx.textAlign='center';
+  ctx.fillStyle='#1e293b';ctx.font='16px Space Mono,monospace';ctx.textAlign='center';
   ctx.fillText('L = '+L+' m',W/2,H-5);
 
   // Applied loads
@@ -1335,13 +1418,13 @@ function drawFBD(L,slist,slistAll,loads,rxns){
         ctx.beginPath();ctx.moveTo(x,by-2);ctx.lineTo(x,by-28);ctx.stroke();
         ctx.beginPath();ctx.moveTo(x,by+2);ctx.lineTo(x-5,by-9);ctx.lineTo(x+5,by-9);ctx.closePath();ctx.fill();
         ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
-        ctx.fillStyle='#e8ecf4';ctx.fillText(ld.P+' kg',x,by-31);
+        ctx.fillStyle='#0f172a';ctx.fillText(ld.P+' kg',x,by-31);
       } else {
         // Upward arrow: stem below beam, tip pointing up above beam
         ctx.beginPath();ctx.moveTo(x,by+bh+2);ctx.lineTo(x,by+bh+28);ctx.stroke();
         ctx.beginPath();ctx.moveTo(x,by+bh-2);ctx.lineTo(x-5,by+bh+9);ctx.lineTo(x+5,by+bh+9);ctx.closePath();ctx.fill();
         ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
-        ctx.fillStyle='#e8ecf4';ctx.fillText(ld.P+' kg',x,by+bh+40);
+        ctx.fillStyle='#0f172a';ctx.fillText(ld.P+' kg',x,by+bh+40);
       }
     } else if(ld.type==='udl'){
       var x1=px(ld.x1),x2=px(ld.x2);
@@ -1357,7 +1440,7 @@ function drawFBD(L,slist,slistAll,loads,rxns){
         var sx2=x1+k*(x2-x1)/st;
         ctx.strokeStyle='#38bdf8';ctx.lineWidth=1.2;
         ctx.beginPath();ctx.moveTo(sx2,uy);ctx.lineTo(sx2,by);ctx.stroke();
-        ctx.fillStyle='#38bdf8';ctx.beginPath();
+        ctx.fillStyle='#0284c7';ctx.beginPath();
         if(wDown){
           // w>0: arrowhead at beam top pointing DOWN toward beam
           ctx.moveTo(sx2,by);ctx.lineTo(sx2-3,by-7);ctx.lineTo(sx2+3,by-7);
@@ -1367,7 +1450,7 @@ function drawFBD(L,slist,slistAll,loads,rxns){
         }
         ctx.closePath();ctx.fill();
       }
-      ctx.fillStyle='#e8ecf4';ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
+      ctx.fillStyle='#0f172a';ctx.font='bold 16px Space Mono,monospace';ctx.textAlign='center';
       ctx.fillText('w = '+ld.w+' kg/m',(x1+x2)/2,uy-3);
     } else if(ld.type==='trap'&&ld.x1<ld.x2){
       var tx1=px(Math.max(ld.x1,0)),tx2=px(Math.min(ld.x2,L));
@@ -1699,7 +1782,7 @@ function drawReactions(id, rxns, L) {
     }
 
     // ── x-position label (between beam and arrow tip) ──
-    ctx.fillStyle='#c8d0e8'; ctx.font='16px Space Mono,monospace'; ctx.textAlign='center';
+    ctx.fillStyle='#1e293b'; ctx.font='16px Space Mono,monospace'; ctx.textAlign='center';
     ctx.fillText('x = '+r.x+' m', sx, beamY+beamH+12);
   }
 
@@ -1709,7 +1792,7 @@ function drawReactions(id, rxns, L) {
   ctx.setLineDash([3,5]); ctx.strokeStyle='#1e2438'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(padL,H-18); ctx.lineTo(W-padR,H-18); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle='#c8d0e8'; ctx.font='16px Space Mono,monospace'; ctx.textAlign='center';
+  ctx.fillStyle='#1e293b'; ctx.font='16px Space Mono,monospace'; ctx.textAlign='center';
   ctx.fillText('L = '+L+' m', W/2, H-5);
 }
 
@@ -1838,31 +1921,31 @@ function drawLabels(ctx,pts,pad,z0,sx,sy,col,W,above,fmt){
 
     if(isZero){
       // Zero crossing: dot only, no label
-      ctx.fillStyle='#38bdf8';
+      ctx.fillStyle='#0284c7';
       ctx.beginPath();ctx.arc(px2,z0,2.5,0,Math.PI*2);ctx.fill();
     } else {
       // Value label: above for positive, below for negative
       var isPos=p.y>=0;
       var ly=isPos?py2-7:py2+14;
       var ly2=isPos?py2-17:py2+23;
-      ctx.fillStyle='#38bdf8';
+      ctx.fillStyle='#0284c7';
       var edgeMargin=pad+10;
       if(px2<edgeMargin){
         // Near left edge: align left, shift right of dot
         ctx.textAlign='left';
         ctx.fillText(lbl,px2+5,ly);
-        ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
+        ctx.fillStyle='#0369a1';ctx.font='10px Space Mono,monospace';
         ctx.fillText(p.x.toFixed(2)+'m',px2+5,ly2);
       } else if(px2>W-edgeMargin){
         // Near right edge: align right, shift left of dot
         ctx.textAlign='right';
         ctx.fillText(lbl,px2-5,ly);
-        ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
+        ctx.fillStyle='#0369a1';ctx.font='10px Space Mono,monospace';
         ctx.fillText(p.x.toFixed(2)+'m',px2-5,ly2);
       } else {
         ctx.textAlign='center';
         ctx.fillText(lbl,px2,ly);
-        ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
+        ctx.fillStyle='#0369a1';ctx.font='10px Space Mono,monospace';
         ctx.fillText(p.x.toFixed(2)+'m',px2,ly2);
       }
       ctx.font='bold 12px Space Mono,monospace';
@@ -1887,22 +1970,22 @@ function drawDiag(id,xs,ys,L,col,lbl,discXs){
   var sy=(ph/2-margin)/maxA,sx=pw/L,N=xs.length-1;
 
   // Grid lines (grey, thin, dashed)
-  ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=0.5;
+  ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(0,0,0,0.10)';ctx.lineWidth=0.5;
   for(var i=1;i<=4;i++){
     var y1=z0-(ph/2-margin)*i/4,y2=z0+(ph/2-margin)*i/4;
     ctx.beginPath();ctx.moveTo(pad,y1);ctx.lineTo(pad+pw,y1);ctx.stroke();
     ctx.beginPath();ctx.moveTo(pad,y2);ctx.lineTo(pad+pw,y2);ctx.stroke();
     var v=(maxA*i/4).toFixed(2);
-    ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
+    ctx.fillStyle='#0f172a';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
     ctx.fillText(v,pad-4,y1+3);ctx.fillText('-'+v,pad-4,y2+3);
   }
   ctx.setLineDash([]);
-  ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';ctx.fillText('0',pad-4,z0+3);
+  ctx.fillStyle='#0f172a';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';ctx.fillText('0',pad-4,z0+3);
   // Y axis (white, solid)
-  ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1.2;
+  ctx.strokeStyle='rgba(0,0,0,0.45)';ctx.lineWidth=1.2;
   ctx.beginPath();ctx.moveTo(pad,tp);ctx.lineTo(pad,tp+ph);ctx.stroke();
   // X axis / zero line (white, solid)
-  ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1.2;
+  ctx.strokeStyle='rgba(0,0,0,0.45)';ctx.lineWidth=1.2;
   ctx.beginPath();ctx.moveTo(pad,z0);ctx.lineTo(pad+pw,z0);ctx.stroke();
 
   // Clip curve and fill to plot area
@@ -1923,11 +2006,11 @@ function drawDiag(id,xs,ys,L,col,lbl,discXs){
   drawLabels(ctx,cpts,pad,z0,sx,sy,col,W);
 
   // X labels
-  ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
+  ctx.fillStyle='#0f172a';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
   var nx=Math.min(10,Math.floor(L)+1);
   for(var i=0;i<=nx;i++){var xv=L*i/nx;ctx.fillText(xv.toFixed(1),pad+xv*sx,tp+ph+14);}
   ctx.fillText('x (m)',pad+pw/2,tp+ph+42);
-  ctx.save();ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
+  ctx.save();ctx.fillStyle='#0f172a';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
   ctx.translate(12,tp+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText(lbl,0,0);ctx.restore();
   // Attach tooltip
   attachTooltip(id,xs,ys,{pad:pad,z0:z0,sx:sx,sy:sy,L:L,yLabel:lbl,yFmt:function(v){return v.toFixed(3);}});
@@ -1962,13 +2045,13 @@ function drawDeflection(id,xs,DEF,L,maxDefAbs,xMaxDef,slist){
   var baseY=tp+padTop+absPos*sy;
 
   // Grid lines (grey, thin, dashed)
-  ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=0.5;
+  ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(0,0,0,0.10)';ctx.lineWidth=0.5;
   var nDiv=3;
   if(hasNeg){
     for(var i=1;i<=nDiv;i++){
       var y=baseY+absNeg*sy*i/nDiv;
       ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(pad+pw,y);ctx.stroke();
-      ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
+      ctx.fillStyle='#0f172a';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
       ctx.fillText('-'+(absNeg*i/nDiv).toFixed(3),pad-4,y+3);
     }
   }
@@ -1976,18 +2059,18 @@ function drawDeflection(id,xs,DEF,L,maxDefAbs,xMaxDef,slist){
     for(var i=1;i<=nDiv;i++){
       var y=baseY-absPos*sy*i/nDiv;
       ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(pad+pw,y);ctx.stroke();
-      ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
+      ctx.fillStyle='#0f172a';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
       ctx.fillText('+'+(absPos*i/nDiv).toFixed(3),pad-4,y+3);
     }
   }
   ctx.setLineDash([]);
-  ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
+  ctx.fillStyle='#0f172a';ctx.font='10px Space Mono,monospace';ctx.textAlign='right';
   ctx.fillText('0',pad-4,baseY+3);
   // Y axis (white, solid)
-  ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1.2;
+  ctx.strokeStyle='rgba(0,0,0,0.45)';ctx.lineWidth=1.2;
   ctx.beginPath();ctx.moveTo(pad,tp);ctx.lineTo(pad,tp+ph);ctx.stroke();
   // Zero / X axis line (white, solid)
-  ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1.2;
+  ctx.strokeStyle='rgba(0,0,0,0.45)';ctx.lineWidth=1.2;
   ctx.beginPath();ctx.moveTo(pad,baseY);ctx.lineTo(pad+pw,baseY);ctx.stroke();
 
   // Undeflected
@@ -2051,24 +2134,24 @@ function drawDeflection(id,xs,DEF,L,maxDefAbs,xMaxDef,slist){
     var p=spanPeaks[i];
     var px2=pad+p.x*sx;
     var py2=baseY+(-p.y)*sy;
-    ctx.fillStyle='#38bdf8';
+    ctx.fillStyle='#0284c7';
     ctx.beginPath();ctx.arc(px2,py2,2.8,0,Math.PI*2);ctx.fill();
     var isDown=p.y<=0;
     var lx=Math.min(Math.max(px2,34),W-34);
     var ly=isDown?py2+14:py2-7;
-    ctx.fillStyle='#38bdf8';ctx.textAlign='center';
+    ctx.fillStyle='#0284c7';ctx.textAlign='center';
     ctx.fillText(p.y.toFixed(3)+' mm',lx,ly);
-    ctx.fillStyle='#7dd3fc';ctx.font='10px Space Mono,monospace';
+    ctx.fillStyle='#0369a1';ctx.font='10px Space Mono,monospace';
     ctx.fillText(p.x.toFixed(2)+'m',lx,isDown?ly+9:ly-9);
     ctx.font='bold 12px Space Mono,monospace';
   }
 
   // X labels
-  ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
+  ctx.fillStyle='#0f172a';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
   var nx=Math.min(10,Math.floor(L)+1);
   for(var i=0;i<=nx;i++){var xv=L*i/nx;ctx.fillText(xv.toFixed(1),pad+xv*sx,tp+ph+14);}
   ctx.fillText('x (m)',pad+pw/2,tp+ph+42);
-  ctx.save();ctx.fillStyle='#e8ecf4';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
+  ctx.save();ctx.fillStyle='#0f172a';ctx.font='10px Space Mono,monospace';ctx.textAlign='center';
   ctx.translate(12,tp+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText('v (mm)',0,0);ctx.restore();
   // Attach tooltip
   attachTooltip(id,xs,DEF,{pad:pad,z0:baseY,sx:sx,sy:sy,L:L,yLabel:'v',yFmt:function(v){return v.toFixed(3)+' mm';}});
@@ -2295,6 +2378,275 @@ function buildBMDEquationLabel(loads, rxns, L) {
   return lines.join('\n');
 }
 
+// ── Print Report ──────────────────────────────────────────────────────────
+// Generates a self-contained print window that matches the PDF template:
+// dark background panels stacked vertically: Beam Diagram, FBD, SFD, BMD, Deflection, Summary
+function printReport() {
+  var resultsEl = document.getElementById('results');
+  var welcomeEl = resultsEl.querySelector('.welcome');
+  if (welcomeEl && getComputedStyle(welcomeEl).display !== 'none') {
+    alert('กรุณากด Calculate ก่อนทำการ Print');
+    return;
+  }
+
+  // Capture all canvas elements as image data URLs
+  var canvases = resultsEl.querySelectorAll('canvas');
+  var canvasData = {};
+  canvases.forEach(function(cv) {
+    try { canvasData[cv.id] = cv.toDataURL('image/png'); } catch(e) {}
+  });
+
+  // Collect summary table HTML — split into summary + equations
+  var sumBlock = resultsEl.querySelector('.dblock:last-of-type');
+  var sumHTML = '';
+  var eqHTML = '';
+  if (sumBlock) {
+    var tbl = sumBlock.querySelector('.sum-table');
+    if (tbl) {
+      var rows = Array.from(tbl.querySelectorAll('tr'));
+      var splitIdx = rows.findIndex(function(r){ return r.textContent.indexOf('Shear Force Equations') >= 0; });
+      if (splitIdx > 0) {
+        var topRows = rows.slice(0, splitIdx).map(function(r){ return r.outerHTML; }).join('');
+        var eqRows  = rows.slice(splitIdx).map(function(r){ return r.outerHTML; }).join('');
+        sumHTML = '<div class="dblock"><div class="dtitle">Summary</div><table class="sum-table">' + topRows + '</table></div>';
+        eqHTML  = '<div class="dblock eq-block"><div class="dtitle">V(x) &amp; M(x) — Equations</div><table class="sum-table">' + eqRows + '</table></div>';
+      } else {
+        sumHTML = sumBlock.outerHTML;
+      }
+    } else {
+      sumHTML = sumBlock.outerHTML;
+    }
+  }
+
+  // Collect Cb block if present
+  var cbBlock = document.getElementById('cb-results-block');
+  var cbHTML = cbBlock ? cbBlock.innerHTML : '';
+
+  // Collect reaction cards
+  var rgrid = resultsEl.querySelector('.rgrid');
+  var rgridHTML = rgrid ? rgrid.outerHTML : '';
+
+  // Collect tags bar
+  var tags = resultsEl.querySelector('.tags');
+  var tagsHTML = tags ? tags.outerHTML : '';
+
+  // Build print-window diagram blocks
+  function imgBlock(title, canvasId, subtitle) {
+    var img = canvasData[canvasId];
+    if (!img) return '';
+    return '<div class="pblock">'
+      + '<div class="ptitle">' + title + (subtitle ? '<span class="psub">' + subtitle + '</span>' : '') + '</div>'
+      + '<img src="' + img + '" style="width:100%;display:block;border-radius:3px;">'
+      + '</div>';
+  }
+
+  var beamType = document.getElementById('hdr-sub').textContent;
+  var L = document.getElementById('beamL').value;
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('th-TH', {year:'numeric',month:'long',day:'numeric'});
+  var timeStr = now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'});
+
+  var win = window.open('', '_blank', 'width=1000,height=900');
+  if (!win) { alert('กรุณาอนุญาต Pop-up เพื่อ Print'); return; }
+
+  win.document.write('<!DOCTYPE html><html><head>'
+    + '<meta charset="UTF-8">'
+    + '<title>Beam Analysis Report</title>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">'
+    + '<style>'
+    + '*{margin:0;padding:0;box-sizing:border-box;}'
+    + 'html,body{background:#f4f6fa;color:#1a2035;font-family:Inter,sans-serif;font-size:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+    + '/* page style defined in print window */'
+
+    /* ── Header ── */
+    + '.rpt-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;margin-bottom:20px;border-bottom:3px solid #1a2035;}'
+    + '.rpt-logo{font-family:Space Mono,monospace;font-size:20px;font-weight:700;color:#1a2035;letter-spacing:2px;}'
+    + '.rpt-logo span{color:#0ea5e9;}'
+    + '.rpt-sub{font-size:12px;color:#64748b;margin-top:5px;letter-spacing:.5px;}'
+    + '.rpt-meta{text-align:right;font-size:11px;color:#64748b;line-height:1.9;}'
+    + '.rpt-meta strong{color:#1a2035;font-size:13px;}'
+    + '.badge{display:inline-block;font-family:Space Mono,monospace;font-size:10px;padding:2px 8px;border-radius:20px;background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;margin-right:4px;margin-top:6px;font-weight:700;letter-spacing:.5px;}'
+
+    /* ── Tag bar ── */
+    + '.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}'
+    + '.tag{font-family:Space Mono,monospace;font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid;font-weight:700;}'
+    + '.tag.s{color:#0369a1;border-color:#bae6fd;background:#e0f2fe;}'
+    + '.tag.mo{color:#c2410c;border-color:#fed7aa;background:#fff7ed;}'
+    + '.tag.pk{color:#be185d;border-color:#fbcfe8;background:#fdf2f8;}'
+    + '.tag.mt{color:#7e22ce;border-color:#e9d5ff;background:#faf5ff;}'
+    + '.tag.id{color:#166534;border-color:#bbf7d0;background:#f0fdf4;}'
+
+    /* ── Reaction cards ── */
+    + '.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:14px;}'
+    + '.rcard{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 13px;border-left:4px solid #f59e0b;box-shadow:0 1px 3px rgba(0,0,0,.06);break-inside:avoid;}'
+    + '.rcard.mc{border-left-color:#ef4444;}'
+    + '.rl{font-size:11px;color:#64748b;letter-spacing:.4px;margin-bottom:3px;font-weight:500;}'
+    + '.rv{font-family:Space Mono,monospace;font-size:17px;color:#92400e;font-weight:700;}'
+    + '.rcard.mc .rv{color:#b91c1c;}'
+    + '.ru{font-size:9px;color:#94a3b8;margin-left:2px;}'
+
+    /* ── Diagram blocks ── */
+    + '.pblock{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:10px;break-inside:avoid;page-break-inside:avoid;box-shadow:0 1px 3px rgba(0,0,0,.06);}'
+    + '.ptitle{font-family:Space Mono,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#475569;margin-bottom:10px;font-weight:700;display:flex;align-items:center;gap:8px;}'
+    + '.ptitle::before{content:"";display:inline-block;width:3px;height:14px;background:#0ea5e9;border-radius:2px;}'
+    + '.psub{font-family:Inter,sans-serif;font-size:10px;color:#7e22ce;letter-spacing:.5px;text-transform:none;font-weight:500;padding:1px 7px;border-radius:20px;background:#faf5ff;border:1px solid #e9d5ff;}'
+    + '.pblock img{width:100%;display:block;border-radius:6px;border:1px solid #e2e8f0;}'
+
+    /* ── Summary table ── */
+    + '.dblock{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:10px;break-inside:avoid;box-shadow:0 1px 3px rgba(0,0,0,.06);}'
+    + '.dtitle{font-family:Space Mono,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#475569;margin-bottom:12px;font-weight:700;display:flex;align-items:center;gap:8px;}'
+    + '.dtitle::before{content:"";display:inline-block;width:3px;height:14px;background:#0ea5e9;border-radius:2px;}'
+    + '.sum-table{width:100%;border-collapse:collapse;font-size:13px;}'
+    + '.sum-table th{text-align:left;padding:6px 10px;border-bottom:2px solid #e2e8f0;color:#475569;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}'
+    + '.sum-table td{padding:7px 10px;border-bottom:1px solid #f1f5f9;color:#1a2035;}'
+    + '.sum-table tr:last-child td{border-bottom:none;}'
+    + '.sum-table td.n{font-family:Space Mono,monospace;color:#0369a1;text-align:right;font-weight:700;}'
+    + '.sum-table td.ng{font-family:Space Mono,monospace;color:#dc2626;text-align:right;font-weight:700;}'
+    + '.sum-table .hr td{background:#f8fafc;}'
+    + 'td[style*="text-align:right"]{font-size:12px;}'
+
+    /* ── Equation rows ── */
+    + 'td span[style*="color:#00e5ff"]{color:#0369a1!important;}'
+    + 'td span[style*="color:#f9a8d4"]{color:#be185d!important;}'
+    + 'td span[style*="color:#a8ff78"]{color:#166534!important;}'
+    + 'td span[style*="color:#ffd60a"]{color:#92400e!important;}'
+    + 'td span[style*="color:#c084fc"]{color:#7e22ce!important;}'
+    + 'td span[style*="color:#8896b8"]{color:#64748b!important;}'
+    + 'td span[style*="background"]{filter:brightness(0.5) saturate(2)!important;}'
+
+    /* ── Cb block ── */
+    + '.cb-block{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:10px;break-inside:avoid;box-shadow:0 1px 3px rgba(0,0,0,.06);}'
+    + '.cb-title{font-family:Space Mono,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#475569;margin-bottom:10px;font-weight:700;}'
+    + '.cb-span-row{background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:10px 12px;margin-bottom:8px;}'
+    + '.cb-span-hd{font-size:12px;color:#7e22ce;margin-bottom:7px;display:flex;justify-content:space-between;font-weight:600;}'
+    + '.cb-val{font-family:Space Mono,monospace;font-size:20px;font-weight:700;color:#166534;}'
+    + '.cb-sub{font-size:11px;color:#64748b;margin-top:2px;}'
+    + '.cb-detail{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px;}'
+    + '.cb-m{text-align:center;background:#f0f9ff;border:1px solid #bae6fd;border-radius:5px;padding:5px 4px;}'
+    + '.cb-ml{font-size:10px;color:#64748b;}'
+    + '.cb-mv{font-family:Space Mono,monospace;font-size:12px;font-weight:700;color:#0369a1;}'
+    + '.cb-note{font-size:11px;color:#64748b;margin-top:6px;padding:4px 8px;background:#faf5ff;border-radius:5px;border-left:3px solid #7e22ce;}'
+    + '.cb-warn{color:#c2410c;font-size:11px;}'
+
+    /* ── inline color overrides from dark theme ── */
+    + '[style*="color:#a8ff78"]{color:#166534!important;}'
+    + '[style*="color:#00e5ff"]{color:#0369a1!important;}'
+    + '[style*="color:#ffd60a"]{color:#92400e!important;}'
+    + '[style*="color:#c084fc"]{color:#7e22ce!important;}'
+    + '[style*="color:#f9a8d4"]{color:#be185d!important;}'
+    + '[style*="color:#8896b8"]{color:#64748b!important;}'
+    + '[style*="color:#c8d0e8"]{color:#475569!important;}'
+    + '[style*="color:#e8ecf4"]{color:#1a2035!important;}'
+    + '[style*="color:var(--muted)"]{color:#64748b!important;}'
+    + '[style*="background:rgba(0,229,255"]{background:#e0f2fe!important;}'
+    + '[style*="background:rgba(192,132,252"]{background:#faf5ff!important;}'
+    + '[style*="border-color:rgba(0,229,255"]{border-color:#bae6fd!important;}'
+    + '[style*="border-color:rgba(192,132,252"]{border-color:#e9d5ff!important;}'
+    + '[style*="border-left:2px solid var(--accent4)"]{border-left-color:#7e22ce!important;}'
+    + '[style*="border-left:2px solid var(--accent)"]{border-left-color:#0ea5e9!important;}'
+
+    /* ── Print button ── */
+    + '.print-btn{position:fixed;bottom:22px;right:22px;background:#0ea5e9;color:#fff;border:none;border-radius:8px;padding:11px 24px;font-family:Space Mono,monospace;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 18px rgba(14,165,233,.35);z-index:999;}'
+    + '.print-btn:hover{background:#0284c7;}'
+    /* ── Running header via real <table><thead> — repeats on every print page ── */
+    + '@page{margin:0;}'
+    + 'html,body{margin:0;padding:0;background:#f4f6fa;}'
+    + 'table.pw{width:100%;border-collapse:collapse;}'
+    + 'thead.pw td{padding:0;background:#f4f6fa;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+    + '.site-header{display:flex;justify-content:space-between;align-items:center;background:#f4f6fa;border-bottom:3px solid #1a2035;padding:10px 28px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+    + '.fh-logo{font-family:Space Mono,monospace;font-size:16px;font-weight:700;color:#1a2035;letter-spacing:2px;}'
+    + '.fh-logo span{color:#0ea5e9;}'
+    + '.fh-sub{font-size:11px;color:#64748b;margin-top:2px;}'
+    + '.fh-meta{text-align:right;font-size:11px;color:#64748b;line-height:1.8;}'
+    + '.fh-meta strong{color:#1a2035;display:block;font-size:12px;}'
+    + '.page{max-width:920px;margin:0 auto;padding:20px 28px 40px;}'
+    + '@media print{.print-btn{display:none!important;}}'
+    + '</style>'
+    + '</head><body>'
+
+    + '<table class="pw"><thead class="pw"><tr><td>'
+    + '<div class="site-header">'
+    + '<div>'
+    + '<div class="fh-logo">&#11035; BEAM <span>ANALYSIS</span> REPORT</div>'
+    + '<div class="fh-sub">' + beamType + ' &nbsp;|&nbsp; L = ' + L + ' m</div>'
+    + '</div>'
+    + '<div class="fh-meta">'
+    + '<strong>Civil Tools Kit</strong>'
+    + '<span>' + dateStr + ' &nbsp; ' + timeStr + '</span>'
+    + '</div>'
+    + '</div>'
+    + '</td></tr></thead>'
+    + '<tbody><tr><td>'
+
+    + '<div class="page">'
+
+    // ── Tags bar ──
+    + tagsHTML
+
+    // ── Reaction cards ──
+    + rgridHTML
+
+    // ── Diagrams ──
+    + imgBlock('Beam Element Diagram', 'cf')
+    + imgBlock('Free Body Diagram — Reactions', 'cr')
+    + imgBlock('Shear Force Diagram — SFD', 'cs')
+    + imgBlock('Bending Moment Diagram — BMD', 'cm')
+    + imgBlock('Deflection — v(x)', 'cd', 'Double Integration M/EI')
+
+    // ── Cb Block ──
+    + (cbHTML ? '<div class="pblock"><div class="ptitle">&#9670; C<sub>b</sub> — Lateral-Torsional Buckling Modification Factor <span class="psub">AISC 360 Eq. F1-1</span></div>' + cbHTML + '</div>' : '')
+
+    // ── Summary Table ──
+    + sumHTML
+
+    // ── Page break before equations ──
+    + '<div style="page-break-before:always;"></div>'
+
+    // ── Equations block ──
+    + eqHTML
+
+    + '</div>'
+    + '</td></tr></tbody></table>'
+    + '<button class="print-btn" onclick="window.print()">&#128424; Print / Save PDF</button>'
+    + '</body></html>');
+
+  win.document.close();
+}
+
+
+// ---- Theme Toggle ----
+function toggleTheme() {
+  var html = document.documentElement;
+  var btn = document.getElementById('btn-theme');
+  if (html.getAttribute('data-theme') === 'light') {
+    html.removeAttribute('data-theme');
+    btn.textContent = '☀ LIGHT';
+    btn.style.color = '#c8d0e8';
+    btn.style.background = 'rgba(255,255,255,0.06)';
+    btn.style.borderColor = 'rgba(255,255,255,0.15)';
+    localStorage.setItem('theme', 'dark');
+  } else {
+    html.setAttribute('data-theme', 'light');
+    btn.textContent = '🌙 DARK';
+    btn.style.color = '#0369a1';
+    btn.style.background = 'rgba(3,105,161,0.08)';
+    btn.style.borderColor = 'rgba(3,105,161,0.30)';
+    localStorage.setItem('theme', 'light');
+  }
+}
+// Restore saved theme on load
+(function() {
+  if (localStorage.getItem('theme') === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    var btn = document.getElementById('btn-theme');
+    if (btn) {
+      btn.textContent = '🌙 DARK';
+      btn.style.color = '#0369a1';
+      btn.style.background = 'rgba(3,105,161,0.08)';
+      btn.style.borderColor = 'rgba(3,105,161,0.30)';
+    }
+  }
+})();
 
 // ---- Init ----
 updateHeader();
