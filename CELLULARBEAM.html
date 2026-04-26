@@ -3113,12 +3113,6 @@ function drawElevation(B, tw, tf, Hcb, a0, S){
   ctx.font = '9px IBM Plex Mono, monospace';
   ctx.textAlign = 'left';
   ctx.fillText('CL of openings', beamRight + 25, cy + 3);
-
-  // Note — show how many openings shown vs estimated for full span
-  ctx.fillStyle = '#888';
-  ctx.font = '9px IBM Plex Mono, monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText(`(แสดง ${openings.length} openings · ความยาวที่แสดง ≈ ${beamLengthMm.toFixed(0)} mm)`, W/2, H - 12);
 }
 
 // Bind input events
