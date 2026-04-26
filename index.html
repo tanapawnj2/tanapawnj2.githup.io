@@ -65,8 +65,20 @@
     .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
     .divider { display: flex; align-items: center; gap: 10px; margin: 1.25rem 0; color: var(--muted); font-size: 0.75rem; }
     .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    /* ── Google buttons hidden ── */
-    .btn-google, .divider { display: none !important; }
+    /* ── Google button ── */
+    .divider { display: flex; }
+    .btn-google {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 9px; padding: 0.72rem 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+      color: var(--text); cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+    .btn-google:hover { border-color: rgba(232,213,163,0.4); transform: translateY(-1px); }
+    .btn-google:active { transform: scale(0.98); }
+    .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
     .msg { font-size: 0.82rem; padding: 0.65rem 0.85rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
     .msg.error   { background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid rgba(248,113,113,0.2); }
     .msg.success { background: rgba(134,239,172,0.1); color: var(--success); border: 1px solid rgba(134,239,172,0.2); }
