@@ -1,0 +1,3133 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<title>CB Section Properties — Cellular Beam</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161b25;--bg3:#1c2333;--bg4:#222c3c;
+  --border:#2a3650;--border2:#334166;
+  --text:#ffffff;--muted:#ffffff;--dim:#ffffff;
+  --blue:#4a90d9;--blue2:#2563a8;
+  --orange:#f0883e;--red:#e05252;--green:#4ade80;
+  --yellow:#f5c842;--purple:#a78bfa;--cyan:#22d3ee;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{min-width:1372px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+sub,sup{font-size:.72em;font-weight:600;line-height:0;position:relative;vertical-align:baseline}
+sub{bottom:-.3em}sup{top:-.4em}
+.hdr{background:linear-gradient(135deg,#0d1520,#1a2540);border-bottom:1px solid var(--border2);
+  padding:0 24px;display:flex;align-items:center;gap:14px;height:52px;position:sticky;top:0;z-index:100;min-width:1280px}
+.hdr-logo{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue);
+  letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--blue2);padding:3px 9px;border-radius:3px}
+.hdr-title{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text);letter-spacing:.04em}
+.hdr-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.layout{display:flex;min-width:1372px}
+.sidebar{width:360px;min-width:360px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* TAB BAR */
+.tab-bar{display:flex;background:var(--bg3);border-bottom:2px solid var(--border2);position:sticky;top:0;z-index:10}
+.tab-btn{flex:1;background:transparent;border:none;color:rgba(255,255,255,.55);
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;
+  padding:11px 8px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tab-btn:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.02)}
+.tab-btn.active{color:var(--yellow);border-bottom-color:var(--yellow);background:var(--bg2)}
+.tab-panel{flex:1}
+.main{width:1012px;min-width:1012px;flex-shrink:0;padding:20px;display:flex;flex-direction:column;gap:0}
+.sg{border-bottom:1px solid var(--border);padding:12px 14px}
+.sg-title{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sg-title::after{content:'';flex:1;height:1px;background:var(--border2)}
+.inp-row{display:flex;align-items:center;margin-bottom:7px;gap:6px}
+.inp-row .lbl{font-size:12px;color:#fff;width:80px;flex-shrink:0;font-weight:500}
+.inp-row .sym{font-size:11px;width:12px;text-align:center;flex-shrink:0}
+.inp-row input{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);color:#fff;
+  font-size:13px;font-weight:600;padding:5px 10px;border-radius:4px;text-align:center;transition:border-color .15s}
+.inp-row input:focus{outline:none;border-color:var(--blue);background:var(--bg4)}
+.inp-row .unit{font-size:11px;color:rgba(255,255,255,.6);width:36px;flex-shrink:0}
+.sec-block{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;background:var(--bg2);width:972px;min-width:972px}
+.sec-hdr{background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:10px}
+.sec-tag{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;padding:2px 7px;border-radius:2px}
+.tag-blue{background:var(--blue2)}.tag-orange{background:#b45309}.tag-green{background:#166534}.tag-yellow{background:#a16207}
+.tag-red{background:#991b1b}.tag-purple{background:#6d28d9}.tag-cyan{background:#0e7490}
+.tag-pink{background:#9d174d}.tag-teal{background:#0f766e}
+.sec-title{font-size:12px;font-weight:600;color:#fff}
+.sec-ref{margin-left:auto;font-size:10px;color:rgba(255,255,255,.6)}
+.rep-grid{display:grid;grid-template-columns:486px 486px;gap:0;border-top:1px solid var(--border)}
+.rep-col{padding:14px;border-right:1px solid var(--border)}
+.rep-col:last-child{border-right:none}
+.rep-col-full{padding:14px}
+.gov{background:linear-gradient(90deg,rgba(245,200,66,.12),transparent);
+  border-left:3px solid #f5c842;padding:8px 12px;margin-top:10px;border-radius:0 4px 4px 0}
+.gov-lbl{font-size:11px;color:rgba(255,255,255,.7)}
+.gov-val{font-size:18px;font-weight:800;color:#f5c842;display:flex;align-items:baseline;gap:6px}
+.gov-unit{font-size:12px;color:rgba(245,200,66,.7);font-weight:500}
+.gov-tag{font-family:var(--mono);font-size:9px;font-weight:700;background:#c47f00;color:#fff;padding:2px 7px;border-radius:2px;letter-spacing:.1em;margin-right:6px}
+.gov-green{background:linear-gradient(90deg,rgba(74,222,128,.1),transparent);border-left:3px solid var(--green);padding:8px 12px;margin-top:10px;border-radius:0 4px 4px 0}
+.gov-green .gov-val{color:var(--green)}.gov-green .gov-unit{color:rgba(74,222,128,.7)}
+.gov-green .gov-tag{background:#166534}
+.gov-red{background:linear-gradient(90deg,rgba(224,82,82,.1),transparent);border-left:3px solid var(--red);padding:8px 12px;margin-top:10px;border-radius:0 4px 4px 0}
+.gov-red .gov-val{color:var(--red)}.gov-red .gov-unit{color:rgba(224,82,82,.7)}
+.gov-red .gov-tag{background:#991b1b}
+.sdiv{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.6);display:flex;align-items:center;gap:8px;margin:10px 0 7px}
+.sdiv::before{content:'';width:10px;height:1px;background:var(--border2)}
+.sdiv::after{content:'';flex:1;height:1px;background:var(--border2)}
+canvas{display:block;border-radius:4px;background:#0f1117}
+.calc-block{margin:6px 0 10px;border-left:2px solid var(--border2)}
+.calc-line1,.calc-line2,.calc-line3{font-size:12px;display:grid;grid-template-columns:20px 18px 1fr;align-items:baseline;padding:2px 0}
+.calc-line1 .cl-ind{display:none}.calc-line1 .cl-eq{display:none}.calc-line1 .cl-body{grid-column:1/4}
+.calc-line2 .cl-ind{display:block}
+.calc-line3{border-left:2px solid rgba(255,255,255,.3);padding:3px 0;margin-top:1px}
+.calc-line3 .cl-ind{display:block}
+.cl-eq{text-align:center;font-weight:500;font-family:var(--mono)}
+.cl-body{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;font-family:var(--mono)}
+.calc-val{font-size:14px;font-weight:700;color:#fff}
+.calc-unit{font-size:10px;color:rgba(255,255,255,.5)}
+.badge-ok{color:var(--green);font-weight:700}.badge-warn{color:var(--yellow);font-weight:700}.badge-fail{color:var(--orange);font-weight:700}
+.sum-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.sum-tbl td{padding:6px 10px;border:1px solid var(--border)}
+.sum-tbl tr:first-child td{background:var(--bg3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.sum-tbl .val{font-weight:700;color:var(--yellow);text-align:right}
+
+
+/* Axis tags — colored badges for capacity/check tables */
+.ax-tag{
+  display:inline-block;
+  padding:3px 9px;
+  border-radius:3px;
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.06em;
+  color:#fff;
+  white-space:nowrap
+}
+.ax-blue{background:#2563a8}
+.ax-purple{background:#6d28d9}
+.ax-pink{background:#9d174d}
+.ax-cyan{background:#0e7490}
+.ax-green{background:#166534}
+.ax-red{background:#991b1b}
+.ax-orange{background:#b45309}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-logo">CB · CG FRAME</div>
+  <div class="hdr-title">CELLULAR BEAM ANALYSIS</div>
+  <button onclick="window.print()" style="margin-left:auto;background:#2563a8;color:#fff;border:1px solid #4a90d9;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;padding:6px 14px;cursor:pointer;text-transform:uppercase">⎙ PRINT</button>
+  <div class="hdr-dot" style="margin-left:12px"></div>
+</div>
+
+<div class="layout">
+<div class="sidebar">
+
+  <!-- TAB SELECTOR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab_geo" onclick="switchTab('geo')">Geometry &amp; Material</button>
+    <button class="tab-btn" id="tab_force" onclick="switchTab('force')">Applied Forces</button>
+  </div>
+
+  <!-- TAB 1: GEOMETRY & MATERIAL -->
+  <div id="panel_geo" class="tab-panel">
+    <div class="sg">
+      <div class="sg-title">เหล็กรูปพรรณต้นกำเนิด (I-Beam)</div>
+      <div class="inp-row"><span class="lbl">H</span><span class="sym">=</span><input id="inp_H" type="text" value="400"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">B</span><span class="sym">=</span><input id="inp_B" type="text" value="200"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">t<sub>w</sub></span><span class="sym">=</span><input id="inp_tw" type="text" value="8"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">t<sub>f</sub></span><span class="sym">=</span><input id="inp_tf" type="text" value="13"><span class="unit">mm</span></div>
+    </div>
+    <div class="sg">
+      <div class="sg-title">รูปทรง Cellular Beam</div>
+      <div class="inp-row"><span class="lbl">H<sub>cb</sub></span><span class="sym">=</span><input id="inp_Hcb" type="text" value="560"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">a<sub>0</sub></span><span class="sym">=</span><input id="inp_a0" type="text" value="400"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">S</span><span class="sym">=</span><input id="inp_S" type="text" value="600"><span class="unit">mm</span></div>
+    </div>
+    <div class="sg">
+      <div class="sg-title">วัสดุ (สำหรับน้ำหนัก)</div>
+      <div class="inp-row"><span class="lbl">ρ</span><span class="sym">=</span><input id="inp_rho" type="text" value="7850"><span class="unit">kg/m³</span></div>
+    </div>
+    <div class="sg">
+      <div class="sg-title" style="color:var(--orange)">วัสดุเหล็ก (สำหรับ Design)</div>
+      <div class="inp-row"><span class="lbl">F<sub>y</sub></span><span class="sym">=</span><input id="inp_Fy" type="text" value="2400"><span class="unit">ksc</span></div>
+      <div class="inp-row"><span class="lbl">E</span><span class="sym">=</span><input id="inp_E" type="text" value="2100000"><span class="unit">ksc</span></div>
+    </div>
+    <div class="sg">
+      <div class="sg-title" style="color:var(--orange)">Unbraced Length &amp; Cb</div>
+      <div class="inp-row"><span class="lbl">L<sub>b</sub></span><span class="sym">=</span><input id="inp_Lb" type="text" value="3000"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">C<sub>b</sub></span><span class="sym">=</span><input id="inp_Cb" type="text" value="1.0"><span class="unit"></span></div>
+    </div>
+    <div class="sg">
+      <div class="sg-title" style="color:var(--cyan)">Effective Length Factor (K)</div>
+      <div class="inp-row"><span class="lbl">K<sub>x</sub></span><span class="sym">=</span><input id="inp_Kx" type="text" value="1.0"><span class="unit"></span></div>
+      <div class="inp-row"><span class="lbl">K<sub>y</sub></span><span class="sym">=</span><input id="inp_Ky" type="text" value="1.0"><span class="unit"></span></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        <b style="color:#fff">K<sub>x</sub></b> = Effective length factor about strong axis (X)<br>
+        <b style="color:#fff">K<sub>y</sub></b> = Effective length factor about weak axis (Y)
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: APPLIED FORCES -->
+  <div id="panel_force" class="tab-panel" style="display:none">
+
+    <div class="sg" style="background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3)">
+      <div class="sg-title" style="color:var(--green)">Design Method</div>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button id="btn_lrfd" onclick="setMethod('LRFD')" style="flex:1;background:var(--green);color:#000;border:none;border-radius:4px;padding:9px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer">LRFD</button>
+        <button id="btn_asd" onclick="setMethod('ASD')" style="flex:1;background:var(--bg3);color:rgba(255,255,255,.6);border:1px solid var(--border2);border-radius:4px;padding:9px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer">ASD</button>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:8px;line-height:1.6">
+        <span id="method_hint">
+
+        </span>
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sg-title" style="color:var(--yellow)">Strong-Axis Forces (X)</div>
+      <div class="inp-row"><span class="lbl">M<sub>r,x</sub></span><span class="sym">=</span><input id="inp_Mr" type="text" value="15000"><span class="unit">kg·m</span></div>
+      <div class="inp-row"><span class="lbl">V<sub>r,y</sub></span><span class="sym">=</span><input id="inp_Vr" type="text" value="5000"><span class="unit">kg</span></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        <b style="color:#fff">M<sub>r,x</sub></b> = โมเมนต์รอบแกนหลัก (Strong/X axis) ที่ opening<br>
+        <b style="color:#fff">V<sub>r,y</sub></b> = แรงเฉือนตามแกนหลัก (Y direction = vertical)
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sg-title" style="color:var(--yellow)">Weak-Axis Forces (Y)</div>
+      <div class="inp-row"><span class="lbl">M<sub>r,y</sub></span><span class="sym">=</span><input id="inp_Mry" type="text" value="2000"><span class="unit">kg·m</span></div>
+      <div class="inp-row"><span class="lbl">V<sub>r,x</sub></span><span class="sym">=</span><input id="inp_Vrx" type="text" value="1000"><span class="unit">kg</span></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        <b style="color:#fff">M<sub>r,y</sub></b> = โมเมนต์รอบแกนรอง (Weak/Y axis)<br>
+        <b style="color:#fff">V<sub>r,x</sub></b> = แรงเฉือนตามแกนรอง (X direction = horizontal)
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sg-title" style="color:var(--red)">Bearing Geometry (สำหรับ J10 Web Yielding/Crippling)</div>
+      <div class="inp-row"><span class="lbl">l<sub>b</sub></span><span class="sym">=</span><input id="inp_lb" type="text" value="100"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">x</span><span class="sym">=</span><input id="inp_xLoad" type="text" value="500"><span class="unit">mm</span></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        <b style="color:#fff">l<sub>b</sub></b> = ความยาวของฐานรองรับ (Bearing Length) <br>
+        <b style="color:#fff">x</b> = ระยะจากปลายคานถึงจุดรองรับ
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sg-title" style="color:var(--cyan)">Axial Force (ตามแนวแกน)</div>
+      <div class="inp-row"><span class="lbl">P<sub>r</sub></span><span class="sym">=</span><input id="inp_Pr_axial" type="text" value="0"><span class="unit">kg</span></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        <b style="color:#fff">P<sub>r</sub></b> = แรงตามแนวแกนคาน (axial)<br>
+        &nbsp;&nbsp;ค่า <b style="color:var(--red)">−</b> = แรงอัด (compression) · <b style="color:var(--green)">+</b> = แรงดึง (tension)
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="main">
+
+<!-- CROSS-SECTION CANVAS -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-blue">Cross-Section</span><span class="sec-title">Cross Section</span></div>
+  <div style="padding:0;display:flex;justify-content:center;background:var(--bg)">
+    <canvas id="sectionCanvas" width="720" height="520" style="width:720px;height:520px;display:block"></canvas>
+  </div>
+</div>
+
+<!-- ELEVATION CANVAS -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-purple">Elevation</span><span class="sec-title">Side View</span></div>
+  <div style="padding:0;display:flex;justify-content:center;background:var(--bg)">
+    <canvas id="elevCanvas" width="940" height="280" style="width:940px;height:280px;display:block"></canvas>
+  </div>
+</div>
+
+<!-- WARNINGS -->
+<div class="sec-block" id="warn-block" style="display:none">
+  <div class="sec-hdr"><span class="sec-tag tag-red">Warning</span><span class="sec-title">เงื่อนไขที่ต้องระวัง</span><span class="sec-ref">SCI P355 / AISC Design Guide 31 Section 3.5</span></div>
+  <div class="rep-col-full" id="warn-list"></div>
+</div>
+
+<!-- GEOMETRY DERIVED -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-cyan">Geometry</span><span class="sec-title">Tee Components</span><span class="sec-ref">Step 1–7</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Tee Stub Dimensions</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">h<sub>s</sub> = (H<sub>cb</sub> − a<sub>0</sub>) / 2</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_hs_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_hs">—</span><span class="calc-unit">mm</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">h<sub>w</sub> = h<sub>s</sub> − t<sub>f</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_hw_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_hw">—</span><span class="calc-unit">mm</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">e = S − a<sub>0</sub> <span style="color:rgba(255,255,255,.5)">(web post)</span></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_e_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_e">—</span><span class="calc-unit">mm</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Tee Areas</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">A<sub>f</sub> = B · t<sub>f</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Af_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Af">—</span><span class="calc-unit">mm²</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">A<sub>w</sub> = t<sub>w</sub> · h<sub>w</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Aw_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Aw">—</span><span class="calc-unit">mm²</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">A<sub>tee</sub> = A<sub>f</sub> + A<sub>w</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Atee_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Atee">—</span><span class="calc-unit">mm²</span></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CENTROID + DISTANCE -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-purple">Centroid</span><span class="sec-title">Tee Centroid &amp; Distance to Neutral Axis</span><span class="sec-ref">Step 6–7</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Centroid ȳ ของ Tee (จากปลาย flange)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">ȳ = (A<sub>f</sub>·t<sub>f</sub>/2 + A<sub>w</sub>·(t<sub>f</sub>+h<sub>w</sub>/2)) / A<sub>tee</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_yb_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_yb">—</span><span class="calc-unit">mm</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">ระยะ d (NA → Tee centroid)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">d = H<sub>cb</sub>/2 − ȳ</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_d_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_d">—</span><span class="calc-unit">mm</span></span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IX CALCULATION -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-orange">I-x</span><span class="sec-title">Second Moment of Area about X-axis</span><span class="sec-ref">Parallel Axis Theorem</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Inertia ของ Tee เดียว (รอบ Tee centroid)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">I<sub>f</sub> = B·t<sub>f</sub>³/12 + A<sub>f</sub>·(ȳ−t<sub>f</sub>/2)²</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_If_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_If">—</span><span class="calc-unit">mm⁴</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">I<sub>w</sub> = t<sub>w</sub>·h<sub>w</sub>³/12 + A<sub>w</sub>·(ȳ−t<sub>f</sub>−h<sub>w</sub>/2)²</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Iw_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Iw">—</span><span class="calc-unit">mm⁴</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">I<sub>tee</sub> = I<sub>f</sub> + I<sub>w</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Itee_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Itee">—</span><span class="calc-unit">mm⁴</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">I<sub>x</sub> ของ CB ทั้งคาน (2 Tee)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">I<sub>x</sub> = 2 · (I<sub>tee</sub> + A<sub>tee</sub>·d²)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Ix_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Ix_mm">—</span><span class="calc-unit">mm⁴</span></span></div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">RESULT</span>I<sub>x</sub> (Second Moment, X-axis)</div>
+        <div class="gov-val"><span id="r_Ix">—</span><span class="gov-unit">cm⁴</span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:8px;line-height:1.6">
+        💡 ค่า I คำนวณโดยไม่รวม Fillet Radius
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ZX -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-orange">Z-x</span><span class="sec-title">Plastic Section Modulus about X-axis</span><span class="sec-ref">Net Section</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Plastic Neutral Axis ที่ H<sub>cb</sub>/2 (สมมาตร)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">Z<sub>x</sub> = 2 · A<sub>tee</sub> · d</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Zx_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Zx_mm">—</span><span class="calc-unit">mm³</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">RESULT</span>Z<sub>x</sub> (Plastic Modulus, X-axis)</div>
+        <div class="gov-val"><span id="r_Zx">—</span><span class="gov-unit">cm³</span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:8px;line-height:1.6">
+        ✓ นับเฉพาะวัสดุจริง (2 Tee) — ไม่รวม web ที่ opening
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ZY -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-orange">Z-y</span><span class="sec-title">Plastic Section Modulus about Y-axis (Weak axis)</span><span class="sec-ref">Doubly Symmetric I-Shape</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">PNA ที่กึ่งกลาง flange (สมมาตรรอบแกน Y)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">Z<sub>y,flanges</sub> = 2·t<sub>f</sub>·B²/4</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Zyf_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Zyf">—</span><span class="calc-unit">mm³</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">Z<sub>y,webs</sub> = 2·h<sub>w</sub>·t<sub>w</sub>²/4</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Zyw_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Zyw">—</span><span class="calc-unit">mm³</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">Z<sub>y</sub> = Z<sub>y,flanges</sub> + Z<sub>y,webs</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Zy_mm">—</span><span class="calc-unit">mm³</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">RESULT</span>Z<sub>y</sub> (Plastic Modulus, Y-axis)</div>
+        <div class="gov-val"><span id="r_Zy">—</span><span class="gov-unit">cm³</span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:8px;line-height:1.6">
+        💡 Z<sub>y</sub> ของ I-Shape คำนวณจาก:<br>
+        &nbsp;&nbsp;• 2 flanges (B × t<sub>f</sub>) แต่ละชิ้นมี Z = B²·t<sub>f</sub>/4<br>
+        &nbsp;&nbsp;• 2 web stubs (t<sub>w</sub> × h<sub>w</sub>) แต่ละชิ้นมี Z = h<sub>w</sub>·t<sub>w</sub>²/4<br>
+        ✓ Opening ไม่มีผลต่อแกน Y
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        Shape Factor (Y) = Z<sub>y</sub>/S<sub>y</sub> = <span style="color:var(--yellow);font-weight:600" id="g_sfy">—</span> (ปกติ ≈ 1.5 สำหรับ I-Shape)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SX, IY, SY -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-green">S-x · I-y · S-y</span><span class="sec-title">Elastic Section Modulus &amp; Y-axis Properties</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">S<sub>x</sub> — Elastic Modulus (X)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">S<sub>x</sub> = I<sub>x</sub> / (H<sub>cb</sub>/2)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Sx_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Sx_mm">—</span><span class="calc-unit">mm³</span></span></div>
+      </div>
+      <div class="gov-green">
+        <div class="gov-lbl"><span class="gov-tag">RESULT</span>S<sub>x</sub></div>
+        <div class="gov-val"><span id="r_Sx">—</span><span class="gov-unit">cm³</span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">I<sub>y</sub> — Inertia Y-axis</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">I<sub>y</sub> = 2·t<sub>f</sub>·B³/12 + 2·t<sub>w</sub>³·h<sub>w</sub>/12</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="g_Iy_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Iy_mm">—</span><span class="calc-unit">mm⁴</span></span></div>
+      </div>
+      <div class="gov-green">
+        <div class="gov-lbl"><span class="gov-tag">RESULT</span>I<sub>y</sub></div>
+        <div class="gov-val"><span id="r_Iy">—</span><span class="gov-unit">cm⁴</span></div>
+      </div>
+      <div class="calc-block" style="margin-top:14px">
+        <div class="calc-line1"><span class="cl-body">S<sub>y</sub> = I<sub>y</sub> / (B/2)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="g_Sy_mm">—</span><span class="calc-unit">mm³</span></span></div>
+      </div>
+      <div class="gov-green">
+        <div class="gov-lbl"><span class="gov-tag">RESULT</span>S<sub>y</sub></div>
+        <div class="gov-val"><span id="r_Sy">—</span><span class="gov-unit">cm³</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUMMARY TABLE -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-teal">Summary</span><span class="sec-title">Section Properties</span></div>
+  <div class="rep-col-full">
+    <table class="sum-tbl">
+      <tr><td>Property</td><td>Symbol</td><td>Value</td><td>Unit</td><td>หมายเหตุ</td></tr>
+      <tr><td>Cross-sectional Area</td><td>A</td><td class="val" id="s_A">—</td><td>cm²</td><td>2 × A<sub>tee</sub></td></tr>
+      <tr><td>Weight per meter</td><td>w</td><td class="val" id="s_wt">—</td><td>kg/m</td><td>A × ρ</td></tr>
+      <tr><td>Second Moment of Area (X)</td><td>I<sub>x</sub></td><td class="val" id="s_Ix">—</td><td>cm⁴</td><td>Parallel Axis Theorem</td></tr>
+      <tr><td>Second Moment of Area (Y)</td><td>I<sub>y</sub></td><td class="val" id="s_Iy">—</td><td>cm⁴</td><td>2 flanges + 2 web stubs</td></tr>
+      <tr><td>Plastic Section Modulus (X)</td><td>Z<sub>x</sub></td><td class="val" id="s_Zx">—</td><td>cm³</td><td>2 × A<sub>tee</sub> × d</td></tr>
+      <tr><td>Plastic Section Modulus (Y)</td><td>Z<sub>y</sub></td><td class="val" id="s_Zy">—</td><td>cm³</td><td>Z<sub>y,flanges</sub> + Z<sub>y,webs</sub></td></tr>
+      <tr><td>Elastic Section Modulus (X)</td><td>S<sub>x</sub></td><td class="val" id="s_Sx">—</td><td>cm³</td><td>I<sub>x</sub> / (H<sub>cb</sub>/2)</td></tr>
+      <tr><td>Elastic Section Modulus (Y)</td><td>S<sub>y</sub></td><td class="val" id="s_Sy">—</td><td>cm³</td><td>I<sub>y</sub> / (B/2)</td></tr>
+      <tr><td>Shape Factor (X)</td><td>Z<sub>x</sub>/S<sub>x</sub></td><td class="val" id="s_sf">—</td><td>—</td><td>ปกติ &gt; 1.0</td></tr>
+      <tr><td>Shape Factor (Y)</td><td>Z<sub>y</sub>/S<sub>y</sub></td><td class="val" id="s_sfy">—</td><td>—</td><td>ปกติ ≈ 1.5</td></tr>
+      <tr><td>Radius of Gyration (X)</td><td>r<sub>x</sub></td><td class="val" id="s_rx">—</td><td>cm</td><td>√(I<sub>x</sub>/A)</td></tr>
+      <tr><td>Radius of Gyration (Y)</td><td>r<sub>y</sub></td><td class="val" id="s_ry">—</td><td>cm</td><td>√(I<sub>y</sub>/A)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FLEXURAL DESIGN — AISC 360-22 + AISC Design Guide 31        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div style="margin:20px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(240,136,62,.15),transparent);border-left:4px solid var(--orange);border-radius:0 6px 6px 0">
+  <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--orange)">FLEXURAL DESIGN CHECK — STRONG AXIS (M<sub>nx</sub>)</div>
+  <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px">AISC 360-22 Chapter F (F2) + AISC Design Guide 31 Section 3 — Bending about X-axis</div>
+</div>
+
+<!-- CLASSIFICATION -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-cyan">Classify</span><span class="sec-title">Section Classification — Table B4.1b (Flexure)</span><span class="sec-ref">AISC 360-22 B4</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Flange — b/t ratio</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ<sub>f</sub> = (B/2) / t<sub>f</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="cl_lf_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="cl_lf">—</span></span></div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6);margin:4px 0 2px">Flange limits (B4.1b Case 10):</div>
+      <div style="font-size:12px;padding:2px 0;font-family:var(--mono)">λ<sub>p</sub> = 0.38√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:600" id="cl_lpf">—</span></div>
+      <div style="font-size:12px;padding:2px 0;font-family:var(--mono)">λ<sub>r</sub> = 1.00√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:600" id="cl_lrf">—</span></div>
+      <div style="margin-top:8px"><span style="font-size:11px;color:rgba(255,255,255,.6)">Flange Class: </span><span id="cl_flange_cls">—</span></div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Web (Tee Stub) — h<sub>w</sub>/t<sub>w</sub></div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ<sub>w</sub> = h<sub>w</sub> / t<sub>w</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="cl_lw_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="cl_lw">—</span></span></div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6);margin:4px 0 2px">Web limits (B4.1b Case 15 — Tee stem):</div>
+      <div style="font-size:12px;padding:2px 0;font-family:var(--mono)">λ<sub>p</sub> = 0.84√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:600" id="cl_lpw">—</span></div>
+      <div style="font-size:12px;padding:2px 0;font-family:var(--mono)">λ<sub>r</sub> = 1.52√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:600" id="cl_lrw">—</span></div>
+      <div style="margin-top:8px"><span style="font-size:11px;color:rgba(255,255,255,.6)">Web Class: </span><span id="cl_web_cls">—</span></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:8px">AISC Design Guide 31 Section 3.1: ใช้ Tee stem properties (h<sub>w</sub>) ที่ตำแหน่ง opening</div>
+    </div>
+  </div>
+</div>
+
+<!-- LIMIT STATE 1: YIELDING -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-orange">F2.1</span><span class="sec-title">Limit State 1 — Yielding (Plastic Moment Capacity)</span><span class="sec-ref">AISC 360-22 F2.1</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Plastic Moment M<sub>p</sub></div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>p</sub> = F<sub>y</sub> · Z<sub>x</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="ly_Mp_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="ly_Mp">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        Z<sub>x</sub> = Plastic Section Modulus (จาก Section Properties)
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Yield Moment M<sub>y</sub> (สำหรับ Noncompact)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>y</sub> = F<sub>y</sub> · S<sub>x</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="ly_My_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="ly_My">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">F2.1</span>M<sub>n</sub> (Yielding) = M<sub>p</sub></div>
+        <div class="gov-val"><span id="ly_Mn">—</span><span class="gov-unit">kg·m</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIMIT STATE 2: LTB -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-orange">F2.2</span><span class="sec-title">Limit State 2 — Lateral-Torsional Buckling (LTB)</span><span class="sec-ref">AISC 360-22 F2.2</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Limit Lengths L<sub>p</sub>, L<sub>r</sub></div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">L<sub>p</sub> = 1.76 · r<sub>y</sub> · √(E/F<sub>y</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="ltb_Lp_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="ltb_Lp">—</span><span class="calc-unit">m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">L<sub>r</sub> = π·r<sub>ts</sub>·√(E/(0.7F<sub>y</sub>)) <span style="color:rgba(255,255,255,.5);font-size:10px">(simplified)</span></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="ltb_Lr">—</span><span class="calc-unit">m</span></span></div>
+      </div>
+      <div style="margin-top:6px;padding:7px 10px;background:rgba(34,211,238,.08);border-radius:4px;font-size:11px">
+        <span style="color:rgba(255,255,255,.6)">L<sub>b</sub> = </span><span style="color:var(--cyan);font-weight:700" id="ltb_Lb">—</span><span style="color:rgba(255,255,255,.5);font-size:10px"> m</span>
+      </div>
+      <div style="margin-top:6px;font-size:11px">
+        <span style="color:rgba(255,255,255,.6)">Region: </span><span id="ltb_region">—</span>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">M<sub>n</sub> from LTB</div>
+      <div id="ltb_calc_box">
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body" id="ltb_eq">—</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="ltb_Mn_calc">—</span><span class="calc-unit">kg·m</span></span></div>
+        </div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">F2.2</span>M<sub>n</sub> (LTB) — limited by M<sub>p</sub></div>
+        <div class="gov-val"><span id="ltb_Mn">—</span><span class="gov-unit">kg·m</span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        C<sub>b</sub> = <span id="ltb_Cb">—</span> (lateral-torsional modification factor)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIMIT STATE 3: VIERENDEEL (AISC Design Guide 31 Section 3.3) -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-pink">DG 31 Section 3.3</span><span class="sec-title">Limit State 3 — Vierendeel Bending at Opening</span><span class="sec-ref">AISC Design Guide 31 Section 3.3 (Eq. 3-3)</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Tee Section at Opening</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>p,tee</sub> = F<sub>y</sub> · Z<sub>tee</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="vd_Mptee_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Mptee">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        Z<sub>tee</sub> = Plastic modulus of Single Tee Section at Web Opening<br>
+        Calculated from Tee Centroid and Stub Geometry
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Vierendeel Moment Capacity</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>n,V</sub> = (4 · M<sub>p,tee</sub> / a<sub>0</sub>) · (H<sub>cb</sub> − 2ȳ)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="vd_MnV_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_MnV_calc">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">DG 31 Section 3.3</span>M<sub>n</sub> (Vierendeel)</div>
+        <div class="gov-val"><span id="vd_MnV">—</span><span class="gov-unit">kg·m</span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        ⚠ Simplified — สมมติแรงเฉือนสม่ำเสมอตลอด Web Opening
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GOVERNING DESIGN MOMENT -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-red">Governing</span><span class="sec-title">Governing Nominal Moment M<sub>n</sub> = min(F2.1, F2.2, DG 31 Section 3.3)</span></div>
+  <div class="rep-col-full">
+    <table class="sum-tbl">
+      <tr><td style="width:50%">Limit State</td><td style="width:25%">M<sub>n</sub> (kg·m)</td><td style="width:25%">Status</td></tr>
+      <tr><td>1. Yielding (F2.1) — M<sub>p</sub></td><td class="val" id="gov_y">—</td><td id="gov_y_st">—</td></tr>
+      <tr><td>2. Lateral-Torsional Buckling (F2.2)</td><td class="val" id="gov_l">—</td><td id="gov_l_st">—</td></tr>
+      <tr><td>3. Vierendeel at Opening (AISC DG 31 Section 3.3)</td><td class="val" id="gov_v">—</td><td id="gov_v_st">—</td></tr>
+    </table>
+    <div class="gov" style="margin-top:14px">
+      <div class="gov-lbl"><span class="gov-tag">CONTROLS</span>Governing M<sub>n</sub></div>
+      <div class="gov-val"><span id="gov_Mn">—</span><span class="gov-unit">kg·m</span> <span style="font-size:11px;color:rgba(255,255,255,.6);margin-left:8px">← <span id="gov_by">—</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- LRFD + ASD CAPACITY (Strong Axis) -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-blue">Capacity</span><span class="sec-title">Design / Allowable Moment Capacity (Strong Axis)</span><span class="sec-ref">AISC 360-22 B3</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">LRFD Design Moment (φ = 0.90)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">φM<sub>n</sub> = 0.90 · M<sub>n</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="lrfd_phiMn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="lrfd_phiMn">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">ASD Allowable Moment (Ω = 1.67)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>n</sub>/Ω = M<sub>n</sub> / 1.67</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="asd_MnO_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="asd_MnO">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FLEXURAL DESIGN — WEAK AXIS (M_ny)                          -->
+<!-- AISC 360-22 Section F6 — I-Shapes Bent About Their Minor Axis -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div style="margin:24px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(167,139,250,.15),transparent);border-left:4px solid #a78bfa;border-radius:0 6px 6px 0">
+  <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#a78bfa">FLEXURAL DESIGN CHECK — WEAK AXIS (M<sub>ny</sub>)</div>
+  <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px">AISC 360-22 Section F6 — Doubly Symmetric I-Shape Bent About Minor Axis</div>
+</div>
+
+<!-- WEAK AXIS — LIMIT STATE 1: YIELDING -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-orange">F6.1</span><span class="sec-title">Limit State 1 — Yielding (Weak Axis)</span><span class="sec-ref">AISC 360-22 F6.1 (Eq. F6-1)</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Plastic Moment M<sub>py</sub></div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>py</sub> = F<sub>y</sub> · Z<sub>y</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="ly_Mpy_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="ly_Mpy">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:6px">Upper limit (1.6·F<sub>y</sub>·S<sub>y</sub>):</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">1.6 · F<sub>y</sub> · S<sub>y</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="ly_FySy">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Limit State Result</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>n,Y</sub> = min(F<sub>y</sub>·Z<sub>y</sub>, 1.6·F<sub>y</sub>·S<sub>y</sub>)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="ly_MnY_calc">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">F6.1</span>M<sub>n</sub> (Yielding, Y-axis)</div>
+        <div class="gov-val"><span id="ly_MnY">—</span><span class="gov-unit">kg·m</span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:8px;line-height:1.6">
+        ✓ <b>ไม่มี LTB</b> สำหรับการดัดรอบแกน weak axis<br>
+        ✓ <b>ไม่มี Vierendeel</b> เพราะ opening ไม่มีผลกับแกน Y
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WEAK AXIS — LIMIT STATE 2: FLB -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-orange">F6.2</span><span class="sec-title">Limit State 2 — Flange Local Buckling (FLB)</span><span class="sec-ref">AISC 360-22 F6.2</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Flange Slenderness</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ = b<sub>f</sub>/(2·t<sub>f</sub>) = (B/2)/t<sub>f</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="flb_l_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="flb_l">—</span></span></div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6);margin:4px 0 2px">Limits (B4.1b Case 10):</div>
+      <div style="font-size:12px;padding:2px 0;font-family:var(--mono)">λ<sub>p</sub> = 0.38√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:600" id="flb_lp">—</span></div>
+      <div style="font-size:12px;padding:2px 0;font-family:var(--mono)">λ<sub>r</sub> = 1.00√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:600" id="flb_lr">—</span></div>
+      <div style="margin-top:8px"><span style="font-size:11px;color:rgba(255,255,255,.6)">FLB Region: </span><span id="flb_region">—</span></div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">M<sub>n</sub> from FLB</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body" id="flb_eq">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="flb_Mn_calc">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">F6.2</span>M<sub>n</sub> (FLB, Y-axis)</div>
+        <div class="gov-val"><span id="flb_Mn">—</span><span class="gov-unit">kg·m</span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        Compact: M<sub>n</sub> = M<sub>p,y</sub><br>
+        Noncompact: linear interpolation<br>
+        Slender: M<sub>n</sub> = F<sub>cr</sub>·S<sub>y</sub>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WEAK AXIS — GOVERNING -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-red">Governing</span><span class="sec-title">Governing M<sub>ny</sub> = min(F6.1, F6.2)</span></div>
+  <div class="rep-col-full">
+    <table class="sum-tbl">
+      <tr><td style="width:50%">Limit State</td><td style="width:25%">M<sub>n</sub> (kg·m)</td><td style="width:25%">Status</td></tr>
+      <tr><td>1. Yielding (F6.1)</td><td class="val" id="govy_y">—</td><td id="govy_y_st">—</td></tr>
+      <tr><td>2. Flange Local Buckling (F6.2)</td><td class="val" id="govy_f">—</td><td id="govy_f_st">—</td></tr>
+    </table>
+    <div class="gov" style="margin-top:14px">
+      <div class="gov-lbl"><span class="gov-tag">CONTROLS</span>Governing M<sub>ny</sub></div>
+      <div class="gov-val"><span id="govy_Mn">—</span><span class="gov-unit">kg·m</span> <span style="font-size:11px;color:rgba(255,255,255,.6);margin-left:8px">← <span id="govy_by">—</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- WEAK AXIS LRFD & ASD -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-blue">LRFD / ASD</span><span class="sec-title">Design Strength &amp; D/C Check (Weak Axis)</span><span class="sec-ref">AISC 360-22 B3</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">LRFD (φ = 0.90)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">φM<sub>ny</sub> = 0.90 · M<sub>ny</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="lrfdY_phiMn">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div style="padding:7px 10px;background:rgba(255,255,255,.05);border-radius:4px;font-family:var(--mono);font-size:12px;margin:8px 0">
+        <span style="color:rgba(255,255,255,.6)">M<sub>r,y</sub> = </span><span style="color:#fff;font-weight:700" id="lrfdY_Muy">—</span> kg·m
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">ASD (Ω = 1.67)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>ny</sub>/Ω = M<sub>ny</sub> / 1.67</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="asdY_MnO">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div style="padding:7px 10px;background:rgba(255,255,255,.05);border-radius:4px;font-family:var(--mono);font-size:12px;margin:8px 0">
+        <span style="color:rgba(255,255,255,.6)">M<sub>r,y</sub> = </span><span style="color:#fff;font-weight:700" id="asdY_May">—</span> kg·m
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TEE SECTION PROPERTIES (used by Vierendeel & Shear checks)  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div style="margin:24px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(34,211,238,.15),transparent);border-left:4px solid var(--cyan);border-radius:0 6px 6px 0">
+  <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan)">TEE SECTION PROPERTIES — Single Tee at Opening</div>
+  <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px">Single Tee — for Vierendeel and Shear Checks</div>
+</div>
+
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-cyan">Tee</span><span class="sec-title">Tee Section Properties (Top &amp; Bottom)</span><span class="sec-ref">AISC DG 31 Section 3.1</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Area &amp; Centroid (already computed)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">A<sub>tee</sub> = B·t<sub>f</sub> + t<sub>w</sub>·h<sub>w</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="t_Atee">—</span><span class="calc-unit">cm²</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">ȳ<sub>tee</sub> = ระยะจากปลาย flange ถึง centroid</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="t_yt">—</span><span class="calc-unit">mm</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">d<sub>eff</sub> = H<sub>cb</sub> − 2·ȳ<sub>tee</sub> <span style="color:rgba(255,255,255,.5);font-size:10px">(distance between Tee centroids)</span></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="t_deff">—</span><span class="calc-unit">mm</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Moment of Inertia &amp; Modulus (about Tee's own neutral axis)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">I<sub>tee</sub> = (จาก Parallel Axis รอบ Tee centroid)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="t_Itee">—</span><span class="calc-unit">cm⁴</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">S<sub>tee</sub> = I<sub>tee</sub> / max(ȳ<sub>tee</sub>, h<sub>s</sub>−ȳ<sub>tee</sub>)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="t_Stee">—</span><span class="calc-unit">cm³</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">Z<sub>tee</sub> = Plastic modulus (PNA in flange or stem)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="t_Ztee">—</span><span class="calc-unit">cm³</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">r<sub>tee</sub> = √(I<sub>tee</sub>/A<sub>tee</sub>) <span style="color:rgba(255,255,255,.5);font-size:10px">(radius of gyration)</span></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="t_rtee">—</span><span class="calc-unit">cm</span></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- VIERENDEEL 3-STEP PROCESS (DG31 Section 3.3 + AISC H1.1)    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div style="margin:24px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(167,139,250,.15),transparent);border-left:4px solid #a78bfa;border-radius:0 6px 6px 0">
+  <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#a78bfa">VIERENDEEL BENDING — 3-STEP PROCESS</div>
+  <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px">AISC DG 31 Section 3.3 + AISC 360-22 Equation H1-1 — Combined Axial + Flexure Interaction</div>
+</div>
+
+<!-- VIERENDEEL STEP 1: DEMAND -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-pink">Step 1</span><span class="sec-title">Vierendeel Demand — Forces at Opening</span><span class="sec-ref">DG 31 Eq. 3-3, 3-4</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Axial Force in Tees (จาก global moment)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>r</sub> = M<sub>r</sub> / d<sub>eff</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="vd_Pr_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Pr">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        Top Tee → Compression · Bottom Tee → Tension<br>
+        ใช้ Compression case เป็น critical
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Vierendeel Moment in each Tee (จาก global shear)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>vr</sub> = V<sub>r</sub> · (A<sub>tee</sub>/A<sub>net</sub>) · (D<sub>o</sub>/4)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="vd_Mvr_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Mvr">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        D<sub>o</sub> = a<sub>0</sub> = opening diameter<br>
+        A<sub>net</sub> = 2 × A<sub>tee</sub> (net section area)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIERENDEEL STEP 2: TEE CAPACITY -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-pink">Step 2</span><span class="sec-title">Tee Capacity — Axial &amp; Flexural</span><span class="sec-ref">AISC 360-22 E3, F9</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Axial Compression Capacity P<sub>n</sub> (E3)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">F<sub>e</sub> = π²·E / (KL/r<sub>tee</sub>)² <span style="color:rgba(255,255,255,.5);font-size:10px">(KL = a<sub>0</sub>/2)</span></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Fe">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">F<sub>cr</sub> = (Eq. E3-2 / E3-3 ตาม slenderness)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>cr</sub> · A<sub>tee</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Pn">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">LRFD</span>φP<sub>n</sub> (φ=0.90)</div>
+        <div class="gov-val"><span id="vd_phiPn">—</span><span class="gov-unit">kg</span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Flexural Capacity M<sub>n,tee</sub> (F9 — Yielding)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>p,tee</sub> = F<sub>y</sub> · Z<sub>tee</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Mptee2">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>y,tee</sub> = F<sub>y</sub> · S<sub>tee</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Mytee">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>n,tee</sub> = min(M<sub>p,tee</sub>, 1.6·M<sub>y,tee</sub>) <span style="color:rgba(255,255,255,.5);font-size:10px">(F9.1, stem in tension)</span></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Mntee">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">LRFD</span>φM<sub>n,tee</sub> (φ=0.90)</div>
+        <div class="gov-val"><span id="vd_phiMntee">—</span><span class="gov-unit">kg·m</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIERENDEEL STEP 3: INTERACTION -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-pink">Step 3</span><span class="sec-title">Interaction Check — Combined Axial + Flexure</span><span class="sec-ref">AISC 360-22 Eq. H1-1a, H1-1b</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Ratio Check</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>r</sub>/P<sub>c</sub> = P<sub>r</sub> / φP<sub>n</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_PrPc">—</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>r</sub>/M<sub>c</sub> = M<sub>vr</sub> / φM<sub>n,tee</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_MrMc">—</span></span></div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:rgba(255,255,255,.6)">Equation Selection:</div>
+      <div style="font-size:11px;line-height:1.7;padding:6px 10px;background:rgba(167,139,250,.06);border-radius:4px;font-family:var(--mono)">
+        <div>If P<sub>r</sub>/P<sub>c</sub> ≥ 0.2: <b style="color:#a78bfa">Eq. H1-1a</b></div>
+        <div style="padding-left:18px">P<sub>r</sub>/P<sub>c</sub> + (8/9)·(M<sub>r</sub>/M<sub>c</sub>) ≤ 1.0</div>
+        <div style="margin-top:4px">If P<sub>r</sub>/P<sub>c</sub> &lt; 0.2: <b style="color:#a78bfa">Eq. H1-1b</b></div>
+        <div style="padding-left:18px">P<sub>r</sub>/(2P<sub>c</sub>) + M<sub>r</sub>/M<sub>c</sub> ≤ 1.0</div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Active Equation &amp; Result</div>
+      <div style="margin-top:6px;padding:8px 12px;background:rgba(245,200,66,.1);border-radius:4px;font-size:12px">
+        <span style="color:rgba(255,255,255,.6)">Active: </span><span id="vd_eq_active" style="color:var(--yellow);font-weight:700">—</span>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body" id="vd_h1_eq">—</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="vd_h1_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_h1_val">—</span></span></div>
+      </div>
+      <div id="vd_status_box" class="gov">
+        <div class="gov-lbl"><span class="gov-tag">H1-1</span>Vierendeel Interaction</div>
+        <div class="gov-val"><span id="vd_status">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HORIZONTAL SHEAR AT WEB POST                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div style="margin:24px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(74,222,128,.15),transparent);border-left:4px solid var(--green);border-radius:0 6px 6px 0">
+  <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--green)">HORIZONTAL SHEAR AT WEB POST</div>
+  <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px">AISC Design Guide 31 Section 3.4 — Horizontal Shear at Web Post</div>
+</div>
+
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-green">Hor.Shear</span><span class="sec-title">Horizontal Shear Check at Web Post</span><span class="sec-ref">AISC DG 31 Eq. 3-9, 3-10</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Demand — Horizontal Shear V<sub>rh</sub></div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">V<sub>rh</sub> = V<sub>r</sub> · S/d<sub>eff</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="hs_Vrh_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="hs_Vrh">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        Horizontal Shear at Web Post from equilibrium between Web Opening
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Capacity — Web Post Shear Yielding</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">V<sub>n,h</sub> = 0.6·F<sub>y</sub>·e·t<sub>w</sub> <span style="color:rgba(255,255,255,.5);font-size:10px">(e = S − a<sub>0</sub>)</span></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="hs_Vnh_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="hs_Vnh">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl"><span class="gov-tag">LRFD</span>φV<sub>n,h</sub> (φ=1.00 for G2.1a or 0.90 G2.1b)</div>
+        <div class="gov-val"><span id="hs_phiVnh">—</span><span class="gov-unit">kg</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- NOMINAL CAPACITIES SUMMARY                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div style="margin:24px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(245,200,66,.18),transparent);border-left:4px solid var(--yellow);border-radius:0 6px 6px 0">
+  <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--yellow)">NOMINAL CAPACITIES — ALL CHECKS</div>
+</div>
+
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-yellow">Capacities</span><span class="sec-title">All Nominal Capacities Combined</span></div>
+  <div class="rep-col-full">
+    <table class="sum-tbl">
+      <tr>
+        <td>Check</td>
+        <td>Axis</td>
+        <td>Reference</td>
+        <td>Nominal R<sub>n</sub></td>
+        <td>φ</td>
+        <td>φR<sub>n</sub> (LRFD)</td>
+        <td>Ω</td>
+        <td>R<sub>n</sub>/Ω (ASD)</td>
+      </tr>
+      <tr>
+        <td>Flexure M<sub>n</sub></td>
+        <td><span class="ax-tag ax-blue">Strong X</span></td>
+        <td>AISC F2</td>
+        <td class="val"><span id="cap_Mnx">—</span> kg·m</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiMnx">—</span> kg·m</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_MnOx">—</span> kg·m</td>
+      </tr>
+      <tr>
+        <td>Flexure M<sub>n</sub></td>
+        <td><span class="ax-tag ax-purple">Weak Y</span></td>
+        <td>AISC F6</td>
+        <td class="val"><span id="cap_Mny">—</span> kg·m</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiMny">—</span> kg·m</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_MnOy">—</span> kg·m</td>
+      </tr>
+      <tr>
+        <td>Vierendeel M<sub>n,V</sub></td>
+        <td><span class="ax-tag ax-pink">Tee at Opening</span></td>
+        <td>DG 31 Sec 3.3 + H1-1</td>
+        <td class="val"><span id="cap_Mntee">—</span> kg·m</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiMntee">—</span> kg·m</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_MnOtee">—</span> kg·m</td>
+      </tr>
+      <tr>
+        <td>Shear V<sub>n</sub></td>
+        <td><span class="ax-tag ax-cyan">Vertical (Net)</span></td>
+        <td>AISC G2 + DG 31</td>
+        <td class="val"><span id="cap_Vn_v">—</span> kg</td>
+        <td>1.00</td>
+        <td class="val"><span id="cap_phiVn_v">—</span> kg</td>
+        <td>1.50</td>
+        <td class="val"><span id="cap_VnO_v">—</span> kg</td>
+      </tr>
+      <tr>
+        <td>Shear V<sub>n,y</sub></td>
+        <td><span class="ax-tag ax-purple">Weak Y (Flange)</span></td>
+        <td>AISC G7</td>
+        <td class="val"><span id="cap_Vny">—</span> kg</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiVny">—</span> kg</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_VnyO">—</span> kg</td>
+      </tr>
+      <tr>
+        <td>Shear V<sub>n,h</sub></td>
+        <td><span class="ax-tag ax-green">Horizontal (Web Post)</span></td>
+        <td>DG 31 Sec 3.4</td>
+        <td class="val"><span id="cap_Vnh">—</span> kg</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiVnh">—</span> kg</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_VnhO">—</span> kg</td>
+      </tr>
+      <tr>
+        <td>Web Post M<sub>n,wp</sub></td>
+        <td><span class="ax-tag ax-red">Buckling</span></td>
+        <td>DG 31 Sec 3.5</td>
+        <td class="val"><span id="cap_Mnwp">—</span> kg·m</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiMnwp">—</span> kg·m</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_MnOwp">—</span> kg·m</td>
+      </tr>
+      <tr>
+        <td>Tension P<sub>n,t</sub></td>
+        <td><span class="ax-tag ax-cyan">Axial (D2)</span></td>
+        <td>AISC D2</td>
+        <td class="val"><span id="cap_Pnt">—</span> kg</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiPnt">—</span> kg</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_PntO">—</span> kg</td>
+      </tr>
+      <tr>
+        <td>Compression P<sub>n,c</sub></td>
+        <td><span class="ax-tag ax-cyan">Axial (E3)</span></td>
+        <td>AISC E3</td>
+        <td class="val"><span id="cap_Pnc">—</span> kg</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiPnc">—</span> kg</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_PncO">—</span> kg</td>
+      </tr>
+      <tr>
+        <td>Compression P<sub>n</sub></td>
+        <td><span class="ax-tag ax-pink">Tee (Vierendeel)</span></td>
+        <td>AISC E3</td>
+        <td class="val"><span id="cap_Pn">—</span> kg</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiPn">—</span> kg</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_PnO">—</span> kg</td>
+      </tr>
+      <tr>
+        <td>Tee Stem M<sub>n</sub></td>
+        <td><span class="ax-tag ax-orange">Local Buckling</span></td>
+        <td>AISC F9.4</td>
+        <td class="val"><span id="cap_Mnstem">—</span> kg·m</td>
+        <td>0.90</td>
+        <td class="val"><span id="cap_phiMnstem">—</span> kg·m</td>
+        <td>1.67</td>
+        <td class="val"><span id="cap_MnOstem">—</span> kg·m</td>
+      </tr>
+      <tr>
+        <td>Web Yielding R<sub>n</sub></td>
+        <td><span class="ax-tag ax-red">Web @ Bearing</span></td>
+        <td>AISC J10.2</td>
+        <td class="val"><span id="cap_RnWY">—</span> kg</td>
+        <td>1.00</td>
+        <td class="val"><span id="cap_phiRnWY">—</span> kg</td>
+        <td>1.50</td>
+        <td class="val"><span id="cap_RnOWY">—</span> kg</td>
+      </tr>
+      <tr>
+        <td>Web Crippling R<sub>n</sub></td>
+        <td><span class="ax-tag ax-red">Web @ Bearing</span></td>
+        <td>AISC J10.3</td>
+        <td class="val"><span id="cap_RnWC">—</span> kg</td>
+        <td>0.75</td>
+        <td class="val"><span id="cap_phiRnWC">—</span> kg</td>
+        <td>2.00</td>
+        <td class="val"><span id="cap_RnOWC">—</span> kg</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- COMPLETE DESIGN SUMMARY — All 8 Limit States                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div style="margin:24px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(74,222,128,.18),transparent);border-left:4px solid var(--green);border-radius:0 6px 6px 0">
+  <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--green)">COMPLETE DESIGN SUMMARY — Design Guide 31</div>
+</div>
+
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-green">All Checks</span><span class="sec-title">All Limit States Combined</span></div>
+  <div class="rep-col-full">
+    <table class="sum-tbl">
+      <tr><td>Limit State</td><td>Reference</td><td>D/C Ratio</td><td>Status</td></tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Strong Axis Flexure (X)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = M<sub>r,x</sub> / φM<sub>n</sub></div>
+            <div>Sub: <span id="sub_x" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC F2 + DG31</td>
+        <td class="val" id="all_x_dc">—</td>
+        <td id="all_x_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Weak Axis Flexure (Y)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = M<sub>r,y</sub> / φM<sub>n,y</sub></div>
+            <div>Sub: <span id="sub_y" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC F6</td>
+        <td class="val" id="all_y_dc">—</td>
+        <td id="all_y_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Vierendeel Interaction</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: P<sub>r,tee</sub>/φP<sub>n,tee</sub> + (8/9)·M<sub>vr</sub>/φM<sub>n,tee</sub> ≤ 1.0</div>
+            <div>Sub: <span id="sub_v" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>DG31 Sec 3.3 + Eq. H1-1</td>
+        <td class="val" id="all_v_dc">—</td>
+        <td id="all_v_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Horizontal Shear (Web Post)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = V<sub>rh</sub> / φV<sub>n,h</sub>;  V<sub>rh</sub> = V<sub>r,y</sub>·S/d<sub>eff</sub></div>
+            <div>Sub: <span id="sub_h" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>DG31 Sec 3.4</td>
+        <td class="val" id="all_h_dc">—</td>
+        <td id="all_h_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Vertical Shear (Net)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = V<sub>r,y</sub> / φV<sub>n</sub></div>
+            <div>Sub: <span id="sub_vs" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC G2 + DG31</td>
+        <td class="val" id="all_vs_dc">—</td>
+        <td id="all_vs_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Weak-Axis Shear</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = V<sub>r,x</sub> / φV<sub>n,y</sub></div>
+            <div>Sub: <span id="sub_vsy" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC G7</td>
+        <td class="val" id="all_vsy_dc">—</td>
+        <td id="all_vsy_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Web Post Buckling</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = M<sub>r,wp</sub> / φM<sub>allow</sub>;  M<sub>r,wp</sub> = V<sub>rh</sub>·h<sub>w</sub></div>
+            <div>Sub: <span id="sub_wp" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>DG31 Sec 3.5</td>
+        <td class="val" id="all_wp_dc">—</td>
+        <td id="all_wp_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Tee Stem Local Buckling</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = M<sub>vr</sub> / φM<sub>n,stem</sub></div>
+            <div>Sub: <span id="sub_ts" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC F9.4</td>
+        <td class="val" id="all_ts_dc">—</td>
+        <td id="all_ts_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Web Local Yielding</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = V<sub>r,y</sub> / φR<sub>n</sub>;  R<sub>n</sub> = F<sub>yw</sub>·t<sub>w</sub>·(2.5k or 5k + l<sub>b</sub>)</div>
+            <div>Sub: <span id="sub_wy" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC J10.2</td>
+        <td class="val" id="all_wy_dc">—</td>
+        <td id="all_wy_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Web Local Crippling</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = V<sub>r,y</sub> / φR<sub>n</sub>;  J10-4 (far) or J10-5 (near end)</div>
+            <div>Sub: <span id="sub_wc" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC J10.3</td>
+        <td class="val" id="all_wc_dc">—</td>
+        <td id="all_wc_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Axial (Tension D2 / Compression E3)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: D/C = |P<sub>r</sub>| / φP<sub>n</sub>;  use D2 if tension, E3 if compression</div>
+            <div>Sub: <span id="sub_ax" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC D2 / E3</td>
+        <td class="val" id="all_ax_dc">—</td>
+        <td id="all_ax_st">—</td>
+      </tr>
+      <tr style="background:rgba(245,200,66,.08)">
+        <td colspan="4" style="text-align:center;font-weight:700;color:var(--yellow);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:8px">
+          Combined Loading Interaction (AISC Chapter H)
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">H1-1: Axial + Biaxial Flexure</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: <span id="cmb_h1_eq">—</span></div>
+            <div>Sub: <span id="cmb_h1_sub" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC H1.1<br><span style="font-size:9px;color:rgba(255,255,255,.5)" id="cmb_h1_active">—</span></td>
+        <td class="val" id="all_h1_dc">—</td>
+        <td id="all_h1_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Biaxial Flexure (No Axial)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: M<sub>rx</sub>/M<sub>cx</sub> + M<sub>ry</sub>/M<sub>cy</sub> ≤ 1.0</div>
+            <div>Sub: <span id="cmb_biax_sub" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>AISC H1 (P=0)</td>
+        <td class="val" id="all_biax_dc">—</td>
+        <td id="all_biax_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Combined Shear (Strong + Weak)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: √[(V<sub>r,y</sub>/φV<sub>n,y</sub>)² + (V<sub>r,x</sub>/φV<sub>n,x</sub>)²] ≤ 1.0</div>
+            <div>Sub: <span id="cmb_vsh_sub" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>SRSS combination</td>
+        <td class="val" id="all_vshear_dc">—</td>
+        <td id="all_vshear_st">—</td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-weight:600;color:#fff">Vierendeel + Axial (at Opening)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;font-family:var(--mono);line-height:1.6">
+            <div>Eq: P<sub>r,tee</sub>/φP<sub>n,tee</sub> + (8/9)·(M<sub>vr</sub>/φM<sub>n,tee</sub>) ≤ 1.0</div>
+            <div>Sub: <span id="cmb_vd_sub" style="color:var(--yellow)">—</span></div>
+          </div>
+        </td>
+        <td>DG 31 + H1-1</td>
+        <td class="val" id="all_vd_dc">—</td>
+        <td id="all_vd_st">—</td>
+      </tr>
+      </tr>
+    </table>
+    <div style="margin-top:14px;padding:10px 14px;background:rgba(245,200,66,.08);border-left:3px solid var(--yellow);border-radius:0 4px 4px 0;font-size:11px;line-height:1.7;color:rgba(255,255,255,.75)">
+      <span style="color:var(--yellow);font-weight:700">📊 Critical Limit State:</span>
+      <span id="all_critical" style="color:#fff;font-weight:600;margin-left:8px">—</span>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+const PI=Math.PI;
+const pi = id => {
+  const el = document.getElementById(id);
+  if (!el) { console.warn('Missing input element:', id); return 0; }
+  return parseFloat(el.value) || 0;
+};
+const sv = (id,v,d=2) => { const el=document.getElementById(id); if(el) el.textContent = (v==null||isNaN(v))?'—':v.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}); };
+const sh = (id,html) => { const el=document.getElementById(id); if(el) el.innerHTML = html; };
+
+// Capacity selector — returns φRn (LRFD) or Rn/Ω (ASD) based on current method
+const cap = (Rn, phi, omega) => {
+  if (window.designMethod === 'ASD') return Rn / omega;
+  return phi * Rn;
+};
+
+function fmtNum(v, d=1){
+  if(v==null||isNaN(v)) return '—';
+  return v.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+}
+
+window.switchTab = function(tabId){
+  // Update buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('tab_' + tabId).classList.add('active');
+  // Show/hide panels
+  document.getElementById('panel_geo').style.display = (tabId === 'geo') ? 'block' : 'none';
+  document.getElementById('panel_force').style.display = (tabId === 'force') ? 'block' : 'none';
+};
+
+// Global Design Method state - LRFD by default
+window.designMethod = 'LRFD';
+
+window.setMethod = function(method){
+  window.designMethod = method;
+  const btnL = document.getElementById('btn_lrfd');
+  const btnA = document.getElementById('btn_asd');
+  const hint = document.getElementById('method_hint');
+  if (method === 'LRFD') {
+    btnL.style.background = 'var(--green)';
+    btnL.style.color = '#000';
+    btnL.style.border = 'none';
+    btnA.style.background = 'var(--bg3)';
+    btnA.style.color = 'rgba(255,255,255,.6)';
+    btnA.style.border = '1px solid var(--border2)';
+  } else {
+    btnA.style.background = 'var(--green)';
+    btnA.style.color = '#000';
+    btnA.style.border = 'none';
+    btnL.style.background = 'var(--bg3)';
+    btnL.style.color = 'rgba(255,255,255,.6)';
+    btnL.style.border = '1px solid var(--border2)';
+  }
+  // Recalculate everything
+  if (typeof calculate === 'function') calculate();
+};
+
+function calculate(){
+  const H = pi('inp_H'), B = pi('inp_B'), tw = pi('inp_tw'), tf = pi('inp_tf');
+  const Hcb = pi('inp_Hcb'), a0 = pi('inp_a0'), S = pi('inp_S');
+  const rho = pi('inp_rho') || 7850;
+
+  if(!H||!B||!tw||!tf||!Hcb||!a0||!S) return;
+
+  // ── Geometry ──
+  const hs = (Hcb - a0) / 2;
+  const hw = Math.max(0, hs - tf);
+  const e  = S - a0;
+
+  // ── Areas ──
+  const Af = B * tf;
+  const Aw = tw * hw;
+  const Atee = Af + Aw;
+  const A_total = 2 * Atee;          // mm²
+
+  // ── Centroid of one Tee (from flange tip) ──
+  const yb = Atee > 0 ? (Af * (tf/2) + Aw * (tf + hw/2)) / Atee : 0;
+  const d  = Hcb/2 - yb;
+
+  // ── Inertia of one Tee (about Tee centroid, Parallel Axis Theorem) ──
+  const If = B * Math.pow(tf,3) / 12 + Af * Math.pow(yb - tf/2, 2);
+  const Iw = tw * Math.pow(hw,3) / 12 + Aw * Math.pow(yb - tf - hw/2, 2);
+  const Itee = If + Iw;
+
+  // ── Full section ──
+  const Ix_mm4 = 2 * (Itee + Atee * d * d);     // mm⁴
+  const Zx_mm3 = 2 * Atee * d;                   // mm³
+  const Sx_mm3 = Ix_mm4 / (Hcb/2);               // mm³
+  const Iy_mm4 = (2*tf*Math.pow(B,3)/12) + (2*Math.pow(tw,3)*hw/12); // mm⁴
+  const Sy_mm3 = Iy_mm4 / (B/2);                 // mm³
+
+  // ── Plastic Section Modulus about Y-axis ──
+  // PNA passes through center of web (axis of symmetry)
+  // Z_y from 2 flanges (each B×tf): each contributes B²·tf/4 × 2 halves × 2 flanges = 2·tf·B²/4
+  // Z_y from 2 web stubs (each tw×hw): each contributes hw·tw²/4 × 2 = 2·hw·tw²/4
+  const Zy_flanges_mm3 = 2 * tf * Math.pow(B,2) / 4;
+  const Zy_webs_mm3    = 2 * hw * Math.pow(tw,2) / 4;
+  const Zy_mm3         = Zy_flanges_mm3 + Zy_webs_mm3;
+
+  // ── Convert to cm units ──
+  const Ix_cm4 = Ix_mm4 / 1e4;
+  const Iy_cm4 = Iy_mm4 / 1e4;
+  const Zx_cm3 = Zx_mm3 / 1e3;
+  const Sx_cm3 = Sx_mm3 / 1e3;
+  const Sy_cm3 = Sy_mm3 / 1e3;
+  const Zy_cm3 = Zy_mm3 / 1e3;
+  const A_cm2  = A_total / 100;
+  const wt     = A_total * 1e-6 * rho;           // kg/m  (mm² × m × kg/m³ = kg/m, with A in m²)
+  const rx     = Math.sqrt(Ix_mm4/A_total) / 10; // cm
+  const ry     = Math.sqrt(Iy_mm4/A_total) / 10; // cm
+  const sf     = Sx_cm3 > 0 ? Zx_cm3/Sx_cm3 : 0;
+  const sfy    = Sy_cm3 > 0 ? Zy_cm3/Sy_cm3 : 0;
+
+  // ══ Display: substitution lines ══
+  sh('g_hs_sub', `(${Hcb} − ${a0}) / 2`);
+  sv('g_hs', hs, 1);
+  sh('g_hw_sub', `${fmtNum(hs,1)} − ${tf}`);
+  sv('g_hw', hw, 1);
+  sh('g_e_sub', `${S} − ${a0}`);
+  sv('g_e', e, 0);
+
+  sh('g_Af_sub', `${B} × ${tf}`);
+  sv('g_Af', Af, 0);
+  sh('g_Aw_sub', `${tw} × ${fmtNum(hw,1)}`);
+  sv('g_Aw', Aw, 1);
+  sh('g_Atee_sub', `${fmtNum(Af,0)} + ${fmtNum(Aw,1)}`);
+  sv('g_Atee', Atee, 1);
+
+  sh('g_yb_sub', `(${fmtNum(Af,0)}·${tf/2} + ${fmtNum(Aw,1)}·${fmtNum(tf+hw/2,1)}) / ${fmtNum(Atee,1)}`);
+  sv('g_yb', yb, 2);
+  sh('g_d_sub', `${Hcb/2} − ${fmtNum(yb,2)}`);
+  sv('g_d', d, 2);
+
+  sh('g_If_sub', `${B}·${tf}³/12 + ${fmtNum(Af,0)}·(${fmtNum(yb,2)}−${tf/2})²`);
+  sv('g_If', If, 0);
+  sh('g_Iw_sub', `${tw}·${fmtNum(hw,1)}³/12 + ${fmtNum(Aw,1)}·(${fmtNum(yb,2)}−${tf}−${fmtNum(hw/2,1)})²`);
+  sv('g_Iw', Iw, 0);
+  sh('g_Itee_sub', `${fmtNum(If,0)} + ${fmtNum(Iw,0)}`);
+  sv('g_Itee', Itee, 0);
+
+  sh('g_Ix_sub', `2 · (${fmtNum(Itee,0)} + ${fmtNum(Atee,1)}·${fmtNum(d,2)}²)`);
+  sv('g_Ix_mm', Ix_mm4, 0);
+  sv('r_Ix', Ix_cm4, 1);
+
+  sh('g_Zx_sub', `2 · ${fmtNum(Atee,1)} · ${fmtNum(d,2)}`);
+  sv('g_Zx_mm', Zx_mm3, 0);
+  sv('r_Zx', Zx_cm3, 1);
+
+  // Zy display
+  sh('g_Zyf_sub', `2 · ${tf} · ${B}²/4`);
+  sv('g_Zyf', Zy_flanges_mm3, 0);
+  sh('g_Zyw_sub', `2 · ${fmtNum(hw,1)} · ${tw}²/4`);
+  sv('g_Zyw', Zy_webs_mm3, 0);
+  sv('g_Zy_mm', Zy_mm3, 0);
+  sv('r_Zy', Zy_cm3, 1);
+  sv('g_sfy', sfy, 3);
+
+  sh('g_Sx_sub', `${fmtNum(Ix_mm4,0)} / ${Hcb/2}`);
+  sv('g_Sx_mm', Sx_mm3, 0);
+  sv('r_Sx', Sx_cm3, 1);
+
+  sh('g_Iy_sub', `2·${tf}·${B}³/12 + 2·${tw}³·${fmtNum(hw,1)}/12`);
+  sv('g_Iy_mm', Iy_mm4, 0);
+  sv('r_Iy', Iy_cm4, 1);
+  sv('g_Sy_mm', Sy_mm3, 0);
+  sv('r_Sy', Sy_cm3, 1);
+
+  // Summary table
+  sv('s_A', A_cm2, 2);
+  sv('s_wt', wt, 2);
+  sv('s_Ix', Ix_cm4, 1);
+  sv('s_Iy', Iy_cm4, 2);
+  sv('s_Zx', Zx_cm3, 1);
+  sv('s_Zy', Zy_cm3, 2);
+  sv('s_Sx', Sx_cm3, 1);
+  sv('s_Sy', Sy_cm3, 2);
+  sv('s_sf', sf, 3);
+  sv('s_sfy', sfy, 3);
+  sv('s_rx', rx, 2);
+  sv('s_ry', ry, 2);
+
+  // Warnings
+  const warns = [];
+  if(hs < tf + 10) warns.push(`h<sub>s</sub> = ${fmtNum(hs,1)} mm น้อยเกิน — ต้องการ h<sub>s</sub> ≥ t<sub>f</sub>+10 = ${tf+10} mm`);
+  if(a0 > Hcb*0.85) warns.push(`a<sub>0</sub>/H<sub>cb</sub> = ${(a0/Hcb).toFixed(2)} &gt; 0.85 — opening ใหญ่เกิน อาจเกิด web buckling`);
+  if(e < 0.10*a0) warns.push(`e = ${e} mm &lt; 0.10·a<sub>0</sub> = ${fmtNum(0.10*a0,0)} mm — web post แคบเกิน เสี่ยง Vierendeel failure`);
+  if(hw <= 0) warns.push(`h<sub>w</sub> ≤ 0 — รูปทรงไม่ถูกต้อง: h<sub>s</sub> ต้อง &gt; t<sub>f</sub>`);
+  if(Hcb < a0) warns.push(`H<sub>cb</sub> &lt; a<sub>0</sub> — ความสูงต้องมากกว่า opening`);
+
+  const wb = document.getElementById('warn-block');
+  if(warns.length){
+    wb.style.display = 'block';
+    document.getElementById('warn-list').innerHTML = warns.map(w=>
+      `<div class="gov-red"><div class="gov-lbl">⚠ ${w}</div></div>`
+    ).join('');
+  } else {
+    wb.style.display = 'none';
+  }
+
+  // Draw both views
+  drawSection(B, tw, tf, Hcb, a0);
+  drawElevation(B, tw, tf, Hcb, a0, S);
+
+  // ═══════════════════════════════════════════════════════════
+  // FLEXURAL DESIGN — AISC 360-22 + AISC Design Guide 31
+  // Units: All inputs converted to consistent ksc/cm system
+  // ═══════════════════════════════════════════════════════════
+  const Fy = pi('inp_Fy');               // ksc (kgf/cm²)
+  const E  = pi('inp_E');                 // ksc
+  const Lb_mm = pi('inp_Lb');             // mm
+  const Cb = pi('inp_Cb') || 1.0;
+  const Mu = pi('inp_Mr');                // kg·m  (strong axis - same as Mr at opening for combined check)
+  const Ma = pi('inp_Mr');                // kg·m  (same applied force, factor handled by user)
+  const Mr = pi('inp_Mr');                // kg·m  (Vierendeel global moment at opening)
+  const Vr = pi('inp_Vr');                // kg    (Vierendeel global shear at opening)
+
+  if (!Fy || !E || !Lb_mm) return;
+
+  const Lb_cm = Lb_mm / 10;
+  // Unit conversion:
+  // M [kgf·cm] = Fy [ksc=kgf/cm²] × Z [cm³]
+  // 1 kg·m = 100 kgf·cm  →  M [kg·m] = Fy·Z / 100
+  const KGFCM_PER_KGM = 100;
+
+  // ── (A) CLASSIFICATION — Table B4.1b ──
+  const lf = (B/2) / tf;
+  const lw = hw / tw;
+  const sqEFy = Math.sqrt(E/Fy);
+  const lpf = 0.38 * sqEFy;     // flange compact (Case 10)
+  const lrf = 1.00 * sqEFy;     // flange noncompact
+  const lpw = 0.84 * sqEFy;     // tee stem compact (Case 15)
+  const lrw = 1.52 * sqEFy;     // tee stem noncompact
+
+  const fl_class = lf <= lpf ? 'COMPACT' : (lf <= lrf ? 'NONCOMPACT' : 'SLENDER');
+  const fl_color = lf <= lpf ? 'var(--green)' : (lf <= lrf ? 'var(--yellow)' : 'var(--red)');
+  const wb_class = lw <= lpw ? 'COMPACT' : (lw <= lrw ? 'NONCOMPACT' : 'SLENDER');
+  const wb_color = lw <= lpw ? 'var(--green)' : (lw <= lrw ? 'var(--yellow)' : 'var(--red)');
+
+  sh('cl_lf_sub', `(${B}/2) / ${tf}`);
+  sv('cl_lf', lf, 2);
+  sv('cl_lpf', lpf, 2);
+  sv('cl_lrf', lrf, 2);
+  sh('cl_flange_cls', `<span style="font-weight:700;color:${fl_color}">${fl_class}</span>`);
+
+  sh('cl_lw_sub', `${fmtNum(hw,1)} / ${tw}`);
+  sv('cl_lw', lw, 2);
+  sv('cl_lpw', lpw, 2);
+  sv('cl_lrw', lrw, 2);
+  sh('cl_web_cls', `<span style="font-weight:700;color:${wb_color}">${wb_class}</span>`);
+
+  // ── (B) LIMIT STATE 1: YIELDING (F2.1) ──
+  // M [kg·m] = Fy [ksc] × Z [cm³] / 100
+  const Mp_kgm = Fy * Zx_cm3 / KGFCM_PER_KGM;
+  const My_kgm = Fy * Sx_cm3 / KGFCM_PER_KGM;
+
+  sh('ly_Mp_sub', `${Fy} × ${fmtNum(Zx_cm3,1)} / 100`);
+  sv('ly_Mp', Mp_kgm, 2);
+  sh('ly_My_sub', `${Fy} × ${fmtNum(Sx_cm3,1)} / 100`);
+  sv('ly_My', My_kgm, 2);
+  sv('ly_Mn', Mp_kgm, 2);
+
+  // ── (C) LIMIT STATE 2: LTB (F2.2) ──
+  // Lp = 1.76·ry·√(E/Fy)
+  // ry already in cm
+  const Lp_cm = 1.76 * ry * sqEFy;
+  const Lp_m = Lp_cm / 100;
+
+  // For CB, use simplified rts ≈ ry (conservative)
+  // Lr ≈ π·rts·√(E/(0.7·Fy))   simplified
+  const Lr_cm = Math.PI * ry * Math.sqrt(E / (0.7 * Fy));
+  const Lr_m = Lr_cm / 100;
+
+  let Mn_LTB_kgm, ltbEqHTML, region;
+  if (Lb_cm <= Lp_cm) {
+    Mn_LTB_kgm = Mp_kgm;
+    region = '<span style="color:var(--green);font-weight:700">L<sub>b</sub> ≤ L<sub>p</sub> → No LTB (Plastic range)</span>';
+    ltbEqHTML = `M<sub>n</sub> = M<sub>p</sub> = ${fmtNum(Mp_kgm,2)} kg·m`;
+  } else if (Lb_cm <= Lr_cm) {
+    // Inelastic LTB: linear interpolation
+    // Mn = Cb·[Mp − (Mp − 0.7·Fy·Sx)·(Lb−Lp)/(Lr−Lp)] ≤ Mp
+    const M_red = (Mp_kgm - 0.7*Fy*Sx_cm3/KGFCM_PER_KGM) * (Lb_cm - Lp_cm) / (Lr_cm - Lp_cm);
+    Mn_LTB_kgm = Math.min(Cb * (Mp_kgm - M_red), Mp_kgm);
+    region = '<span style="color:var(--yellow);font-weight:700">L<sub>p</sub> &lt; L<sub>b</sub> ≤ L<sub>r</sub> → Inelastic LTB</span>';
+    ltbEqHTML = `M<sub>n</sub> = C<sub>b</sub>·[M<sub>p</sub> − (M<sub>p</sub> − 0.7F<sub>y</sub>S<sub>x</sub>)·(L<sub>b</sub>−L<sub>p</sub>)/(L<sub>r</sub>−L<sub>p</sub>)] ≤ M<sub>p</sub>`;
+  } else {
+    // Elastic LTB (simplified)
+    // Mn = Fcr·Sx where Fcr ≈ Cb·π²·E/(Lb/rts)² — simplified
+    const slender = Lb_cm / ry;
+    const Fcr = Cb * Math.PI * Math.PI * E / (slender * slender);
+    Mn_LTB_kgm = Math.min(Fcr * Sx_cm3 / KGFCM_PER_KGM, Mp_kgm);
+    region = '<span style="color:var(--red);font-weight:700">L<sub>b</sub> &gt; L<sub>r</sub> → Elastic LTB</span>';
+    ltbEqHTML = `M<sub>n</sub> = F<sub>cr</sub>·S<sub>x</sub>, F<sub>cr</sub> = C<sub>b</sub>·π²·E/(L<sub>b</sub>/r<sub>ts</sub>)² ≈ ${fmtNum(Fcr,0)} ksc`;
+  }
+
+  sh('ltb_Lp_sub', `1.76 × ${fmtNum(ry,2)} × √(${E}/${Fy})`);
+  sv('ltb_Lp', Lp_m, 3);
+  sv('ltb_Lr', Lr_m, 3);
+  sv('ltb_Lb', Lb_mm/1000, 3);
+  sh('ltb_region', region);
+  sh('ltb_eq', ltbEqHTML);
+  sv('ltb_Mn_calc', Mn_LTB_kgm, 2);
+  sv('ltb_Mn', Mn_LTB_kgm, 2);
+  sv('ltb_Cb', Cb, 2);
+
+  // ── (D) LIMIT STATE 3: VIERENDEEL (AISC Design Guide 31 Section 3.3 simplified) ──
+  // Plastic modulus of a single Tee about its own centroid (Z_tee)
+  // For a Tee section, compute plastic neutral axis location (PNA)
+  // Tee dimensions: flange B×tf, stem tw×hw, total height = tf + hw
+  // Total area = Atee. PNA at distance yp from flange tip such that
+  // area above PNA = area below = Atee/2
+  let Ztee_cm3;
+  {
+    const halfArea = Atee / 2;
+    let yp;  // distance from flange tip (top) to PNA
+    if (B * tf >= halfArea) {
+      // PNA is in the flange
+      yp = halfArea / B;
+    } else {
+      // PNA is in the stem
+      const remain = halfArea - B * tf;
+      yp = tf + remain / tw;
+    }
+    // Distances to centroids of areas above and below PNA
+    let ZteeMM3 = 0;
+    if (yp <= tf) {
+      // Above PNA: rectangle B × yp,    centroid at yp/2 from PNA
+      // Below PNA: top half = remaining flange (B × (tf-yp)) + stem (tw × hw)
+      const A_above = B * yp;
+      const c_above = yp / 2;
+      const A_flBelow = B * (tf - yp);
+      const c_flBelow = (tf - yp) / 2;
+      const A_stem = tw * hw;
+      const c_stem = (tf - yp) + hw / 2;
+      const A_below = A_flBelow + A_stem;
+      const c_below = (A_flBelow * c_flBelow + A_stem * c_stem) / A_below;
+      ZteeMM3 = A_above * c_above + A_below * c_below;
+    } else {
+      // PNA in stem
+      const stemAbove = yp - tf;
+      const A_flAbove = B * tf;
+      const c_flAbove = stemAbove + tf/2;
+      const A_stemAbove = tw * stemAbove;
+      const c_stemAbove = stemAbove / 2;
+      const A_above = A_flAbove + A_stemAbove;
+      const c_above = (A_flAbove * c_flAbove + A_stemAbove * c_stemAbove) / A_above;
+
+      const stemBelow = hw - stemAbove;
+      const A_below = tw * stemBelow;
+      const c_below = stemBelow / 2;
+      ZteeMM3 = A_above * c_above + A_below * c_below;
+    }
+    Ztee_cm3 = ZteeMM3 / 1000;  // mm³ → cm³
+  }
+
+  const MpTee_kgm = Fy * Ztee_cm3 / KGFCM_PER_KGM;
+  // AISC Design Guide 31 Section 3.3 simplified Vierendeel: Mn,V = (4·Mp,tee / a₀) × (Hcb − 2ȳ)
+  // Convert: a0 in mm, Hcb in mm, ȳ in mm. Result must be kg·m
+  // (4·Mp,tee[kg·m] / a0[m]) × (Hcb−2ȳ)[m] gives kg·m
+  const a0_m = a0 / 1000;
+  const arm_m = (Hcb - 2*yb) / 1000;
+  const MnV_kgm = (4 * MpTee_kgm / a0_m) * arm_m;
+
+  sh('vd_Mptee_sub', `${Fy} × ${fmtNum(Ztee_cm3,1)} / 100`);
+  sv('vd_Mptee', MpTee_kgm, 3);
+  sh('vd_MnV_sub', `(4 × ${fmtNum(MpTee_kgm,3)} / ${fmtNum(a0_m,3)}) × ${fmtNum(arm_m,3)}`);
+  sv('vd_MnV_calc', MnV_kgm, 2);
+  sv('vd_MnV', MnV_kgm, 2);
+
+  // ── (E) GOVERNING ──
+  const candidates = [
+    { name: 'Yielding (F2.1)',     M: Mp_kgm,     key: 'y' },
+    { name: 'LTB (F2.2)',          M: Mn_LTB_kgm, key: 'l' },
+    { name: 'Vierendeel (AISC DG 31 Section 3.3)',   M: MnV_kgm,    key: 'v' }
+  ];
+  candidates.sort((a,b) => a.M - b.M);
+  const Mn_gov = candidates[0].M;
+  const Mn_gov_name = candidates[0].name;
+
+  // Status badges
+  candidates.forEach(c => {
+    const isMin = (c.M === Mn_gov);
+    const html = isMin
+      ? '<span style="color:var(--orange);font-weight:700">◀ CONTROLS</span>'
+      : '<span style="color:rgba(255,255,255,.4)">—</span>';
+    sh(`gov_${c.key}_st`, html);
+  });
+
+  sv('gov_y', Mp_kgm, 2);
+  sv('gov_l', Mn_LTB_kgm, 2);
+  sv('gov_v', MnV_kgm, 2);
+  sv('gov_Mn', Mn_gov, 2);
+  sh('gov_by', Mn_gov_name);
+
+  // ── (F) LRFD ──
+  const phi = 0.90;
+  const phiMn_kgm = phi * Mn_gov;
+  const designCap_M = cap(Mn_gov, 0.90, 1.67);
+  const lrfd_dc = designCap_M > 0 ? Mu / designCap_M : 0;
+  const lrfd_pass = lrfd_dc <= 1.0;
+
+  sh('lrfd_phiMn_sub', `0.90 × ${fmtNum(Mn_gov,2)}`);
+  sv('lrfd_phiMn', phiMn_kgm, 2);
+  sv('lrfd_Mu', Mu, 2);
+  sv('lrfd_dc', lrfd_dc, 3);
+
+  const lrfdBox = document.getElementById('lrfd_result_box');
+  if (lrfdBox) {
+    if (lrfd_pass) {
+      lrfdBox.className = 'gov-green';
+      sh('lrfd_status', `✓ OK (D/C = ${fmtNum(lrfd_dc,3)})`);
+    } else {
+      lrfdBox.className = 'gov-red';
+      sh('lrfd_status', `✗ FAIL (D/C = ${fmtNum(lrfd_dc,3)})`);
+    }
+  }
+
+  // ── (G) ASD ──
+  const omega = 1.67;
+  const MnOmega_kgm = Mn_gov / omega;
+  const asd_dc = Ma / MnOmega_kgm;
+  const asd_pass = asd_dc <= 1.0;
+
+  sh('asd_MnO_sub', `${fmtNum(Mn_gov,2)} / 1.67`);
+  sv('asd_MnO', MnOmega_kgm, 2);
+  sv('asd_Ma', Ma, 2);
+  sv('asd_dc', asd_dc, 3);
+
+  const asdBox = document.getElementById('asd_result_box');
+  if (asdBox) {
+    if (asd_pass) {
+      asdBox.className = 'gov-green';
+      sh('asd_status', `✓ OK (D/C = ${fmtNum(asd_dc,3)})`);
+    } else {
+      asdBox.className = 'gov-red';
+      sh('asd_status', `✗ FAIL (D/C = ${fmtNum(asd_dc,3)})`);
+    }
+  }
+
+  // ── (H) Strong Axis Summary table removed ──
+
+  // ═══════════════════════════════════════════════════════════
+  // WEAK-AXIS FLEXURAL DESIGN — AISC 360-22 Section F6
+  // Doubly Symmetric I-Shapes Bent About Their Minor Axis
+  // ═══════════════════════════════════════════════════════════
+  const Muy = pi('inp_Mry');                // kg·m  (weak axis applied moment)
+  const May = pi('inp_Mry');                // kg·m  (same applied force, factor handled by user)
+
+  // ── (Y-A) F6.1 YIELDING ──
+  // Mn = Mp = Fy·Zy ≤ 1.6·Fy·Sy  (Eq. F6-1)
+  const Mpy_kgm     = Fy * Zy_cm3 / KGFCM_PER_KGM;
+  const FySy_lim    = 1.6 * Fy * Sy_cm3 / KGFCM_PER_KGM;
+  const MnY_yield   = Math.min(Mpy_kgm, FySy_lim);
+
+  sh('ly_Mpy_sub', `${Fy} × ${fmtNum(Zy_cm3,2)} / 100`);
+  sv('ly_Mpy', Mpy_kgm, 2);
+  sv('ly_FySy', FySy_lim, 2);
+  sv('ly_MnY_calc', MnY_yield, 2);
+  sv('ly_MnY', MnY_yield, 2);
+
+  // ── (Y-B) F6.2 FLANGE LOCAL BUCKLING ──
+  // Use same flange λ as before (lf, lpf, lrf already computed in strong axis)
+  // Three regions:
+  //   Compact (λ ≤ λp):     Mn = Mp,y
+  //   Noncompact (λp<λ≤λr): Mn = Mp,y − (Mp,y − 0.7·Fy·Sy)·(λ−λp)/(λr−λp)
+  //   Slender (λ > λr):     Mn = Fcr·Sy, where Fcr = 0.69·E/λ²
+  let Mn_FLB, flbEqHTML, flbRegion;
+  const FySy_07 = 0.7 * Fy * Sy_cm3 / KGFCM_PER_KGM;
+
+  if (lf <= lpf) {
+    Mn_FLB = Mpy_kgm;
+    flbRegion = '<span style="color:var(--green);font-weight:700">COMPACT (λ ≤ λp) → No FLB</span>';
+    flbEqHTML = `M<sub>n</sub> = M<sub>p,y</sub> = ${fmtNum(Mpy_kgm,2)} kg·m`;
+  } else if (lf <= lrf) {
+    // Linear interpolation between Mp and 0.7·Fy·Sy
+    const M_red = (Mpy_kgm - FySy_07) * (lf - lpf) / (lrf - lpf);
+    Mn_FLB = Mpy_kgm - M_red;
+    flbRegion = '<span style="color:var(--yellow);font-weight:700">NONCOMPACT (λp &lt; λ ≤ λr)</span>';
+    flbEqHTML = `M<sub>n</sub> = M<sub>p,y</sub> − (M<sub>p,y</sub> − 0.7F<sub>y</sub>S<sub>y</sub>)·(λ−λ<sub>p</sub>)/(λ<sub>r</sub>−λ<sub>p</sub>)`;
+  } else {
+    // Slender: Mn = Fcr·Sy, where Fcr = 0.69·E/λ²
+    const Fcr = 0.69 * E / (lf * lf);
+    Mn_FLB = Fcr * Sy_cm3 / KGFCM_PER_KGM;
+    flbRegion = '<span style="color:var(--red);font-weight:700">SLENDER (λ &gt; λr)</span>';
+    flbEqHTML = `M<sub>n</sub> = F<sub>cr</sub>·S<sub>y</sub>, F<sub>cr</sub> = 0.69·E/λ² ≈ ${fmtNum(Fcr,0)} ksc`;
+  }
+  // FLB cannot exceed Mp,y
+  Mn_FLB = Math.min(Mn_FLB, Mpy_kgm);
+
+  sh('flb_l_sub', `(${B}/2) / ${tf}`);
+  sv('flb_l', lf, 2);
+  sv('flb_lp', lpf, 2);
+  sv('flb_lr', lrf, 2);
+  sh('flb_region', flbRegion);
+  sh('flb_eq', flbEqHTML);
+  sv('flb_Mn_calc', Mn_FLB, 2);
+  sv('flb_Mn', Mn_FLB, 2);
+
+  // ── (Y-C) GOVERNING ──
+  const candidatesY = [
+    { name: 'Yielding (F6.1)',                M: MnY_yield, key: 'y' },
+    { name: 'Flange Local Buckling (F6.2)',  M: Mn_FLB,    key: 'f' }
+  ];
+  candidatesY.sort((a,b) => a.M - b.M);
+  const Mny_gov = candidatesY[0].M;
+  const Mny_gov_name = candidatesY[0].name;
+
+  candidatesY.forEach(c => {
+    const isMin = (c.M === Mny_gov);
+    const html = isMin
+      ? '<span style="color:var(--orange);font-weight:700">◀ CONTROLS</span>'
+      : '<span style="color:rgba(255,255,255,.4)">—</span>';
+    sh(`govy_${c.key}_st`, html);
+  });
+
+  sv('govy_y', MnY_yield, 2);
+  sv('govy_f', Mn_FLB, 2);
+  sv('govy_Mn', Mny_gov, 2);
+  sh('govy_by', Mny_gov_name);
+
+  // ── (Y-D) LRFD ──
+  const phiMnY_kgm = phi * Mny_gov;        // phi = 0.90 from strong-axis section
+  const designCap_My = cap(Mny_gov, 0.90, 1.67);
+  const lrfdY_dc = designCap_My > 0 ? Muy / designCap_My : 0;
+  const lrfdY_pass = lrfdY_dc <= 1.0;
+
+  sv('lrfdY_phiMn', phiMnY_kgm, 2);
+  sv('lrfdY_Muy', Muy, 2);
+  sv('lrfdY_dc', lrfdY_dc, 3);
+
+  const lrfdYBox = document.getElementById('lrfdY_result_box');
+  if (lrfdYBox) {
+    if (lrfdY_pass) {
+      lrfdYBox.className = 'gov-green';
+      sh('lrfdY_status', `✓ OK (D/C = ${fmtNum(lrfdY_dc,3)})`);
+    } else {
+      lrfdYBox.className = 'gov-red';
+      sh('lrfdY_status', `✗ FAIL (D/C = ${fmtNum(lrfdY_dc,3)})`);
+    }
+  }
+
+  // ── (Y-E) ASD ──
+  const MnYOmega_kgm = Mny_gov / omega;    // omega = 1.67 from strong-axis section
+  const asdY_dc = May / MnYOmega_kgm;
+  const asdY_pass = asdY_dc <= 1.0;
+
+  sv('asdY_MnO', MnYOmega_kgm, 2);
+  sv('asdY_May', May, 2);
+  sv('asdY_dc', asdY_dc, 3);
+
+  const asdYBox = document.getElementById('asdY_result_box');
+  if (asdYBox) {
+    if (asdY_pass) {
+      asdYBox.className = 'gov-green';
+      sh('asdY_status', `✓ OK (D/C = ${fmtNum(asdY_dc,3)})`);
+    } else {
+      asdYBox.className = 'gov-red';
+      sh('asdY_status', `✗ FAIL (D/C = ${fmtNum(asdY_dc,3)})`);
+    }
+  }
+
+  // ── (Y-F) Weak Axis Summary table removed ──
+
+  // ═══════════════════════════════════════════════════════════
+  // TEE SECTION PROPERTIES (used by Vierendeel & Shear checks)
+  // ═══════════════════════════════════════════════════════════
+  // I_tee about Tee's centroid (computed earlier as Itee in mm⁴)
+  const Itee_cm4 = Itee / 1e4;
+  const ybar_top = yb;                          // distance from flange tip to centroid
+  const ybar_bot = hs - yb;                     // distance from stem tip to centroid
+  const c_max    = Math.max(ybar_top, ybar_bot);
+  const Stee_mm3 = Itee / c_max;
+  const Stee_cm3 = Stee_mm3 / 1e3;
+
+  // Z_tee — plastic modulus already computed in Vierendeel original section: Ztee_cm3
+  // (kept from earlier code; if not present, recompute here)
+  const rtee_cm  = Math.sqrt(Itee / Atee) / 10; // cm
+  const deff_mm  = Hcb - 2 * yb;                // distance between Tee centroids
+  const Atee_cm2 = Atee / 100;
+
+  sv('t_Atee', Atee_cm2, 2);
+  sv('t_yt', yb, 2);
+  sv('t_deff', deff_mm, 2);
+  sv('t_Itee', Itee_cm4, 2);
+  sv('t_Stee', Stee_cm3, 2);
+  sv('t_Ztee', Ztee_cm3, 2);
+  sv('t_rtee', rtee_cm, 3);
+
+  // ═══════════════════════════════════════════════════════════
+  // VIERENDEEL — 3-STEP PROCESS (DG 31 Sec 3.3 + AISC H1-1)
+  // ═══════════════════════════════════════════════════════════
+  // ── Step 1: DEMAND ──
+  const deff_m = deff_mm / 1000;
+  const Pr_kg  = Mr / deff_m;                   // P_r = M_r / d_eff [kg]
+  const Anet_cm2 = 2 * Atee_cm2;                // 2 Tees
+  const Mvr_kgm  = Vr * (Atee_cm2 / Anet_cm2) * (a0/1000) / 4;  // = Vr·(1/2)·(a0/4) for symmetric
+
+  sh('vd_Pr_sub', `${fmtNum(Mr,0)} / ${fmtNum(deff_m,3)}`);
+  sv('vd_Pr', Pr_kg, 0);
+  sh('vd_Mvr_sub', `${fmtNum(Vr,0)} × (${fmtNum(Atee_cm2,2)}/${fmtNum(Anet_cm2,2)}) × ${fmtNum(a0/1000,3)}/4`);
+  sv('vd_Mvr', Mvr_kgm, 2);
+
+  // ── Step 2: TEE CAPACITY ──
+  // Axial Compression (Chapter E3) — KL = a0/2 (half opening as effective length)
+  const KL_cm = (a0/2) / 10;                    // cm
+  const slender = KL_cm / rtee_cm;
+  const Fe = Math.PI*Math.PI*E / (slender*slender);  // ksc
+  // E3-2 vs E3-3
+  let Fcr_E3;
+  if (Fy/Fe <= 2.25) {
+    Fcr_E3 = Math.pow(0.658, Fy/Fe) * Fy;       // E3-2
+  } else {
+    Fcr_E3 = 0.877 * Fe;                         // E3-3
+  }
+  const Pn_kg = Fcr_E3 * Atee_cm2;              // ksc × cm² = kg
+  const phiPn = 0.90 * Pn_kg;
+  sv('vd_Fe', Fe, 0);
+  sv('vd_Fcr', Fcr_E3, 0);
+  sv('vd_Pn', Pn_kg, 0);
+  sv('vd_phiPn', phiPn, 0);
+
+  // Flexural Tee Capacity (F9.1, stem in tension is critical)
+  const Mptee_kgm = Fy * Ztee_cm3 / KGFCM_PER_KGM;
+  const Mytee_kgm = Fy * Stee_cm3 / KGFCM_PER_KGM;
+  const Mntee_kgm = Math.min(Mptee_kgm, 1.6 * Mytee_kgm);
+  const phiMntee = 0.90 * Mntee_kgm;
+  sv('vd_Mptee2', Mptee_kgm, 3);
+  sv('vd_Mytee', Mytee_kgm, 3);
+  sv('vd_Mntee', Mntee_kgm, 3);
+  sv('vd_phiMntee', phiMntee, 3);
+
+  // ── Step 3: INTERACTION (Eq. H1-1) ──
+  const PrPc = phiPn > 0 ? Pr_kg / phiPn : 0;
+  const MrMc = phiMntee > 0 ? Mvr_kgm / phiMntee : 0;
+  sv('vd_PrPc', PrPc, 3);
+  sv('vd_MrMc', MrMc, 3);
+
+  let h1_value, h1_eq_html, h1_sub_html, h1_active;
+  if (PrPc >= 0.2) {
+    h1_active = 'Eq. H1-1a (P_r/P_c ≥ 0.2)';
+    h1_value = PrPc + (8/9) * MrMc;
+    h1_eq_html  = `P<sub>r</sub>/P<sub>c</sub> + (8/9)·(M<sub>r</sub>/M<sub>c</sub>)`;
+    h1_sub_html = `${fmtNum(PrPc,3)} + (8/9)·${fmtNum(MrMc,3)}`;
+  } else {
+    h1_active = 'Eq. H1-1b (P_r/P_c < 0.2)';
+    h1_value = PrPc / 2 + MrMc;
+    h1_eq_html  = `P<sub>r</sub>/(2P<sub>c</sub>) + M<sub>r</sub>/M<sub>c</sub>`;
+    h1_sub_html = `${fmtNum(PrPc,3)}/2 + ${fmtNum(MrMc,3)}`;
+  }
+  sh('vd_eq_active', h1_active);
+  sh('vd_h1_eq', h1_eq_html);
+  sh('vd_h1_sub', h1_sub_html);
+  sv('vd_h1_val', h1_value, 3);
+
+  const vd_pass = h1_value <= 1.0;
+  const vdBox = document.getElementById('vd_status_box');
+  if (vdBox) {
+    vdBox.className = vd_pass ? 'gov-green' : 'gov-red';
+    sh('vd_status', vd_pass
+      ? `✓ OK (Interaction = ${fmtNum(h1_value,3)})`
+      : `✗ FAIL (Interaction = ${fmtNum(h1_value,3)})`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // HORIZONTAL SHEAR AT WEB POST (DG 31 Sec 3.4)
+  // ═══════════════════════════════════════════════════════════
+  const S_mm  = S;
+  const Vrh_kg = Vr * (S_mm / deff_mm);          // Horizontal shear at web post
+  sh('hs_Vrh_sub', `${fmtNum(Vr,0)} × (${S}/${fmtNum(deff_mm,1)})`);
+  sv('hs_Vrh', Vrh_kg, 0);
+
+  // Capacity: Vn,h = 0.6·Fy·e·tw  (e = web post width = S - a0)
+  const e_cm = e / 10;        // mm → cm
+  const tw_cm = tw / 10;
+  const Vnh_kg = 0.6 * Fy * e_cm * tw_cm;       // ksc × cm² = kg
+  const phiVnh = 0.90 * Vnh_kg;                 // φ=0.90 for shear yielding
+  sh('hs_Vnh_sub', `0.6 × ${Fy} × ${fmtNum(e_cm,2)} × ${fmtNum(tw_cm,2)}`);
+  sv('hs_Vnh', Vnh_kg, 0);
+  sv('hs_phiVnh', phiVnh, 0);
+
+  const designCap_Vh = cap(Vnh_kg, 0.90, 1.67);
+  const hs_dc = designCap_Vh > 0 ? Vrh_kg / designCap_Vh : 0;
+  sv('hs_dc', hs_dc, 3);
+
+  const hs_pass = hs_dc <= 1.0;
+  const hsBox = document.getElementById('hs_status_box');
+  if (hsBox) {
+    hsBox.className = hs_pass ? 'gov-green' : 'gov-red';
+    sh('hs_status', hs_pass
+      ? `✓ OK (D/C = ${fmtNum(hs_dc,3)})`
+      : `✗ FAIL (D/C = ${fmtNum(hs_dc,3)})`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // VERTICAL SHEAR AT NET SECTION (AISC G2 + DG 31)
+  // ═══════════════════════════════════════════════════════════
+  const hw_cm = hw / 10;
+  const Aw_net_cm2 = 2 * hw_cm * tw_cm;          // 2 Tee web stems
+  const Vn_kg = 0.6 * Fy * Aw_net_cm2 * 1.0;    // Cv1=1.0 (typically compact webs)
+  const phiVn = 1.00 * Vn_kg;                    // φ=1.00 for G2.1a (compact)
+
+  sv('vs_Vr', Vr, 0);
+  sh('vs_Aw_sub', `2 × ${fmtNum(hw_cm,2)} × ${fmtNum(tw_cm,2)}`);
+  sv('vs_Aw', Aw_net_cm2, 2);
+  sh('vs_Vn_sub', `0.6 × ${Fy} × ${fmtNum(Aw_net_cm2,2)} × 1.0`);
+  sv('vs_Vn', Vn_kg, 0);
+  sv('vs_phiVn', phiVn, 0);
+
+  const designCap_Vy = cap(Vn_kg, 1.00, 1.50);
+  const vs_dc = designCap_Vy > 0 ? Vr / designCap_Vy : 0;
+  sv('vs_dc', vs_dc, 3);
+
+  const vs_pass = vs_dc <= 1.0;
+  const vsBox = document.getElementById('vs_status_box');
+  if (vsBox) {
+    vsBox.className = vs_pass ? 'gov-green' : 'gov-red';
+    sh('vs_status', vs_pass
+      ? `✓ OK (D/C = ${fmtNum(vs_dc,3)})`
+      : `✗ FAIL (D/C = ${fmtNum(vs_dc,3)})`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // AXIAL FORCE — Tension (D2) / Compression (E3) — Full Section
+  // ═══════════════════════════════════════════════════════════
+  const Pr_axial = pi('inp_Pr_axial') || 0;       // kg, − = compression, + = tension
+
+  // Tension: Pn = Fy · Ag (gross area in cm²)
+  const Pn_tens = Fy * A_cm2;                     // ksc · cm² = kgf
+  const phiPn_tens = 0.90 * Pn_tens;
+  const PnO_tens = Pn_tens / 1.67;
+
+  sh('ax_Pnt_sub', `${Fy} × ${fmtNum(A_cm2,2)}`);
+  sv('ax_Pnt', Pn_tens, 0);
+  sv('ax_phiPnt', phiPn_tens, 0);
+
+  // Compression (E3): use Kx·Lx/rx and Ky·Ly/ry, governing = max
+  // Note: rx, ry already in cm
+  const Kx_factor = pi('inp_Kx') || 1.0;
+  const Ky_factor = pi('inp_Ky') || 1.0;
+  const KLx_cm = Kx_factor * Lb_cm;
+  const KLy_cm = Ky_factor * Lb_cm;
+  const slender_x = KLx_cm / rx;
+  const slender_y = KLy_cm / ry;
+  const slender_full = Math.max(slender_x, slender_y);
+  const govAxis = (slender_x >= slender_y) ? 'X' : 'Y';
+  const Fe_full = Math.PI*Math.PI*E / (slender_full*slender_full);
+
+  let Fcr_full, fcr_eq;
+  if (Fy/Fe_full <= 2.25) {
+    Fcr_full = Math.pow(0.658, Fy/Fe_full) * Fy;
+    fcr_eq = `0.658^(Fy/Fe) · Fy = 0.658^${fmtNum(Fy/Fe_full,3)} · ${Fy}`;
+  } else {
+    Fcr_full = 0.877 * Fe_full;
+    fcr_eq = `0.877 · Fe = 0.877 · ${fmtNum(Fe_full,0)}`;
+  }
+  const Pn_comp = Fcr_full * A_cm2;
+  const phiPn_comp = 0.90 * Pn_comp;
+  const PnO_comp = Pn_comp / 1.67;
+
+  sv('ax_Fe', Fe_full, 0);
+  sh('ax_Fcr_sub', fcr_eq);
+  sv('ax_Fcr', Fcr_full, 0);
+  sv('ax_Pnc', Pn_comp, 0);
+  sv('ax_phiPnc', phiPn_comp, 0);
+
+  // Determine demand and check
+  // Sign convention: −Pr = compression (E3), +Pr = tension (D2)
+  sv('ax_Pr', Pr_axial, 0);
+  let ax_mode_txt, phiPn_use;
+  if (Pr_axial < 0) {
+    ax_mode_txt = '<span style="color:#ef4444">COMPRESSION (use E3)</span>';
+    phiPn_use = phiPn_comp;
+  } else if (Pr_axial > 0) {
+    ax_mode_txt = '<span style="color:#22c55e">TENSION (use D2)</span>';
+    phiPn_use = phiPn_tens;
+  } else {
+    ax_mode_txt = '<span style="color:rgba(255,255,255,.5)">NO AXIAL FORCE</span>';
+    phiPn_use = phiPn_comp;     // dummy
+  }
+  sh('ax_mode', ax_mode_txt);
+  const Rn_ax_use = (Pr_axial > 0) ? Pn_tens : Pn_comp;
+  const phi_ax_use = (Pr_axial > 0) ? 0.90 : 0.90;
+  const omega_ax_use = (Pr_axial > 0) ? 1.67 : 1.67;
+  const designCap_ax = cap(Rn_ax_use, phi_ax_use, omega_ax_use);
+  const ax_dc = designCap_ax > 0 ? Math.abs(Pr_axial) / designCap_ax : 0;
+  sv('ax_dc', ax_dc, 3);
+
+  const ax_pass = ax_dc <= 1.0;
+  const axBox = document.getElementById('ax_status_box');
+  if (axBox) {
+    if (Pr_axial === 0) {
+      axBox.className = 'gov';
+      sh('ax_status', `<span style="color:rgba(255,255,255,.5)">— (P<sub>r</sub> = 0)</span>`);
+    } else {
+      axBox.className = ax_pass ? 'gov-green' : 'gov-red';
+      sh('ax_status', ax_pass
+        ? `✓ OK (D/C = ${fmtNum(ax_dc,3)})`
+        : `✗ FAIL (D/C = ${fmtNum(ax_dc,3)})`);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // WEAK-AXIS SHEAR (AISC 360-22 Section G7 + G2.2)
+  // ═══════════════════════════════════════════════════════════
+  // Vn = 0.6·Fy·Aw,y·Cv2
+  //   where  Aw,y = 2·bf·tf  (2 flanges resist horizontal shear)
+  //          Cv2 from G2.2 based on flange slenderness
+  //          φ = 0.90, Ω = 1.67  (different from G2.1a)
+  const Vrx = pi("inp_Vrx");                      // kg
+  const bf_cm = B / 10;
+  const tf_cm = tf / 10;
+  const Aw_y_cm2 = 2 * bf_cm * tf_cm;             // 2 flanges
+
+  // Flange slenderness for G2.2 (note: for flange shear, h/tw → bf/(2·tf))
+  const lambda_y = bf_cm / (2 * tf_cm);
+  const kv_flange = 1.2;                          // G7 default for flange
+  const lim1_y = 1.10 * Math.sqrt(kv_flange * E / Fy);
+  const lim2_y = 1.37 * Math.sqrt(kv_flange * E / Fy);
+
+  // Cv2 from G2.2:
+  //   Cv2 = 1.0                                    if h/tw ≤ 1.10·√(kv·E/Fy)
+  //   Cv2 = 1.10·√(kv·E/Fy)/(h/tw)                  if 1.10√… < h/tw ≤ 1.37√…
+  //   Cv2 = 1.51·kv·E/[(h/tw)²·Fy]                  if h/tw > 1.37√…
+  let Cv2;
+  if (lambda_y <= lim1_y) {
+    Cv2 = 1.0;
+  } else if (lambda_y <= lim2_y) {
+    Cv2 = (1.10 * Math.sqrt(kv_flange * E / Fy)) / lambda_y;
+  } else {
+    Cv2 = 1.51 * kv_flange * E / (lambda_y * lambda_y * Fy);
+  }
+
+  const Vn_y = 0.6 * Fy * Aw_y_cm2 * Cv2;        // kg
+  const phi_y = 0.90;
+  const phiVn_y = phi_y * Vn_y;
+  const omega_y = 1.67;
+  const VnO_y = Vn_y / omega_y;
+
+  sv('vsy_Vr', Vrx, 0);
+  sh('vsy_Aw_sub', `2 × ${fmtNum(bf_cm,2)} × ${fmtNum(tf_cm,2)}`);
+  sv('vsy_Aw', Aw_y_cm2, 2);
+  sv('vsy_lambda', lambda_y, 2);
+  sv('vsy_lim1', lim1_y, 2);
+  sv('vsy_Cv2', Cv2, 3);
+  sh('vsy_Vn_sub', `0.6 × ${Fy} × ${fmtNum(Aw_y_cm2,2)} × ${fmtNum(Cv2,3)}`);
+  sv('vsy_Vn', Vn_y, 0);
+  sv('vsy_phiVn', phiVn_y, 0);
+
+  const designCap_Vx = cap(Vn_y, 0.90, 1.67);
+  const vsy_dc = designCap_Vx > 0 ? Vrx / designCap_Vx : 0;
+  sv('vsy_dc', vsy_dc, 3);
+  const vsy_pass = vsy_dc <= 1.0;
+  const vsyBox = document.getElementById('vsy_status_box');
+  if (vsyBox) {
+    vsyBox.className = vsy_pass ? 'gov-green' : 'gov-red';
+    sh('vsy_status', vsy_pass
+      ? `✓ OK (D/C = ${fmtNum(vsy_dc,3)})`
+      : `✗ FAIL (D/C = ${fmtNum(vsy_dc,3)})`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // WEB POST BUCKLING (DG 31 Section 3.5.2)
+  // ═══════════════════════════════════════════════════════════
+  // For Cellular Beams, DG 31 Eq. 3-21:
+  //   Me/Mp = C1·(S/Do) − C2·(S/Do)² − C3
+  // Constants C1, C2, C3 are functions of Do/tw (interpolated from tables)
+  // Simplified approximate constants:
+  const SD = S / a0;
+  const Dt = a0 / tw;
+  sv('wp_SD', SD, 3);
+  sv('wp_Dt', Dt, 1);
+
+  // Approximate constants for Cellular (DG 31 Table 3-1, simplified)
+  // For Do/tw between 10 and 50:
+  let C1, C2, C3;
+  if (Dt <= 20) {
+    C1 = 5.097; C2 = 0.1464; C3 = 0.00174;
+  } else if (Dt <= 30) {
+    C1 = 11.441; C2 = 0.2903; C3 = 0.00528;
+  } else if (Dt <= 40) {
+    C1 = 15.842; C2 = 0.4079; C3 = 0.0072;
+  } else {
+    C1 = 18.985; C2 = 0.4828; C3 = 0.00917;
+  }
+
+  // Note: Eq. 3-21 uses (S/Do) ratio; valid range typically 1.08 ≤ S/Do ≤ 1.5
+  let MeMp = C1*SD - C2*SD*SD - C3;
+  if (MeMp < 0) MeMp = 0;       // safety
+  if (MeMp > 1) MeMp = 1;        // cap at 1.0
+
+  sh('wp_ratio_sub', `${fmtNum(C1,3)}·${fmtNum(SD,3)} − ${fmtNum(C2,4)}·${fmtNum(SD,3)}² − ${fmtNum(C3,5)}`);
+  sv('wp_ratio', MeMp, 3);
+
+  // Plastic web post moment: Mp,wp = Fy·tw·so²/4
+  // ─────────────────────────────────────────────────────────
+  // CORRECTED per DG 31 Section 3.5.2 (Cellular Beam)
+  // Reference: Aglan & Redwood (1974), Bjorhovde (2000)
+  //   Mp,wp = Fy·tw·(so)²/4
+  // where so = horizontal web-post width at critical section
+  // For cellular beams, the critical section is located at angle θ
+  // measured from the horizontal axis through opening center.
+  //
+  // The horizontal web-post width at angle θ:  so(θ) = S − Do·cos(θ)
+  // Critical θ ≈ 25° for typical S/Do ratios (DG 31 Section 3.5.2)
+  //
+  // so_eff = e + Do·(1 − cos(θcrit)) where θcrit ≈ 25°
+  //        = e + 0.0937·Do
+  //
+  // Previous incorrect formula used so = e (θ=0°) only,
+  // which underestimates Mp,wp significantly when Do is large.
+  // ─────────────────────────────────────────────────────────
+  const theta_crit_deg = 25;
+  const theta_crit_rad = theta_crit_deg * Math.PI / 180;
+  const so_mm = e + a0 * (1 - Math.cos(theta_crit_rad));
+  const so_cm = so_mm / 10;
+
+  // Convert to kg·m: Fy [ksc] × tw [cm] × so² [cm²] / 4 = kgf·cm / 4 → /100 to get kg·m
+  const Mpwp_kgm = (Fy * tw_cm * so_cm * so_cm / 4) / 100;
+  const Mallow_kgm = MeMp * Mpwp_kgm;
+  const phiMallow  = 0.90 * Mallow_kgm;
+
+  sh('wp_Mpwp_sub', `${Fy} × ${fmtNum(tw_cm,2)} × ${fmtNum(so_cm,2)}²/4 / 100  (s<sub>o</sub> at θ=25°)`);
+  sv('wp_Mpwp', Mpwp_kgm, 3);
+  sv('wp_Mallow', Mallow_kgm, 3);
+  sv('wp_phiM', phiMallow, 3);
+
+  // Demand: M_r,wp = Vrh × hw  (web post moment from horizontal shear)
+  const Mrwp_kgm = Vrh_kg * (hw / 1000);  // hw in m
+  sv('wp_Mr', Mrwp_kgm, 3);
+
+  const designCap_wp = cap(Mallow_kgm, 0.90, 1.67);
+  const wp_dc = designCap_wp > 0 ? Mrwp_kgm / designCap_wp : 999;
+  sv('wp_dc', wp_dc, 3);
+
+  const wp_pass = wp_dc <= 1.0;
+  const wpBox = document.getElementById('wp_status_box');
+  if (wpBox) {
+    wpBox.className = wp_pass ? 'gov-green' : 'gov-red';
+    sh('wp_status', wp_pass
+      ? `✓ OK (D/C = ${fmtNum(wp_dc,3)})`
+      : `✗ FAIL (D/C = ${fmtNum(wp_dc,3)})`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // TEE LOCAL STEM BUCKLING (AISC F9.4)
+  // For stem in compression — relevant at Tee under negative moment
+  // ═══════════════════════════════════════════════════════════
+  // Slenderness: d/tw, where d = stem depth ≈ hs (for our Tee stub)
+  const ts_lambda  = hs / tw;
+  const ts_lp      = 0.84 * sqEFy;
+  const ts_lr      = 1.52 * sqEFy;
+
+  let ts_class, ts_class_color, Fcr_stem, ts_Fcr_eq_html;
+  if (ts_lambda <= ts_lp) {
+    Fcr_stem = Fy;
+    ts_class = 'COMPACT'; ts_class_color = 'var(--green)';
+    ts_Fcr_eq_html = `F<sub>cr</sub> = F<sub>y</sub> = ${Fy} ksc`;
+  } else if (ts_lambda <= ts_lr) {
+    // F9-17: Fcr = [1.43 - 0.515·(d/tw)·√(Fy/E)]·Fy
+    const factor = 1.43 - 0.515 * ts_lambda * Math.sqrt(Fy/E);
+    Fcr_stem = factor * Fy;
+    ts_class = 'NONCOMPACT'; ts_class_color = 'var(--yellow)';
+    ts_Fcr_eq_html = `F<sub>cr</sub> = [1.43 − 0.515·(${fmtNum(ts_lambda,2)})·√(${Fy}/${E})] · ${Fy}`;
+  } else {
+    // F9-18: Fcr = 1.52·E / (d/tw)²
+    Fcr_stem = 1.52 * E / (ts_lambda * ts_lambda);
+    ts_class = 'SLENDER'; ts_class_color = 'var(--red)';
+    ts_Fcr_eq_html = `F<sub>cr</sub> = 1.52·E / (${fmtNum(ts_lambda,2)})² = ${fmtNum(Fcr_stem,0)} ksc`;
+  }
+  // F9.4: Mn,stem cannot exceed My
+  const Mn_stem_kgm = Math.min(Fcr_stem * Stee_cm3 / KGFCM_PER_KGM, Fy * Stee_cm3 / KGFCM_PER_KGM);
+  const phi_Mn_stem = 0.90 * Mn_stem_kgm;
+
+  sh('ts_lambda_sub', `${fmtNum(hs,1)} / ${tw}`);
+  sv('ts_lambda', ts_lambda, 2);
+  sv('ts_lp', ts_lp, 2);
+  sv('ts_lr', ts_lr, 2);
+  sh('ts_class', `<span style="font-weight:700;color:${ts_class_color}">${ts_class}</span>`);
+  sh('ts_Fcr_eq', ts_Fcr_eq_html);
+  sv('ts_Fcr', Fcr_stem, 0);
+  sh('ts_Mn_sub', `${fmtNum(Fcr_stem,0)} × ${fmtNum(Stee_cm3,2)} / 100`);
+  sv('ts_Mn', Mn_stem_kgm, 2);
+  sv('ts_phiMn', phi_Mn_stem, 2);
+
+  // D/C — compare against Vierendeel moment demand Mvr (which loads Tee in flexure)
+  const designCap_ts = cap(Mn_stem_kgm, 0.90, 1.67);
+  const ts_dc = designCap_ts > 0 ? Mvr_kgm / designCap_ts : 0;
+  sv('ts_dc', ts_dc, 3);
+  const ts_pass = ts_dc <= 1.0;
+  const tsBox = document.getElementById('ts_status_box');
+  if (tsBox) {
+    tsBox.className = ts_pass ? 'gov-green' : 'gov-red';
+    sh('ts_status', ts_pass
+      ? `✓ OK (D/C = ${fmtNum(ts_dc,3)})`
+      : `✗ FAIL (D/C = ${fmtNum(ts_dc,3)})`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // WEB LOCAL YIELDING (AISC J10.2) & CRIPPLING (J10.3)
+  // ═══════════════════════════════════════════════════════════
+  // Demand ใช้ Vr (= support reaction = vertical shear ที่ปลายคาน)
+  const Prc = Vr;                             // kg — ใช้ Vr เป็น concentrated load demand
+  const lb_mm = pi('inp_lb');                 // mm
+  const xLoad = pi('inp_xLoad');              // mm
+  // k = tf + r1 (assume r1 = 0 for CB)
+  const k_mm = tf;
+  const d_full = Hcb;
+
+  sv('wy_Pr', Prc, 0);
+  sv('wy_lb', lb_mm, 0);
+  sv('wy_x', xLoad, 0);
+  sv('wy_k', k_mm, 0);
+
+  // Position check: load near end if x ≤ d
+  const isNearEnd = xLoad <= d_full;
+  const posTxt = isNearEnd
+    ? '<span style="color:var(--yellow);font-weight:700">NEAR END (x ≤ d)</span>'
+    : '<span style="color:var(--green);font-weight:700">FAR FROM END (x > d)</span>';
+  sh('wy_pos', posTxt);
+  sh('wc_pos', posTxt);
+
+  // ── J10.2 Web Local Yielding ──
+  // Convert to cm for ksc·cm² = kgf
+  const k_cm = k_mm / 10;
+  const lb_cm = lb_mm / 10;
+  let Rn_WY, wy_eq_html, wy_Rn_sub_html;
+  if (!isNearEnd) {
+    // Eq. J10-2: Rn = Fyw·tw·(5k + lb)
+    Rn_WY = Fy * tw_cm * (5 * k_cm + lb_cm);
+    wy_eq_html = `R<sub>n</sub> = F<sub>yw</sub>·t<sub>w</sub>·(5k + l<sub>b</sub>)`;
+    wy_Rn_sub_html = `${Fy} × ${fmtNum(tw_cm,2)} × (5×${fmtNum(k_cm,2)} + ${fmtNum(lb_cm,2)})`;
+  } else {
+    // Eq. J10-3: Rn = Fyw·tw·(2.5k + lb)
+    Rn_WY = Fy * tw_cm * (2.5 * k_cm + lb_cm);
+    wy_eq_html = `R<sub>n</sub> = F<sub>yw</sub>·t<sub>w</sub>·(2.5k + l<sub>b</sub>)`;
+    wy_Rn_sub_html = `${Fy} × ${fmtNum(tw_cm,2)} × (2.5×${fmtNum(k_cm,2)} + ${fmtNum(lb_cm,2)})`;
+  }
+  const phi_WY = 1.00;
+  const phiRn_WY = phi_WY * Rn_WY;
+  sh('wy_eq', wy_eq_html);
+  sh('wy_Rn_sub', wy_Rn_sub_html);
+  sv('wy_Rn', Rn_WY, 0);
+  sv('wy_phiRn', phiRn_WY, 0);
+
+  const designCap_wy = cap(Rn_WY, 1.00, 1.50);
+  const wy_dc = designCap_wy > 0 ? Prc / designCap_wy : 0;
+  sv('wy_dc', wy_dc, 3);
+  const wy_pass = wy_dc <= 1.0;
+  const wyBox = document.getElementById('wy_status_box');
+  if (wyBox) {
+    wyBox.className = wy_pass ? 'gov-green' : 'gov-red';
+    sh('wy_status', wy_pass
+      ? `✓ OK (D/C = ${fmtNum(wy_dc,3)})`
+      : `✗ FAIL (D/C = ${fmtNum(wy_dc,3)})`);
+  }
+
+  // ── J10.3 Web Local Crippling ──
+  const lbd = lb_mm / d_full;
+  sv('wc_lbd', lbd, 3);
+  // tf_cm already declared earlier (in G7 section)
+  let Rn_WC, wc_eq_html, wc_Rn_sub_html;
+
+  if (!isNearEnd) {
+    // J10-4: Rn = 0.80·tw²·[1 + 3·(lb/d)·(tw/tf)^1.5]·√(EFy·tf/tw)
+    const term1 = 1 + 3 * lbd * Math.pow(tw_cm/tf_cm, 1.5);
+    const sqrtTerm = Math.sqrt(E * Fy * tf_cm / tw_cm);
+    Rn_WC = 0.80 * tw_cm * tw_cm * term1 * sqrtTerm;
+    wc_eq_html = `R<sub>n</sub> = 0.80·t<sub>w</sub>²·[1 + 3·(l<sub>b</sub>/d)·(t<sub>w</sub>/t<sub>f</sub>)<sup>1.5</sup>]·√(E·F<sub>y</sub>·t<sub>f</sub>/t<sub>w</sub>)`;
+    wc_Rn_sub_html = `0.80 × ${fmtNum(tw_cm,2)}² × [1 + 3·${fmtNum(lbd,3)}·${fmtNum(Math.pow(tw_cm/tf_cm,1.5),3)}] × ${fmtNum(sqrtTerm,0)}`;
+  } else {
+    // J10-5a or J10-5b: Reduced for end loading
+    let term1;
+    if (lbd <= 0.2) {
+      // J10-5a: Rn = 0.40·tw²·[1 + 3·(lb/d)·(tw/tf)^1.5]·√(EFy·tf/tw)
+      term1 = 1 + 3 * lbd * Math.pow(tw_cm/tf_cm, 1.5);
+    } else {
+      // J10-5b: Rn = 0.40·tw²·[1 + (4·lb/d − 0.2)·(tw/tf)^1.5]·√(EFy·tf/tw)
+      term1 = 1 + (4 * lbd - 0.2) * Math.pow(tw_cm/tf_cm, 1.5);
+    }
+    const sqrtTerm = Math.sqrt(E * Fy * tf_cm / tw_cm);
+    Rn_WC = 0.40 * tw_cm * tw_cm * term1 * sqrtTerm;
+    wc_eq_html = `R<sub>n</sub> = 0.40·t<sub>w</sub>²·[bracket]·√(E·F<sub>y</sub>·t<sub>f</sub>/t<sub>w</sub>) <span style="color:rgba(255,255,255,.5)">(near-end reduced)</span>`;
+    wc_Rn_sub_html = `0.40 × ${fmtNum(tw_cm,2)}² × ${fmtNum(term1,3)} × ${fmtNum(sqrtTerm,0)}`;
+  }
+  const phi_WC = 0.75;
+  const phiRn_WC = phi_WC * Rn_WC;
+  sh('wc_eq', wc_eq_html);
+  sh('wc_Rn_sub', wc_Rn_sub_html);
+  sv('wc_Rn', Rn_WC, 0);
+  sv('wc_phiRn', phiRn_WC, 0);
+
+  const designCap_wc = cap(Rn_WC, 0.75, 2.00);
+  const wc_dc = designCap_wc > 0 ? Prc / designCap_wc : 0;
+  sv('wc_dc', wc_dc, 3);
+  const wc_pass = wc_dc <= 1.0;
+  const wcBox = document.getElementById('wc_status_box');
+  if (wcBox) {
+    wcBox.className = wc_pass ? 'gov-green' : 'gov-red';
+    sh('wc_status', wc_pass
+      ? `✓ OK (D/C = ${fmtNum(wc_dc,3)})`
+      : `✗ FAIL (D/C = ${fmtNum(wc_dc,3)})`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // NOMINAL CAPACITIES SUMMARY TABLE
+  // ═══════════════════════════════════════════════════════════
+  // Flexure - Strong X
+  sv('cap_Mnx',     Mn_gov, 1);
+  sv('cap_phiMnx',  phiMn_kgm, 1);
+  sv('cap_MnOx',    MnOmega_kgm, 1);
+
+  // Flexure - Weak Y
+  sv('cap_Mny',     Mny_gov, 1);
+  sv('cap_phiMny',  phiMnY_kgm, 1);
+  sv('cap_MnOy',    MnYOmega_kgm, 1);
+
+  // Vierendeel - Tee Flexural
+  sv('cap_Mntee',   Mntee_kgm, 2);
+  sv('cap_phiMntee', phiMntee, 2);
+  sv('cap_MnOtee',  Mntee_kgm/omega, 2);
+
+  // Vertical Shear (Net)
+  sv('cap_Vn_v',    Vn_kg, 0);
+  sv('cap_phiVn_v', phiVn, 0);
+  sv('cap_VnO_v',   Vn_kg/1.50, 0);   // Ω=1.50 for shear (G2.1a)
+
+  // Weak Axis Shear (G7)
+  sv('cap_Vny',     Vn_y, 0);
+  sv('cap_phiVny',  phiVn_y, 0);
+  sv('cap_VnyO',    VnO_y, 0);
+
+  // Horizontal Shear (Web Post)
+  sv('cap_Vnh',     Vnh_kg, 0);
+  sv('cap_phiVnh',  phiVnh, 0);
+  sv('cap_VnhO',    Vnh_kg/omega, 0);
+
+  // Web Post Buckling Moment
+  sv('cap_Mnwp',    Mallow_kgm, 2);
+  sv('cap_phiMnwp', phiMallow, 2);
+  sv('cap_MnOwp',   Mallow_kgm/omega, 2);
+
+  // Compression - Tee
+  sv('cap_Pn',      Pn_kg, 0);
+  sv('cap_phiPn',   phiPn, 0);
+  sv('cap_PnO',     Pn_kg/omega, 0);
+
+  // Axial Tension (D2)
+  sv('cap_Pnt',     Pn_tens, 0);
+  sv('cap_phiPnt',  phiPn_tens, 0);
+  sv('cap_PntO',    PnO_tens, 0);
+
+  // Axial Compression Full (E3)
+  sv('cap_Pnc',     Pn_comp, 0);
+  sv('cap_phiPnc',  phiPn_comp, 0);
+  sv('cap_PncO',    PnO_comp, 0);
+
+  // Tee Stem Local Buckling
+  sv('cap_Mnstem',    Mn_stem_kgm, 2);
+  sv('cap_phiMnstem', phi_Mn_stem, 2);
+  sv('cap_MnOstem',   Mn_stem_kgm/omega, 2);
+
+  // Web Local Yielding
+  sv('cap_RnWY',    Rn_WY, 0);
+  sv('cap_phiRnWY', phiRn_WY, 0);
+  sv('cap_RnOWY',   Rn_WY/1.50, 0);
+
+  // Web Local Crippling
+  sv('cap_RnWC',    Rn_WC, 0);
+  sv('cap_phiRnWC', phiRn_WC, 0);
+  sv('cap_RnOWC',   Rn_WC/2.00, 0);
+
+  // ═══════════════════════════════════════════════════════════
+  // COMBINED LOADING INTERACTION (AISC Chapter H)
+  // ═══════════════════════════════════════════════════════════
+  // H1-1: Combined Axial + Biaxial Flexure
+  // ใช้ |Pr| สำหรับ Pr/Pc ratio
+  // Pc = phiPn (use compression φPn,c if Pr<0, tension φPn,t if Pr>0, else compression)
+  const Pr_abs = Math.abs(Pr_axial);
+  // Combined Loading uses the SAME designCap_* values (method-aware via cap() helper)
+  const Pc_use = (Pr_axial > 0) ? designCap_ax : designCap_ax;  // already method-aware
+  const PrPc_full = Pc_use > 0 ? Pr_abs / Pc_use : 0;
+
+  // Mcx, Mcy = governing flexure capacity (already method-aware)
+  const Mcx_use = designCap_M;     // designCap_M = φMn (LRFD) or Mn/Ω (ASD)
+  const Mcy_use = designCap_My;    // designCap_My = φMn,y (LRFD) or Mny/Ω (ASD)
+
+  const MrxMcx = Mcx_use > 0 ? Mu / Mcx_use : 0;
+  const MryMcy = Mcy_use > 0 ? Muy / Mcy_use : 0;
+
+  let h1_dc, h1_full_eq;
+  if (PrPc_full >= 0.2) {
+    h1_dc = PrPc_full + (8/9) * (MrxMcx + MryMcy);
+    h1_full_eq = 'P<sub>r</sub>/P<sub>c</sub> + (8/9)·(M<sub>rx</sub>/M<sub>cx</sub> + M<sub>ry</sub>/M<sub>cy</sub>) ≤ 1.0  [H1-1a]';
+  } else {
+    h1_dc = PrPc_full/2 + (MrxMcx + MryMcy);
+    h1_full_eq = 'P<sub>r</sub>/(2P<sub>c</sub>) + (M<sub>rx</sub>/M<sub>cx</sub> + M<sub>ry</sub>/M<sub>cy</sub>) ≤ 1.0  [H1-1b]';
+  }
+  const h1_pass = h1_dc <= 1.0;
+  sh('h1_eq', h1_full_eq);
+  // H1-1 active equation displayed via cmb_h1_eq / cmb_h1_sub
+  // (H1-1b explicit row removed - redundant since H1-1 auto-selects)
+  sv('all_h1_dc', h1_dc, 3);
+
+  // Biaxial Flexure (No Axial)
+  const biax_dc = MrxMcx + MryMcy;
+  const biax_pass = biax_dc <= 1.0;
+  sv('all_biax_dc', biax_dc, 3);
+
+  // Combined Shear (SRSS — common engineering practice for biaxial shear)
+  // Uses method-aware capacities
+  const VrVc_y = designCap_Vy > 0 ? Vr / designCap_Vy : 0;
+  const VrVc_x = designCap_Vx > 0 ? Vrx / designCap_Vx : 0;
+  const vshear_dc = Math.sqrt(VrVc_y*VrVc_y + VrVc_x*VrVc_x);
+  const vshear_pass = vshear_dc <= 1.0;
+  sv('all_vshear_dc', vshear_dc, 3);
+
+  // Vierendeel + Axial at Opening (already computed as h1_value)
+  sv('all_vd_dc', h1_value, 3);
+  const vd_pass_combined = h1_value <= 1.0;
+
+  // ═══════════════════════════════════════════════════════════
+  // COMPLETE SUMMARY — All Limit States
+  // ═══════════════════════════════════════════════════════════
+  const allChecks = [
+    { name: 'Strong Axis Flexure',  dc: lrfd_dc,  passKey: lrfd_pass },
+    { name: 'Weak Axis Flexure',    dc: lrfdY_dc, passKey: lrfdY_pass },
+    { name: 'Vierendeel Interaction', dc: h1_value, passKey: vd_pass },
+    { name: 'Horizontal Shear',     dc: hs_dc,    passKey: hs_pass },
+    { name: 'Vertical Shear',       dc: vs_dc,    passKey: vs_pass },
+    { name: 'Weak-Axis Shear',      dc: vsy_dc,   passKey: vsy_pass },
+    { name: 'Web Post Buckling',    dc: wp_dc,    passKey: wp_pass },
+    { name: 'Tee Stem Local Buckling', dc: ts_dc, passKey: ts_pass },
+    { name: 'Web Local Yielding',   dc: wy_dc,    passKey: wy_pass },
+    { name: 'Web Local Crippling',  dc: wc_dc,    passKey: wc_pass },
+    { name: 'Axial (Tension/Compression)', dc: ax_dc, passKey: ax_pass },
+    { name: 'H1-1 Combined Axial+Biaxial Flexure', dc: h1_dc, passKey: h1_pass },
+    { name: 'Biaxial Flexure (No Axial)', dc: biax_dc, passKey: biax_pass },
+    { name: 'Combined Shear (X+Y)', dc: vshear_dc, passKey: vshear_pass }
+  ];
+
+  sv('all_x_dc',  lrfd_dc, 3);
+  sv('all_y_dc',  lrfdY_dc, 3);
+  sv('all_v_dc',  h1_value, 3);
+  sv('all_h_dc',  hs_dc, 3);
+  sv('all_vs_dc', vs_dc, 3);
+  sv('all_vsy_dc', vsy_dc, 3);
+  sv('all_wp_dc', wp_dc, 3);
+  sv('all_ts_dc', ts_dc, 3);
+  sv('all_wy_dc', wy_dc, 3);
+  sv('all_wc_dc', wc_dc, 3);
+  sv('all_ax_dc', ax_dc, 3);
+
+  const passHTML = '<span style="color:var(--green);font-weight:700">✓ OK</span>';
+  const failHTML = '<span style="color:var(--red);font-weight:700">✗ FAIL</span>';
+  sh('all_x_st',  lrfd_pass  ? passHTML : failHTML);
+  sh('all_y_st',  lrfdY_pass ? passHTML : failHTML);
+  sh('all_v_st',  vd_pass    ? passHTML : failHTML);
+  sh('all_h_st',  hs_pass    ? passHTML : failHTML);
+  sh('all_vs_st', vs_pass    ? passHTML : failHTML);
+  sh('all_vsy_st', vsy_pass  ? passHTML : failHTML);
+  sh('all_wp_st', wp_pass    ? passHTML : failHTML);
+  sh('all_ts_st', ts_pass    ? passHTML : failHTML);
+  sh('all_wy_st', wy_pass    ? passHTML : failHTML);
+  sh('all_wc_st', wc_pass    ? passHTML : failHTML);
+  sh('all_ax_st', ax_pass    ? passHTML : failHTML);
+
+  // Combined Loading Interaction status
+  sh('all_h1_st',     h1_pass         ? passHTML : failHTML);
+  sh('all_biax_st',   biax_pass       ? passHTML : failHTML);
+  sh('all_vshear_st', vshear_pass     ? passHTML : failHTML);
+  sh('all_vd_st',     vd_pass_combined ? passHTML : failHTML);
+
+  // ═══════════════════════════════════════════════════════════
+  // INLINE SUBSTITUTIONS — Individual Limit States
+  // ═══════════════════════════════════════════════════════════
+  // Strong Axis Flexure
+  sh('sub_x', `${fmtNum(Mu,2)} / ${fmtNum(designCap_M,2)} = ${fmtNum(lrfd_dc,3)}`);
+  // Weak Axis Flexure
+  sh('sub_y', `${fmtNum(Muy,2)} / ${fmtNum(designCap_My,2)} = ${fmtNum(lrfdY_dc,3)}`);
+  // Vierendeel
+  sh('sub_v', (typeof PrPc !== 'undefined' && typeof MrMc !== 'undefined')
+    ? (PrPc >= 0.2
+        ? `${fmtNum(PrPc,4)} + (8/9)·(${fmtNum(MrMc,4)}) = ${fmtNum(h1_value,3)}`
+        : `${fmtNum(PrPc,4)}/2 + ${fmtNum(MrMc,4)} = ${fmtNum(h1_value,3)}`)
+    : '—');
+  // Horizontal Shear
+  sh('sub_h', `V<sub>rh</sub> = ${fmtNum(Vrh_kg,0)} kg → ${fmtNum(Vrh_kg,0)} / ${fmtNum(designCap_Vh,0)} = ${fmtNum(hs_dc,3)}`);
+  // Vertical Shear
+  sh('sub_vs', `${fmtNum(Vr,0)} / ${fmtNum(designCap_Vy,0)} = ${fmtNum(vs_dc,3)}`);
+  // Weak Axis Shear (G7)
+  sh('sub_vsy', `${fmtNum(Vrx,0)} / ${fmtNum(designCap_Vx,0)} = ${fmtNum(vsy_dc,3)}`);
+  // Web Post Buckling
+  sh('sub_wp', `M<sub>r,wp</sub> = ${fmtNum(Mrwp_kgm,2)} → ${fmtNum(Mrwp_kgm,2)} / ${fmtNum(designCap_wp,2)} = ${fmtNum(wp_dc,3)}`);
+  // Tee Stem Buckling
+  sh('sub_ts', `${fmtNum(Mvr_kgm,2)} / ${fmtNum(designCap_ts,2)} = ${fmtNum(ts_dc,3)}`);
+  // Web Local Yielding
+  sh('sub_wy', `${fmtNum(Prc,0)} / ${fmtNum(designCap_wy,0)} = ${fmtNum(wy_dc,3)} <span style="color:rgba(255,255,255,.4)">[${isNearEnd ? 'near end' : 'far'}]</span>`);
+  // Web Local Crippling
+  sh('sub_wc', `${fmtNum(Prc,0)} / ${fmtNum(designCap_wc,0)} = ${fmtNum(wc_dc,3)}`);
+  // Axial
+  sh('sub_ax', (Pr_axial === 0)
+    ? '— (P<sub>r</sub> = 0, no axial check needed)'
+    : `${fmtNum(Pr_abs,0)} / ${fmtNum(designCap_ax,0)} = ${fmtNum(ax_dc,3)} <span style="color:rgba(255,255,255,.4)">[${Pr_axial > 0 ? 'tension' : 'compression'}]</span>`);
+
+  // ═══════════════════════════════════════════════════════════
+  // INLINE SUBSTITUTION DISPLAYS — within All Limit States Table
+  // ═══════════════════════════════════════════════════════════
+  // Vierendeel + Axial demand at Tee
+  // h1_value already computed in Vierendeel section using PrPc (Tee) and MrMc
+
+  // H1-1 Active equation + substitution
+  if (PrPc_full >= 0.2) {
+    sh('cmb_h1_eq',  'P<sub>r</sub>/P<sub>c</sub> + (8/9)·(M<sub>rx</sub>/M<sub>cx</sub> + M<sub>ry</sub>/M<sub>cy</sub>) ≤ 1.0');
+    sh('cmb_h1_sub', `${fmtNum(PrPc_full,4)} + (8/9)·(${fmtNum(MrxMcx,4)} + ${fmtNum(MryMcy,4)}) = ${fmtNum(h1_dc,3)}`);
+    sh('cmb_h1_active', '[H1-1a active]');
+  } else {
+    sh('cmb_h1_eq',  'P<sub>r</sub>/(2P<sub>c</sub>) + (M<sub>rx</sub>/M<sub>cx</sub> + M<sub>ry</sub>/M<sub>cy</sub>) ≤ 1.0');
+    sh('cmb_h1_sub', `${fmtNum(PrPc_full,4)}/2 + (${fmtNum(MrxMcx,4)} + ${fmtNum(MryMcy,4)}) = ${fmtNum(h1_dc,3)}`);
+    sh('cmb_h1_active', '[H1-1b active]');
+  }
+
+  // H1-1b explicit substitution
+  // (H1-1b explicit row removed - redundant)
+
+  // Biaxial substitution
+  sh('cmb_biax_sub', `${fmtNum(MrxMcx,4)} + ${fmtNum(MryMcy,4)} = ${fmtNum(biax_dc,3)}`);
+
+  // Combined Shear SRSS substitution
+  sh('cmb_vsh_sub',
+    `√[(${fmtNum(Vr,0)}/${fmtNum(phiVn,0)})² + (${fmtNum(Vrx,0)}/${fmtNum(phiVn_y,0)})²] = √[(${fmtNum(VrVc_y,4)})² + (${fmtNum(VrVc_x,4)})²] = ${fmtNum(vshear_dc,3)}`);
+
+  // Vierendeel substitution (using existing Vierendeel variables)
+  // h1_value uses PrPc (Tee) and MrMc - both computed earlier
+  sh('cmb_vd_sub',
+    (typeof PrPc !== 'undefined' && typeof MrMc !== 'undefined')
+      ? (PrPc >= 0.2
+          ? `${fmtNum(PrPc,4)} + (8/9)·(${fmtNum(MrMc,4)}) = ${fmtNum(h1_value,3)}`
+          : `${fmtNum(PrPc,4)}/2 + ${fmtNum(MrMc,4)} = ${fmtNum(h1_value,3)}`)
+      : '—');
+
+  // Find critical (highest D/C)
+  const sorted = [...allChecks].sort((a,b) => b.dc - a.dc);
+  const critical = sorted[0];
+  sh('all_critical', `<b style="color:${critical.passKey ? 'var(--green)' : 'var(--red)'}">${critical.name}</b> (D/C = ${fmtNum(critical.dc,3)})`);
+}
+
+// ──────────────────────────────────────────────────
+// CROSS-SECTION — I-Beam with grid, axes, dimension lines (Civil ToolKit style)
+// ──────────────────────────────────────────────────
+function drawSection(B, tw, tf, Hcb, a0){
+  const c = document.getElementById('sectionCanvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0f1117';
+  ctx.fillRect(0,0,W,H);
+
+  // ── DOTTED GRID BACKGROUND ──
+  ctx.fillStyle = '#1a2235';
+  const gridStep = 20;
+  for (let x = gridStep; x < W; x += gridStep) {
+    for (let y = gridStep; y < H; y += gridStep) {
+      ctx.fillRect(x - 0.5, y - 0.5, 1, 1);
+    }
+  }
+
+  // padding for dimension lines
+  const padL = 90, padR = 90, padT = 50, padB = 50;
+  const drawW = W - padL - padR;
+  const drawH = H - padT - padB;
+  const sc = Math.min(drawW/B, drawH/Hcb) * 0.82;
+
+  const bW = B*sc, bH = Hcb*sc;
+  const tfp = Math.max(3, tf*sc);
+  const twp = Math.max(3, tw*sc);
+  const cx = padL + drawW/2;
+  const cy = padT + drawH/2;
+  const bX = cx - bW/2;
+  const bY = cy - bH/2;
+  const wX = cx - twp/2;
+  const hr = (a0/2)*sc;
+  const hsP = ((Hcb-a0)/2)*sc;
+
+  // ── I-BEAM FILL (light blue) ──
+  ctx.fillStyle = '#3a7ec4';
+  ctx.beginPath();
+  ctx.moveTo(bX, bY);
+  ctx.lineTo(bX + bW, bY);
+  ctx.lineTo(bX + bW, bY + tfp);
+  ctx.lineTo(wX + twp, bY + tfp);
+  ctx.lineTo(wX + twp, bY + bH - tfp);
+  ctx.lineTo(bX + bW, bY + bH - tfp);
+  ctx.lineTo(bX + bW, bY + bH);
+  ctx.lineTo(bX, bY + bH);
+  ctx.lineTo(bX, bY + bH - tfp);
+  ctx.lineTo(wX, bY + bH - tfp);
+  ctx.lineTo(wX, bY + tfp);
+  ctx.lineTo(bX, bY + tfp);
+  ctx.closePath();
+  ctx.fill();
+
+  // ── I-BEAM OUTLINE ──
+  ctx.strokeStyle = '#7ab5e8';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(bX, bY);
+  ctx.lineTo(bX + bW, bY);
+  ctx.lineTo(bX + bW, bY + tfp);
+  ctx.lineTo(wX + twp, bY + tfp);
+  ctx.lineTo(wX + twp, bY + bH - tfp);
+  ctx.lineTo(bX + bW, bY + bH - tfp);
+  ctx.lineTo(bX + bW, bY + bH);
+  ctx.lineTo(bX, bY + bH);
+  ctx.lineTo(bX, bY + bH - tfp);
+  ctx.lineTo(wX, bY + bH - tfp);
+  ctx.lineTo(wX, bY + tfp);
+  ctx.lineTo(bX, bY + tfp);
+  ctx.closePath();
+  ctx.stroke();
+
+  // ── X-Y AXES through centroid (dashed cyan) ──
+  ctx.strokeStyle = '#22d3ee';
+  ctx.setLineDash([5,4]);
+  ctx.lineWidth = 1;
+  // Horizontal axis (X) — extends slightly outside section
+  ctx.beginPath();
+  ctx.moveTo(bX - 20, cy);
+  ctx.lineTo(bX + bW + 30, cy);
+  ctx.stroke();
+  // Vertical axis (Y)
+  ctx.beginPath();
+  ctx.moveTo(cx, bY - 20);
+  ctx.lineTo(cx, bY + bH + 20);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── ORIGIN MARKER (orange L-shaped axis indicator) ──
+  ctx.strokeStyle = '#f0883e';
+  ctx.fillStyle = '#f0883e';
+  ctx.lineWidth = 2;
+  // X arrow (right)
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + 22, cy);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx + 22, cy);
+  ctx.lineTo(cx + 17, cy - 3);
+  ctx.lineTo(cx + 17, cy + 3);
+  ctx.closePath();
+  ctx.fill();
+  // Y arrow (up)
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx, cy - 22);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - 22);
+  ctx.lineTo(cx - 3, cy - 17);
+  ctx.lineTo(cx + 3, cy - 17);
+  ctx.closePath();
+  ctx.fill();
+  // Axis labels
+  ctx.font = 'italic bold 11px IBM Plex Sans, sans-serif';
+  ctx.fillStyle = '#f0883e';
+  ctx.textAlign = 'left';
+  ctx.fillText('x', cx + 26, cy + 4);
+  ctx.fillText('y', cx + 4, cy - 24);
+  // Origin dot
+  ctx.fillStyle = '#f0883e';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 2, 0, 2*Math.PI);
+  ctx.fill();
+
+  // ── DIMENSION LINES (green, thin like reference) ──
+  const dimColor = '#4ade80';
+  ctx.strokeStyle = dimColor;
+  ctx.lineWidth = 1;
+
+  // H_cb on LEFT side — extension lines + arrows + label
+  const hcbX = bX - 50;
+  // Extension lines (thin dashed)
+  ctx.setLineDash([2,2]);
+  ctx.beginPath();
+  ctx.moveTo(bX - 4, bY); ctx.lineTo(hcbX - 6, bY);
+  ctx.moveTo(bX - 4, bY + bH); ctx.lineTo(hcbX - 6, bY + bH);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // Main dim line with arrows
+  ctx.beginPath();
+  ctx.moveTo(hcbX, bY);
+  ctx.lineTo(hcbX, bY + bH);
+  // arrows
+  ctx.moveTo(hcbX - 4, bY + 7); ctx.lineTo(hcbX, bY); ctx.lineTo(hcbX + 4, bY + 7);
+  ctx.moveTo(hcbX - 4, bY + bH - 7); ctx.lineTo(hcbX, bY + bH); ctx.lineTo(hcbX + 4, bY + bH - 7);
+  ctx.stroke();
+  // Label rotated
+  ctx.fillStyle = dimColor;
+  ctx.save();
+  ctx.translate(hcbX - 8, cy);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.fillText(`H_cb=${Hcb}`, 0, 0);
+  ctx.restore();
+
+  // B on TOP — extension lines + arrows + label
+  const bDimY = bY - 28;
+  ctx.strokeStyle = dimColor;
+  ctx.setLineDash([2,2]);
+  ctx.beginPath();
+  ctx.moveTo(bX, bY - 4); ctx.lineTo(bX, bDimY - 6);
+  ctx.moveTo(bX + bW, bY - 4); ctx.lineTo(bX + bW, bDimY - 6);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(bX, bDimY);
+  ctx.lineTo(bX + bW, bDimY);
+  ctx.moveTo(bX + 7, bDimY - 4); ctx.lineTo(bX, bDimY); ctx.lineTo(bX + 7, bDimY + 4);
+  ctx.moveTo(bX + bW - 7, bDimY - 4); ctx.lineTo(bX + bW, bDimY); ctx.lineTo(bX + bW - 7, bDimY + 4);
+  ctx.stroke();
+  ctx.fillStyle = dimColor;
+  ctx.textAlign = 'center';
+  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.fillText(`B=${B}`, cx, bDimY - 6);
+
+  // ── COMPONENT LABELS (purple) ──
+  ctx.fillStyle = '#a78bfa';
+  ctx.font = '10px IBM Plex Mono, monospace';
+
+  // tf label — to the right of top flange
+  ctx.textAlign = 'left';
+  ctx.save();
+  ctx.translate(bX + bW + 8, bY + tfp/2 + 3);
+  ctx.fillText(`t_f=${tf}`, 0, 0);
+  ctx.restore();
+
+  // tw label — below at bottom of section
+  ctx.textAlign = 'center';
+  ctx.fillText(`t_w=${tw}`, cx, bY + bH + 30);
+
+  // a₀ info shown in Elevation View instead
+
+  // Title at top
+  ctx.fillStyle = '#7ab5e8';
+  ctx.font = 'bold 11px IBM Plex Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('Cross-Section View', W/2, 22);
+}
+
+// ──────────────────────────────────────────────────
+// ELEVATION — Side view of beam with multiple openings
+// ──────────────────────────────────────────────────
+function drawElevation(B, tw, tf, Hcb, a0, S){
+  const c = document.getElementById('elevCanvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0f1117';
+  ctx.fillRect(0,0,W,H);
+
+  // ── DOTTED GRID BACKGROUND ──
+  ctx.fillStyle = '#1a2235';
+  const gridStep = 20;
+  for (let x = gridStep; x < W; x += gridStep) {
+    for (let y = gridStep; y < H; y += gridStep) {
+      ctx.fillRect(x - 0.5, y - 0.5, 1, 1);
+    }
+  }
+
+  // Title
+  ctx.fillStyle = '#a78bfa';
+  ctx.font = 'bold 12px IBM Plex Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('Side Elevation — Beam with Cellular Openings', W/2, 22);
+
+  // We want to show ~4-5 openings in the available width
+  const padL = 60, padR = 60, padT = 60, padB = 80;
+  const drawW = W - padL - padR;
+  const drawH = H - padT - padB;
+
+  // Decide scale: fit beam height comfortably, then show as many openings as fit
+  const scH = drawH / Hcb;             // pixel per mm vertically
+  const scL = scH;                     // use same horizontal scale (real proportions)
+  const beamLengthPx = drawW;
+  const beamLengthMm = beamLengthPx / scL;
+
+  const Sp = S * scL;                   // spacing in pixels
+  const a0p = a0 * scL;                 // opening diameter px
+  const r = a0p / 2;
+  const tfp = Math.max(3, tf * scH);
+  const Hp = Hcb * scH;
+
+  const beamY = padT + (drawH - Hp) / 2;
+  const beamLeft = padL;
+  const beamRight = padL + beamLengthPx;
+  const cy = beamY + Hp / 2;
+
+  // ── DRAW BEAM (rectangle with flanges drawn as solid lines) ──
+  // Top flange band
+  ctx.fillStyle = '#2c4a7a';
+  ctx.fillRect(beamLeft, beamY, beamLengthPx, tfp);
+  // Bottom flange band
+  ctx.fillRect(beamLeft, beamY + Hp - tfp, beamLengthPx, tfp);
+  // Web background (lighter)
+  ctx.fillStyle = '#1d3a66';
+  ctx.fillRect(beamLeft, beamY + tfp, beamLengthPx, Hp - 2*tfp);
+
+  // ── DRAW OPENINGS ──
+  // Place first opening at S/2 from left edge, then every S
+  let xPos = beamLeft + Sp / 2;
+  const openings = [];
+  while (xPos + r <= beamRight) {
+    openings.push(xPos);
+    xPos += Sp;
+  }
+
+  // Cut openings (dest-out)
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  openings.forEach(x => {
+    ctx.beginPath();
+    ctx.arc(x, cy, r, 0, 2*Math.PI);
+    ctx.fill();
+  });
+  ctx.restore();
+
+  // Outline beam edges
+  ctx.strokeStyle = '#6aa9e0';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(beamLeft, beamY, beamLengthPx, Hp);
+  // Inner flange lines
+  ctx.beginPath();
+  ctx.moveTo(beamLeft, beamY + tfp);
+  ctx.lineTo(beamRight, beamY + tfp);
+  ctx.moveTo(beamLeft, beamY + Hp - tfp);
+  ctx.lineTo(beamRight, beamY + Hp - tfp);
+  ctx.stroke();
+
+  // Outline openings
+  ctx.strokeStyle = '#f0883e';
+  ctx.lineWidth = 1.5;
+  openings.forEach(x => {
+    ctx.beginPath();
+    ctx.arc(x, cy, r, 0, 2*Math.PI);
+    ctx.stroke();
+  });
+
+  // Centerline of openings
+  ctx.strokeStyle = '#22d3ee';
+  ctx.setLineDash([4,3]);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(beamLeft - 20, cy);
+  ctx.lineTo(beamRight + 20, cy);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── DIMENSIONS ──
+  ctx.font = '10px IBM Plex Mono, monospace';
+
+  // S spacing — show between first 2 openings
+  if (openings.length >= 2) {
+    const x1 = openings[0], x2 = openings[1];
+    const dimY = beamY + Hp + 20;
+    ctx.strokeStyle = '#f5c842';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x1, dimY);
+    ctx.lineTo(x2, dimY);
+    // arrows
+    ctx.moveTo(x1 + 6, dimY - 4); ctx.lineTo(x1, dimY); ctx.lineTo(x1 + 6, dimY + 4);
+    ctx.moveTo(x2 - 6, dimY - 4); ctx.lineTo(x2, dimY); ctx.lineTo(x2 - 6, dimY + 4);
+    // tick marks
+    ctx.moveTo(x1, beamY + Hp + 4); ctx.lineTo(x1, dimY + 5);
+    ctx.moveTo(x2, beamY + Hp + 4); ctx.lineTo(x2, dimY + 5);
+    ctx.stroke();
+    ctx.fillStyle = '#f5c842';
+    ctx.textAlign = 'center';
+    ctx.fillText(`S = ${S} mm`, (x1 + x2) / 2, dimY + 18);
+  }
+
+  // a₀ label (inside first opening)
+  if (openings.length >= 1) {
+    const x = openings[0];
+    ctx.fillStyle = '#f0883e';
+    ctx.font = 'bold 10px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`a₀=${a0}`, x, cy + 4);
+  }
+
+  // e (web post) — between openings
+  if (openings.length >= 2) {
+    const x1Edge = openings[0] + r;
+    const x2Edge = openings[1] - r;
+    const eY = beamY - 14;
+    ctx.strokeStyle = '#4ade80';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x1Edge, eY);
+    ctx.lineTo(x2Edge, eY);
+    ctx.moveTo(x1Edge + 4, eY - 3); ctx.lineTo(x1Edge, eY); ctx.lineTo(x1Edge + 4, eY + 3);
+    ctx.moveTo(x2Edge - 4, eY - 3); ctx.lineTo(x2Edge, eY); ctx.lineTo(x2Edge - 4, eY + 3);
+    ctx.stroke();
+    ctx.fillStyle = '#4ade80';
+    ctx.font = '9px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`e = ${(S - a0).toFixed(0)}`, (x1Edge + x2Edge) / 2, eY - 4);
+  }
+
+  // H_cb on left side
+  const dimX = beamLeft - 25;
+  ctx.strokeStyle = '#f5c842';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(dimX, beamY);
+  ctx.lineTo(dimX, beamY + Hp);
+  ctx.moveTo(dimX - 4, beamY + 6); ctx.lineTo(dimX, beamY); ctx.lineTo(dimX + 4, beamY + 6);
+  ctx.moveTo(dimX - 4, beamY + Hp - 6); ctx.lineTo(dimX, beamY + Hp); ctx.lineTo(dimX + 4, beamY + Hp - 6);
+  // tick marks
+  ctx.moveTo(beamLeft - 30, beamY); ctx.lineTo(beamLeft + 4, beamY);
+  ctx.moveTo(beamLeft - 30, beamY + Hp); ctx.lineTo(beamLeft + 4, beamY + Hp);
+  ctx.stroke();
+  ctx.fillStyle = '#f5c842';
+  ctx.save();
+  ctx.translate(dimX - 8, beamY + Hp/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.font = '10px IBM Plex Mono, monospace';
+  ctx.fillText(`H_cb = ${Hcb}`, 0, 0);
+  ctx.restore();
+
+  // Centerline label
+  ctx.fillStyle = '#22d3ee';
+  ctx.font = '9px IBM Plex Mono, monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('CL of openings', beamRight + 25, cy + 3);
+
+  // Note — show how many openings shown vs estimated for full span
+  ctx.fillStyle = '#888';
+  ctx.font = '9px IBM Plex Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(`(แสดง ${openings.length} openings · ความยาวที่แสดง ≈ ${beamLengthMm.toFixed(0)} mm)`, W/2, H - 12);
+}
+
+// Bind input events
+document.querySelectorAll('input').forEach(inp => {
+  inp.addEventListener('input', calculate);
+});
+
+// Initial
+calculate();
+</script>
+</body>
+</html>
