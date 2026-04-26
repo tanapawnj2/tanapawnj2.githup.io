@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CivilToolKit — เข้าสู่ระบบ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0e0e10; --surface: #18181b; --surface2: #222226;
+      --border: rgba(255,255,255,0.08); --text: #f4f4f5; --muted: #71717a;
+      --accent: #e8d5a3; --accent-dim: rgba(232,213,163,0.12);
+      --danger: #f87171; --success: #86efac; --radius: 14px;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem; overflow: hidden;
+      gap: 1.5rem;
+    }
+    body::before {
+      content: ''; position: fixed; top: -30%; left: -10%; width: 60vw; height: 60vw;
+      background: radial-gradient(circle, rgba(232,213,163,0.06) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* ── Auth Card ── */
+    .auth-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2.5rem 2.25rem;
+      width: 100%; max-width: 420px; position: relative; z-index: 1;
+      animation: fadeUp 0.45s ease both;
+      flex-shrink: 0;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    .brand { font-family: 'Instrument Serif', serif; font-size: 1.75rem; color: var(--accent); margin-bottom: 0.3rem; }
+    .subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; }
+    .tabs {
+      display: grid; grid-template-columns: 1fr 1fr; background: var(--surface2);
+      border-radius: 10px; padding: 4px; margin-bottom: 1.75rem; gap: 4px;
+    }
+    .tab-btn {
+      background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem; font-weight: 500; padding: 0.55rem 1rem; border-radius: 7px; cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 6px rgba(0,0,0,0.4); }
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-bottom: 0.4rem; letter-spacing: 0.03em; text-transform: uppercase; }
+    input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 9px; padding: 0.7rem 0.9rem; font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; color: var(--text); outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus { border-color: rgba(232,213,163,0.4); box-shadow: 0 0 0 3px rgba(232,213,163,0.08); }
+    input::placeholder { color: #3f3f46; }
+    .btn-primary {
+      width: 100%; background: var(--accent); color: #18180b; border: none; border-radius: 9px;
+      padding: 0.75rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; margin-top: 0.5rem; transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+    .divider { display: flex; align-items: center; gap: 10px; margin: 1.25rem 0; color: var(--muted); font-size: 0.75rem; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    /* ── Google button ── */
+    .divider { display: flex; }
+    .btn-google {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 9px; padding: 0.72rem 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+      color: var(--text); cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+    .btn-google:hover { border-color: rgba(232,213,163,0.4); transform: translateY(-1px); }
+    .btn-google:active { transform: scale(0.98); }
+    .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .msg { font-size: 0.82rem; padding: 0.65rem 0.85rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
+    .msg.error   { background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid rgba(248,113,113,0.2); }
+    .msg.success { background: rgba(134,239,172,0.1); color: var(--success); border: 1px solid rgba(134,239,172,0.2); }
+    .msg.show    { display: block; }
+    .spinner {
+      width: 16px; height: 16px; border: 2px solid rgba(24,24,11,0.3); border-top-color: #18180b;
+      border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block;
+      vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #dashboard { display: none; animation: fadeUp 0.4s ease both; }
+    .avatar-circle {
+      width: 56px; height: 56px; border-radius: 50%; background: var(--accent-dim);
+      border: 2px solid rgba(232,213,163,0.3); display: flex; align-items: center; justify-content: center;
+      font-family: 'Instrument Serif', serif; font-size: 1.4rem; color: var(--accent); margin-bottom: 1rem;
+    }
+    .user-name  { font-family: 'Instrument Serif', serif; font-size: 1.5rem; color: var(--text); }
+    .user-email { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.75rem; }
+    .info-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.15rem; margin-bottom: 1rem; }
+    .info-box .ilabel { font-size: 0.75rem; color: var(--muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .info-box .ivalue { font-size: 0.9rem; color: var(--text); }
+    .btn-outline {
+      width: 100%; background: none; border: 1px solid var(--border); border-radius: 9px; padding: 0.7rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--muted); cursor: pointer;
+      margin-top: 0.75rem; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--danger); color: var(--danger); }
+    .forgot-link {
+      display: block; text-align: right; font-size: 0.78rem; color: var(--muted);
+      cursor: pointer; margin-top: 0.3rem; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--accent); }
+    .btn-back {
+      display: flex; align-items: center; gap: 5px; background: none; border: none;
+      color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+      cursor: pointer; padding: 0; margin-bottom: 1.5rem; transition: color 0.2s;
+    }
+    .btn-back:hover { color: var(--accent); }
+    .forgot-title { font-family: 'Instrument Serif', serif; font-size: 1.2rem; color: var(--text); margin-bottom: 0.4rem; }
+    .forgot-desc  { font-size: 0.83rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; }
+    /* success state */
+    .success-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(134,239,172,0.08); border: 2px solid rgba(134,239,172,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 1rem;
+    }
+    .success-title { font-family: 'Instrument Serif', serif; font-size: 1.25rem; color: var(--text); margin-bottom: 0.45rem; }
+    .success-desc  { font-size: 0.83rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.25rem; }
+    .countdown-bar-wrap {
+      background: var(--surface2); border-radius: 99px; height: 4px;
+      margin-bottom: 0.6rem; overflow: hidden;
+    }
+    .countdown-bar {
+      height: 100%; background: var(--accent); border-radius: 99px;
+      width: 100%; transition: width 1s linear;
+    }
+    .countdown-text { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.25rem; text-align: center; }
+    .btn-back-login {
+      width: 100%; background: none; border: 1px solid var(--border); border-radius: 9px;
+      padding: 0.7rem; font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      color: var(--muted); cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-back-login:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Update Panel ── */
+    .update-panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.75rem 1.5rem;
+      width: 100%; max-width: 300px; position: relative; z-index: 1;
+      animation: fadeUp 0.55s ease both;
+      display: flex; flex-direction: column; gap: 0;
+      max-height: 520px;
+      flex-shrink: 0;
+    }
+    .panel-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 1.25rem; flex-shrink: 0;
+    }
+    .panel-header-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
+      box-shadow: 0 0 6px rgba(232,213,163,0.5);
+    }
+    .panel-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1rem; color: var(--text); flex: 1;
+    }
+    .panel-badge {
+      font-size: 0.7rem; font-weight: 500; color: var(--accent);
+      background: var(--accent-dim); border: 1px solid rgba(232,213,163,0.2);
+      border-radius: 20px; padding: 2px 8px; letter-spacing: 0.03em;
+    }
+    .update-list {
+      display: flex; flex-direction: column; gap: 0;
+      overflow-y: auto; flex: 1;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .update-list::-webkit-scrollbar { width: 4px; }
+    .update-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .update-item {
+      display: flex; gap: 12px; padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .update-item:last-child { border-bottom: none; }
+    .update-timeline {
+      display: flex; flex-direction: column; align-items: center;
+      flex-shrink: 0; width: 10px; padding-top: 5px;
+    }
+    .update-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      border: 2px solid var(--border); background: var(--bg);
+      flex-shrink: 0;
+    }
+    .update-dot.new {
+      background: var(--accent); border-color: var(--accent);
+      box-shadow: 0 0 5px rgba(232,213,163,0.4);
+    }
+    .update-dot.fix  { background: #60a5fa; border-color: #60a5fa; }
+    .update-dot.imp  { background: #a78bfa; border-color: #a78bfa; }
+    .update-line {
+      width: 1px; flex: 1; min-height: 8px;
+      background: var(--border); margin-top: 4px;
+    }
+    .update-item:last-child .update-line { display: none; }
+    .update-content { flex: 1; min-width: 0; }
+    .update-meta {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 3px; flex-wrap: wrap;
+    }
+    .update-tag {
+      font-size: 0.68rem; font-weight: 500; letter-spacing: 0.04em;
+      padding: 1px 6px; border-radius: 4px; text-transform: uppercase;
+    }
+    .tag-new  { background: rgba(232,213,163,0.1); color: var(--accent); }
+    .tag-fix  { background: rgba(96,165,250,0.1);  color: #60a5fa; }
+    .tag-imp  { background: rgba(167,139,250,0.1); color: #a78bfa; }
+    .update-date { font-size: 0.72rem; color: var(--muted); }
+    .update-text {
+      font-size: 0.82rem; color: var(--text); line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    /* ── Donation Panel ── */
+    .donation-panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.75rem 1.5rem;
+      width: 100%; max-width: 300px; position: relative; z-index: 1;
+      animation: fadeUp 0.65s ease both;
+      display: flex; flex-direction: column; gap: 0;
+      flex-shrink: 0;
+    }
+    .donation-heart {
+      font-size: 2rem; margin-bottom: 0.75rem; display: block;
+      animation: heartbeat 1.8s ease-in-out infinite;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.18); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.12); }
+      56% { transform: scale(1); }
+    }
+    .donation-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.1rem; color: var(--text); margin-bottom: 0.35rem;
+    }
+    .donation-subtitle {
+      font-size: 0.8rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.25rem;
+    }
+    .donor-list {
+      display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.25rem;
+    }
+    .donor-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0.65rem 0.85rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; transition: border-color 0.2s;
+    }
+    .donor-item:hover { border-color: rgba(232,213,163,0.25); }
+    .donor-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent-dim); border: 1.5px solid rgba(232,213,163,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Instrument Serif', serif; font-size: 0.95rem; color: var(--accent);
+      flex-shrink: 0;
+    }
+    .donor-info { flex: 1; min-width: 0; }
+    .donor-name { font-size: 0.83rem; color: var(--text); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .donor-msg  { font-size: 0.73rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .donor-amount {
+      font-size: 0.78rem; font-weight: 500; color: var(--accent);
+      background: var(--accent-dim); border-radius: 6px; padding: 2px 7px; flex-shrink: 0;
+    }
+    .donation-divider { height: 1px; background: var(--border); margin-bottom: 1.1rem; }
+    .donation-cta-label {
+      font-size: 0.75rem; color: var(--muted); text-align: center;
+      margin-bottom: 0.6rem; line-height: 1.5;
+    }
+    .btn-donate {
+      width: 100%; background: none;
+      border: 1px solid rgba(232,213,163,0.3); border-radius: 9px;
+      padding: 0.65rem; font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+      color: var(--accent); cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-donate:hover { background: var(--accent-dim); border-color: rgba(232,213,163,0.5); }
+
+    .donor-loading {
+      text-align: center; color: var(--muted); font-size: 0.8rem; padding: 1.5rem 0;
+    }
+    .donor-empty {
+      text-align: center; color: var(--muted); font-size: 0.8rem;
+      padding: 1.25rem 0; line-height: 1.7;
+    }
+    @media (max-width: 800px) {
+      body { flex-direction: column; align-items: center; overflow: auto; }
+      .update-panel { max-width: 420px; max-height: 360px; }
+      .donation-panel { max-width: 420px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Update Panel ── -->
+<aside class="update-panel" id="update-panel">
+  <div class="panel-header">
+    <div class="panel-header-dot"></div>
+    <div class="panel-badge">Last Update</div>
+  </div>
+  <div class="update-list">
+
+        <div class="update-item">
+      <div class="update-timeline">
+        <div class="update-dot imp"></div>
+        <div class="update-line"></div>
+      </div>
+      <div class="update-content">
+        <div class="update-meta">
+          <span class="update-tag tag-imp">New Update</span>
+          <span class="update-date">24 เม.ย. 2568</span>
+        </div>
+        <div class="update-text">เพิ่มเครื่องมือวิเคราะห์หน้าตัด Box และ L-Angle Section Analysis (AISC360-22) โดยที่ยังไม่รวมผลของ Fillet Radius การปริ้นเอกสารจะทำการอัพเดทอีกทีในภายหลัง</div>
+      </div>
+    </div>
+    
+    <div class="update-item">
+      <div class="update-timeline">
+        <div class="update-dot new"></div>
+        <div class="update-line"></div>
+      </div>
+      <div class="update-content">
+        <div class="update-meta">
+          <span class="update-tag tag-new">New Update</span>
+          <span class="update-date">23 เม.ย. 2568</span>
+        </div>
+        <div class="update-text">เพิ่มเครื่องมือวิเคราะห์หน้าตัด H / I และ C-Channel Section Analysis (AISC360-22) โดยที่ยังไม่รวมผลของ Fillet Radius การปริ้นเอกสารจะทำการอัพเดทอีกทีในภายหลัง</div>
+      </div>
+    </div>
+
+    <div class="update-item">
+      <div class="update-timeline">
+        <div class="update-dot fix"></div>
+        <div class="update-line"></div>
+      </div>
+      <div class="update-content">
+        <div class="update-meta">
+          <span class="update-tag tag-fix">Note</span>
+          <span class="update-date">23 เม.ย. 2568</span>
+        </div>
+        <div class="update-text">ผู้พัฒนาจะต้องทำการเขียนแก้บทความเพื่อจบ ป.โท และพึ่งเข้ารับราชการ การอัพเดท และการเพิ่มเคร่องมืออาจจะมีความล่าช้าอยู่บ้าง ตามแต่ที่ผู้พัฒนาจะสามารถหาเวลาว่างเข้ามาทำได้</div>
+      </div>
+    </div>
+
+    <div class="update-item" style="display:none;">
+      <div class="update-timeline">
+        <div class="update-dot new"></div>
+        <div class="update-line"></div>
+      </div>
+      <div class="update-content">
+        <div class="update-meta">
+          <span class="update-tag tag-new">ใหม่</span>
+          <span class="update-date">28 มี.ค. 2568</span>
+        </div>
+        <div class="update-text">เปิดตัวระบบ Login ด้วยอีเมล พร้อมการยืนยันตัวตนผ่านอีเมล</div>
+      </div>
+    </div>
+
+  </div>
+</aside>
+
+<!-- ── Auth Card ── -->
+<div class="auth-card" id="auth-card">
+  <div class="brand">CivilToolKit</div>
+  <div class="subtitle">ยินดีต้อนรับ — กรุณาเข้าสู่ระบบหรือสมัครสมาชิก<br>develop by Tanapawn Jardrit</div>
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-login">เข้าสู่ระบบ</button>
+    <button class="tab-btn" id="tab-register">สมัครสมาชิก</button>
+  </div>
+  <div class="msg" id="msg-box"></div>
+
+  <div id="form-login">
+    <div class="form-group">
+      <label>อีเมล</label>
+      <input type="email" id="login-email" placeholder="youremail@example.com" />
+    </div>
+    <div class="form-group">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="login-password" placeholder="••••••••" />
+      <a class="forgot-link" id="btn-forgot" href="#">ลืมรหัสผ่าน?</a>
+    </div>
+    <button class="btn-primary" id="btn-login">เข้าสู่ระบบ</button>
+    <div class="divider">หรือ</div>
+    <button class="btn-google" id="btn-google-login">
+      <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      ดำเนินการต่อด้วย Google
+    </button>
+    <div class="subtitle"><br>มีปัญหาเรื่องการใช้งาน ให้ส่งอีเมลมาที่ civiltoolkits@gmail.com</div>
+  </div>
+
+  <div id="form-register" style="display:none;">
+    <div class="form-group">
+      <label>ชื่อที่แสดง</label>
+      <input type="text" id="reg-name" placeholder="ชื่อ Username ของคุณ" />
+    </div>
+    <div class="form-group">
+      <label>อีเมล</label>
+      <input type="email" id="reg-email" placeholder="youremail@example.com" />
+    </div>
+    <div class="form-group">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="reg-password" placeholder="อย่างน้อย 6 ตัวอักษร" />
+    </div>
+    <div class="form-group">
+      <label>ยืนยันรหัสผ่าน</label>
+      <input type="password" id="reg-password-confirm" placeholder="พิมพ์รหัสผ่านอีกครั้ง" />
+    </div>
+    <button class="btn-primary" id="btn-register">สร้างบัญชี</button>
+    <div class="divider">หรือ</div>
+    <button class="btn-google" id="btn-google-register">
+      <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      สมัครด้วย Google
+    </button>
+  </div>
+
+  <!-- ── Forgot Password Form ── -->
+  <div id="form-forgot" style="display:none;">
+    <button class="btn-back" id="btn-back-from-forgot">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      กลับหน้าเข้าสู่ระบบ
+    </button>
+    <div class="forgot-title">กู้คืนรหัสผ่าน</div>
+    <div class="forgot-desc">กรอกอีเมลที่ใช้สมัครสมาชิก ระบบจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้ทันที</div>
+    <div class="msg" id="msg-box-forgot"></div>
+    <div class="form-group">
+      <label>อีเมล</label>
+      <input type="email" id="forgot-email" placeholder="youremail@example.com" />
+    </div>
+    <button class="btn-primary" id="btn-send-reset">ส่งลิงก์กู้คืนรหัสผ่าน</button>
+  </div>
+
+  <!-- ── Forgot Password Success ── -->
+  <div id="view-forgot-success" style="display:none;">
+    <div class="success-icon">✉️</div>
+    <div class="success-title">ส่งอีเมลแล้ว!</div>
+    <div class="success-desc" id="success-email-desc">ระบบส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลของคุณแล้ว กรุณาตรวจสอบ Inbox และโฟลเดอร์ถังขยะ</div>
+    <div class="countdown-bar-wrap">
+      <div class="countdown-bar" id="countdown-bar"></div>
+    </div>
+    <div class="countdown-text" id="countdown-text">กลับหน้าเข้าสู่ระบบอัตโนมัติใน 60 วินาที</div>
+    <button class="btn-back-login" id="btn-back-to-login-now">← กลับหน้าเข้าสู่ระบบทันที</button>
+  </div>
+
+</div>
+
+<!-- ── Donation Thank-You Panel ── -->
+<aside class="donation-panel">
+  <span class="donation-heart">🙏</span>
+  <div class="donation-title">ขอบคุณผู้สนับสนุน</div>
+  <div class="donation-subtitle">
+    ขอบคุณทุกท่านที่ช่วยสนับสนุน CivilToolKit<br>
+    ทุกการบริจาคช่วยให้เราพัฒนาเครื่องมือต่อไปได้ครับ 🛠️
+  </div>
+
+  <div class="donor-list" id="donor-list">
+    <div class="donor-loading">กำลังโหลด...</div>
+  </div>
+
+  <div class="donation-divider"></div>
+  <div class="donation-cta-label">อยากสนับสนุนการพัฒนา?<br>ช่วยได้เลยผ่าน PromptPay หรือ Ko-fi ครับ<br>หากท่านใดโอนเงินให้ผมผ่าน QR Code ให้ส่ง Slip การโอนเงินมาที่ civiltoolkits@gmail.com ได้เลยครับ</div>
+  <a class="btn-donate kofi-button" href='https://ko-fi.com/tanapawnjardrit' target='_blank'>
+    <img src='https://storage.ko-fi.com/cdn/cup-border.png' alt='Ko-fi' style='height:20px;width:auto;vertical-align:middle;margin-right:6px;'/>
+    Support me
+  </a>
+  </a>
+</aside>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged,
+    updateProfile, sendEmailVerification, sendPasswordResetEmail
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, collection, query, orderBy, limit, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBKhes9uVB7tFATNChmYJtkSGXtoV8pGoI",
+    authDomain:        "civiltoolskit.firebaseapp.com",
+    projectId:         "civiltoolskit",
+    storageBucket:     "civiltoolskit.firebasestorage.app",
+    messagingSenderId: "108662763128",
+    appId:             "1:108662763128:web:864248bfaf2fd27c52878d",
+    measurementId:     "G-K7F45DZKSY"
+  };
+
+  const app      = initializeApp(firebaseConfig);
+  const auth     = getAuth(app);
+  const provider = new GoogleAuthProvider();
+  const db       = getFirestore(app);
+
+  // ── Real-time donor list from Firestore ──
+  const donorQ = query(
+    collection(db, "donors"),
+    orderBy("amount", "desc"),
+    limit(20)
+  );
+
+  onSnapshot(donorQ, (snapshot) => {
+    const list = document.getElementById("donor-list");
+    if (!list) return;
+
+    if (snapshot.empty) {
+      list.innerHTML = `<div class="donor-empty">ยังไม่มีผู้สนับสนุน<br>เป็นคนแรกได้เลยครับ ☕</div>`;
+      return;
+    }
+
+    list.innerHTML = snapshot.docs.map(doc => {
+      const d = doc.data();
+      const initial = (d.name || "?")[0].toUpperCase();
+      const amount  = d.amount ? `${d.amount} ${d.currency || "THB"}` : "";
+      const msg     = d.message
+        ? `<div class="donor-msg">${d.message}</div>` : "";
+      return `
+        <div class="donor-item">
+          <div class="donor-avatar">${initial}</div>
+          <div class="donor-info">
+            <div class="donor-name">${d.name || "Anonymous"}</div>
+            ${msg}
+          </div>
+          ${amount ? `<div class="donor-amount">${amount}</div>` : ""}
+        </div>`;
+    }).join("");
+  }, () => {
+    // Firestore ยังไม่ได้สร้าง หรือ permission error — ซ่อน panel ไปก่อน
+    const list = document.getElementById("donor-list");
+    if (list) list.innerHTML = `<div class="donor-empty">ยังไม่มีผู้สนับสนุน<br>เป็นคนแรกได้เลยครับ ☕</div>`;
+  });
+
+  // ── Helpers ──
+  function showMsg(text, type) {
+    const box = document.getElementById("msg-box");
+    box.textContent = text;
+    box.className   = "msg " + type + " show";
+  }
+
+  function setLoading(btnId, loading, defaultText) {
+    const btn     = document.getElementById(btnId);
+    btn.disabled  = loading;
+    btn.innerHTML = loading ? '<span class="spinner"></span> กำลังดำเนินการ...' : defaultText;
+  }
+
+  function getErrorMsg(code) {
+    const map = {
+      "auth/email-already-in-use":  "อีเมลนี้ถูกใช้งานแล้ว",
+      "auth/invalid-email":         "รูปแบบอีเมลไม่ถูกต้อง",
+      "auth/weak-password":         "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+      "auth/user-not-found":        "ไม่พบบัญชีนี้ในระบบ",
+      "auth/wrong-password":        "รหัสผ่านไม่ถูกต้อง หากลืมรหัสผ่านกรุณาติดต่อผู้พัฒนา",
+      "auth/invalid-credential":    "อีเมลหรือรหัสผ่านไม่ถูกต้อง หากลืมรหัสผ่านกรุณาติดต่อผู้พัฒนา",
+      "auth/popup-closed-by-user":  "ปิด popup ก่อนลงชื่อเข้าใช้",
+      "auth/too-many-requests":     "ลองมากเกินไป กรุณารอสักครู่",
+      "auth/operation-not-allowed": "กรุณาเปิด Email/Password ใน Firebase Console ก่อน",
+    };
+    return map[code] || "เกิดข้อผิดพลาด: " + code;
+  }
+
+  function switchTab(tab) {
+    document.getElementById("form-login").style.display    = tab === "login"    ? "block" : "none";
+    document.getElementById("form-register").style.display = tab === "register" ? "block" : "none";
+    document.getElementById("tab-login").classList.toggle("active",    tab === "login");
+    document.getElementById("tab-register").classList.toggle("active", tab === "register");
+    document.getElementById("msg-box").className = "msg";
+  }
+
+  const SESSION_KEY = "login_time";
+  const SESSION_LIMIT = 24 * 60 * 60 * 1000; // 24 ชั่วโมง
+
+  // ── Auth state ──
+  onAuthStateChanged(auth, async user => {
+    if (user && user.emailVerified) {
+      const loginTime = localStorage.getItem(SESSION_KEY);
+      const now = Date.now();
+
+      if (!loginTime) {
+        localStorage.setItem(SESSION_KEY, now.toString());
+        window.location.href = "Main.html";
+      } else if ((now - parseInt(loginTime)) < SESSION_LIMIT) {
+        window.location.href = "Main.html";
+      } else {
+        await signOut(auth);
+        localStorage.removeItem(SESSION_KEY);
+        window.location.href = "index.html";
+      }
+    } else {
+      document.getElementById("auth-card").style.display = "block";
+    }
+  });
+
+  // ── Tab buttons ──
+  document.getElementById("tab-login").addEventListener("click", () => switchTab("login"));
+  document.getElementById("tab-register").addEventListener("click", () => switchTab("register"));
+
+  // ── Register ──
+  document.getElementById("btn-register").addEventListener("click", async () => {
+    const name    = document.getElementById("reg-name").value.trim();
+    const email   = document.getElementById("reg-email").value.trim();
+    const pass    = document.getElementById("reg-password").value;
+    const confirm = document.getElementById("reg-password-confirm").value;
+    if (!name || !email || !pass || !confirm) return showMsg("กรุณากรอกข้อมูลให้ครบ", "error");
+    if (pass.length < 6)   return showMsg("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร", "error");
+    if (pass !== confirm)  return showMsg("รหัสผ่านทั้งสองช่องไม่ตรงกัน", "error");
+    setLoading("btn-register", true, "สร้างบัญชี");
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+      await sendEmailVerification(cred.user);
+      await signOut(auth);
+      showMsg("สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมล และยืนยันอีเมลก่อนเข้าสู่ระบบ หากไม่พบอีเมลใน Inbox กรุณาตรวจสอบที่ไฟล์ถังขยะ", "success");
+      switchTab("login");
+    } catch (e) {
+      showMsg(getErrorMsg(e.code), "error");
+    } finally {
+      setLoading("btn-register", false, "สร้างบัญชี");
+    }
+  });
+
+  // ── Login ──
+  document.getElementById("btn-login").addEventListener("click", async () => {
+    const email = document.getElementById("login-email").value.trim();
+    const pass  = document.getElementById("login-password").value;
+    if (!email || !pass) return showMsg("กรุณากรอกอีเมลและรหัสผ่าน", "error");
+    setLoading("btn-login", true, "เข้าสู่ระบบ");
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, pass);
+      if (!result.user.emailVerified) {
+        await signOut(auth);
+        showMsg("กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ ตรวจสอบ Inbox ของคุณ หากไม่พบอีเมลใน Inbox กรุณาตรวจสอบที่ไฟล์ถังขยะ", "error");
+        return;
+      }
+      localStorage.setItem(SESSION_KEY, Date.now().toString());
+    } catch (e) {
+      showMsg(getErrorMsg(e.code), "error");
+    } finally {
+      setLoading("btn-login", false, "เข้าสู่ระบบ");
+    }
+  });
+
+  // ── Google (kept in code, buttons hidden via CSS) ──
+  function handleGoogle() {
+    signInWithPopup(auth, provider)
+      .then(() => localStorage.setItem(SESSION_KEY, Date.now().toString()))
+      .catch(e => showMsg(getErrorMsg(e.code), "error"));
+  }
+  document.getElementById("btn-google-login").addEventListener("click", handleGoogle)
+  document.getElementById("btn-google-register").addEventListener("click", handleGoogle);
+
+  // ── View switcher ──
+  const VIEWS = ["form-login", "form-register", "form-forgot", "view-forgot-success"];
+  function showView(id) {
+    VIEWS.forEach(v => document.getElementById(v).style.display = v === id ? "block" : "none");
+    // hide tabs + subtitle when showing forgot views
+    const isForgot = id === "form-forgot" || id === "view-forgot-success";
+    document.querySelector(".tabs").style.display    = isForgot ? "none" : "";
+    document.querySelector(".subtitle").style.display = isForgot ? "none" : "";
+    document.getElementById("msg-box").className = "msg";
+  }
+
+  // open forgot view
+  document.getElementById("btn-forgot").addEventListener("click", e => {
+    e.preventDefault();
+    showView("form-forgot");
+  });
+
+  // back from forgot form → login
+  document.getElementById("btn-back-from-forgot").addEventListener("click", () => {
+    showView("form-login");
+  });
+
+  // ── Send Reset Email ──
+  let countdownTimer = null;
+  function startCountdown() {
+    const TOTAL = 60;
+    let remaining = TOTAL;
+    const bar  = document.getElementById("countdown-bar");
+    const text = document.getElementById("countdown-text");
+    bar.style.width = "100%";
+
+    countdownTimer = setInterval(() => {
+      remaining--;
+      bar.style.width = (remaining / TOTAL * 100) + "%";
+      text.textContent = `กลับหน้าเข้าสู่ระบบอัตโนมัติใน ${remaining} วินาที`;
+      if (remaining <= 0) {
+        clearInterval(countdownTimer);
+        goBackToLogin();
+      }
+    }, 1000);
+  }
+
+  function goBackToLogin() {
+    if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+    document.getElementById("forgot-email").value = "";
+    showView("form-login");
+    switchTab("login");
+  }
+
+  document.getElementById("btn-back-to-login-now").addEventListener("click", goBackToLogin);
+
+  document.getElementById("btn-send-reset").addEventListener("click", async () => {
+    const email = document.getElementById("forgot-email").value.trim();
+    const msgBox = document.getElementById("msg-box-forgot");
+    if (!email) {
+      msgBox.textContent = "กรุณากรอกอีเมลของคุณ";
+      msgBox.className = "msg error show";
+      return;
+    }
+    const btn = document.getElementById("btn-send-reset");
+    btn.disabled  = true;
+    btn.innerHTML = '<span class="spinner"></span> กำลังส่ง...';
+    try {
+      await sendPasswordResetEmail(auth, email);
+      document.getElementById("success-email-desc").innerHTML =
+        `ระบบส่งลิงก์รีเซ็ตรหัสผ่านไปที่<br><strong style="color:var(--accent)">${email}</strong><br><br>กรุณาตรวจสอบ Inbox และโฟลเดอร์ถังขยะด้วยนะครับ`;
+      showView("view-forgot-success");
+      startCountdown();
+    } catch (e) {
+      const map = {
+        "auth/invalid-email":     "รูปแบบอีเมลไม่ถูกต้อง",
+        "auth/user-not-found":    "ไม่พบบัญชีที่ใช้อีเมลนี้",
+        "auth/too-many-requests": "ลองมากเกินไป กรุณารอสักครู่",
+      };
+      msgBox.textContent = map[e.code] || "เกิดข้อผิดพลาด: " + e.code;
+      msgBox.className = "msg error show";
+      btn.disabled  = false;
+      btn.innerHTML = "ส่งลิงก์กู้คืนรหัสผ่าน";
+    }
+  });
+
+  // กด Enter ในช่องอีเมล forgot
+  document.getElementById("forgot-email").addEventListener("keydown", e => {
+    if (e.key === "Enter") document.getElementById("btn-send-reset").click();
+  });
+
+  // ── Logout ──
+  window.handleLogout = async function() {
+    await signOut(auth);
+  };
+</script>
+
+
+<!-- Ko-fi Floating Widget — แสดงตลอดเวลา -->
+<script>
+  // โหลด Ko-fi script แล้วค่อยเรียกใช้
+  var kofiScript = document.createElement('script');
+  kofiScript.src = 'https://storage.ko-fi.com/cdn/scripts/overlay-widget.js';
+  kofiScript.onload = function() {
+    kofiWidgetOverlay.draw('tanapawnjardrit', {
+      'type': 'floating-chat',
+      'floating-chat.donateButton.text': 'Support me',
+      'floating-chat.donateButton.background-color': '#e8d5a3',
+      'floating-chat.donateButton.text-color': '#18180b'
+    });
+  };
+  document.body.appendChild(kofiScript);
+
+  // ปุ่มในกล่อง — เปิด Ko-fi ใน popup
+  window.addEventListener('load', function() {
+    const btn = document.querySelector('.kofi-button');
+    if (btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.open('https://ko-fi.com/tanapawnjardrit', '_blank', 'width=500,height=600,scrollbars=yes');
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
