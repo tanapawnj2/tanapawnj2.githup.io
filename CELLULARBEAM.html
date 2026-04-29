@@ -139,7 +139,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       const name = user.displayName || user.email.split("@")[0];
       document.getElementById("user-name").textContent = name;
     } else {
-      window.location.href = "Login.html";
+      window.location.href = "index.html";
     }
   });
 
@@ -147,7 +147,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     document.getElementById("btn-logout").addEventListener("click", async () => {
       localStorage.removeItem("login_time");
       await signOut(auth);
-      window.location.href = "Login.html";
+      window.location.href = "index.html";
     });
   });
 </script>
