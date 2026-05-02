@@ -2070,7 +2070,7 @@ const SOIL_TYPES = {
 
 let layers = [
   { name: 'Loose Sand',    soilType: 'sand', thickness: 3.0, gamma: 17.0, nspt: 8,  phi: 30 },
-  { name: 'Soft Clay',     soilType: 'clay', thickness: 4.0, gamma: 16.5, nspt: 4,  suFactor: 6.25, adhesionMethod: 'tomlinson', Nc: 9 },
+  { name: 'Soft Clay',     soilType: 'clay', thickness: 4.0, gamma: 16.5, nspt: 4,  suFactor: 6.5, adhesionMethod: 'tomlinson', Nc: 9 },
   { name: 'Dense Sand',    soilType: 'sand', thickness: 5.0, gamma: 18.0, nspt: 35, phi: 38 }
 ];
 
@@ -2168,7 +2168,7 @@ function renderLayers() {
   layers.forEach((layer, i) => {
     // backward compat
     if (!layer.soilType) layer.soilType = 'sand';
-    if (layer.soilType === 'clay' && layer.suFactor === undefined) layer.suFactor = 6.25;
+    if (layer.soilType === 'clay' && layer.suFactor === undefined) layer.suFactor = 6.5;
     if (layer.soilType === 'clay' && !layer.adhesionMethod) layer.adhesionMethod = 'tomlinson';
     if (layer.soilType === 'clay' && layer.Nc === undefined) layer.Nc = 9;
     if (layer.soilType === 'clay' && !layer.suMode) layer.suMode = 'nspt';
@@ -2311,7 +2311,7 @@ function renderLayers() {
         layers[i][key] = e.target.value;
         if (key === 'soilType') {
           if (e.target.value === 'clay') {
-            if (layers[i].suFactor === undefined) layers[i].suFactor = 6.25;
+            if (layers[i].suFactor === undefined) layers[i].suFactor = 6.5;
             if (!layers[i].adhesionMethod) layers[i].adhesionMethod = 'tomlinson';
             if (layers[i].Nc === undefined) layers[i].Nc = 9;
             if (!layers[i].suMode) layers[i].suMode = 'nspt';
@@ -4658,7 +4658,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   if (!confirm('ต้องการรีเซ็ตข้อมูลทั้งหมดหรือไม่?')) return;
   layers = [
     { name: 'Loose Sand', soilType: 'sand', thickness: 3.0, gamma: 17.0, nspt: 8,  phi: 30 },
-    { name: 'Soft Clay',  soilType: 'clay', thickness: 4.0, gamma: 16.5, nspt: 4,  suFactor: 6.25, adhesionMethod: 'tomlinson', Nc: 9 },
+    { name: 'Soft Clay',  soilType: 'clay', thickness: 4.0, gamma: 16.5, nspt: 4,  suFactor: 6.5, adhesionMethod: 'tomlinson', Nc: 9 },
     { name: 'Dense Sand', soilType: 'sand', thickness: 5.0, gamma: 18.0, nspt: 35, phi: 38 }
   ];
   document.getElementById('waterTable').value = 2.0;
