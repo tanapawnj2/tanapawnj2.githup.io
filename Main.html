@@ -37,12 +37,7 @@
 
     body {
       font-family: 'DM Sans', sans-serif;
-      background-color: var(--bg);
-      background-image: url('S__21348384.jpg');
-      background-size: contain;
-      background-position: right center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
+      background: var(--bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -50,24 +45,7 @@
       justify-content: center;
       gap: 1.5rem;
       padding: 2rem 1.5rem;
-      transition: background-color 0.3s, color 0.3s;
-      position: relative;
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(to right, rgba(14,14,16,0.95) 0%, rgba(14,14,16,0.88) 55%, rgba(14,14,16,0.45) 100%);
-      z-index: 0;
-      pointer-events: none;
-      transition: background 0.3s;
-    }
-    :root.light body::before {
-      background: linear-gradient(to right, rgba(247,245,242,0.95) 0%, rgba(247,245,242,0.88) 55%, rgba(247,245,242,0.45) 100%);
-    }
-    body > * {
-      position: relative;
-      z-index: 1;
+      transition: background 0.3s, color 0.3s;
     }
 
     /* ── Theme toggle button ── */
