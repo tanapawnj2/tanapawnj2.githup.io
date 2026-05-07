@@ -93,6 +93,142 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 .sum-tbl .val{font-weight:700;color:var(--yellow);text-align:right}
 .ax{font-size:10px;font-weight:700;padding:1px 6px;border-radius:2px;margin-right:2px}
 .ax-x{background:#0e4f6e;color:var(--cyan)}.ax-y{background:#3b1d6e;color:var(--purple)}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PRINT STYLES
+   ═══════════════════════════════════════════════════════════════════ */
+.print-header,.print-footer{display:none}
+
+@media print{
+  @page{size:A4 portrait;margin:12mm 10mm 16mm 10mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+
+  .hdr,.sidebar{display:none!important}
+  html{min-width:0!important}
+  body{background:#fff!important;color:#222!important;font-size:10.5px!important;line-height:1.4!important}
+  .layout{display:block!important;min-width:0!important}
+  .main{width:100%!important;min-width:0!important;padding:0!important}
+
+  /* Print header */
+  .print-header{
+    display:flex!important;align-items:center;justify-content:space-between;
+    border-bottom:2.5px solid #1a365d;padding:0 0 5px 0;margin-bottom:6px;
+    page-break-inside:avoid;break-inside:avoid;
+  }
+  .print-header .ph-left{font-family:var(--mono);font-size:13px;font-weight:700;color:#1a365d;letter-spacing:.04em}
+  .print-header .ph-left small{display:block;font-size:8.5px;font-weight:500;color:#666;letter-spacing:.06em;margin-top:1px}
+  .print-header .ph-right{text-align:right;font-family:var(--mono);font-size:8.5px;color:#555;line-height:1.6}
+
+  /* Input summary — page 1 only */
+  .print-input-summary{
+    display:flex!important;flex-wrap:wrap;gap:3px 14px;
+    background:#f0f4f8;border:1px solid #ccd;border-radius:3px;
+    padding:5px 10px;margin-bottom:6px;
+    font-family:var(--mono);font-size:8.5px;color:#333;
+    page-break-inside:avoid;break-inside:avoid;
+  }
+  .print-input-summary b{font-weight:700;color:#1a365d}
+
+  /* Footer */
+  .print-footer{
+    display:block!important;position:fixed;bottom:0;left:0;right:0;
+    text-align:center;font-family:var(--mono);font-size:7.5px;color:#999;
+    border-top:1px solid #ddd;padding:3px 0 0;
+  }
+
+  /* Section blocks — break-inside:avoid on all */
+  .sec-block{
+    border-color:#bbb!important;background:#fff!important;
+    width:100%!important;min-width:0!important;margin-bottom:4px!important;
+    page-break-inside:avoid!important;break-inside:avoid!important;
+  }
+  /* Summary table block — allow break (too long for one page) */
+  .sec-block.print-allow-break{
+    page-break-inside:auto!important;break-inside:auto!important;
+  }
+
+  .sec-hdr{
+    background:#e8edf4!important;border-bottom:1px solid #bbb!important;color:#222!important;
+    page-break-after:avoid!important;break-after:avoid!important;
+  }
+  .sec-tag{color:#fff!important}
+  .sec-title{color:#222!important}
+  .sec-ref{color:#666!important}
+
+  .sdiv{color:#555!important;page-break-after:avoid!important;break-after:avoid!important}
+
+  .rep-grid{grid-template-columns:1fr 1fr!important;border-top:1px solid #bbb!important}
+  .rep-col{border-right:1px solid #ccc!important;padding:8px 10px!important}
+  .rep-col:last-child{border-right:none!important}
+  .rep-col-full{padding:8px 10px!important}
+
+  .calc-block{page-break-inside:avoid;break-inside:avoid}
+  .gov,.gov-green{page-break-inside:avoid;break-inside:avoid}
+
+  .sum-tbl tr{page-break-inside:avoid;break-inside:avoid}
+  .sum-tbl thead{display:table-header-group}
+  /* Compact summary table and gov cards for print */
+  .sum-tbl td{padding:4px 6px!important;font-size:10px!important}
+  .gov{padding:5px 10px!important;margin-top:6px!important}
+
+  #sectionCanvas{width:100%!important;height:auto!important;max-height:300px}
+
+  /* Table styling */
+  .sum-tbl td{border-color:#bbb!important}
+  .sum-tbl tr:first-child td{background:#e8edf4!important;color:#222!important}
+  .sum-tbl .val{color:#1a365d!important}
+  .loc-tbl th{background:#e8edf4!important;color:#222!important;border-color:#bbb!important}
+  .loc-tbl td{border-color:#bbb!important}
+
+  /* ── COLOR OVERRIDES: dark → print ── */
+  .calc-val{color:#111!important}
+  .calc-unit{color:#555!important}
+
+  .gov{background:linear-gradient(90deg,rgba(200,170,50,.12),transparent)!important;border-left:3px solid #c09800!important}
+  .gov-lbl{color:#555!important}
+  .gov-val{color:#7a5d10!important}
+  .gov-unit{color:#8b6914!important}
+  .gov-tag{background:#a67c00!important;color:#fff!important}
+
+  .gov-green{background:linear-gradient(90deg,rgba(50,160,80,.08),transparent)!important;border-left:3px solid #2f855a!important}
+  .gov-green .gov-lbl{color:#555!important}
+  .gov-green .gov-val{color:#276749!important}
+  .gov-green .gov-unit{color:#2f855a!important}
+  .gov-green .gov-tag{background:#276749!important;color:#fff!important}
+
+  .compact,.nonslender{color:#276749!important}
+  .noncompact{color:#8b6914!important}
+  .slender{color:#c53030!important}
+  .badge-ok{color:#276749!important}
+  .badge-warn{color:#8b6914!important}
+  .badge-fail{color:#c53030!important}
+
+  /* Override ALL white-on-dark inline styles */
+  [style*="color:rgba(255,255,255"]{color:#555!important}
+  [style*="color: rgba(255,255,255"]{color:#555!important}
+  [style*="color:#ccc"]{color:#555!important}
+  [style*="color:#fff"]{color:#222!important}
+  [style*="color:var(--cyan)"]{color:#0e7490!important}
+  [style*="color:var(--purple)"]{color:#6d28d9!important}
+  [style*="color:var(--blue)"]{color:#1a365d!important}
+  [style*="color:var(--yellow)"]{color:#8b6914!important}
+  [style*="color:var(--green)"]{color:#276749!important}
+  [style*="color:var(--orange)"]{color:#b45309!important}
+  [style*="color:var(--red)"]{color:#c53030!important}
+  [style*="color:#4ade80"]{color:#276749!important}
+  [style*="color:rgba(74,222,128"]{color:#276749!important}
+  [style*="color:rgba(245,200,66"]{color:#8b6914!important}
+  [style*="color:#f0883e"]{color:#b45309!important}
+
+  .ax-x{background:#d1ecf9!important;color:#0e4f6e!important}
+  .ax-y{background:#e8dcfa!important;color:#3b1d6e!important}
+
+  .print-break-before{page-break-before:always!important;break-before:page!important}
+}
+
+@media screen{
+  .print-header,.print-footer,.print-input-summary{display:none!important}
+}
 </style>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -168,6 +304,26 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 </div>
 
 <div class="main">
+
+<!-- PRINT-ONLY: Header -->
+<div class="print-header">
+  <div class="ph-left">
+    AISC 360-22 — C-Channel (Singly Symmetric)
+    <small>STRUCTURAL STEEL DESIGN CALCULATION SHEET</small>
+  </div>
+  <div class="ph-right">
+    <span id="print-date"></span><br>
+    CivilToolsKit — Automated Calculation
+  </div>
+</div>
+
+<!-- PRINT-ONLY: Input summary (page 1 only) -->
+<div class="print-input-summary" id="print-input-strip"></div>
+
+<!-- PRINT-ONLY: Footer -->
+<div class="print-footer">
+  AISC 360-22 C-Channel — CivilToolsKit &nbsp;|&nbsp; Printed <span id="print-footer-date"></span> &nbsp;|&nbsp; This document was generated automatically
+</div>
 
 <!-- CANVAS -->
 <div class="sec-block">
@@ -331,6 +487,10 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 </div>
 
 <!-- SHEAR G2/G3 -->
+<div class="print-header print-header-repeat print-break-before" aria-hidden="true">
+  <div class="ph-left">AISC 360-22 — C-Channel (Singly Symmetric)<small>SHEAR &amp; COMPRESSION DESIGN</small></div>
+  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+</div>
 <div class="sec-block">
   <div class="sec-hdr"><span class="sec-tag tag-red">Shear</span><span class="sec-title">Shear Strength — Strong Axis (Web) &amp; Weak Axis (Flanges)</span><span class="sec-ref">AISC 360-22 G2 / G3</span></div>
   <div class="rep-grid">
@@ -489,11 +649,16 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 </div>
 
 <!-- SUMMARY -->
-<div class="sec-block">
+<div class="print-header print-header-repeat print-break-before" aria-hidden="true">
+  <div class="ph-left">AISC 360-22 — C-Channel (Singly Symmetric)<small>DESIGN STRENGTH SUMMARY</small></div>
+  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+</div>
+<div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
   <div class="sec-hdr"><span class="sec-tag tag-teal">Summary</span><span class="sec-title">Design Strength Summary — LRFD &amp; ASD</span><span class="sec-ref">AISC 360-22</span></div>
   <div class="rep-col-full">
     <table class="sum-tbl">
-      <tr><td>Check</td><td>Axis</td><td>Ref.</td><td>Nominal R<sub>n</sub></td><td>φ</td><td>φR<sub>n</sub> (LRFD)</td><td>Ω</td><td>R<sub>n</sub>/Ω (ASD)</td></tr>
+      <thead><tr><td>Check</td><td>Axis</td><td>Ref.</td><td>Nominal R<sub>n</sub></td><td>φ</td><td>φR<sub>n</sub> (LRFD)</td><td>Ω</td><td>R<sub>n</sub>/Ω (ASD)</td></tr></thead>
+      <tbody>
       <tr>
         <td>Flexure M<sub>n</sub></td><td><span class="ax ax-x">Strong X</span></td><td style="color:rgba(255,255,255,.5)">F2</td>
         <td class="val"><span id="sum_Mnx">—</span> kg·m</td><td>0.90</td>
@@ -536,6 +701,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
         <td class="val"><span id="sum_phiPnFT">—</span> kg</td><td>1.67</td>
         <td class="val"><span id="sum_ASDPnFT">—</span> kg</td>
       </tr>
+      </tbody>
     </table>
     <div style="margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
       <div class="gov"><div class="gov-lbl">Flexure — Strong axis (F2)</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_fx">—</span><span id="fm_fx">—</span></div></div>
@@ -929,6 +1095,56 @@ function calculate(){
 setupInputs();
 window.addEventListener('load',()=>{setupInputs();calculate();});
 window.addEventListener('resize',calculate);
+
+// ═════════════════════════════════════════════════════════════════════
+// PRINT PREPARATION
+// ═════════════════════════════════════════════════════════════════════
+function preparePrint(){
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})
+    + ' ' + now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  const el1 = document.getElementById('print-date');
+  const el2 = document.getElementById('print-footer-date');
+  if(el1) el1.textContent = dateStr;
+  if(el2) el2.textContent = dateStr;
+
+  const v = id => { const e=document.getElementById(id); return e?e.value:''; };
+  const strip = document.getElementById('print-input-strip');
+  if(strip){
+    strip.innerHTML =
+      '<div><b>d=</b>'+v('inp_d')+' mm</div>'+
+      '<div><b>bf=</b>'+v('inp_bf')+' mm</div>'+
+      '<div><b>tf=</b>'+v('inp_tf')+' mm</div>'+
+      '<div><b>tw=</b>'+v('inp_tw')+' mm</div>'+
+      '<div>|</div>'+
+      '<div><b>Fy=</b>'+v('inp_Fy')+' ksc</div>'+
+      '<div><b>E=</b>'+v('inp_E')+' ksc</div>'+
+      '<div>|</div>'+
+      '<div><b>Lb=</b>'+v('inp_Lb')+' mm</div>'+
+      '<div><b>Lx=</b>'+v('inp_Lx')+' mm</div>'+
+      '<div><b>Ly=</b>'+v('inp_Ly')+' mm</div>'+
+      '<div>|</div>'+
+      '<div><b>Kx=</b>'+v('inp_Kx')+'</div>'+
+      '<div><b>Ky=</b>'+v('inp_Ky')+'</div>'+
+      '<div><b>Cb=</b>'+v('inp_Cb')+'</div>';
+  }
+}
+
+window.addEventListener('beforeprint', function(){
+  preparePrint();
+  document.querySelectorAll('.print-date-repeat').forEach(function(el){
+    el.textContent = document.getElementById('print-date').textContent;
+  });
+});
+
+const origPrintBtn = document.querySelector('[onclick="window.print()"]');
+if(origPrintBtn){
+  origPrintBtn.removeAttribute('onclick');
+  origPrintBtn.addEventListener('click', function(){
+    preparePrint();
+    setTimeout(function(){ window.print(); }, 100);
+  });
+}
 </script>
 </body>
 </html>
