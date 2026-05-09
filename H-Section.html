@@ -95,7 +95,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 .ax-x{background:#0e4f6e;color:var(--cyan)}.ax-y{background:#3b1d6e;color:var(--purple)}
 
 /* ═══════════════════ PRINT STYLES ═══════════════════ */
-.print-header,.print-footer{display:none}
+.print-header,.print-header-repeat,.print-footer{display:none}
 @media print{
   @page{size:A4 portrait;margin:12mm 10mm 16mm 10mm}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
@@ -105,7 +105,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
   /* Reset layout */
   html{min-width:0!important}
-  body{background:#fff!important;color:#222!important;font-size:10.5px!important;line-height:1.4!important}
+  body{background:#fff!important;color:#222!important;font-size:10px!important;line-height:1.32!important}
   .layout{display:block!important;min-width:0!important}
   .main{width:100%!important;min-width:0!important;padding:0!important}
 
@@ -115,9 +115,14 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     border-bottom:2.5px solid #1a365d;padding:0 0 5px 0;margin-bottom:6px;
     page-break-inside:avoid;break-inside:avoid;
   }
-  .print-header .ph-left{font-family:var(--mono);font-size:13px;font-weight:700;color:#1a365d;letter-spacing:.04em}
-  .print-header .ph-left small{display:block;font-size:8.5px;font-weight:500;color:#666;letter-spacing:.06em;margin-top:1px}
-  .print-header .ph-right{text-align:right;font-family:var(--mono);font-size:8.5px;color:#555;line-height:1.6}
+  .print-header-repeat{
+    display:flex!important;align-items:center;justify-content:space-between;
+    border-bottom:2.5px solid #1a365d;padding:0 0 5px 0;margin-bottom:6px;
+    page-break-inside:avoid;break-inside:avoid;
+  }
+  .print-header .ph-left,.print-header-repeat .ph-left{font-family:var(--mono);font-size:13px;font-weight:700;color:#1a365d;letter-spacing:.04em}
+  .print-header .ph-left small,.print-header-repeat .ph-left small{display:block;font-size:8.5px;font-weight:500;color:#666;letter-spacing:.06em;margin-top:1px}
+  .print-header .ph-right,.print-header-repeat .ph-right{text-align:right;font-family:var(--mono);font-size:8.5px;color:#555;line-height:1.6}
 
   /* Input summary — page 1 only */
   .print-input-summary{
@@ -129,37 +134,36 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   }
   .print-input-summary b{font-weight:700;color:#1a365d}
 
-  /* Footer (fixed at bottom of every page) */
-  .print-footer{
-    display:block!important;position:fixed;bottom:0;left:0;right:0;
-    text-align:center;font-family:var(--mono);font-size:7.5px;color:#999;
-    border-top:1px solid #ddd;padding:3px 0 0;
-  }
 
   /* ── SECTION BLOCKS ── */
   .sec-block{
     border-color:#bbb!important;background:#fff!important;
-    width:100%!important;min-width:0!important;margin-bottom:4px!important;
+    width:100%!important;min-width:0!important;margin-bottom:3px!important;
     page-break-inside:avoid!important;break-inside:avoid!important;
   }
   .sec-hdr{
     background:#e8edf4!important;border-bottom:1px solid #bbb!important;color:#222!important;
+    padding:4px 10px!important;
     page-break-after:avoid!important;break-after:avoid!important;
   }
   .sec-tag{color:#fff!important}
-  .sec-title{color:#222!important}
-  .sec-ref{color:#666!important}
-  .sdiv{color:#555!important;page-break-after:avoid!important;break-after:avoid!important}
+  .sec-title{color:#222!important;font-size:11px!important}
+  .sec-ref{color:#666!important;font-size:9px!important}
+  .sdiv{color:#555!important;margin:5px 0 4px!important;page-break-after:avoid!important;break-after:avoid!important}
 
   /* Grid */
   .rep-grid{grid-template-columns:1fr 1fr!important;border-top:1px solid #bbb!important}
-  .rep-col{border-right:1px solid #ccc!important;padding:8px 10px!important}
+  .rep-col{border-right:1px solid #ccc!important;padding:6px 9px!important}
   .rep-col:last-child{border-right:none!important}
-  .rep-col-full{padding:8px 10px!important}
+  .rep-col-full{padding:6px 9px!important}
 
-  /* Keep sub-components together */
-  .calc-block{page-break-inside:avoid;break-inside:avoid}
-  .gov,.gov-green,.gov-red{page-break-inside:avoid;break-inside:avoid;padding:5px 10px!important;margin-top:6px!important}
+  /* Keep sub-components together — tighter spacing */
+  .calc-block{page-break-inside:avoid;break-inside:avoid;margin:3px 0 5px!important}
+  .calc-line1,.calc-line2,.calc-line3{font-size:10.5px!important;padding:1px 0!important}
+  .calc-val{font-size:11.5px!important}
+  .gov,.gov-green,.gov-red{page-break-inside:avoid;break-inside:avoid;padding:4px 9px!important;margin-top:4px!important}
+  .gov-val,.gov-green .gov-val,.gov-red .gov-val{font-size:13px!important}
+  .gov-lbl{font-size:9.5px!important}
 
   /* Summary tables */
   .sum-tbl tr{page-break-inside:avoid;break-inside:avoid}
@@ -171,7 +175,9 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   .loc-tbl td{border-color:#bbb!important}
 
   /* Canvas */
-  canvas,[id*="Canvas"]{width:100%!important;height:auto!important;max-height:300px}
+  #sectionCanvas{width:auto!important;height:auto!important;max-width:100%!important;max-height:215px!important;aspect-ratio:1/1!important;background:#fff!important}
+  [style*="background:var(--bg)"]{background:#fff!important}
+  div:has(#sectionCanvas){background:#fff!important}
 
   /* ── COLOR OVERRIDES (dark → print) ── */
   .calc-val{color:#111!important}
@@ -231,7 +237,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
 /* Screen: hide print elements */
 @media screen{
-  .print-header,.print-footer,.print-input-summary{display:none!important}
+  .print-header,.print-header-repeat,.print-footer,.print-input-summary,.print-break-before{display:none!important}
 }
 </style>
 <script type="module">
@@ -333,7 +339,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <div class="sec-block">
   <div class="sec-hdr"><span class="sec-tag tag-blue">Section</span><span class="sec-title">I / H Section — Doubly Symmetric (ภาพหน้าตัด)</span></div>
   <div style="padding:0;display:flex;justify-content:center;background:var(--bg)">
-    <canvas id="sectionCanvas" width="720" height="480" style="width:720px;height:480px;display:block"></canvas>
+    <canvas id="sectionCanvas" width="600" height="600" style="width:600px;height:600px;display:block"></canvas>
   </div>
 </div>
 
@@ -405,6 +411,12 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       </div>
     </div>
   </div>
+</div>
+
+<!-- PRINT: page break + header before Flexure -->
+<div class="print-header-repeat print-break-before" aria-hidden="true">
+  <div class="ph-left">I / H Section — AISC 360-22<small>Flexure (Strong &amp; Weak Axis) · Shear (G2 / G3)</small></div>
+  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
 </div>
 
 <!-- FLEXURE STRONG F2 -->
@@ -486,7 +498,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
 </div>
 
-<!-- SHEAR G2/G3 -->
+<!-- SHEAR G2/G3 (flows after Flexure on same page) -->
 <div class="sec-block">
   <div class="sec-hdr"><span class="sec-tag tag-red">Shear</span><span class="sec-title">Shear Strength — Strong Axis (Web) &amp; Weak Axis (Flanges)</span><span class="sec-ref">AISC 360-22 G2 / G3</span></div>
   <div class="rep-grid">
@@ -534,6 +546,12 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.5)">G3: φ<sub>v</sub>=0.90 (ต่างจาก G2 ที่ φ<sub>v</sub>=1.00)</div>
     </div>
   </div>
+</div>
+
+<!-- PRINT: page break + header before Compression -->
+<div class="print-header-repeat print-break-before" aria-hidden="true">
+  <div class="ph-left">I / H Section — AISC 360-22<small>Compression · Design Strength Summary — LRFD & ASD</small></div>
+  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
 </div>
 
 <!-- COMPRESSION E3/E7 -->
@@ -599,13 +617,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
 </div>
 
-<!-- PRINT: page break before summary -->
-<div class="print-header print-header-repeat print-break-before" aria-hidden="true">
-  <div class="ph-left">I / H Section — AISC 360-22<small>Design Strength Summary</small></div>
-  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
-</div>
-
-<!-- SUMMARY -->
+<!-- SUMMARY (flows after Compression on same page) -->
 <div class="sec-block" style="page-break-inside:auto;break-inside:auto">
   <div class="sec-hdr"><span class="sec-tag tag-teal">Summary</span><span class="sec-title">Design Strength Summary — LRFD &amp; ASD</span><span class="sec-ref">AISC 360-22</span></div>
   <div class="rep-col-full">
@@ -709,6 +721,42 @@ function drawSection(d,bf,tf,tw){
   const bY=ry(0)-28;ext(rx(0),ry(0),rx(0),bY-2);ext(rx(bf),ry(0),rx(bf),bY-2);dH(rx(0),bY,rx(bf),'bf='+bf,'#c8c8c8');
   const tX=rx(bf)+28;ext(rx(bf),ry(0),tX-2,ry(0));ext(rx(bf),ry(tf),tX-2,ry(tf));dV(tX,ry(0),ry(tf),'tf='+tf,'#22d3ee');
   const wY=ry(d)+26;const wx=(bf-tw)/2;ext(rx(wx),ry(d),rx(wx),wY-2);ext(rx(wx+tw),ry(d),rx(wx+tw),wY-2);dH(rx(wx),wY,rx(wx+tw),'tw='+tw,'#a78bfa');
+}
+
+// ═══════ DRAW SECTION FOR PRINT — white background, dark colors ═══════
+function drawSectionForPrint(d,bf,tf,tw){
+  const cvs=document.getElementById('sectionCanvas');if(!cvs)return;
+  const ctx=cvs.getContext('2d');
+  const W=600,H=600;
+  cvs.width=W;cvs.height=H;
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#e0e0e0';
+  for(let gx=15;gx<W;gx+=30)for(let gy=15;gy<H;gy+=30){ctx.beginPath();ctx.arc(gx,gy,.8,0,PI*2);ctx.fill();}
+  const sc=Math.min((W-180)/bf,(H-160)/d)*.75;
+  const ox=W/2-bf*sc/2,oy=H/2-d*sc/2;
+  const rx=x=>ox+x*sc,ry=y=>oy+y*sc;
+  ctx.fillStyle='#d6e8fa';ctx.strokeStyle='#1a365d';ctx.lineWidth=1.5;
+  [[0,0,bf,tf],[0,d-tf,bf,tf],[(bf-tw)/2,tf,tw,d-2*tf]].forEach(([x,y,w,h])=>{ctx.beginPath();ctx.rect(rx(x),ry(y),w*sc,h*sc);ctx.fill();ctx.stroke();});
+  const cgx=rx(bf/2),cgy=ry(d/2),al=22,cc='#b45309';
+  ctx.strokeStyle=cc;ctx.fillStyle=cc;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(cgx,cgy);ctx.lineTo(cgx+al,cgy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cgx+al,cgy);ctx.lineTo(cgx+al-6,cgy-3);ctx.lineTo(cgx+al-6,cgy+3);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(cgx,cgy);ctx.lineTo(cgx,cgy-al);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cgx,cgy-al);ctx.lineTo(cgx-3,cgy-al+6);ctx.lineTo(cgx+3,cgy-al+6);ctx.closePath();ctx.fill();
+  ctx.font='bold 10px IBM Plex Mono,monospace';ctx.fillText('x',cgx+al+4,cgy+4);ctx.fillText('y',cgx-4,cgy-al-6);
+  ctx.save();ctx.strokeStyle='rgba(14,116,144,.35)';ctx.lineWidth=.8;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(rx(0)-10,cgy);ctx.lineTo(rx(bf)+10,cgy);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  ctx.save();ctx.strokeStyle='rgba(109,40,217,.35)';ctx.lineWidth=.8;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(cgx,ry(0)-10);ctx.lineTo(cgx,ry(d)+10);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  function dH(x1,y,x2,lbl,col){ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();ctx.font='bold 10px IBM Plex Mono,monospace';ctx.textAlign='center';ctx.fillText(lbl,(x1+x2)/2,y-5);ctx.restore();}
+  function dV(x,y1,y2,lbl,col){ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,y2);ctx.stroke();ctx.save();ctx.translate(x-13,(y1+y2)/2);ctx.rotate(-PI/2);ctx.font='bold 10px IBM Plex Mono,monospace';ctx.textAlign='center';ctx.fillText(lbl,0,0);ctx.restore();ctx.restore();}
+  function ext(x1,y1,x2,y2){ctx.save();ctx.strokeStyle='rgba(100,100,100,.4)';ctx.lineWidth=.5;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);ctx.restore();}
+  const dX=rx(0)-36;ext(rx(0),ry(0),dX+2,ry(0));ext(rx(0),ry(d),dX+2,ry(d));dV(dX,ry(0),ry(d),'d='+d,'#166534');
+  const bY=ry(0)-28;ext(rx(0),ry(0),rx(0),bY-2);ext(rx(bf),ry(0),rx(bf),bY-2);dH(rx(0),bY,rx(bf),'bf='+bf,'#555555');
+  const tX=rx(bf)+28;ext(rx(bf),ry(0),tX-2,ry(0));ext(rx(bf),ry(tf),tX-2,ry(tf));dV(tX,ry(0),ry(tf),'tf='+tf,'#0e7490');
+  const wY=ry(d)+26;const wx=(bf-tw)/2;ext(rx(wx),ry(d),rx(wx),wY-2);ext(rx(wx+tw),ry(d),rx(wx+tw),wY-2);dH(rx(wx),wY,rx(wx+tw),'tw='+tw,'#6d28d9');
 }
 
 // Unit conversion factors (SI → Thai metric)
@@ -972,6 +1020,12 @@ window.addEventListener('beforeprint', function(){
   document.querySelectorAll('.print-date-repeat').forEach(function(el){
     el.textContent = document.getElementById('print-date').textContent;
   });
+  const d=pi('inp_d'),bf=pi('inp_bf'),tf=pi('inp_tf'),tw=pi('inp_tw');
+  if(d&&bf&&tf&&tw) drawSectionForPrint(d,bf,tf,tw);
+});
+window.addEventListener('afterprint', function(){
+  const d=pi('inp_d'),bf=pi('inp_bf'),tf=pi('inp_tf'),tw=pi('inp_tw');
+  if(d&&bf&&tf&&tw) drawSection(d,bf,tf,tw);
 });
 
 // Override existing print button
