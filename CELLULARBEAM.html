@@ -121,7 +121,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 /* ═══════════════════════════════════════════════════════════════════
    PRINT STYLES
    ═══════════════════════════════════════════════════════════════════ */
-.print-header,.print-footer{display:none}
+.print-header,.print-header-repeat,.print-footer{display:none}
 
 @media print{
   @page{size:A4 portrait;margin:12mm 10mm 16mm 10mm}
@@ -132,7 +132,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
   /* Reset layout */
   html{min-width:0!important}
-  body{background:#fff!important;color:#222!important;font-size:10.5px!important;line-height:1.4!important}
+  body{background:#fff!important;color:#222!important;font-size:9.5px!important;line-height:1.28!important}
   .layout{display:block!important;min-width:0!important}
   .main{width:100%!important;min-width:0!important;padding:0!important}
 
@@ -142,9 +142,14 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     border-bottom:2.5px solid #1a365d;padding:0 0 5px 0;margin-bottom:6px;
     page-break-inside:avoid;break-inside:avoid;
   }
-  .print-header .ph-left{font-family:var(--mono);font-size:13px;font-weight:700;color:#1a365d;letter-spacing:.04em}
-  .print-header .ph-left small{display:block;font-size:8.5px;font-weight:500;color:#666;letter-spacing:.06em;margin-top:1px}
-  .print-header .ph-right{text-align:right;font-family:var(--mono);font-size:8.5px;color:#555;line-height:1.6}
+  .print-header-repeat{
+    display:flex!important;align-items:center;justify-content:space-between;
+    border-bottom:2.5px solid #1a365d;padding:0 0 5px 0;margin-bottom:6px;
+    page-break-inside:avoid;break-inside:avoid;
+  }
+  .print-header .ph-left,.print-header-repeat .ph-left{font-family:var(--mono);font-size:13px;font-weight:700;color:#1a365d;letter-spacing:.04em}
+  .print-header .ph-left small,.print-header-repeat .ph-left small{display:block;font-size:8.5px;font-weight:500;color:#666;letter-spacing:.06em;margin-top:1px}
+  .print-header .ph-right,.print-header-repeat .ph-right{text-align:right;font-family:var(--mono);font-size:8.5px;color:#555;line-height:1.6}
 
   /* Input summary — page 1 only */
   .print-input-summary{
@@ -166,7 +171,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   /* Section blocks */
   .sec-block{
     border-color:#bbb!important;background:#fff!important;
-    width:100%!important;min-width:0!important;margin-bottom:4px!important;
+    width:100%!important;min-width:0!important;margin-bottom:3px!important;
     page-break-inside:auto;break-inside:auto;
   }
 
@@ -175,33 +180,43 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   /* sec-hdr: rely on break-after:avoid + targeted inline fixes */
   .sec-hdr{
     background:#e8edf4!important;border-bottom:1px solid #bbb!important;color:#222!important;
+    padding:3px 9px!important;
     page-break-after:avoid!important;break-after:avoid!important;
   }
-  .sec-tag{color:#fff!important}
-  .sec-title{color:#222!important}
-  .sec-ref{color:#666!important}
+  .sec-tag{color:#fff!important;font-size:7.5px!important;padding:1px 5px!important}
+  .sec-title{color:#222!important;font-size:10.5px!important}
+  .sec-ref{color:#666!important;font-size:8.5px!important}
 
   .sdiv{
-    color:#555!important;
+    color:#555!important;margin:4px 0 3px!important;font-size:8.5px!important;
     page-break-after:avoid!important;break-after:avoid!important;
   }
 
   /* Grid */
   .rep-grid{grid-template-columns:1fr 1fr!important;border-top:1px solid #bbb!important}
-  .rep-col{border-right:1px solid #ccc!important;padding:8px 10px!important}
+  .rep-col{border-right:1px solid #ccc!important;padding:5px 8px!important}
   .rep-col:last-child{border-right:none!important}
-  .rep-col-full{padding:8px 10px!important}
+  .rep-col-full{padding:5px 8px!important}
 
   /* Keep calc/gov together */
-  .calc-block{page-break-inside:avoid;break-inside:avoid}
-  .gov,.gov-green,.gov-red{page-break-inside:avoid;break-inside:avoid}
+  .calc-block{page-break-inside:avoid;break-inside:avoid;margin:2px 0 4px!important}
+  .calc-line1,.calc-line2,.calc-line3{font-size:10px!important;padding:1px 0!important}
+  .calc-val{font-size:11px!important}
+  .gov,.gov-green,.gov-red{page-break-inside:avoid;break-inside:avoid;padding:3px 8px!important;margin-top:3px!important}
+  .gov-val,.gov-green .gov-val,.gov-red .gov-val{font-size:12px!important}
+  .gov-lbl{font-size:9px!important}
 
   /* Summary table: rows should not break inside, thead repeats */
   .sum-tbl tr{page-break-inside:avoid;break-inside:avoid}
   .sum-tbl thead{display:table-header-group}
+  .sum-tbl td{padding:2px 5px!important;font-size:9px!important}
 
   /* Canvas */
-  #sectionCanvas,#elevCanvas{width:100%!important;height:auto!important;max-height:300px}
+  #sectionCanvas{width:auto!important;height:auto!important;max-width:100%!important;max-height:260px!important;aspect-ratio:1/1!important;background:#fff!important}
+  #elevCanvas{width:100%!important;height:auto!important;max-height:260px!important;background:#fff!important}
+  /* Container ของ canvas ให้เป็นสีขาว */
+  [style*="background:var(--bg)"]{background:#fff!important}
+  div:has(#sectionCanvas),div:has(#elevCanvas){background:#fff!important}
 
   /* Table */
   .sum-tbl td{border-color:#bbb!important}
@@ -271,13 +286,34 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   .ax-red{background:#fed7d7!important;color:#991b1b!important}
   .ax-orange{background:#feebc8!important;color:#b45309!important}
 
+  /* Global font-size compression for inline-styled rows */
+  [style*="font-size:13px"]{font-size:10.5px!important}
+  [style*="font-size:12px"]{font-size:9.5px!important}
+  [style*="font-size:11px"]{font-size:9px!important}
+  [style*="font-size:10px"]{font-size:8.5px!important}
+  [style*="line-height:1.7"]{line-height:1.3!important}
+  [style*="line-height:1.6"]{line-height:1.3!important}
+
+  /* Compress decorative section banners (margin:24px 0 14px) */
+  [style*="margin:24px 0 14px"]{margin:5px 0 3px!important;padding:4px 9px!important}
+  [style*="margin:24px 0 14px"] > div{font-size:9.5px!important}
+
+  /* Compress other inline margins */
+  [style*="margin-top:12px"]{margin-top:4px!important}
+  [style*="margin-top:10px"]{margin-top:4px!important}
+  [style*="margin-top:8px"]{margin-top:3px!important}
+  [style*="margin-bottom:10px"]{margin-bottom:4px!important}
+  [style*="margin-bottom:8px"]{margin-bottom:3px!important}
+  [style*="padding:14px"]{padding:6px!important}
+  [style*="padding:12px 16px"]{padding:4px 9px!important}
+
   /* Page break helpers */
   .print-break-before{page-break-before:always!important;break-before:page!important}
 }
 
 /* Screen: hide print elements */
 @media screen{
-  .print-header,.print-footer,.print-input-summary{display:none!important}
+  .print-header,.print-header-repeat,.print-footer,.print-input-summary,.print-break-before{display:none!important}
 }
 </style>
 <script type="module">
@@ -448,16 +484,13 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <!-- PRINT-ONLY: Input summary (page 1 only) -->
 <div class="print-input-summary" id="print-input-strip"></div>
 
-<!-- PRINT-ONLY: Footer -->
-<div class="print-footer">
-  Cellular Beam Analysis — CivilToolsKit &nbsp;|&nbsp; Printed <span id="print-footer-date"></span> &nbsp;|&nbsp; This document was generated automatically
-</div>
+
 
 <!-- CROSS-SECTION CANVAS -->
 <div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
   <div class="sec-hdr"><span class="sec-tag tag-blue">Cross-Section</span><span class="sec-title">Cross Section</span></div>
   <div style="padding:0;display:flex;justify-content:center;background:var(--bg)">
-    <canvas id="sectionCanvas" width="720" height="520" style="width:720px;height:520px;display:block"></canvas>
+    <canvas id="sectionCanvas" width="600" height="600" style="width:600px;height:600px;display:block"></canvas>
   </div>
 </div>
 
@@ -518,6 +551,8 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
 </div>
 
+<!-- Centroid section flows naturally after Geometry -->
+
 <!-- CENTROID + DISTANCE -->
 <div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
   <div class="sec-hdr"><span class="sec-tag tag-purple">Centroid</span><span class="sec-title">Tee Centroid &amp; Distance to Neutral Axis</span><span class="sec-ref">Step 6–7</span></div>
@@ -544,6 +579,10 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 </div>
 
 <!-- IX CALCULATION -->
+ <div class="print-header-repeat print-break-before" aria-hidden="true">
+  <div class="ph-left">CELLULAR BEAM ANALYSIS<small>SECTION PROPERTIES & DESIGN CHECK - AISC 360-22 / DESIGN GUIDE 31</small></div>
+  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+</div>
 <div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
   <div class="sec-hdr"><span class="sec-tag tag-orange">I-x</span><span class="sec-title">Second Moment of Area about X-axis</span><span class="sec-ref">Parallel Axis Theorem</span></div>
   <div class="rep-grid">
@@ -606,6 +645,8 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     </div>
   </div>
 </div>
+
+<!-- ZY/SX/IY/SY flow naturally after Zx -->
 
 <!-- ZY -->
 <div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
@@ -710,12 +751,12 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- FLEXURAL DESIGN — AISC 360-22 + AISC Design Guide 31        -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div class="print-header print-header-repeat print-break-before" aria-hidden="true">
+<div class="print-header-repeat print-break-before" aria-hidden="true">
   <div class="ph-left">CELLULAR BEAM ANALYSIS<small>FLEXURAL DESIGN — STRONG AXIS</small></div>
   <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
 </div>
 
-<div style="margin:20px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(240,136,62,.15),transparent);border-left:4px solid var(--orange);border-radius:0 6px 6px 0">
+<div style="margin:5px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(240,136,62,.15),transparent);border-left:4px solid var(--orange);border-radius:0 6px 6px 0">
   <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--orange)">FLEXURAL DESIGN CHECK — STRONG AXIS (M<sub>nx</sub>)</div>
   <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px">AISC 360-22 Chapter F (F2) + AISC Design Guide 31 Section 3 — Bending about X-axis</div>
 </div>
@@ -781,6 +822,8 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     </div>
   </div>
 </div>
+
+<!-- LTB flows naturally after Yielding (Limit State 1) -->
 
 <!-- LIMIT STATE 2: LTB -->
 <div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
@@ -901,7 +944,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <!-- FLEXURAL DESIGN — WEAK AXIS (M_ny)                          -->
 <!-- AISC 360-22 Section F6 — I-Shapes Bent About Their Minor Axis -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div class="print-header print-header-repeat print-break-before" aria-hidden="true">
+<div class="print-header-repeat print-break-before" aria-hidden="true">
   <div class="ph-left">CELLULAR BEAM ANALYSIS<small>FLEXURAL DESIGN — WEAK AXIS</small></div>
   <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
 </div>
@@ -1075,8 +1118,9 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- VIERENDEEL 3-STEP PROCESS (DG31 Section 3.3 + AISC H1.1)    -->
+<!-- Horizontal Shear moved to AFTER Step 3 Interaction          -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div class="print-header print-header-repeat print-break-before" aria-hidden="true">
+<div class="print-header-repeat print-break-before" aria-hidden="true">
   <div class="ph-left">CELLULAR BEAM ANALYSIS<small>VIERENDEEL BENDING — DG31 SECTION 3.3</small></div>
   <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
 </div>
@@ -1203,51 +1247,8 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- HORIZONTAL SHEAR AT WEB POST                                -->
+<!-- NOMINAL CAPACITIES SUMMARY (flows after Vierendeel Step 3)  -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-
-<div style="margin:24px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(74,222,128,.15),transparent);border-left:4px solid var(--green);border-radius:0 6px 6px 0">
-  <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--green)">HORIZONTAL SHEAR AT WEB POST</div>
-  <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px">AISC Design Guide 31 Section 3.4 — Horizontal Shear at Web Post</div>
-</div>
-
-<div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
-  <div class="sec-hdr"><span class="sec-tag tag-green">Hor.Shear</span><span class="sec-title">Horizontal Shear Check at Web Post</span><span class="sec-ref">AISC DG 31 Eq. 3-9, 3-10</span></div>
-  <div class="rep-grid">
-    <div class="rep-col">
-      <div class="sdiv">Demand — Horizontal Shear V<sub>rh</sub></div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">V<sub>rh</sub> = V<sub>r</sub> · S/d<sub>eff</sub></span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="hs_Vrh_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="hs_Vrh">—</span><span class="calc-unit">kg</span></span></div>
-      </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
-        Horizontal Shear at Web Post from equilibrium between Web Opening
-      </div>
-    </div>
-    <div class="rep-col">
-      <div class="sdiv">Capacity — Web Post Shear Yielding</div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">V<sub>n,h</sub> = 0.6·F<sub>y</sub>·e·t<sub>w</sub> <span style="color:rgba(255,255,255,.5);font-size:10px">(e = S − a<sub>0</sub>)</span></span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="hs_Vnh_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="hs_Vnh">—</span><span class="calc-unit">kg</span></span></div>
-      </div>
-      <div class="gov">
-        <div class="gov-lbl"><span class="gov-tag">LRFD</span>φV<sub>n,h</sub> (φ=1.00 for G2.1a or 0.90 G2.1b)</div>
-        <div class="gov-val"><span id="hs_phiVnh">—</span><span class="gov-unit">kg</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- NOMINAL CAPACITIES SUMMARY                                  -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="print-header print-header-repeat print-break-before" aria-hidden="true">
-  <div class="ph-left">CELLULAR BEAM ANALYSIS<small>NOMINAL CAPACITIES SUMMARY</small></div>
-  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
-</div>
-
 <div style="margin:24px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(245,200,66,.18),transparent);border-left:4px solid var(--yellow);border-radius:0 6px 6px 0">
   <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--yellow)">NOMINAL CAPACITIES — ALL CHECKS</div>
 </div>
@@ -1405,7 +1406,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- COMPLETE DESIGN SUMMARY — All 8 Limit States                -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div class="print-header print-header-repeat print-break-before" aria-hidden="true">
+<div class="print-header-repeat print-break-before" aria-hidden="true">
   <div class="ph-left">CELLULAR BEAM ANALYSIS<small>COMPLETE DESIGN SUMMARY — ALL LIMIT STATES</small></div>
   <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
 </div>
@@ -1558,9 +1559,6 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 </div>
 
 <!-- COMBINED LOADING INTERACTION — NEW PAGE -->
-<div class="print-header print-header-repeat print-break-before" aria-hidden="true">
-  <div class="ph-left">CELLULAR BEAM ANALYSIS<small>COMBINED LOADING INTERACTION — AISC CHAPTER H</small></div>
-  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
 </div>
 
 <div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
@@ -3376,6 +3374,314 @@ document.querySelectorAll('input').forEach(inp => {
 calculate();
 
 // ═════════════════════════════════════════════════════════════════════
+// DRAW SECTION FOR PRINT — white background, dark colors
+// ═════════════════════════════════════════════════════════════════════
+function drawSectionForPrint(B, tw, tf, Hcb, a0){
+  const c = document.getElementById('sectionCanvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,W,H);
+
+  // Grid dots (light gray)
+  ctx.fillStyle = '#e0e0e0';
+  const gridStep = 20;
+  for (let x = gridStep; x < W; x += gridStep)
+    for (let y = gridStep; y < H; y += gridStep)
+      ctx.fillRect(x - 0.5, y - 0.5, 1, 1);
+
+  const padL = 90, padR = 90, padT = 50, padB = 50;
+  const drawW = W - padL - padR;
+  const drawH = H - padT - padB;
+  const sc = Math.min(drawW/B, drawH/Hcb) * 0.82;
+
+  const bW = B*sc, bH = Hcb*sc;
+  const tfp = Math.max(3, tf*sc);
+  const twp = Math.max(3, tw*sc);
+  const cx = padL + drawW/2;
+  const cy = padT + drawH/2;
+  const bX = cx - bW/2;
+  const bY = cy - bH/2;
+  const wX = cx - twp/2;
+
+  // I-beam fill (light blue)
+  ctx.fillStyle = '#d6e8fa';
+  ctx.beginPath();
+  ctx.moveTo(bX, bY);
+  ctx.lineTo(bX + bW, bY);
+  ctx.lineTo(bX + bW, bY + tfp);
+  ctx.lineTo(wX + twp, bY + tfp);
+  ctx.lineTo(wX + twp, bY + bH - tfp);
+  ctx.lineTo(bX + bW, bY + bH - tfp);
+  ctx.lineTo(bX + bW, bY + bH);
+  ctx.lineTo(bX, bY + bH);
+  ctx.lineTo(bX, bY + bH - tfp);
+  ctx.lineTo(wX, bY + bH - tfp);
+  ctx.lineTo(wX, bY + tfp);
+  ctx.lineTo(bX, bY + tfp);
+  ctx.closePath();
+  ctx.fill();
+
+  // I-beam outline (dark blue)
+  ctx.strokeStyle = '#1a365d';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(bX, bY);
+  ctx.lineTo(bX + bW, bY);
+  ctx.lineTo(bX + bW, bY + tfp);
+  ctx.lineTo(wX + twp, bY + tfp);
+  ctx.lineTo(wX + twp, bY + bH - tfp);
+  ctx.lineTo(bX + bW, bY + bH - tfp);
+  ctx.lineTo(bX + bW, bY + bH);
+  ctx.lineTo(bX, bY + bH);
+  ctx.lineTo(bX, bY + bH - tfp);
+  ctx.lineTo(wX, bY + bH - tfp);
+  ctx.lineTo(wX, bY + tfp);
+  ctx.lineTo(bX, bY + tfp);
+  ctx.closePath();
+  ctx.stroke();
+
+  // Axes (dark cyan dashed)
+  ctx.strokeStyle = '#0e7490';
+  ctx.setLineDash([5,4]);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(bX - 20, cy); ctx.lineTo(bX + bW + 30, cy);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx, bY - 20); ctx.lineTo(cx, bY + bH + 20);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Origin marker (dark orange)
+  ctx.strokeStyle = '#b45309';
+  ctx.fillStyle = '#b45309';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + 22, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx + 22, cy); ctx.lineTo(cx + 17, cy - 3); ctx.lineTo(cx + 17, cy + 3); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - 22); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, cy - 22); ctx.lineTo(cx - 3, cy - 17); ctx.lineTo(cx + 3, cy - 17); ctx.closePath(); ctx.fill();
+  ctx.font = 'italic bold 11px IBM Plex Sans, sans-serif';
+  ctx.fillStyle = '#b45309';
+  ctx.textAlign = 'left';
+  ctx.fillText('x', cx + 26, cy + 4);
+  ctx.fillText('y', cx + 4, cy - 24);
+  ctx.beginPath(); ctx.arc(cx, cy, 2, 0, 2*Math.PI); ctx.fill();
+
+  // Dimension lines (dark green)
+  const dimColor = '#166534';
+  ctx.strokeStyle = dimColor;
+  ctx.lineWidth = 1;
+  const hcbX = bX - 50;
+  ctx.setLineDash([2,2]);
+  ctx.beginPath();
+  ctx.moveTo(bX - 4, bY); ctx.lineTo(hcbX - 6, bY);
+  ctx.moveTo(bX - 4, bY + bH); ctx.lineTo(hcbX - 6, bY + bH);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(hcbX, bY); ctx.lineTo(hcbX, bY + bH);
+  ctx.moveTo(hcbX - 4, bY + 7); ctx.lineTo(hcbX, bY); ctx.lineTo(hcbX + 4, bY + 7);
+  ctx.moveTo(hcbX - 4, bY + bH - 7); ctx.lineTo(hcbX, bY + bH); ctx.lineTo(hcbX + 4, bY + bH - 7);
+  ctx.stroke();
+  ctx.fillStyle = dimColor;
+  ctx.save();
+  ctx.translate(hcbX - 8, cy);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.fillText('H_cb='+Hcb, 0, 0);
+  ctx.restore();
+
+  const bDimY = bY - 28;
+  ctx.strokeStyle = dimColor;
+  ctx.setLineDash([2,2]);
+  ctx.beginPath();
+  ctx.moveTo(bX, bY - 4); ctx.lineTo(bX, bDimY - 6);
+  ctx.moveTo(bX + bW, bY - 4); ctx.lineTo(bX + bW, bDimY - 6);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(bX, bDimY); ctx.lineTo(bX + bW, bDimY);
+  ctx.moveTo(bX + 7, bDimY - 4); ctx.lineTo(bX, bDimY); ctx.lineTo(bX + 7, bDimY + 4);
+  ctx.moveTo(bX + bW - 7, bDimY - 4); ctx.lineTo(bX + bW, bDimY); ctx.lineTo(bX + bW - 7, bDimY + 4);
+  ctx.stroke();
+  ctx.fillStyle = dimColor;
+  ctx.textAlign = 'center';
+  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.fillText('B='+B, cx, bDimY - 6);
+
+  // Component labels (dark purple)
+  ctx.fillStyle = '#6d28d9';
+  ctx.font = '10px IBM Plex Mono, monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('t_f='+tf, bX + bW + 8, bY + tfp/2 + 3);
+  ctx.textAlign = 'center';
+  ctx.fillText('t_w='+tw, cx, bY + bH + 30);
+
+  // Title
+  ctx.fillStyle = '#1a365d';
+  ctx.font = 'bold 11px IBM Plex Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('Cross-Section View', W/2, 22);
+}
+
+function drawElevationForPrint(B, tw, tf, Hcb, a0, S){
+  const c = document.getElementById('elevCanvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,W,H);
+
+  // Grid dots
+  ctx.fillStyle = '#e0e0e0';
+  const gridStep = 20;
+  for (let x = gridStep; x < W; x += gridStep)
+    for (let y = gridStep; y < H; y += gridStep)
+      ctx.fillRect(x - 0.5, y - 0.5, 1, 1);
+
+  // Title
+  ctx.fillStyle = '#6d28d9';
+  ctx.font = 'bold 12px IBM Plex Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('Side Elevation — Beam with Cellular Openings', W/2, 22);
+
+  const padL = 60, padR = 60, padT = 60, padB = 80;
+  const drawW = W - padL - padR;
+  const drawH = H - padT - padB;
+  const scH = drawH / Hcb;
+  const scL = scH;
+  const beamLengthPx = drawW;
+  const Sp = S * scL;
+  const a0p = a0 * scL;
+  const r = a0p / 2;
+  const tfp = Math.max(3, tf * scH);
+  const Hp = Hcb * scH;
+  const beamY = padT + (drawH - Hp) / 2;
+  const beamLeft = padL;
+  const beamRight = padL + beamLengthPx;
+  const cy = beamY + Hp / 2;
+
+  // Beam flanges (medium blue)
+  ctx.fillStyle = '#93b8d8';
+  ctx.fillRect(beamLeft, beamY, beamLengthPx, tfp);
+  ctx.fillRect(beamLeft, beamY + Hp - tfp, beamLengthPx, tfp);
+  // Web (light blue)
+  ctx.fillStyle = '#d6e8fa';
+  ctx.fillRect(beamLeft, beamY + tfp, beamLengthPx, Hp - 2*tfp);
+
+  // Cut openings
+  let xPos = beamLeft + Sp / 2;
+  const openings = [];
+  while (xPos + r <= beamRight) { openings.push(xPos); xPos += Sp; }
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  openings.forEach(x => {
+    ctx.beginPath(); ctx.arc(x, cy, r, 0, 2*Math.PI); ctx.fill();
+  });
+  ctx.restore();
+
+  // Beam outline
+  ctx.strokeStyle = '#1a365d';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(beamLeft, beamY, beamLengthPx, Hp);
+  ctx.beginPath();
+  ctx.moveTo(beamLeft, beamY + tfp); ctx.lineTo(beamRight, beamY + tfp);
+  ctx.moveTo(beamLeft, beamY + Hp - tfp); ctx.lineTo(beamRight, beamY + Hp - tfp);
+  ctx.stroke();
+
+  // Opening outlines (dark orange)
+  ctx.strokeStyle = '#b45309';
+  ctx.lineWidth = 1.5;
+  openings.forEach(x => {
+    ctx.beginPath(); ctx.arc(x, cy, r, 0, 2*Math.PI); ctx.stroke();
+  });
+
+  // Centerline (dark cyan)
+  ctx.strokeStyle = '#0e7490';
+  ctx.setLineDash([4,3]);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(beamLeft - 20, cy); ctx.lineTo(beamRight + 20, cy);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.font = '10px IBM Plex Mono, monospace';
+
+  // S spacing
+  if (openings.length >= 2) {
+    const x1 = openings[0], x2 = openings[1];
+    const dimY = beamY + Hp + 20;
+    ctx.strokeStyle = '#8b6914';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x1, dimY); ctx.lineTo(x2, dimY);
+    ctx.moveTo(x1 + 6, dimY - 4); ctx.lineTo(x1, dimY); ctx.lineTo(x1 + 6, dimY + 4);
+    ctx.moveTo(x2 - 6, dimY - 4); ctx.lineTo(x2, dimY); ctx.lineTo(x2 - 6, dimY + 4);
+    ctx.moveTo(x1, beamY + Hp + 4); ctx.lineTo(x1, dimY + 5);
+    ctx.moveTo(x2, beamY + Hp + 4); ctx.lineTo(x2, dimY + 5);
+    ctx.stroke();
+    ctx.fillStyle = '#8b6914';
+    ctx.textAlign = 'center';
+    ctx.fillText('S = '+S+' mm', (x1 + x2) / 2, dimY + 18);
+  }
+
+  // a₀ label
+  if (openings.length >= 1) {
+    ctx.fillStyle = '#b45309';
+    ctx.font = 'bold 10px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('a₀='+a0, openings[0], cy + 4);
+  }
+
+  // e (web post)
+  if (openings.length >= 2) {
+    const x1Edge = openings[0] + r, x2Edge = openings[1] - r;
+    const eY = beamY - 14;
+    ctx.strokeStyle = '#166534';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x1Edge, eY); ctx.lineTo(x2Edge, eY);
+    ctx.moveTo(x1Edge + 4, eY - 3); ctx.lineTo(x1Edge, eY); ctx.lineTo(x1Edge + 4, eY + 3);
+    ctx.moveTo(x2Edge - 4, eY - 3); ctx.lineTo(x2Edge, eY); ctx.lineTo(x2Edge - 4, eY + 3);
+    ctx.stroke();
+    ctx.fillStyle = '#166534';
+    ctx.font = '9px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('e = '+(S - a0).toFixed(0), (x1Edge + x2Edge) / 2, eY - 4);
+  }
+
+  // H_cb on left
+  const dimX = beamLeft - 25;
+  ctx.strokeStyle = '#8b6914';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(dimX, beamY); ctx.lineTo(dimX, beamY + Hp);
+  ctx.moveTo(dimX - 4, beamY + 6); ctx.lineTo(dimX, beamY); ctx.lineTo(dimX + 4, beamY + 6);
+  ctx.moveTo(dimX - 4, beamY + Hp - 6); ctx.lineTo(dimX, beamY + Hp); ctx.lineTo(dimX + 4, beamY + Hp - 6);
+  ctx.moveTo(beamLeft - 30, beamY); ctx.lineTo(beamLeft + 4, beamY);
+  ctx.moveTo(beamLeft - 30, beamY + Hp); ctx.lineTo(beamLeft + 4, beamY + Hp);
+  ctx.stroke();
+  ctx.fillStyle = '#8b6914';
+  ctx.save();
+  ctx.translate(dimX - 8, beamY + Hp/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.font = '10px IBM Plex Mono, monospace';
+  ctx.fillText('H_cb = '+Hcb, 0, 0);
+  ctx.restore();
+
+  // Centerline label
+  ctx.fillStyle = '#0e7490';
+  ctx.font = '9px IBM Plex Mono, monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('CL of openings', beamRight + 25, cy + 3);
+}
+
+// ═════════════════════════════════════════════════════════════════════
 // PRINT PREPARATION
 // ═════════════════════════════════════════════════════════════════════
 function preparePrint(){
@@ -3431,6 +3737,27 @@ window.addEventListener('beforeprint', function(){
   document.querySelectorAll('.print-date-repeat').forEach(function(el){
     el.textContent = document.getElementById('print-date').textContent;
   });
+  // วาด canvas ใหม่ด้วยพื้นหลังขาวสำหรับปริ้น
+  const B  = parseFloat(document.getElementById('inp_B').value)||200;
+  const tw = parseFloat(document.getElementById('inp_tw').value)||8;
+  const tf = parseFloat(document.getElementById('inp_tf').value)||13;
+  const Hcb= parseFloat(document.getElementById('inp_Hcb').value)||560;
+  const a0 = parseFloat(document.getElementById('inp_a0').value)||400;
+  const S  = parseFloat(document.getElementById('inp_S').value)||600;
+  drawSectionForPrint(B, tw, tf, Hcb, a0);
+  drawElevationForPrint(B, tw, tf, Hcb, a0, S);
+});
+
+window.addEventListener('afterprint', function(){
+  // คืนค่า canvas เป็นธีมเข้มเหมือนเดิม
+  const B  = parseFloat(document.getElementById('inp_B').value)||200;
+  const tw = parseFloat(document.getElementById('inp_tw').value)||8;
+  const tf = parseFloat(document.getElementById('inp_tf').value)||13;
+  const Hcb= parseFloat(document.getElementById('inp_Hcb').value)||560;
+  const a0 = parseFloat(document.getElementById('inp_a0').value)||400;
+  const S  = parseFloat(document.getElementById('inp_S').value)||600;
+  drawSection(B, tw, tf, Hcb, a0);
+  drawElevation(B, tw, tf, Hcb, a0, S);
 });
 
 // Override print button
