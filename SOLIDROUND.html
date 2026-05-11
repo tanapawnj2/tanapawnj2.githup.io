@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<title>Solid Round — AISC 360-22</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161b25;--bg3:#1c2333;--bg4:#222c3c;
+  --border:#2a3650;--border2:#334166;
+  --text:#ffffff;--muted:#ffffff;--dim:#ffffff;
+  --blue:#4a90d9;--blue2:#2563a8;
+  --orange:#f0883e;--red:#e05252;--green:#4ade80;
+  --yellow:#f5c842;--purple:#a78bfa;--cyan:#22d3ee;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{min-width:1372px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+sub,sup{font-size:.72em;font-weight:600;line-height:0;position:relative;vertical-align:baseline}
+sub{bottom:-.3em}sup{top:-.4em}
+.hdr{background:linear-gradient(135deg,#0d1520,#1a2540);border-bottom:1px solid var(--border2);
+  padding:0 24px;display:flex;align-items:center;gap:14px;height:52px;position:sticky;top:0;z-index:100;min-width:1280px}
+.hdr-logo{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue);
+  letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--blue2);padding:3px 9px;border-radius:3px}
+.hdr-title{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text);letter-spacing:.04em}
+.hdr-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.layout{display:flex;min-width:1372px}
+.sidebar{width:360px;min-width:360px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
+.main{width:1012px;min-width:1012px;flex-shrink:0;padding:20px;display:flex;flex-direction:column;gap:0}
+.sg{border-bottom:1px solid var(--border);padding:12px 14px}
+.sg-title{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sg-title::after{content:'';flex:1;height:1px;background:var(--border2)}
+.inp-row{display:flex;align-items:center;margin-bottom:7px;gap:6px}
+.inp-row .lbl{font-size:12px;color:#fff;width:80px;flex-shrink:0;font-weight:500}
+.inp-row .sym{font-size:11px;width:12px;text-align:center;flex-shrink:0}
+.inp-row input{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);color:#fff;
+  font-size:13px;font-weight:600;padding:5px 10px;border-radius:4px;text-align:center;transition:border-color .15s}
+.inp-row input:focus{outline:none;border-color:var(--blue);background:var(--bg4)}
+.inp-row .unit{font-size:11px;color:rgba(255,255,255,.6);width:36px;flex-shrink:0}
+.sec-block{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;background:var(--bg2);width:972px;min-width:972px}
+.sec-hdr{background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:10px}
+.sec-tag{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;padding:2px 7px;border-radius:2px}
+.tag-blue{background:var(--blue2)}.tag-orange{background:#b45309}.tag-green{background:#166534}
+.tag-red{background:#991b1b}.tag-purple{background:#6d28d9}.tag-cyan{background:#0e7490}
+.tag-pink{background:#9d174d}.tag-teal{background:#0f766e}.tag-yellow{background:#a16207}
+.sec-title{font-size:12px;font-weight:600;color:#fff}
+.sec-ref{margin-left:auto;font-size:10px;color:rgba(255,255,255,.6)}
+.rep-grid{display:grid;grid-template-columns:486px 486px;gap:0;border-top:1px solid var(--border)}
+.rep-col{padding:14px;border-right:1px solid var(--border)}
+.rep-col:last-child{border-right:none}
+.rep-col-full{padding:14px}
+.gov{background:linear-gradient(90deg,rgba(245,200,66,.12),transparent);
+  border-left:3px solid #f5c842;padding:8px 12px;margin-top:10px;border-radius:0 4px 4px 0}
+.gov-lbl{font-size:11px;color:rgba(255,255,255,.7)}
+.gov-val{font-size:18px;font-weight:800;color:#f5c842;display:flex;align-items:baseline;gap:6px}
+.gov-unit{font-size:12px;color:rgba(245,200,66,.7);font-weight:500}
+.gov-tag{font-family:var(--mono);font-size:9px;font-weight:700;background:#c47f00;color:#fff;padding:2px 7px;border-radius:2px;letter-spacing:.1em;margin-right:6px}
+.gov-green{background:linear-gradient(90deg,rgba(74,222,128,.1),transparent);border-left:3px solid var(--green);padding:8px 12px;margin-top:10px;border-radius:0 4px 4px 0}
+.gov-green .gov-val{color:var(--green)}.gov-green .gov-unit{color:rgba(74,222,128,.7)}
+.gov-green .gov-tag{background:#166534}
+.sdiv{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.6);display:flex;align-items:center;gap:8px;margin:10px 0 7px}
+.sdiv::before{content:'';width:10px;height:1px;background:var(--border2)}
+.sdiv::after{content:'';flex:1;height:1px;background:var(--border2)}
+canvas{display:block;border-radius:4px;background:#0f1117}
+.calc-block{margin:6px 0 10px;border-left:2px solid var(--border2)}
+.calc-line1,.calc-line2,.calc-line3{font-size:12px;display:grid;grid-template-columns:20px 18px 1fr;align-items:baseline;padding:2px 0}
+.calc-line1 .cl-ind{display:none}.calc-line1 .cl-eq{display:none}.calc-line1 .cl-body{grid-column:1/4}
+.calc-line2 .cl-ind{display:block}
+.calc-line3{border-left:2px solid rgba(255,255,255,.3);padding:3px 0;margin-top:1px}
+.calc-line3 .cl-ind{display:block}
+.cl-eq{text-align:center;font-weight:500;font-family:var(--mono)}
+.cl-body{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.calc-val{font-size:14px;font-weight:700;color:#fff}
+.calc-unit{font-size:10px;color:rgba(255,255,255,.5)}
+.badge-ok{color:var(--green);font-weight:700}.badge-warn{color:var(--yellow);font-weight:700}.badge-fail{color:var(--orange);font-weight:700}
+.sum-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.sum-tbl td{padding:6px 10px;border:1px solid var(--border)}
+.sum-tbl tr:first-child td{background:var(--bg3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.sum-tbl .val{font-weight:700;color:var(--yellow);text-align:right}
+.ax{font-size:10px;font-weight:700;padding:1px 6px;border-radius:2px;margin-right:2px}
+.ax-x{background:#0e4f6e;color:var(--cyan)}.ax-y{background:#3b1d6e;color:var(--purple)}
+.info-box{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:10px 14px;margin-top:8px;font-size:11px;color:rgba(255,255,255,.65);line-height:1.8}
+.info-box b{color:var(--cyan);font-weight:600}
+/* ═══════════════════ PRINT STYLES ═══════════════════ */
+.print-header,.print-header-repeat,.print-footer{display:none}
+@media print{
+  @page{size:A4 portrait;margin:12mm 10mm 16mm 10mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  .hdr,.sidebar{display:none!important}
+  html{min-width:0!important}
+  body{background:#fff!important;color:#222!important;font-size:10.5px!important;line-height:1.4!important}
+  .layout{display:block!important;min-width:0!important}
+  .main{width:100%!important;min-width:0!important;padding:0!important}
+  .print-header{display:flex!important;align-items:center;justify-content:space-between;border-bottom:2.5px solid #1a365d;padding:0 0 5px 0;margin-bottom:6px;page-break-inside:avoid;break-inside:avoid}
+  .print-header-repeat{display:flex!important;align-items:center;justify-content:space-between;border-bottom:2.5px solid #1a365d;padding:0 0 5px 0;margin-bottom:6px;page-break-inside:avoid;break-inside:avoid}
+  .print-header .ph-left,.print-header-repeat .ph-left{font-family:var(--mono);font-size:13px;font-weight:700;color:#1a365d;letter-spacing:.04em}
+  .print-header .ph-left small,.print-header-repeat .ph-left small{display:block;font-size:8.5px;font-weight:500;color:#666;letter-spacing:.06em;margin-top:1px}
+  .print-header .ph-right,.print-header-repeat .ph-right{text-align:right;font-family:var(--mono);font-size:8.5px;color:#555;line-height:1.6}
+  .print-input-summary{display:flex!important;flex-wrap:wrap;gap:3px 14px;background:#f0f4f8;border:1px solid #ccd;border-radius:3px;padding:5px 10px;margin-bottom:6px;font-family:var(--mono);font-size:8.5px;color:#333;page-break-inside:avoid;break-inside:avoid}
+  .print-input-summary b{font-weight:700;color:#1a365d}
+  .print-footer{display:block!important;position:fixed;bottom:0;left:0;right:0;text-align:center;font-family:var(--mono);font-size:7.5px;color:#999;border-top:1px solid #ddd;padding:3px 0 0}
+  .sec-block{border-color:#bbb!important;background:#fff!important;width:100%!important;min-width:0!important;margin-bottom:4px!important;page-break-inside:avoid!important;break-inside:avoid!important}
+  .sec-hdr{background:#e8edf4!important;border-bottom:1px solid #bbb!important;padding:4px 10px!important;page-break-after:avoid!important;break-after:avoid!important}
+  .sec-tag{color:#fff!important}.sec-title{color:#222!important;font-size:11px!important}.sec-ref{color:#666!important;font-size:9px!important}
+  .sdiv{color:#555!important;margin:5px 0 4px!important;page-break-after:avoid!important;break-after:avoid!important}
+  .rep-grid{grid-template-columns:1fr 1fr!important;border-top:1px solid #bbb!important}
+  .rep-col{border-right:1px solid #ccc!important;padding:6px 9px!important}
+  .rep-col:last-child{border-right:none!important}
+  .rep-col-full{padding:6px 9px!important}
+  .calc-block{page-break-inside:avoid;break-inside:avoid;margin:3px 0 5px!important}
+  .calc-line1,.calc-line2,.calc-line3{font-size:10.5px!important;padding:1px 0!important}
+  .calc-val{font-size:11.5px!important;color:#111!important}
+  .calc-unit{color:#555!important}
+  .gov,.gov-green{page-break-inside:avoid;break-inside:avoid;padding:4px 9px!important;margin-top:4px!important}
+  .gov-val,.gov-green .gov-val{font-size:13px!important}
+  .gov-lbl{font-size:9.5px!important;color:#555!important}
+  .sum-tbl tr{page-break-inside:avoid;break-inside:avoid}
+  .sum-tbl td{padding:4px 6px!important;font-size:10px!important;border-color:#bbb!important}
+  .sum-tbl tr:first-child td{background:#e8edf4!important;color:#222!important}
+  .sum-tbl .val{color:#1a365d!important}
+  canvas{width:auto!important;height:auto!important;max-width:100%!important;max-height:220px!important;background:#fff!important}
+  .canvas-wrap{background:#fff!important}
+  .gov{background:linear-gradient(90deg,rgba(200,170,50,.12),transparent)!important;border-left:3px solid #c09800!important}
+  .gov-val{color:#7a5d10!important}.gov-unit{color:#8b6914!important}
+  .gov-tag{background:#a67c00!important;color:#fff!important}
+  .gov-green{background:linear-gradient(90deg,rgba(50,160,80,.08),transparent)!important;border-left:3px solid #2f855a!important}
+  .gov-green .gov-lbl{color:#555!important}.gov-green .gov-val{color:#276749!important}
+  .gov-green .gov-tag{background:#276749!important;color:#fff!important}
+  .info-box{background:#f4f4f4!important;border-color:#ccc!important;color:#444!important}
+  [style*="color:rgba(255,255,255"]{color:#555!important}
+  [style*="color:#fff"]{color:#222!important}
+  [style*="color:var(--cyan)"]{color:#0e7490!important}
+  [style*="color:var(--yellow)"]{color:#8b6914!important}
+  [style*="color:var(--green)"]{color:#276749!important}
+  [style*="color:var(--blue)"]{color:#1a365d!important}
+  .print-break-before{page-break-before:always!important;break-before:page!important}
+}
+@media screen{.print-header,.print-header-repeat,.print-footer,.print-input-summary,.print-break-before{display:none!important}}
+</style>
+
+<!-- Firebase Auth -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBKhes9uVB7tFATNChmYJtkSGXtoV8pGoI",
+    authDomain:        "civiltoolskit.firebaseapp.com",
+    projectId:         "civiltoolskit",
+    storageBucket:     "civiltoolskit.firebasestorage.app",
+    messagingSenderId: "108662763128",
+    appId:             "1:108662763128:web:864248bfaf2fd27c52878d"
+  };
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      const name = user.displayName || user.email.split("@")[0];
+      document.getElementById("user-name").textContent = name;
+    } else {
+      window.location.href = "index.html";
+    }
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("btn-logout").addEventListener("click", async () => {
+      localStorage.removeItem("login_time");
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+  });
+</script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">AISC 360-22</div>
+  <div class="hdr-title">Solid Round Bar</div>
+  <button style="margin-left:auto;background:#2563a8;color:#fff;border:1px solid #4a90d9;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;padding:6px 14px;cursor:pointer;text-transform:uppercase" id="btn-print">⎙ PRINT</button>
+  <div class="hdr-dot" style="margin-left:12px"></div>
+  <span id="user-name" style="font-size:0.78rem;color:#e8d5a3;font-family:monospace;margin-left:16px;"></span>
+  <button id="btn-logout" style="font-size:0.78rem;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#8896b8;padding:3px 10px;cursor:pointer;font-family:monospace;margin-left:8px;">LOGOUT</button>
+</div>
+
+<div class="layout">
+
+<!-- ══════════════════════════════════════════════════════ SIDEBAR -->
+<div class="sidebar">
+  <div class="sg">
+    <div class="sg-title">ขนาดหน้าตัด</div>
+    <div class="inp-row"><span class="lbl">D</span><span class="sym">=</span><input id="inp_D" type="text" value="50"><span class="unit">mm</span></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">วัสดุ</div>
+    <div class="inp-row"><span class="lbl">F<sub>y</sub></span><span class="sym">=</span><input id="inp_Fy" type="text" value="2400"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">F<sub>u</sub></span><span class="sym">=</span><input id="inp_Fu" type="text" value="4100"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">E</span><span class="sym">=</span><input id="inp_E" type="text" value="2039400"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">G</span><span class="sym">=</span><input id="inp_G" type="text" value="784400"><span class="unit">ksc</span></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Unbraced Length</div>
+    <div class="inp-row"><span class="lbl">L</span><span class="sym">=</span><input id="inp_L" type="text" value="3000"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">L<sub>v</sub></span><span class="sym">=</span><input id="inp_Lv" type="text" value="3000"><span class="unit">mm</span></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Parameters</div>
+    <div class="inp-row"><span class="lbl">K</span><span class="sym">=</span><input id="inp_K" type="text" value="1"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">C<sub>b</sub></span><span class="sym">=</span><input id="inp_Cb" type="text" value="1"><span class="unit"></span></div>
+  </div>
+  <div class="sg" style="border-bottom:none">
+    <div class="sg-title">Note</div>
+    <div style="font-size:10px;color:rgba(255,255,255,.5);line-height:1.7">
+      Solid Round Bar — ไม่มี Local Buckling<br>
+      ทุก element เป็น Compact เสมอ<br>
+      Flexure: AISC F11 (สำหรับแท่งกลม)<br>
+      Shear: AISC G6 (Ag ทั้งก้อน)<br>
+      Torsion: AISC H3.2 (Solid round)
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ MAIN -->
+<div class="main">
+
+<!-- PRINT header (screen-hidden) -->
+<div class="print-header">
+  <div class="ph-left">Solid Round Bar — AISC 360-22<small>Tension · Flexure · Shear · Torsion · Compression</small></div>
+  <div class="ph-right"><span id="print-date"></span><br>CivilToolsKit — Automated Calculation</div>
+</div>
+<div class="print-input-summary" id="print-input-strip"></div>
+
+<!-- ── CANVAS ── -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-blue">Section</span><span class="sec-title">Solid Round Bar — ภาพหน้าตัด</span></div>
+  <div class="canvas-wrap" style="padding:0;display:flex;justify-content:center;background:var(--bg)">
+    <canvas id="sectionCanvas" width="480" height="480" style="width:480px;height:480px;display:block"></canvas>
+  </div>
+</div>
+
+<!-- ── SECTION PROPERTIES ── -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-blue">Section</span><span class="sec-title">Section Properties — Solid Round Bar</span></div>
+  <div class="rep-col-full">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+      <div style="border-right:1px solid var(--border);padding:14px">
+        <div class="sdiv">Geometric</div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">D = <span id="m_D" style="color:var(--blue);font-weight:700">50.0</span> <span style="color:rgba(255,255,255,.5);font-size:10px">mm</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">A<sub>g</sub> = <span id="m_Ag" style="color:var(--blue);font-weight:700">1,963</span> <span style="color:rgba(255,255,255,.5);font-size:10px">mm²</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:#ccc">w<sub>t</sub> = <span id="m_wt" style="color:var(--blue);font-weight:700">15.4</span> <span style="color:rgba(255,255,255,.5);font-size:10px">kg/m</span></div>
+      </div>
+      <div style="border-right:1px solid var(--border);padding:14px">
+        <div class="sdiv">Moment of Inertia &amp; Radius</div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I = <span id="m_I" style="color:var(--blue);font-weight:700">0.307</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10⁶ mm⁴</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">r = <span id="m_r" style="color:var(--blue);font-weight:700">12.50</span> <span style="color:rgba(255,255,255,.5);font-size:10px">mm</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--purple)">J = <span id="m_J" style="color:var(--blue);font-weight:700">0.614</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10⁶ mm⁴</span></div>
+      </div>
+      <div style="padding:14px">
+        <div class="sdiv">Section Modulus</div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">S = <span id="m_S" style="color:var(--blue);font-weight:700">12.27</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">Z = <span id="m_Z" style="color:var(--blue);font-weight:700">20.83</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--purple)">C = <span id="m_C" style="color:var(--blue);font-weight:700">24.54</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
+      </div>
+    </div>
+    <div class="info-box" style="margin:10px 0 4px">
+      <b>Solid Round Bar</b> — ไม่มีแนวคิด Local Buckling ทุก element เป็น Compact เสมอ
+      &nbsp;|&nbsp; I<sub>x</sub> = I<sub>y</sub> = πD⁴/64 &nbsp;|&nbsp; J = πD⁴/32 = 2I &nbsp;|&nbsp; r = D/4
+    </div>
+  </div>
+</div>
+
+<!-- ── TENSION D2 ── -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-purple">D2 — Tension</span><span class="sec-title">Tensile Strength</span><span class="sec-ref">AISC 360-22 D2</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv" style="color:var(--cyan)">Tensile Yielding — D2-1</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>y</sub> · A<sub>g</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="tn_Pn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="tn_Pn">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">φ<sub>t</sub>P<sub>n</sub> (LRFD, φ<sub>t</sub>=0.90)</div>
+        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="tn_phiPn">—</span><span class="gov-unit">kg</span></div></div>
+      <div class="gov" style="margin-top:6px"><div class="gov-lbl">P<sub>n</sub>/Ω<sub>t</sub> (ASD, Ω<sub>t</sub>=1.67)</div>
+        <div class="gov-val"><span class="gov-tag">ASD</span><span id="tn_ASDPn">—</span><span class="gov-unit">kg</span></div></div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv" style="color:var(--purple)">Tensile Rupture — D2-2 (U=1.0)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>u</sub> · A<sub>e</sub> &nbsp;(A<sub>e</sub>=A<sub>g</sub>, U=1.0)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="tnr_Pn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="tnr_Pn">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">φ<sub>t</sub>P<sub>n</sub> (LRFD, φ<sub>t</sub>=0.75)</div>
+        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="tnr_phiPn">—</span><span class="gov-unit">kg</span></div></div>
+      <div class="gov" style="margin-top:6px"><div class="gov-lbl">P<sub>n</sub>/Ω<sub>t</sub> (ASD, Ω<sub>t</sub>=2.00)</div>
+        <div class="gov-val"><span class="gov-tag">ASD</span><span id="tnr_ASDPn">—</span><span class="gov-unit">kg</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FLEXURE F11 ── -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-orange">F11 — Flexure</span><span class="sec-title">Flexural Strength — Solid Round Bar</span><span class="sec-ref">AISC 360-22 F11</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv" style="color:var(--cyan)">Plastic &amp; Elastic Moment</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>p</sub> = F<sub>y</sub> · Z</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_Mp_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Mp">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>y</sub> = F<sub>y</sub> · S</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_My_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_My">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="info-box">
+        Solid round bar มี I<sub>x</sub>=I<sub>y</sub> → ไม่มี LTB<br>
+        Compact (always) → <b>F11-1: M<sub>n</sub> = M<sub>p</sub> ≤ 1.6M<sub>y</sub></b>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv" style="color:var(--cyan)">M<sub>n</sub> — F11 Governing</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">Compact → F11-1: M<sub>n</sub> = min(M<sub>p</sub>, 1.6M<sub>y</sub>)</span></div>
+        <div class="calc-line1"><span class="cl-body" id="fl_limit_note">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Mn">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">φ<sub>b</sub>M<sub>n</sub> (LRFD, φ<sub>b</sub>=0.90)</div>
+        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="fl_phiMn">—</span><span class="gov-unit">kg·m</span></div></div>
+      <div class="gov" style="margin-top:6px"><div class="gov-lbl">M<sub>n</sub>/Ω<sub>b</sub> (ASD, Ω<sub>b</sub>=1.67)</div>
+        <div class="gov-val"><span class="gov-tag">ASD</span><span id="fl_ASDMn">—</span><span class="gov-unit">kg·m</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SHEAR G6 ── -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-red">G6 — Shear</span><span class="sec-title">Shear Strength — Solid Round Bar</span><span class="sec-ref">AISC 360-22 G6</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv" style="color:var(--cyan)">Critical Shear Stress F<sub>cr</sub> &amp; Web Area</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">F<sub>cr</sub> = 0.6 F<sub>y</sub> &nbsp;(solid, always yield governs)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">A<sub>w</sub> = A<sub>g</sub> = πD²/4</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Aw">—</span><span class="calc-unit">mm²</span></span></div>
+      </div>
+      <div class="info-box">
+        AISC G6: V<sub>n</sub> = F<sub>cr</sub>·A<sub>g</sub>/2<br>
+        แท่งกลมใช้ A<sub>g</sub> ÷ 2 เพราะ shear stress กระจายไม่สม่ำเสมอ
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv" style="color:var(--cyan)">V<sub>n</sub> = F<sub>cr</sub> · A<sub>g</sub>/2 &nbsp;(Eq. G6-1)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">V<sub>n</sub> = F<sub>cr</sub> · A<sub>g</sub> / 2</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_Vn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Vn">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">φ<sub>v</sub>V<sub>n</sub> (LRFD, φ<sub>v</sub>=0.90)</div>
+        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="sh_phiVn">—</span><span class="gov-unit">kg</span></div></div>
+      <div class="gov" style="margin-top:6px"><div class="gov-lbl">V<sub>n</sub>/Ω<sub>v</sub> (ASD, Ω<sub>v</sub>=1.67)</div>
+        <div class="gov-val"><span class="gov-tag">ASD</span><span id="sh_ASDVn">—</span><span class="gov-unit">kg</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TORSION H3.2 ── -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-yellow">H3.2 — Torsion</span><span class="sec-title">Torsional Strength — Solid Round Bar</span><span class="sec-ref">AISC 360-22 H3.2</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv" style="color:var(--cyan)">Torsion Shear Stress F<sub>cr,T</sub></div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">F<sub>cr</sub> = 0.6 F<sub>y</sub> &nbsp;(Solid rod — shear yielding always governs)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">C = J / (D/2) = πD³/16 &nbsp;(torsional constant)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_C">—</span><span class="calc-unit">×10³ mm³</span></span></div>
+      </div>
+      <div class="info-box">
+        H3.2: T<sub>n</sub> = F<sub>cr</sub> · C<br>
+        C = πD³/16 สำหรับแท่งกลม Solid
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv" style="color:var(--cyan)">T<sub>n</sub> = F<sub>cr</sub> · C &nbsp;(Eq. H3-1)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">T<sub>n</sub> = F<sub>cr</sub> · C</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="to_Tn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Tn">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">φ<sub>T</sub>T<sub>n</sub> (LRFD, φ<sub>T</sub>=0.90)</div>
+        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="to_phiTn">—</span><span class="gov-unit">kg·m</span></div></div>
+      <div class="gov" style="margin-top:6px"><div class="gov-lbl">T<sub>n</sub>/Ω<sub>T</sub> (ASD, Ω<sub>T</sub>=1.67)</div>
+        <div class="gov-val"><span class="gov-tag">ASD</span><span id="to_ASDTn">—</span><span class="gov-unit">kg·m</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT page break -->
+<div class="print-header-repeat print-break-before" aria-hidden="true">
+  <div class="ph-left">Solid Round Bar — AISC 360-22<small>Compression — Flexural Buckling (E3)</small></div>
+  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+</div>
+
+<!-- ── COMPRESSION E3 ── -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-green">E3 — Compr</span><span class="sec-title">Compression — Flexural Buckling (ไม่มี Local Buckling)</span><span class="sec-ref">AISC 360-22 E3</span></div>
+  <div class="rep-col-full" style="border-top:1px solid var(--border)">
+    <div class="info-box" style="margin-bottom:10px">
+      Solid Round Bar ไม่มี Local Buckling ไม่ต้องคำนวณ Q (E7) → <b>Q = 1.0 เสมอ</b>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+      <div style="border-right:1px solid var(--border);padding-right:14px">
+        <div class="sdiv" style="color:var(--cyan)">Slenderness &amp; Elastic Buckling</div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">KL/r = K · L / r</span></div>
+          <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="co_KLr_sub">—</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_KLr">—</span></span></div>
+        </div>
+        <div style="font-size:12px;padding:2px 0">4.71√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:600" id="co_lim">—</span></div>
+        <div class="calc-block" style="margin-top:8px">
+          <div class="calc-line1"><span class="cl-body">F<sub>e</sub> = π²E / (KL/r)²</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_Fe">—</span><span class="calc-unit">ksc</span></span></div>
+        </div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body" id="co_regime">—</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
+        </div>
+      </div>
+      <div style="padding-left:14px">
+        <div class="sdiv" style="color:var(--cyan)">Design Compressive Strength</div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>cr</sub> · A<sub>g</sub></span></div>
+          <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="co_Pn_sub">—</span></div>
+          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_Pn">—</span><span class="calc-unit">kg</span></span></div>
+        </div>
+        <div class="gov"><div class="gov-lbl">φ<sub>c</sub>P<sub>n</sub> (LRFD, φ<sub>c</sub>=0.90)</div>
+          <div class="gov-val"><span class="gov-tag">LRFD</span><span id="co_phiPn">—</span><span class="gov-unit">kg</span></div></div>
+        <div class="gov" style="margin-top:6px"><div class="gov-lbl">P<sub>n</sub>/Ω<sub>c</sub> (ASD, Ω<sub>c</sub>=1.67)</div>
+          <div class="gov-val"><span class="gov-tag">ASD</span><span id="co_ASDPn">—</span><span class="gov-unit">kg</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SUMMARY ── -->
+<div class="print-header-repeat print-break-before" aria-hidden="true">
+  <div class="ph-left">Solid Round Bar — AISC 360-22<small>Design Strength Summary</small></div>
+  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+</div>
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-teal">Summary</span><span class="sec-title">Design Strength Summary — LRFD &amp; ASD</span><span class="sec-ref">AISC 360-22</span></div>
+  <div class="rep-col-full">
+    <table class="sum-tbl">
+      <thead>
+        <tr><td>Check</td><td>Ref.</td><td>Nominal R<sub>n</sub></td><td>φ</td><td>φR<sub>n</sub> (LRFD)</td><td>Ω</td><td>R<sub>n</sub>/Ω (ASD)</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Tension — Yielding</td><td style="color:rgba(255,255,255,.5)">D2</td>
+          <td class="val"><span id="sum_Pnt_y">—</span> kg</td><td>0.90</td>
+          <td class="val"><span id="sum_phiPnt_y">—</span> kg</td><td>1.67</td>
+          <td class="val"><span id="sum_ASDPnt_y">—</span> kg</td>
+        </tr>
+        <tr>
+          <td>Tension — Rupture</td><td style="color:rgba(255,255,255,.5)">D2</td>
+          <td class="val"><span id="sum_Pnt_r">—</span> kg</td><td>0.75</td>
+          <td class="val"><span id="sum_phiPnt_r">—</span> kg</td><td>2.00</td>
+          <td class="val"><span id="sum_ASDPnt_r">—</span> kg</td>
+        </tr>
+        <tr>
+          <td>Flexure M<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">F11</td>
+          <td class="val"><span id="sum_Mn">—</span> kg·m</td><td>0.90</td>
+          <td class="val"><span id="sum_phiMn">—</span> kg·m</td><td>1.67</td>
+          <td class="val"><span id="sum_ASDMn">—</span> kg·m</td>
+        </tr>
+        <tr>
+          <td>Shear V<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">G6</td>
+          <td class="val"><span id="sum_Vn">—</span> kg</td><td>0.90</td>
+          <td class="val"><span id="sum_phiVn">—</span> kg</td><td>1.67</td>
+          <td class="val"><span id="sum_ASDVn">—</span> kg</td>
+        </tr>
+        <tr>
+          <td>Torsion T<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">H3.2</td>
+          <td class="val"><span id="sum_Tn">—</span> kg·m</td><td>0.90</td>
+          <td class="val"><span id="sum_phiTn">—</span> kg·m</td><td>1.67</td>
+          <td class="val"><span id="sum_ASDTn">—</span> kg·m</td>
+        </tr>
+        <tr>
+          <td>Compression P<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">E3</td>
+          <td class="val"><span id="sum_Pnc">—</span> kg</td><td>0.90</td>
+          <td class="val"><span id="sum_phiPnc">—</span> kg</td><td>1.67</td>
+          <td class="val"><span id="sum_ASDPnc">—</span> kg</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div class="gov"><div class="gov-lbl">Tension — Governing</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_tn">YIELD</span><span id="fm_tn">Tensile yielding governs</span></div></div>
+      <div class="gov"><div class="gov-lbl">Flexure — F11</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_fl">PLASTIC</span><span id="fm_fl">Plastic moment Mp</span></div></div>
+      <div class="gov"><div class="gov-lbl">Shear — G6</div><div class="gov-val" style="font-size:13px"><span class="gov-tag">YIELD</span>Shear yielding (0.6Fy)</div></div>
+      <div class="gov"><div class="gov-lbl">Torsion — H3.2</div><div class="gov-val" style="font-size:13px"><span class="gov-tag">YIELD</span>Torsional yielding (0.6Fy)</div></div>
+      <div class="gov"><div class="gov-lbl">Compression — E3</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_co">INELASTIC</span><span id="fm_co">Inelastic flexural buckling</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="print-footer">
+  CivilToolsKit — Solid Round Bar · AISC 360-22 &nbsp;|&nbsp; Automated Calculation &nbsp;|&nbsp; <span id="print-footer-date"></span>
+</div>
+
+</div></div><!-- end .main, .layout -->
+
+<!-- ══════════════════════════════════════════════════════ SCRIPT -->
+<script>
+const PI = Math.PI;
+
+// ── Formatting helpers ──
+function f(v, d=2){
+  const n = Number(v);
+  if (!isFinite(n) || isNaN(n)) return '—';
+  const dc = Math.min(Math.max(0,d), 4);
+  let s = dc===0 ? Math.round(n).toString() : parseFloat(n.toFixed(dc)).toString();
+  const p = s.split('.'); p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return p.join('.');
+}
+function pi(id){ const e = document.getElementById(id); return e ? parseFloat(e.value.replace(/,/g,''))||0 : 0; }
+function fi(el){ const r=el.value.replace(/,/g,''), n=parseFloat(r); if(!isFinite(n))return; const p=r.split('.'); p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,','); el.value=p.join('.'); }
+function sv(id, v, d=2){ const e=document.getElementById(id); if(e) e.textContent=f(v,d); }
+function tx(id, t){ const e=document.getElementById(id); if(e) e.textContent=t; }
+function hx(id, h){ const e=document.getElementById(id); if(e) e.innerHTML=h; }
+
+function setupInputs(){
+  document.querySelectorAll('.sidebar input').forEach(el=>{
+    el.addEventListener('blur', ()=>{ fi(el); calculate(); });
+    el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ fi(el); calculate(); } });
+    fi(el);
+  });
+}
+
+// ── Canvas ──
+function drawSection(D){
+  const cvs = document.getElementById('sectionCanvas'); if(!cvs) return;
+  const ctx = cvs.getContext('2d');
+  const isPrint = window._printMode || false;
+  const W = cvs.offsetWidth || 480, H = cvs.offsetHeight || 480;
+  const dpr = isPrint ? 4 : (window.devicePixelRatio||1);
+  cvs.width = W*dpr; cvs.height = H*dpr; ctx.scale(dpr,dpr);
+
+  const bgColor = isPrint ? '#ffffff' : '#0f1117';
+  ctx.fillStyle = bgColor; ctx.fillRect(0,0,W,H);
+
+  // Dot grid (screen only)
+  if(!isPrint){
+    ctx.fillStyle = '#1c2333';
+    for(let gx=15;gx<W;gx+=30) for(let gy=15;gy<H;gy+=30){ ctx.beginPath(); ctx.arc(gx,gy,.8,0,PI*2); ctx.fill(); }
+  }
+
+  const cx=W/2, cy=H/2;
+  const maxR = Math.min(W,H)/2 - 60;
+  const scale = maxR/(D/2);
+  const Ro = D/2 * scale;
+
+  const colFill  = isPrint ? '#1a4a8a' : '#2563a8';
+  const colEdge  = isPrint ? '#0d2d5e' : '#4a90d9';
+  const colAxis  = isPrint ? '#c05010' : '#f0883e';
+  const colDimD  = isPrint ? '#1a7a3a' : '#4ade80';
+  const colDash  = isPrint ? 'rgba(0,120,160,.3)' : 'rgba(34,211,238,.2)';
+  const colDashV = isPrint ? 'rgba(80,0,180,.25)' : 'rgba(167,139,250,.2)';
+  const colText  = isPrint ? '#111' : '#f0883e';
+
+  // Filled solid circle
+  ctx.beginPath(); ctx.arc(cx, cy, Ro, 0, PI*2);
+  ctx.fillStyle = colFill; ctx.fill();
+  ctx.strokeStyle = colEdge; ctx.lineWidth = isPrint?2:1.5; ctx.stroke();
+
+  // Crosshatch fill pattern to indicate solid (subtle)
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, Ro, 0, PI*2); ctx.clip();
+  ctx.strokeStyle = isPrint ? 'rgba(10,30,80,.18)' : 'rgba(255,255,255,.06)';
+  ctx.lineWidth = isPrint ? 1.2 : 1;
+  for(let i=-Ro*2; i<Ro*2; i+=14){
+    ctx.beginPath(); ctx.moveTo(cx+i, cy-Ro); ctx.lineTo(cx+i+Ro*2, cy+Ro); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Center dot
+  ctx.beginPath(); ctx.arc(cx, cy, isPrint?3:2.5, 0, PI*2);
+  ctx.fillStyle = colAxis; ctx.fill();
+
+  // Axes arrows
+  const al=24;
+  ctx.strokeStyle=colAxis; ctx.fillStyle=colAxis; ctx.lineWidth=isPrint?2:1.5;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+al,cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+al,cy); ctx.lineTo(cx+al-7,cy-3.5); ctx.lineTo(cx+al-7,cy+3.5); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx,cy-al); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,cy-al); ctx.lineTo(cx-3.5,cy-al+7); ctx.lineTo(cx+3.5,cy-al+7); ctx.closePath(); ctx.fill();
+  ctx.font='bold 11px IBM Plex Mono,monospace'; ctx.fillStyle=colText;
+  ctx.fillText('x', cx+al+5, cy+4); ctx.fillText('y', cx-4, cy-al-7);
+
+  // Dashed centre lines
+  ctx.save(); ctx.strokeStyle=colDash; ctx.lineWidth=.8; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(cx-Ro-18,cy); ctx.lineTo(cx+Ro+18,cy); ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+  ctx.save(); ctx.strokeStyle=colDashV; ctx.lineWidth=.8; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(cx,cy-Ro-18); ctx.lineTo(cx,cy+Ro+18); ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+
+  // D dimension line (top)
+  const dimY = cy - Ro - 28;
+  ctx.save(); ctx.strokeStyle=isPrint?'rgba(0,0,0,.15)':'rgba(150,150,150,.25)'; ctx.lineWidth=.5; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(cx-Ro, cy-Ro); ctx.lineTo(cx-Ro, dimY-2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+Ro, cy-Ro); ctx.lineTo(cx+Ro, dimY-2); ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+  ctx.strokeStyle=colDimD; ctx.fillStyle=colDimD; ctx.lineWidth=isPrint?1.5:1;
+  ctx.beginPath(); ctx.moveTo(cx-Ro, dimY); ctx.lineTo(cx+Ro, dimY); ctx.stroke();
+  // arrow heads
+  ctx.beginPath(); ctx.moveTo(cx-Ro,dimY); ctx.lineTo(cx-Ro+6,dimY-3); ctx.lineTo(cx-Ro+6,dimY+3); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx+Ro,dimY); ctx.lineTo(cx+Ro-6,dimY-3); ctx.lineTo(cx+Ro-6,dimY+3); ctx.closePath(); ctx.fill();
+  ctx.font='bold 11px IBM Plex Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('D = '+f(D,1)+' mm', cx, dimY-6);
+
+  // SOLID label in centre
+  ctx.font = isPrint?'bold 13px IBM Plex Mono,monospace':'bold 12px IBM Plex Mono,monospace';
+  ctx.fillStyle = isPrint?'rgba(255,255,255,.9)':'rgba(255,255,255,.55)';
+  ctx.textAlign='center';
+  ctx.fillText('SOLID', cx, cy+5);
+
+  // Section name
+  ctx.font = '11px IBM Plex Sans,sans-serif';
+  ctx.fillStyle = isPrint?'#333':'rgba(255,255,255,.4)';
+  ctx.fillText('⌀'+f(D,1)+' mm  Solid Round', cx, cy+Ro+22);
+}
+
+// ── Main calculation ──
+function calculate(){
+  const ksc=10.1972, kgf=101.972;
+
+  const D   = pi('inp_D');
+  const Fy_ksc = pi('inp_Fy'), Fu_ksc = pi('inp_Fu');
+  const E_ksc  = pi('inp_E'),  G_ksc  = pi('inp_G');
+  const L   = pi('inp_L'), Lv = pi('inp_Lv') || pi('inp_L');
+  const K   = pi('inp_K') || 1;
+  const Cb  = pi('inp_Cb') || 1;
+
+  if(!D) return;
+
+  // Convert ksc → MPa
+  const Fy = Fy_ksc/ksc, Fu = Fu_ksc/ksc, E = E_ksc/ksc, G = G_ksc/ksc;
+
+  // ── Section Properties ──
+  const Ag = PI*D*D/4;
+  const I  = PI*Math.pow(D,4)/64;
+  const r  = D/4;                          // r = √(I/A) = D/4 for solid circle
+  const S  = PI*Math.pow(D,3)/32;
+  const Z  = Math.pow(D,3)/6;
+  const J  = PI*Math.pow(D,4)/32;         // J = 2I for solid circle
+  const C  = PI*Math.pow(D,3)/16;         // torsional constant = J/(D/2)
+  const wt = Ag*1e-6*7850;                // kg/m
+
+  sv('m_D', D, 1);
+  sv('m_Ag', Ag, 0);
+  sv('m_wt', wt, 2);
+  sv('m_I', I/1e6, 3);
+  sv('m_r', r, 2);
+  sv('m_J', J/1e6, 3);
+  sv('m_S', S/1e3, 2);
+  sv('m_Z', Z/1e3, 2);
+  sv('m_C', C/1e3, 2);
+
+  drawSection(D);
+
+  // ── Tension D2 ──
+  const Pn_y = Fy*Ag/1e3;   // kN (yielding)
+  const Pn_r = Fu*Ag/1e3;   // kN (rupture, U=1.0)
+
+  tx('tn_Pn_sub', f(Fy_ksc,1)+' ksc × '+f(Ag,0)+' mm²');
+  sv('tn_Pn', Pn_y*kgf, 0);
+  sv('tn_phiPn', 0.90*Pn_y*kgf, 0);
+  sv('tn_ASDPn', Pn_y/1.67*kgf, 0);
+
+  tx('tnr_Pn_sub', f(Fu_ksc,1)+' ksc × '+f(Ag,0)+' mm²');
+  sv('tnr_Pn', Pn_r*kgf, 0);
+  sv('tnr_phiPn', 0.75*Pn_r*kgf, 0);
+  sv('tnr_ASDPn', Pn_r/2.0*kgf, 0);
+
+  // ── Flexure F11 ──
+  const Mp = Fy*Z/1e6;     // kN·m
+  const My = Fy*S/1e6;     // kN·m
+  const Mn = Math.min(Mp, 1.6*My);   // F11-1: Mn = Mp ≤ 1.6My
+
+  sv('fl_Mp', Mp*kgf, 1);
+  tx('fl_Mp_sub', f(Fy_ksc,1)+' ksc × '+f(Z/1e6,5)+' m³');
+  sv('fl_My', My*kgf, 1);
+  tx('fl_My_sub', f(Fy_ksc,1)+' ksc × '+f(S/1e6,5)+' m³');
+
+  const ratio = Mp/My;   // = Z/S = (D³/6)/(πD³/32) = 32/(6π) ≈ 1.698
+  if(Mp <= 1.6*My){
+    tx('fl_limit_note', 'Mp='+f(Mp*kgf,1)+' ≤ 1.6My='+f(1.6*My*kgf,1)+' kg·m → M_n = Mp');
+  } else {
+    tx('fl_limit_note', '1.6My='+f(1.6*My*kgf,1)+' < Mp='+f(Mp*kgf,1)+' kg·m → M_n = 1.6My');
+  }
+  sv('fl_Mn', Mn*kgf, 1);
+  sv('fl_phiMn', 0.90*Mn*kgf, 1);
+  sv('fl_ASDMn', Mn/1.67*kgf, 1);
+
+  // ── Shear G6 ──
+  const Fcr_sh = 0.6*Fy;    // Solid bar: always shear yielding
+  const Vn = Fcr_sh*Ag/(2*1e3);   // kN  (G6-1: Vn = Fcr·Ag/2)
+
+  sv('sh_Fcr', Fcr_sh*ksc, 1);
+  sv('sh_Aw', Ag, 0);
+  tx('sh_Vn_sub', f(Fcr_sh*ksc,1)+' ksc × '+f(Ag,0)+' mm² / 2');
+  sv('sh_Vn', Vn*kgf, 0);
+  sv('sh_phiVn', 0.90*Vn*kgf, 0);
+  sv('sh_ASDVn', Vn/1.67*kgf, 0);
+
+  // ── Torsion H3.2 ──
+  const Fcr_to = 0.6*Fy;    // Solid round: shear yielding (H3-3)
+  const Tn = Fcr_to*C/1e6;  // kN·m  (H3-1: Tn = Fcr·C)
+
+  sv('to_Fcr', Fcr_to*ksc, 1);
+  sv('to_C', C/1e3, 2);
+  tx('to_Tn_sub', f(Fcr_to*ksc,1)+' ksc × '+f(C/1e3,2)+' ×10³ mm³');
+  sv('to_Tn', Tn*kgf, 1);
+  sv('to_phiTn', 0.90*Tn*kgf, 1);
+  sv('to_ASDTn', Tn/1.67*kgf, 1);
+
+  // ── Compression E3 (Q=1, no local buckling) ──
+  const KLr = K*L/r;
+  const lim  = 4.71*Math.sqrt(E/Fy);
+  const Fe   = PI*PI*E/(KLr*KLr);
+  let Fcr_co, coReg;
+  if(KLr <= lim){
+    Fcr_co = Math.pow(0.658, Fy/Fe)*Fy;   // E3-2 inelastic
+    coReg = 'KL/r='+f(KLr,1)+' ≤ '+f(lim,1)+' (Inelastic) → F_cr = [0.658^(Fy/Fe)]·Fy';
+  } else {
+    Fcr_co = 0.877*Fe;                      // E3-3 elastic
+    coReg = 'KL/r='+f(KLr,1)+' > '+f(lim,1)+' (Elastic) → F_cr = 0.877·Fe';
+  }
+  const Pn_co = Fcr_co*Ag/1e3;  // kN
+
+  tx('co_KLr_sub', 'K='+f(K,2)+' × L='+f(L,0)+' mm / r='+f(r,2)+' mm');
+  sv('co_KLr', KLr, 1);
+  sv('co_lim', lim, 1);
+  sv('co_Fe', Fe*ksc, 1);
+  tx('co_regime', coReg);
+  sv('co_Fcr', Fcr_co*ksc, 1);
+  tx('co_Pn_sub', f(Fcr_co*ksc,1)+' ksc × '+f(Ag,0)+' mm²');
+  sv('co_Pn', Pn_co*kgf, 0);
+  sv('co_phiPn', 0.90*Pn_co*kgf, 0);
+  sv('co_ASDPn', Pn_co/1.67*kgf, 0);
+
+  // ── Summary ──
+  sv('sum_Pnt_y', Pn_y*kgf, 0); sv('sum_phiPnt_y', 0.90*Pn_y*kgf, 0); sv('sum_ASDPnt_y', Pn_y/1.67*kgf, 0);
+  sv('sum_Pnt_r', Pn_r*kgf, 0); sv('sum_phiPnt_r', 0.75*Pn_r*kgf, 0); sv('sum_ASDPnt_r', Pn_r/2.0*kgf, 0);
+  sv('sum_Mn', Mn*kgf, 1); sv('sum_phiMn', 0.90*Mn*kgf, 1); sv('sum_ASDMn', Mn/1.67*kgf, 1);
+  sv('sum_Vn', Vn*kgf, 0); sv('sum_phiVn', 0.90*Vn*kgf, 0); sv('sum_ASDVn', Vn/1.67*kgf, 0);
+  sv('sum_Tn', Tn*kgf, 1); sv('sum_phiTn', 0.90*Tn*kgf, 1); sv('sum_ASDTn', Tn/1.67*kgf, 1);
+  sv('sum_Pnc', Pn_co*kgf, 0); sv('sum_phiPnc', 0.90*Pn_co*kgf, 0); sv('sum_ASDPnc', Pn_co/1.67*kgf, 0);
+
+  // ── Failure mode tags ──
+  // Tension
+  const phi_y = 0.90*Pn_y, phi_r = 0.75*Pn_r;
+  if(phi_y <= phi_r){ hx('fm_tag_tn','YIELD'); hx('fm_tn','Tensile yielding governs'); }
+  else { hx('fm_tag_tn','RUPTURE'); hx('fm_tn','Tensile rupture governs'); }
+
+  // Flexure
+  if(Mn === Mp){ hx('fm_tag_fl','PLASTIC'); hx('fm_fl','Plastic moment (Mp)'); }
+  else { hx('fm_tag_fl','1.6My LIM'); hx('fm_fl','Limited by 1.6My (F11-1)'); }
+
+  // Compression
+  if(KLr <= lim){ hx('fm_tag_co','INELASTIC'); hx('fm_co','Inelastic flexural buckling (E3-2)'); }
+  else { hx('fm_tag_co','ELASTIC'); hx('fm_co','Elastic flexural buckling (E3-3)'); }
+}
+
+setupInputs();
+window.addEventListener('load', ()=>{ setupInputs(); calculate(); });
+window.addEventListener('resize', calculate);
+
+// ── Print preparation ──
+function preparePrint(){
+  const now = new Date();
+  const ds = now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})
+    + ' ' + now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  ['print-date','print-footer-date'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent=ds; });
+  document.querySelectorAll('.print-date-repeat').forEach(e=>{ e.textContent=ds; });
+
+  const v = id=>{ const e=document.getElementById(id); return e?e.value:''; };
+  const strip = document.getElementById('print-input-strip');
+  if(strip){
+    strip.innerHTML =
+      '<div><b>D =</b> '+v('inp_D')+' mm</div>' +
+      '<div>|</div>' +
+      '<div><b>Fy =</b> '+v('inp_Fy')+' ksc</div>' +
+      '<div>|</div>' +
+      '<div><b>Fu =</b> '+v('inp_Fu')+' ksc</div>' +
+      '<div>|</div>' +
+      '<div><b>E =</b> '+v('inp_E')+' ksc</div>' +
+      '<div>|</div>' +
+      '<div><b>G =</b> '+v('inp_G')+' ksc</div>' +
+      '<div>|</div>' +
+      '<div><b>L =</b> '+v('inp_L')+' mm</div>' +
+      '<div>|</div>' +
+      '<div><b>Lv =</b> '+v('inp_Lv')+' mm</div>' +
+      '<div>|</div>' +
+      '<div><b>K =</b> '+v('inp_K')+'</div>' +
+      '<div>|</div>' +
+      '<div><b>Cb =</b> '+v('inp_Cb')+'</div>';
+  }
+}
+
+window.addEventListener('beforeprint', ()=>{ preparePrint(); window._printMode=true; calculate(); });
+window.addEventListener('afterprint', ()=>{ window._printMode=false; calculate(); });
+document.getElementById('btn-print').addEventListener('click', ()=>{
+  preparePrint(); window._printMode=true; calculate();
+  setTimeout(()=>{ window.print(); }, 150);
+});
+</script>
+</body></html>
