@@ -212,13 +212,8 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="inp-row"><span class="lbl">C<sub>b</sub></span><span class="sym">=</span><input id="inp_Cb" type="text" value="1"><span class="unit"></span></div>
   </div>
   <div class="sg" style="border-bottom:none">
-    <div class="sg-title">Note</div>
+
     <div style="font-size:10px;color:rgba(255,255,255,.5);line-height:1.7">
-      Solid Round Bar — ไม่มี Local Buckling<br>
-      ทุก element เป็น Compact เสมอ<br>
-      Flexure: AISC F11 (สำหรับแท่งกลม)<br>
-      Shear: AISC G6 (Ag ทั้งก้อน)<br>
-      Torsion: AISC H3.2 (Solid round)
     </div>
   </div>
 </div>
@@ -265,9 +260,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
                     <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--purple)">C = <span id="m_C" style="color:var(--blue);font-weight:700">24.54</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
                 </div>
             </div>
-            <div class="info-box" style="margin:10px 0 4px">
-                <b>Solid Round Bar</b> — ไม่มีแนวคิด Local Buckling ทุก element เป็น Compact เสมอ
-                &nbsp;|&nbsp; I<sub>x</sub> = I<sub>y</sub> = πD⁴/64 &nbsp;|&nbsp; J = πD⁴/32 = 2I &nbsp;|&nbsp; r = D/4
+            <div>
             </div>
         </div>
     </div>
@@ -327,9 +320,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
                     <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_My_sub">—</span></div>
                     <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_My">—</span><span class="calc-unit">kg·m</span></span></div>
                 </div>
-                <div class="info-box">
-                    Solid round bar มี I<sub>x</sub>=I<sub>y</sub> → ไม่มี LTB<br>
-                    Compact (always) → <b>F11-1: M<sub>n</sub> = M<sub>p</sub> ≤ 1.6M<sub>y</sub></b>
+                <div>
                 </div>
             </div>
             <div class="rep-col">
@@ -369,9 +360,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
                     <div class="calc-line1"><span class="cl-body">A<sub>w</sub> = A<sub>g</sub> = πD²/4</span></div>
                     <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Aw">—</span><span class="calc-unit">mm²</span></span></div>
                 </div>
-                <div class="info-box">
-                    AISC G6: V<sub>n</sub> = F<sub>cr</sub>·A<sub>g</sub>/2<br>
-                    แท่งกลมใช้ A<sub>g</sub> ÷ 2 เพราะ shear stress กระจายไม่สม่ำเสมอ
+                <div>
                 </div>
             </div>
             <div class="rep-col">
@@ -407,9 +396,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
                     <div class="calc-line1"><span class="cl-body">C = J / (D/2) = πD³/16 &nbsp;(torsional constant)</span></div>
                     <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_C">—</span><span class="calc-unit">×10³ mm³</span></span></div>
                 </div>
-                <div class="info-box">
-                    H3.2: T<sub>n</sub> = F<sub>cr</sub> · C<br>
-                    C = πD³/16 สำหรับแท่งกลม Solid
+                <div>
                 </div>
             </div>
             <div class="rep-col">
@@ -435,8 +422,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="sec-block">
         <div class="sec-hdr"><span class="sec-tag tag-green">E3 — Compr</span><span class="sec-title">Compression — Flexural Buckling (ไม่มี Local Buckling)</span><span class="sec-ref">AISC 360-22 E3</span></div>
         <div class="rep-col-full" style="border-top:1px solid var(--border)">
-            <div class="info-box" style="margin-bottom:10px">
-                Solid Round Bar ไม่มี Local Buckling ไม่ต้องคำนวณ Q (E7) → <b>Q = 1.0 เสมอ</b>
+            <div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
                 <div style="border-right:1px solid var(--border);padding-right:14px">
