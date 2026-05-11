@@ -226,288 +226,334 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <!-- ══════════════════════════════════════════════════════ MAIN -->
 <div class="main">
 
-<!-- PRINT header (screen-hidden) -->
-<div class="print-header">
-  <div class="ph-left">Solid Round Bar — AISC 360-22<small>Tension · Flexure · Shear · Torsion · Compression</small></div>
-  <div class="ph-right"><span id="print-date"></span><br>CivilToolsKit — Automated Calculation</div>
-</div>
-<div class="print-input-summary" id="print-input-strip"></div>
+    <!-- PRINT header (screen-hidden) -->
+    <div class="print-header">
+        <div class="ph-left">Solid Round Bar — AISC 360-22<small>Tension · Flexure · Shear · Torsion · Compression</small></div>
+        <div class="ph-right"><span id="print-date"></span><br>CivilToolsKit — Automated Calculation</div>
+    </div>
+    <div class="print-input-summary" id="print-input-strip"></div>
 
-<!-- ── CANVAS ── -->
-<div class="sec-block">
-  <div class="sec-hdr"><span class="sec-tag tag-blue">Section</span><span class="sec-title">Solid Round Bar — ภาพหน้าตัด</span></div>
-  <div class="canvas-wrap" style="padding:0;display:flex;justify-content:center;background:var(--bg)">
-    <canvas id="sectionCanvas" width="480" height="480" style="width:480px;height:480px;display:block"></canvas>
-  </div>
-</div>
-
-<!-- ── SECTION PROPERTIES ── -->
-<div class="sec-block">
-  <div class="sec-hdr"><span class="sec-tag tag-blue">Section</span><span class="sec-title">Section Properties — Solid Round Bar</span></div>
-  <div class="rep-col-full">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
-      <div style="border-right:1px solid var(--border);padding:14px">
-        <div class="sdiv">Geometric</div>
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">D = <span id="m_D" style="color:var(--blue);font-weight:700">50.0</span> <span style="color:rgba(255,255,255,.5);font-size:10px">mm</span></div>
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">A<sub>g</sub> = <span id="m_Ag" style="color:var(--blue);font-weight:700">1,963</span> <span style="color:rgba(255,255,255,.5);font-size:10px">mm²</span></div>
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:#ccc">w<sub>t</sub> = <span id="m_wt" style="color:var(--blue);font-weight:700">15.4</span> <span style="color:rgba(255,255,255,.5);font-size:10px">kg/m</span></div>
-      </div>
-      <div style="border-right:1px solid var(--border);padding:14px">
-        <div class="sdiv">Moment of Inertia &amp; Radius</div>
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I = <span id="m_I" style="color:var(--blue);font-weight:700">0.307</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10⁶ mm⁴</span></div>
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">r = <span id="m_r" style="color:var(--blue);font-weight:700">12.50</span> <span style="color:rgba(255,255,255,.5);font-size:10px">mm</span></div>
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--purple)">J = <span id="m_J" style="color:var(--blue);font-weight:700">0.614</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10⁶ mm⁴</span></div>
-      </div>
-      <div style="padding:14px">
-        <div class="sdiv">Section Modulus</div>
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">S = <span id="m_S" style="color:var(--blue);font-weight:700">12.27</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">Z = <span id="m_Z" style="color:var(--blue);font-weight:700">20.83</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--purple)">C = <span id="m_C" style="color:var(--blue);font-weight:700">24.54</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
-      </div>
-    </div>
-    <div class="info-box" style="margin:10px 0 4px">
-      <b>Solid Round Bar</b> — ไม่มีแนวคิด Local Buckling ทุก element เป็น Compact เสมอ
-      &nbsp;|&nbsp; I<sub>x</sub> = I<sub>y</sub> = πD⁴/64 &nbsp;|&nbsp; J = πD⁴/32 = 2I &nbsp;|&nbsp; r = D/4
-    </div>
-  </div>
-</div>
-
-<!-- ── TENSION D2 ── -->
-<div class="sec-block">
-  <div class="sec-hdr"><span class="sec-tag tag-purple">D2 — Tension</span><span class="sec-title">Tensile Strength</span><span class="sec-ref">AISC 360-22 D2</span></div>
-  <div class="rep-grid">
-    <div class="rep-col">
-      <div class="sdiv" style="color:var(--cyan)">Tensile Yielding — D2-1</div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>y</sub> · A<sub>g</sub></span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="tn_Pn_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="tn_Pn">—</span><span class="calc-unit">kg</span></span></div>
-      </div>
-      <div class="gov"><div class="gov-lbl">φ<sub>t</sub>P<sub>n</sub> (LRFD, φ<sub>t</sub>=0.90)</div>
-        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="tn_phiPn">—</span><span class="gov-unit">kg</span></div></div>
-      <div class="gov" style="margin-top:6px"><div class="gov-lbl">P<sub>n</sub>/Ω<sub>t</sub> (ASD, Ω<sub>t</sub>=1.67)</div>
-        <div class="gov-val"><span class="gov-tag">ASD</span><span id="tn_ASDPn">—</span><span class="gov-unit">kg</span></div></div>
-    </div>
-    <div class="rep-col">
-      <div class="sdiv" style="color:var(--purple)">Tensile Rupture — D2-2 (U=1.0)</div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>u</sub> · A<sub>e</sub> &nbsp;(A<sub>e</sub>=A<sub>g</sub>, U=1.0)</span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="tnr_Pn_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="tnr_Pn">—</span><span class="calc-unit">kg</span></span></div>
-      </div>
-      <div class="gov"><div class="gov-lbl">φ<sub>t</sub>P<sub>n</sub> (LRFD, φ<sub>t</sub>=0.75)</div>
-        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="tnr_phiPn">—</span><span class="gov-unit">kg</span></div></div>
-      <div class="gov" style="margin-top:6px"><div class="gov-lbl">P<sub>n</sub>/Ω<sub>t</sub> (ASD, Ω<sub>t</sub>=2.00)</div>
-        <div class="gov-val"><span class="gov-tag">ASD</span><span id="tnr_ASDPn">—</span><span class="gov-unit">kg</span></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ── FLEXURE F11 ── -->
-<div class="sec-block">
-  <div class="sec-hdr"><span class="sec-tag tag-orange">F11 — Flexure</span><span class="sec-title">Flexural Strength — Solid Round Bar</span><span class="sec-ref">AISC 360-22 F11</span></div>
-  <div class="rep-grid">
-    <div class="rep-col">
-      <div class="sdiv" style="color:var(--cyan)">Plastic &amp; Elastic Moment</div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">M<sub>p</sub> = F<sub>y</sub> · Z</span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_Mp_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Mp">—</span><span class="calc-unit">kg·m</span></span></div>
-      </div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">M<sub>y</sub> = F<sub>y</sub> · S</span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_My_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_My">—</span><span class="calc-unit">kg·m</span></span></div>
-      </div>
-      <div class="info-box">
-        Solid round bar มี I<sub>x</sub>=I<sub>y</sub> → ไม่มี LTB<br>
-        Compact (always) → <b>F11-1: M<sub>n</sub> = M<sub>p</sub> ≤ 1.6M<sub>y</sub></b>
-      </div>
-    </div>
-    <div class="rep-col">
-      <div class="sdiv" style="color:var(--cyan)">M<sub>n</sub> — F11 Governing</div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">Compact → F11-1: M<sub>n</sub> = min(M<sub>p</sub>, 1.6M<sub>y</sub>)</span></div>
-        <div class="calc-line1"><span class="cl-body" id="fl_limit_note">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Mn">—</span><span class="calc-unit">kg·m</span></span></div>
-      </div>
-      <div class="gov"><div class="gov-lbl">φ<sub>b</sub>M<sub>n</sub> (LRFD, φ<sub>b</sub>=0.90)</div>
-        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="fl_phiMn">—</span><span class="gov-unit">kg·m</span></div></div>
-      <div class="gov" style="margin-top:6px"><div class="gov-lbl">M<sub>n</sub>/Ω<sub>b</sub> (ASD, Ω<sub>b</sub>=1.67)</div>
-        <div class="gov-val"><span class="gov-tag">ASD</span><span id="fl_ASDMn">—</span><span class="gov-unit">kg·m</span></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ── SHEAR G6 ── -->
-<div class="sec-block">
-  <div class="sec-hdr"><span class="sec-tag tag-red">G6 — Shear</span><span class="sec-title">Shear Strength — Solid Round Bar</span><span class="sec-ref">AISC 360-22 G6</span></div>
-  <div class="rep-grid">
-    <div class="rep-col">
-      <div class="sdiv" style="color:var(--cyan)">Critical Shear Stress F<sub>cr</sub> &amp; Web Area</div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">F<sub>cr</sub> = 0.6 F<sub>y</sub> &nbsp;(solid, always yield governs)</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
-      </div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">A<sub>w</sub> = A<sub>g</sub> = πD²/4</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Aw">—</span><span class="calc-unit">mm²</span></span></div>
-      </div>
-      <div class="info-box">
-        AISC G6: V<sub>n</sub> = F<sub>cr</sub>·A<sub>g</sub>/2<br>
-        แท่งกลมใช้ A<sub>g</sub> ÷ 2 เพราะ shear stress กระจายไม่สม่ำเสมอ
-      </div>
-    </div>
-    <div class="rep-col">
-      <div class="sdiv" style="color:var(--cyan)">V<sub>n</sub> = F<sub>cr</sub> · A<sub>g</sub>/2 &nbsp;(Eq. G6-1)</div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">V<sub>n</sub> = F<sub>cr</sub> · A<sub>g</sub> / 2</span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_Vn_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Vn">—</span><span class="calc-unit">kg</span></span></div>
-      </div>
-      <div class="gov"><div class="gov-lbl">φ<sub>v</sub>V<sub>n</sub> (LRFD, φ<sub>v</sub>=0.90)</div>
-        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="sh_phiVn">—</span><span class="gov-unit">kg</span></div></div>
-      <div class="gov" style="margin-top:6px"><div class="gov-lbl">V<sub>n</sub>/Ω<sub>v</sub> (ASD, Ω<sub>v</sub>=1.67)</div>
-        <div class="gov-val"><span class="gov-tag">ASD</span><span id="sh_ASDVn">—</span><span class="gov-unit">kg</span></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ── TORSION H3.2 ── -->
-<div class="sec-block">
-  <div class="sec-hdr"><span class="sec-tag tag-yellow">H3.2 — Torsion</span><span class="sec-title">Torsional Strength — Solid Round Bar</span><span class="sec-ref">AISC 360-22 H3.2</span></div>
-  <div class="rep-grid">
-    <div class="rep-col">
-      <div class="sdiv" style="color:var(--cyan)">Torsion Shear Stress F<sub>cr,T</sub></div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">F<sub>cr</sub> = 0.6 F<sub>y</sub> &nbsp;(Solid rod — shear yielding always governs)</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
-      </div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">C = J / (D/2) = πD³/16 &nbsp;(torsional constant)</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_C">—</span><span class="calc-unit">×10³ mm³</span></span></div>
-      </div>
-      <div class="info-box">
-        H3.2: T<sub>n</sub> = F<sub>cr</sub> · C<br>
-        C = πD³/16 สำหรับแท่งกลม Solid
-      </div>
-    </div>
-    <div class="rep-col">
-      <div class="sdiv" style="color:var(--cyan)">T<sub>n</sub> = F<sub>cr</sub> · C &nbsp;(Eq. H3-1)</div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">T<sub>n</sub> = F<sub>cr</sub> · C</span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="to_Tn_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Tn">—</span><span class="calc-unit">kg·m</span></span></div>
-      </div>
-      <div class="gov"><div class="gov-lbl">φ<sub>T</sub>T<sub>n</sub> (LRFD, φ<sub>T</sub>=0.90)</div>
-        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="to_phiTn">—</span><span class="gov-unit">kg·m</span></div></div>
-      <div class="gov" style="margin-top:6px"><div class="gov-lbl">T<sub>n</sub>/Ω<sub>T</sub> (ASD, Ω<sub>T</sub>=1.67)</div>
-        <div class="gov-val"><span class="gov-tag">ASD</span><span id="to_ASDTn">—</span><span class="gov-unit">kg·m</span></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ── COMPRESSION E3 ── -->
-<div class="sec-block">
-  <div class="sec-hdr"><span class="sec-tag tag-green">E3 — Compr</span><span class="sec-title">Compression — Flexural Buckling (ไม่มี Local Buckling)</span><span class="sec-ref">AISC 360-22 E3</span></div>
-  <div class="rep-col-full" style="border-top:1px solid var(--border)">
-    <div class="info-box" style="margin-bottom:10px">
-      Solid Round Bar ไม่มี Local Buckling ไม่ต้องคำนวณ Q (E7) → <b>Q = 1.0 เสมอ</b>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
-      <div style="border-right:1px solid var(--border);padding-right:14px">
-        <div class="sdiv" style="color:var(--cyan)">Slenderness &amp; Elastic Buckling</div>
-        <div class="calc-block">
-          <div class="calc-line1"><span class="cl-body">KL/r = K · L / r</span></div>
-          <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="co_KLr_sub">—</span></div>
-          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_KLr">—</span></span></div>
+    <!-- ── CANVAS ── -->
+    <div class="sec-block">
+        <div class="sec-hdr"><span class="sec-tag tag-blue">Section</span><span class="sec-title">Solid Round Bar — ภาพหน้าตัด</span></div>
+        <div class="canvas-wrap" style="padding:0;display:flex;justify-content:center;background:var(--bg)">
+            <canvas id="sectionCanvas" width="480" height="480" style="width:480px;height:480px;display:block"></canvas>
         </div>
-        <div style="font-size:12px;padding:2px 0">4.71√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:600" id="co_lim">—</span></div>
-        <div class="calc-block" style="margin-top:8px">
-          <div class="calc-line1"><span class="cl-body">F<sub>e</sub> = π²E / (KL/r)²</span></div>
-          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_Fe">—</span><span class="calc-unit">ksc</span></span></div>
-        </div>
-        <div class="calc-block">
-          <div class="calc-line1"><span class="cl-body" id="co_regime">—</span></div>
-          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
-        </div>
-      </div>
-      <div style="padding-left:14px">
-        <div class="sdiv" style="color:var(--cyan)">Design Compressive Strength</div>
-        <div class="calc-block">
-          <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>cr</sub> · A<sub>g</sub></span></div>
-          <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="co_Pn_sub">—</span></div>
-          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_Pn">—</span><span class="calc-unit">kg</span></span></div>
-        </div>
-        <div class="gov"><div class="gov-lbl">φ<sub>c</sub>P<sub>n</sub> (LRFD, φ<sub>c</sub>=0.90)</div>
-          <div class="gov-val"><span class="gov-tag">LRFD</span><span id="co_phiPn">—</span><span class="gov-unit">kg</span></div></div>
-        <div class="gov" style="margin-top:6px"><div class="gov-lbl">P<sub>n</sub>/Ω<sub>c</sub> (ASD, Ω<sub>c</sub>=1.67)</div>
-          <div class="gov-val"><span class="gov-tag">ASD</span><span id="co_ASDPn">—</span><span class="gov-unit">kg</span></div></div>
-      </div>
     </div>
-  </div>
-</div>
 
-<!-- ── SUMMARY ── -->
-<div class="print-header-repeat print-break-before" aria-hidden="true">
-  <div class="ph-left">Solid Round Bar — AISC 360-22<small>Design Strength Summary</small></div>
-  <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
-</div>
-<div class="sec-block">
-  <div class="sec-hdr"><span class="sec-tag tag-teal">Summary</span><span class="sec-title">Design Strength Summary — LRFD &amp; ASD</span><span class="sec-ref">AISC 360-22</span></div>
-  <div class="rep-col-full">
-    <table class="sum-tbl">
-      <thead>
-        <tr><td>Check</td><td>Ref.</td><td>Nominal R<sub>n</sub></td><td>φ</td><td>φR<sub>n</sub> (LRFD)</td><td>Ω</td><td>R<sub>n</sub>/Ω (ASD)</td></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Tension — Yielding</td><td style="color:rgba(255,255,255,.5)">D2</td>
-          <td class="val"><span id="sum_Pnt_y">—</span> kg</td><td>0.90</td>
-          <td class="val"><span id="sum_phiPnt_y">—</span> kg</td><td>1.67</td>
-          <td class="val"><span id="sum_ASDPnt_y">—</span> kg</td>
-        </tr>
-        <tr>
-          <td>Tension — Rupture</td><td style="color:rgba(255,255,255,.5)">D2</td>
-          <td class="val"><span id="sum_Pnt_r">—</span> kg</td><td>0.75</td>
-          <td class="val"><span id="sum_phiPnt_r">—</span> kg</td><td>2.00</td>
-          <td class="val"><span id="sum_ASDPnt_r">—</span> kg</td>
-        </tr>
-        <tr>
-          <td>Flexure M<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">F11</td>
-          <td class="val"><span id="sum_Mn">—</span> kg·m</td><td>0.90</td>
-          <td class="val"><span id="sum_phiMn">—</span> kg·m</td><td>1.67</td>
-          <td class="val"><span id="sum_ASDMn">—</span> kg·m</td>
-        </tr>
-        <tr>
-          <td>Shear V<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">G6</td>
-          <td class="val"><span id="sum_Vn">—</span> kg</td><td>0.90</td>
-          <td class="val"><span id="sum_phiVn">—</span> kg</td><td>1.67</td>
-          <td class="val"><span id="sum_ASDVn">—</span> kg</td>
-        </tr>
-        <tr>
-          <td>Torsion T<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">H3.2</td>
-          <td class="val"><span id="sum_Tn">—</span> kg·m</td><td>0.90</td>
-          <td class="val"><span id="sum_phiTn">—</span> kg·m</td><td>1.67</td>
-          <td class="val"><span id="sum_ASDTn">—</span> kg·m</td>
-        </tr>
-        <tr>
-          <td>Compression P<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">E3</td>
-          <td class="val"><span id="sum_Pnc">—</span> kg</td><td>0.90</td>
-          <td class="val"><span id="sum_phiPnc">—</span> kg</td><td>1.67</td>
-          <td class="val"><span id="sum_ASDPnc">—</span> kg</td>
-        </tr>
-      </tbody>
-    </table>
-    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-      <div class="gov"><div class="gov-lbl">Tension — Governing</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_tn">YIELD</span><span id="fm_tn">Tensile yielding governs</span></div></div>
-      <div class="gov"><div class="gov-lbl">Flexure — F11</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_fl">PLASTIC</span><span id="fm_fl">Plastic moment Mp</span></div></div>
-      <div class="gov"><div class="gov-lbl">Shear — G6</div><div class="gov-val" style="font-size:13px"><span class="gov-tag">YIELD</span>Shear yielding (0.6Fy)</div></div>
-      <div class="gov"><div class="gov-lbl">Torsion — H3.2</div><div class="gov-val" style="font-size:13px"><span class="gov-tag">YIELD</span>Torsional yielding (0.6Fy)</div></div>
-      <div class="gov"><div class="gov-lbl">Compression — E3</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_co">INELASTIC</span><span id="fm_co">Inelastic flexural buckling</span></div></div>
+    <!-- ── SECTION PROPERTIES ── -->
+    <div class="sec-block">
+        <div class="sec-hdr"><span class="sec-tag tag-blue">Section</span><span class="sec-title">Section Properties — Solid Round Bar</span></div>
+        <div class="rep-col-full">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+                <div style="border-right:1px solid var(--border);padding:14px">
+                    <div class="sdiv">Geometric</div>
+                    <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">D = <span id="m_D" style="color:var(--blue);font-weight:700">50.0</span> <span style="color:rgba(255,255,255,.5);font-size:10px">mm</span></div>
+                    <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">A<sub>g</sub> = <span id="m_Ag" style="color:var(--blue);font-weight:700">1,963</span> <span style="color:rgba(255,255,255,.5);font-size:10px">mm²</span></div>
+                    <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:#ccc">w<sub>t</sub> = <span id="m_wt" style="color:var(--blue);font-weight:700">15.4</span> <span style="color:rgba(255,255,255,.5);font-size:10px">kg/m</span></div>
+                </div>
+                <div style="border-right:1px solid var(--border);padding:14px">
+                    <div class="sdiv">Moment of Inertia &amp; Radius</div>
+                    <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">I = <span id="m_I" style="color:var(--blue);font-weight:700">0.307</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10⁶ mm⁴</span></div>
+                    <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">r = <span id="m_r" style="color:var(--blue);font-weight:700">12.50</span> <span style="color:rgba(255,255,255,.5);font-size:10px">mm</span></div>
+                    <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--purple)">J = <span id="m_J" style="color:var(--blue);font-weight:700">0.614</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10⁶ mm⁴</span></div>
+                </div>
+                <div style="padding:14px">
+                    <div class="sdiv">Section Modulus</div>
+                    <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">S = <span id="m_S" style="color:var(--blue);font-weight:700">12.27</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
+                    <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">Z = <span id="m_Z" style="color:var(--blue);font-weight:700">20.83</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
+                    <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--purple)">C = <span id="m_C" style="color:var(--blue);font-weight:700">24.54</span> <span style="color:rgba(255,255,255,.5);font-size:10px">×10³ mm³</span></div>
+                </div>
+            </div>
+            <div class="info-box" style="margin:10px 0 4px">
+                <b>Solid Round Bar</b> — ไม่มีแนวคิด Local Buckling ทุก element เป็น Compact เสมอ
+                &nbsp;|&nbsp; I<sub>x</sub> = I<sub>y</sub> = πD⁴/64 &nbsp;|&nbsp; J = πD⁴/32 = 2I &nbsp;|&nbsp; r = D/4
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+
+    <!-- ── TENSION D2 ── -->
+    <div class="sec-block">
+        <div class="sec-hdr"><span class="sec-tag tag-purple">D2 — Tension</span><span class="sec-title">Tensile Strength</span><span class="sec-ref">AISC 360-22 D2</span></div>
+        <div class="rep-grid">
+            <div class="rep-col">
+                <div class="sdiv" style="color:var(--cyan)">Tensile Yielding — D2-1</div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>y</sub> · A<sub>g</sub></span></div>
+                    <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="tn_Pn_sub">—</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="tn_Pn">—</span><span class="calc-unit">kg</span></span></div>
+                </div>
+                <div class="gov">
+                    <div class="gov-lbl">φ<sub>t</sub>P<sub>n</sub> (LRFD, φ<sub>t</sub>=0.90)</div>
+                    <div class="gov-val"><span class="gov-tag">LRFD</span><span id="tn_phiPn">—</span><span class="gov-unit">kg</span></div>
+                </div>
+                <div class="gov" style="margin-top:6px">
+                    <div class="gov-lbl">P<sub>n</sub>/Ω<sub>t</sub> (ASD, Ω<sub>t</sub>=1.67)</div>
+                    <div class="gov-val"><span class="gov-tag">ASD</span><span id="tn_ASDPn">—</span><span class="gov-unit">kg</span></div>
+                </div>
+            </div>
+            <div class="rep-col">
+                <div class="sdiv" style="color:var(--purple)">Tensile Rupture — D2-2 (U=1.0)</div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>u</sub> · A<sub>e</sub> &nbsp;(A<sub>e</sub>=A<sub>g</sub>, U=1.0)</span></div>
+                    <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="tnr_Pn_sub">—</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="tnr_Pn">—</span><span class="calc-unit">kg</span></span></div>
+                </div>
+                <div class="gov">
+                    <div class="gov-lbl">φ<sub>t</sub>P<sub>n</sub> (LRFD, φ<sub>t</sub>=0.75)</div>
+                    <div class="gov-val"><span class="gov-tag">LRFD</span><span id="tnr_phiPn">—</span><span class="gov-unit">kg</span></div>
+                </div>
+                <div class="gov" style="margin-top:6px">
+                    <div class="gov-lbl">P<sub>n</sub>/Ω<sub>t</sub> (ASD, Ω<sub>t</sub>=2.00)</div>
+                    <div class="gov-val"><span class="gov-tag">ASD</span><span id="tnr_ASDPn">—</span><span class="gov-unit">kg</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── FLEXURE F11 ── -->
+    <div class="sec-block">
+        <div class="sec-hdr"><span class="sec-tag tag-orange">F11 — Flexure</span><span class="sec-title">Flexural Strength — Solid Round Bar</span><span class="sec-ref">AISC 360-22 F11</span></div>
+        <div class="rep-grid">
+            <div class="rep-col">
+                <div class="sdiv" style="color:var(--cyan)">Plastic &amp; Elastic Moment</div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">M<sub>p</sub> = F<sub>y</sub> · Z</span></div>
+                    <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_Mp_sub">—</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Mp">—</span><span class="calc-unit">kg·m</span></span></div>
+                </div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">M<sub>y</sub> = F<sub>y</sub> · S</span></div>
+                    <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fl_My_sub">—</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_My">—</span><span class="calc-unit">kg·m</span></span></div>
+                </div>
+                <div class="info-box">
+                    Solid round bar มี I<sub>x</sub>=I<sub>y</sub> → ไม่มี LTB<br>
+                    Compact (always) → <b>F11-1: M<sub>n</sub> = M<sub>p</sub> ≤ 1.6M<sub>y</sub></b>
+                </div>
+            </div>
+            <div class="rep-col">
+                <div class="sdiv" style="color:var(--cyan)">M<sub>n</sub> — F11 Governing</div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">Compact → F11-1: M<sub>n</sub> = min(M<sub>p</sub>, 1.6M<sub>y</sub>)</span></div>
+                    <div class="calc-line1"><span class="cl-body" id="fl_limit_note">—</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fl_Mn">—</span><span class="calc-unit">kg·m</span></span></div>
+                </div>
+                <div class="gov">
+                    <div class="gov-lbl">φ<sub>b</sub>M<sub>n</sub> (LRFD, φ<sub>b</sub>=0.90)</div>
+                    <div class="gov-val"><span class="gov-tag">LRFD</span><span id="fl_phiMn">—</span><span class="gov-unit">kg·m</span></div>
+                </div>
+                <div class="gov" style="margin-top:6px">
+                    <div class="gov-lbl">M<sub>n</sub>/Ω<sub>b</sub> (ASD, Ω<sub>b</sub>=1.67)</div>
+                    <div class="gov-val"><span class="gov-tag">ASD</span><span id="fl_ASDMn">—</span><span class="gov-unit">kg·m</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── SHEAR G6 ── -->
+    <div class="print-header-repeat print-break-before" aria-hidden="true">
+        <div class="ph-left">Solid Round Bar — AISC 360-22<small>Shear , Torsion , Compression</small></div>
+        <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+    </div>
+    <div class="sec-block">
+        <div class="sec-hdr"><span class="sec-tag tag-red">G6 — Shear</span><span class="sec-title">Shear Strength — Solid Round Bar</span><span class="sec-ref">AISC 360-22 G6</span></div>
+        <div class="rep-grid">
+            <div class="rep-col">
+                <div class="sdiv" style="color:var(--cyan)">Critical Shear Stress F<sub>cr</sub> &amp; Web Area</div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">F<sub>cr</sub> = 0.6 F<sub>y</sub> &nbsp;(solid, always yield governs)</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
+                </div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">A<sub>w</sub> = A<sub>g</sub> = πD²/4</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Aw">—</span><span class="calc-unit">mm²</span></span></div>
+                </div>
+                <div class="info-box">
+                    AISC G6: V<sub>n</sub> = F<sub>cr</sub>·A<sub>g</sub>/2<br>
+                    แท่งกลมใช้ A<sub>g</sub> ÷ 2 เพราะ shear stress กระจายไม่สม่ำเสมอ
+                </div>
+            </div>
+            <div class="rep-col">
+                <div class="sdiv" style="color:var(--cyan)">V<sub>n</sub> = F<sub>cr</sub> · A<sub>g</sub>/2 &nbsp;(Eq. G6-1)</div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">V<sub>n</sub> = F<sub>cr</sub> · A<sub>g</sub> / 2</span></div>
+                    <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="sh_Vn_sub">—</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="sh_Vn">—</span><span class="calc-unit">kg</span></span></div>
+                </div>
+                <div class="gov">
+                    <div class="gov-lbl">φ<sub>v</sub>V<sub>n</sub> (LRFD, φ<sub>v</sub>=0.90)</div>
+                    <div class="gov-val"><span class="gov-tag">LRFD</span><span id="sh_phiVn">—</span><span class="gov-unit">kg</span></div>
+                </div>
+                <div class="gov" style="margin-top:6px">
+                    <div class="gov-lbl">V<sub>n</sub>/Ω<sub>v</sub> (ASD, Ω<sub>v</sub>=1.67)</div>
+                    <div class="gov-val"><span class="gov-tag">ASD</span><span id="sh_ASDVn">—</span><span class="gov-unit">kg</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── TORSION H3.2 ── -->
+    <div class="sec-block">
+        <div class="sec-hdr"><span class="sec-tag tag-yellow">H3.2 — Torsion</span><span class="sec-title">Torsional Strength — Solid Round Bar</span><span class="sec-ref">AISC 360-22 H3.2</span></div>
+        <div class="rep-grid">
+            <div class="rep-col">
+                <div class="sdiv" style="color:var(--cyan)">Torsion Shear Stress F<sub>cr,T</sub></div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">F<sub>cr</sub> = 0.6 F<sub>y</sub> &nbsp;(Solid rod — shear yielding always governs)</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
+                </div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">C = J / (D/2) = πD³/16 &nbsp;(torsional constant)</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_C">—</span><span class="calc-unit">×10³ mm³</span></span></div>
+                </div>
+                <div class="info-box">
+                    H3.2: T<sub>n</sub> = F<sub>cr</sub> · C<br>
+                    C = πD³/16 สำหรับแท่งกลม Solid
+                </div>
+            </div>
+            <div class="rep-col">
+                <div class="sdiv" style="color:var(--cyan)">T<sub>n</sub> = F<sub>cr</sub> · C &nbsp;(Eq. H3-1)</div>
+                <div class="calc-block">
+                    <div class="calc-line1"><span class="cl-body">T<sub>n</sub> = F<sub>cr</sub> · C</span></div>
+                    <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="to_Tn_sub">—</span></div>
+                    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Tn">—</span><span class="calc-unit">kg·m</span></span></div>
+                </div>
+                <div class="gov">
+                    <div class="gov-lbl">φ<sub>T</sub>T<sub>n</sub> (LRFD, φ<sub>T</sub>=0.90)</div>
+                    <div class="gov-val"><span class="gov-tag">LRFD</span><span id="to_phiTn">—</span><span class="gov-unit">kg·m</span></div>
+                </div>
+                <div class="gov" style="margin-top:6px">
+                    <div class="gov-lbl">T<sub>n</sub>/Ω<sub>T</sub> (ASD, Ω<sub>T</sub>=1.67)</div>
+                    <div class="gov-val"><span class="gov-tag">ASD</span><span id="to_ASDTn">—</span><span class="gov-unit">kg·m</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── COMPRESSION E3 ── -->
+    <div class="sec-block">
+        <div class="sec-hdr"><span class="sec-tag tag-green">E3 — Compr</span><span class="sec-title">Compression — Flexural Buckling (ไม่มี Local Buckling)</span><span class="sec-ref">AISC 360-22 E3</span></div>
+        <div class="rep-col-full" style="border-top:1px solid var(--border)">
+            <div class="info-box" style="margin-bottom:10px">
+                Solid Round Bar ไม่มี Local Buckling ไม่ต้องคำนวณ Q (E7) → <b>Q = 1.0 เสมอ</b>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+                <div style="border-right:1px solid var(--border);padding-right:14px">
+                    <div class="sdiv" style="color:var(--cyan)">Slenderness &amp; Elastic Buckling</div>
+                    <div class="calc-block">
+                        <div class="calc-line1"><span class="cl-body">KL/r = K · L / r</span></div>
+                        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="co_KLr_sub">—</span></div>
+                        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_KLr">—</span></span></div>
+                    </div>
+                    <div style="font-size:12px;padding:2px 0">4.71√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:600" id="co_lim">—</span></div>
+                    <div class="calc-block" style="margin-top:8px">
+                        <div class="calc-line1"><span class="cl-body">F<sub>e</sub> = π²E / (KL/r)²</span></div>
+                        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_Fe">—</span><span class="calc-unit">ksc</span></span></div>
+                    </div>
+                    <div class="calc-block">
+                        <div class="calc-line1"><span class="cl-body" id="co_regime">—</span></div>
+                        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
+                    </div>
+                </div>
+                <div style="padding-left:14px">
+                    <div class="sdiv" style="color:var(--cyan)">Design Compressive Strength</div>
+                    <div class="calc-block">
+                        <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = F<sub>cr</sub> · A<sub>g</sub></span></div>
+                        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="co_Pn_sub">—</span></div>
+                        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="co_Pn">—</span><span class="calc-unit">kg</span></span></div>
+                    </div>
+                    <div class="gov">
+                        <div class="gov-lbl">φ<sub>c</sub>P<sub>n</sub> (LRFD, φ<sub>c</sub>=0.90)</div>
+                        <div class="gov-val"><span class="gov-tag">LRFD</span><span id="co_phiPn">—</span><span class="gov-unit">kg</span></div>
+                    </div>
+                    <div class="gov" style="margin-top:6px">
+                        <div class="gov-lbl">P<sub>n</sub>/Ω<sub>c</sub> (ASD, Ω<sub>c</sub>=1.67)</div>
+                        <div class="gov-val"><span class="gov-tag">ASD</span><span id="co_ASDPn">—</span><span class="gov-unit">kg</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── SUMMARY ── -->
+    <div class="print-header-repeat print-break-before" aria-hidden="true">
+        <div class="ph-left">Solid Round Bar — AISC 360-22<small>Design Strength Summary</small></div>
+        <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+    </div>
+    <div class="sec-block">
+        <div class="sec-hdr"><span class="sec-tag tag-teal">Summary</span><span class="sec-title">Design Strength Summary — LRFD &amp; ASD</span><span class="sec-ref">AISC 360-22</span></div>
+        <div class="rep-col-full">
+            <table class="sum-tbl">
+                <thead>
+                    <tr><td>Check</td><td>Ref.</td><td>Nominal R<sub>n</sub></td><td>φ</td><td>φR<sub>n</sub> (LRFD)</td><td>Ω</td><td>R<sub>n</sub>/Ω (ASD)</td></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Tension — Yielding</td>
+                        <td style="color:rgba(255,255,255,.5)">D2</td>
+                        <td class="val"><span id="sum_Pnt_y">—</span> kg</td>
+                        <td>0.90</td>
+                        <td class="val"><span id="sum_phiPnt_y">—</span> kg</td>
+                        <td>1.67</td>
+                        <td class="val"><span id="sum_ASDPnt_y">—</span> kg</td>
+                    </tr>
+                    <tr>
+                        <td>Tension — Rupture</td>
+                        <td style="color:rgba(255,255,255,.5)">D2</td>
+                        <td class="val"><span id="sum_Pnt_r">—</span> kg</td>
+                        <td>0.75</td>
+                        <td class="val"><span id="sum_phiPnt_r">—</span> kg</td>
+                        <td>2.00</td>
+                        <td class="val"><span id="sum_ASDPnt_r">—</span> kg</td>
+                    </tr>
+                    <tr>
+                        <td>Flexure M<sub>n</sub></td>
+                        <td style="color:rgba(255,255,255,.5)">F11</td>
+                        <td class="val"><span id="sum_Mn">—</span> kg·m</td>
+                        <td>0.90</td>
+                        <td class="val"><span id="sum_phiMn">—</span> kg·m</td>
+                        <td>1.67</td>
+                        <td class="val"><span id="sum_ASDMn">—</span> kg·m</td>
+                    </tr>
+                    <tr>
+                        <td>Shear V<sub>n</sub></td>
+                        <td style="color:rgba(255,255,255,.5)">G6</td>
+                        <td class="val"><span id="sum_Vn">—</span> kg</td>
+                        <td>0.90</td>
+                        <td class="val"><span id="sum_phiVn">—</span> kg</td>
+                        <td>1.67</td>
+                        <td class="val"><span id="sum_ASDVn">—</span> kg</td>
+                    </tr>
+                    <tr>
+                        <td>Torsion T<sub>n</sub></td>
+                        <td style="color:rgba(255,255,255,.5)">H3.2</td>
+                        <td class="val"><span id="sum_Tn">—</span> kg·m</td>
+                        <td>0.90</td>
+                        <td class="val"><span id="sum_phiTn">—</span> kg·m</td>
+                        <td>1.67</td>
+                        <td class="val"><span id="sum_ASDTn">—</span> kg·m</td>
+                    </tr>
+                    <tr>
+                        <td>Compression P<sub>n</sub></td>
+                        <td style="color:rgba(255,255,255,.5)">E3</td>
+                        <td class="val"><span id="sum_Pnc">—</span> kg</td>
+                        <td>0.90</td>
+                        <td class="val"><span id="sum_phiPnc">—</span> kg</td>
+                        <td>1.67</td>
+                        <td class="val"><span id="sum_ASDPnc">—</span> kg</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+                <div class="gov"><div class="gov-lbl">Tension — Governing</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_tn">YIELD</span><span id="fm_tn">Tensile yielding governs</span></div></div>
+                <div class="gov"><div class="gov-lbl">Flexure — F11</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_fl">PLASTIC</span><span id="fm_fl">Plastic moment Mp</span></div></div>
+                <div class="gov"><div class="gov-lbl">Shear — G6</div><div class="gov-val" style="font-size:13px"><span class="gov-tag">YIELD</span>Shear yielding (0.6Fy)</div></div>
+                <div class="gov"><div class="gov-lbl">Torsion — H3.2</div><div class="gov-val" style="font-size:13px"><span class="gov-tag">YIELD</span>Torsional yielding (0.6Fy)</div></div>
+                <div class="gov"><div class="gov-lbl">Compression — E3</div><div class="gov-val" style="font-size:13px"><span class="gov-tag" id="fm_tag_co">INELASTIC</span><span id="fm_co">Inelastic flexural buckling</span></div></div>
+            </div>
+        </div>
+    </div>
 
 
 
