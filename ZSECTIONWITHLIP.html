@@ -48,6 +48,16 @@ sub{bottom:-0.3em;}sup{top:-0.4em;}
   font-family:var(--sans);font-size:13px;font-weight:600;padding:5px 10px;border-radius:4px;text-align:center;transition:border-color .15s}
 .inp-row input:focus{outline:none;border-color:var(--blue);background:var(--bg4)}
 .inp-row .unit{font-size:11px;color:rgba(255,255,255,0.6);width:36px;flex-shrink:0;font-family:var(--sans)}
+.inp-row select{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);color:#fff;
+  font-family:var(--sans);font-size:13px;font-weight:600;padding:5px 10px;border-radius:4px;text-align:center;cursor:pointer}
+.inp-row select:focus{outline:none;border-color:var(--blue);background:var(--bg4)}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:5}
+.tab-btn{flex:1;background:transparent;border:none;color:rgba(255,255,255,0.55);
+  font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  padding:11px 6px;cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+.tab-btn:hover{color:#fff}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);background:var(--bg3)}
+.tab-pane.hidden{display:none}
 
 .sec-block{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;background:var(--bg2);width:972px;min-width:972px;box-sizing:border-box}
 .sec-hdr{background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:10px}
@@ -286,6 +296,11 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <div class="layout">
 <!-- ══ SIDEBAR ══ -->
 <div class="sidebar">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="props" type="button">หน้าตัด / วัสดุ</button>
+    <button class="tab-btn" data-tab="force" type="button">Applied force</button>
+  </div>
+  <div class="tab-pane" id="tab-props">
   <div class="sg">
     <div class="sg-title">ขนาดหน้าตัด</div>
     <div class="inp-row"><span class="lbl">H</span><span class="sym">=</span><input id="inp_H" type="text" inputmode="decimal" value="100"><span class="unit">mm</span></div>
@@ -312,6 +327,30 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="inp-row"><span class="lbl">K<sub>y</sub></span><span class="sym">=</span><input id="inp_Ky" type="text" inputmode="decimal" value="1"><span class="unit"></span></div>
     <div class="inp-row"><span class="lbl">K<sub>t</sub></span><span class="sym">=</span><input id="inp_Kt" type="text" inputmode="decimal" value="1"><span class="unit"></span></div>
     <div class="inp-row"><span class="lbl">C<sub>b</sub></span><span class="sym">=</span><input id="inp_Cb" type="text" inputmode="decimal" value="1"><span class="unit"></span></div>
+  </div>
+  </div>
+  <div class="tab-pane hidden" id="tab-force">
+  <div class="sg">
+    <div class="sg-title">Applied Force</div>
+    <div class="inp-row"><span class="lbl">Code</span><span class="sym">=</span><select id="inp_code"><option value="LRFD">LRFD</option><option value="ASD">ASD</option></select><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">M<sub>x</sub></span><span class="sym">=</span><input id="inp_Mx" type="text" inputmode="decimal" value="0"><span class="unit">kg·m</span></div>
+    <div class="inp-row"><span class="lbl">M<sub>y</sub></span><span class="sym">=</span><input id="inp_My" type="text" inputmode="decimal" value="0"><span class="unit">kg·m</span></div>
+    <div class="inp-row"><span class="lbl">P</span><span class="sym">=</span><input id="inp_P" type="text" inputmode="decimal" value="0"><span class="unit">kg</span></div>
+    <div class="inp-row"><span class="lbl">V<sub>y</sub></span><span class="sym">=</span><input id="inp_Vy" type="text" inputmode="decimal" value="0"><span class="unit">kg</span></div>
+    <div class="inp-row"><span class="lbl">n</span><span class="sym">=</span><input id="inp_n" type="text" inputmode="decimal" value="1"><span class="unit">ea</span></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Combined Check</div>
+    <div class="inp-row" style="justify-content:space-between"><span class="lbl" style="width:auto">Design code</span><span id="ck_code" style="font-weight:700;color:var(--blue)">LRFD</span></div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">P + M<sub>x</sub> + M<sub>y</sub></span><span style="font-weight:700" id="ck_pm">0.000</span><span id="ck_pm_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_pm_sub">—</div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">M<sub>x</sub> + V<sub>y</sub></span><span style="font-weight:700" id="ck_mv">0.000</span><span id="ck_mv_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0;word-break:break-all" id="ck_mv_sub">—</div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">หมายเหตุ</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">M<sub>x</sub>, M<sub>y</sub> = โมเมนต์รอบแกน x, y (kg·m)<br>P = แรงตามแนวแกน (kg)<br>V<sub>y</sub> = แรงเฉือนแกน y (kg)<br>n = จำนวนหน้าตัด (Built-up)</div>
+  </div>
   </div>
 </div>
 
@@ -1283,6 +1322,17 @@ function setupInputs(){
     el.addEventListener('keydown',e=>{if(e.key==='Enter'){fmtInput(el);calculate();}});
     fmtInput(el);
   });
+  document.querySelectorAll('select').forEach(el=>el.addEventListener('change',calculate));
+}
+function setupTabs(){
+  const btns=document.querySelectorAll('.tab-btn');
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    btns.forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.add('hidden'));
+    const pane=document.getElementById('tab-'+b.dataset.tab);
+    if(pane)pane.classList.remove('hidden');
+  }));
 }
 function s(id,v,d=2){const e=document.getElementById(id);if(e)e.textContent=f(v,d);}
 function t(id,txt){const e=document.getElementById(id);if(e)e.textContent=txt;}
@@ -1789,8 +1839,8 @@ function calculate(){
   s('dt_Af',Af,2);s('dt_Jf',Jf,4);s('dt_Ixf',Ixf,4);s('dt_Iyf',Iyf,4);
   s('dt_Ixyf',Ixyf,4);s('dt_Xof',Xof,3);s('dt_xhf',xhf,3);s('dt_yof',yof,3);
 
-  // Distortional half-wavelength
-  const Lm=Ly*10;
+  // Distortional half-wavelength (Excel Z-Section!D57 = J17*10, J17 = Lt)
+  const Lm=Lt*10;
   const nu2=1-0.3**2;
   const dT=Cwf+Ixf*(Xof-xhf)**2*(1-Ixyf**2/(Ixf*Iyf));
   const Lcrd=PI*H*(6*nu2/(tt**3*(H**3))*dT)**0.25;
@@ -1877,7 +1927,12 @@ function calculate(){
   s('fy_Mndy',Mndy);s('fy_Mndy_gov',Mndy);
 
   // Local Buckling (Effective Width)
-  const Fn_min=Math.min(Fn_x,Fn_y);
+  // Effective-width reference stress = Excel Z-Section!D42 = MIN(D35,J35) compression global Fn
+  const lc_x=Math.sqrt(Fy/Fcre_x),lc_y=Math.sqrt(Fy/Fcre_y);
+  const Fn_cx=lc_x>1.5?0.877*Fy/(lc_x**2):(0.658**(lc_x**2))*Fy;
+  const Fn_cy=lc_y>1.5?0.877*Fy/(lc_y**2):(0.658**(lc_y**2))*Fy;
+  const Fn_c=Math.min(Fn_cx,Fn_cy);
+  const Fn_min=Fn_c;
   s('l_Fn',Fn_min,0);
   const lc=(slD,flatD,lrC,c1,c2)=>{
     const lam=slD/tt,lr=lrC*Math.sqrt(E/Fy),lrFn=lr*Math.sqrt(Fy/Fn_min);
@@ -1897,15 +1952,11 @@ function calculate(){
     s('l_Fel'+id,arr[i].Fel,0);s('l_be'+id,arr[i].be,3);
     h('l_st'+id,stL(arr[i].sl));
   });
-  t('l_Fn_sub',`min(${f(Fn_x,0)}, ${f(Fn_y,0)})`);
+  t('l_Fn_sub',`min(${f(Fn_cx,0)}, ${f(Fn_cy,0)})`);
   s('l_Ae',Ae,4);
   t('l_Ae_sub',`2×${f(lip.be,3)}×${tt}/10 + 2×${f(fl.be,3)}×${tt}/10 + ${f(wb.be,3)}×${tt}/10`);
 
-  const lc_x=Math.sqrt(Fy/Fcre_x),lc_y=Math.sqrt(Fy/Fcre_y);
-  const Fn_cx=lc_x>1.5?0.877*Fy/(lc_x**2):(0.658**(lc_x**2))*Fy;
-  const Fn_cy=lc_y>1.5?0.877*Fy/(lc_y**2):(0.658**(lc_y**2))*Fy;
   const Pne_x=Fn_cx*A/100,Pne_y=Fn_cy*A/100,Pn=Math.min(Pne_x,Pne_y);
-  const Fn_c=Math.min(Fn_cx,Fn_cy);
   const Pnl_val=Ae*Fn_c,Pnl=Math.min(Pnl_val,Pn);
   t('l_Pnl_sub',`${f(Ae,4)} × ${f(Fn_c,0)}`);s('l_Pnl_val',Pnl_val,0);s('l_Pn',Pn,0);
   s('l_Pnl_gov',Pnl,0);
@@ -1915,7 +1966,7 @@ function calculate(){
   const be_lip_mm = lip.be * 10;  // convert cm back to mm
   const be_fl_mm  = fl.be  * 10;
   const be_web_mm = wb.be  * 10;
-  const Ixeff = 2*tt*(0.0417*(be_web_mm**3)
+  const Ixeff = 2*tt*(0.0417*((P1**3)-((P1-be_web_mm)**3))
     + be_fl_mm*(P1/2+r)**2 + P4*(P1/2+0.637*r)**2 + 0.149*(r**3)
     + Ix_coeff*(r**3) + P4*(P1/2+r*sg/g)**2
     + (be_lip_mm**3)*(sg**2)/12 + be_lip_mm*(P1/2+r*cg-be_lip_mm/2*sg)**2);
@@ -1996,16 +2047,45 @@ function calculate(){
   s('sum_Pn',Pn,0);s('sum_Pnl',Pnl,0);s('sum_Pnd',Pnd,0);
   s('sum_Vn',Vn,0);s('sum_Vn_gov',Vn,0);
 
-  const mnx_min=Math.min(Mne_x,Mnlx_final,Mndx);
+  // Excel Cal sheet AB91=MIN(Mnl-x,Mne-x), AB92=MIN(Mnl-y,Mne-y) — distortional NOT in governing min
+  const mnx_min=Math.min(Mne_x,Mnlx_final);
   s('sum_Mnx_gov',mnx_min);
-  t('sum_Mnx_mode',mnx_min===Mndx?'Distortional Buckling governs':mnx_min===Mnlx_final?'Local Buckling governs':'LTB governs');
-  const mny_min=Math.min(Mne_y,Mnly_final,Mndy);
+  t('sum_Mnx_mode',mnx_min===Mnlx_final?'Local Buckling governs':'LTB governs');
+  const mny_min=Math.min(Mne_y,Mnly_final);
   s('sum_Mny_gov',mny_min);
-  t('sum_Mny_mode',mny_min===Mndy?'Distortional Buckling governs':mny_min===Mnly_final?'Local Buckling governs':'LTB governs');
-  const pn_min=Math.min(Pey,Pex,Pt,Pn,Pnl,Pnd);
+  t('sum_Mny_mode',mny_min===Mnly_final?'Local Buckling governs':'LTB governs');
+  // Excel Cal sheet X128=MIN(Pnd,Pnl,Pn,Pey,Pex) — Pt NOT in governing min
+  const pn_min=Math.min(Pey,Pex,Pn,Pnl,Pnd);
   s('sum_Pn_gov',pn_min,0);
-  t('sum_Pn_mode',pn_min===Pnd?'Pnd Distortional governs':pn_min===Pnl?'Pnl Local Buckling governs':pn_min===Pn?'Pn Global Buckling governs':pn_min===Pey?'Pey Euler Y governs':pn_min===Pex?'Pex Euler X governs':'Pt Torsional governs');
+  t('sum_Pn_mode',pn_min===Pnd?'Pnd Distortional governs':pn_min===Pnl?'Pnl Local Buckling governs':pn_min===Pn?'Pn Global Buckling governs':pn_min===Pey?'Pey Euler Y governs':'Pex Euler X governs');
   h('sum_Vn_mode',lv<=0.587?`Yielding governs (λ<sub>v</sub>=${f(lv,3)} ≤ 0.587)`:`Shear Buckling governs (λ<sub>v</sub>=${f(lv,3)} > 0.587)`);
+
+  // ── Combined Check (Applied Force) — replicate Excel Cal sheet BH120-123 / BI144,BI145 ──
+  const Pap=parseInput('inp_P'),Mxap=parseInput('inp_Mx'),Myap=parseInput('inp_My'),Vyap=parseInput('inp_Vy');
+  let nSec=parseInput('inp_n'); if(!(nSec>0))nSec=1;
+  const codeEl=document.getElementById('inp_code');
+  const code=codeEl&&codeEl.value==='ASD'?'ASD':'LRFD';
+  // Capacities scaled by n (Excel XLOOKUP n→base or 2·base; base = governing Pn / Mn-x / Mn-y / Vn)
+  const AL113=pn_min*nSec, AL114=mnx_min*nSec, AL115=mny_min*nSec, AL116=Vn*nSec;
+  const PHI=0.9, OM=1.67;
+  // P+M : Excel BH120 (LRFD) / BH121 (ASD)
+  const pm_LRFD=Pap/(PHI*AL113)+Mxap/(PHI*AL114)+Myap/(PHI*AL115);
+  const pm_ASD =OM*Pap/AL113+OM*Mxap/AL114+OM*Myap/AL115;
+  // M+V : Excel BH122 (LRFD) / BH123 (ASD) — verbatim: V÷(Φ·Mn-x), M÷(Φ·Vn)
+  const mv_LRFD=Math.sqrt((Vyap/(PHI*AL114))**2+(Mxap/(PHI*AL116))**2);
+  const mv_ASD =Math.sqrt((OM*Vyap/AL114)**2+(OM*Mxap/AL116)**2);
+  const isASD=code==='ASD';
+  const r_pm=isASD?pm_ASD:pm_LRFD, r_mv=isASD?mv_ASD:mv_LRFD;
+  const ckBadge=(id,r)=>{const e=document.getElementById(id);if(!e)return;const ok=r<=1;e.textContent=ok?'OK':'Not OK';e.className='sec-tag '+(ok?'tag-green':'tag-red');};
+  t('ck_code',code);
+  s('ck_pm',r_pm,3); ckBadge('ck_pm_st',r_pm);
+  s('ck_mv',r_mv,3); ckBadge('ck_mv_st',r_mv);
+  t('ck_pm_sub',isASD
+     ?`1.67·${f(Pap,0)}/${f(AL113,0)} + 1.67·${f(Mxap,2)}/${f(AL114,2)} + 1.67·${f(Myap,2)}/${f(AL115,2)}`
+     :`${f(Pap,0)}/(0.9·${f(AL113,0)}) + ${f(Mxap,2)}/(0.9·${f(AL114,2)}) + ${f(Myap,2)}/(0.9·${f(AL115,2)})`);
+  t('ck_mv_sub',isASD
+     ?`√((1.67·${f(Vyap,0)}/${f(AL114,2)})² + (1.67·${f(Mxap,2)}/${f(AL116,0)})²)`
+     :`√((${f(Vyap,0)}/(0.9·${f(AL114,2)}))² + (${f(Mxap,2)}/(0.9·${f(AL116,0)}))²)`);
 
 
 
@@ -2092,7 +2172,7 @@ if(window.ResizeObserver){
   if(cvs)ro2.observe(cvs);
 }
 window.addEventListener('resize',calculate);
-window.addEventListener('load',()=>{setupInputs();calculate();});
+window.addEventListener('load',()=>{setupInputs();setupTabs();calculate();});
 </script>
 </div></div>
 </body>
