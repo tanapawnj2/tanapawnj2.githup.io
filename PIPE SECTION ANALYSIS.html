@@ -43,6 +43,16 @@ sub{bottom:-.3em}sup{top:-.4em}
   font-size:13px;font-weight:600;padding:5px 10px;border-radius:4px;text-align:center;transition:border-color .15s}
 .inp-row input:focus{outline:none;border-color:var(--blue);background:var(--bg4)}
 .inp-row .unit{font-size:11px;color:rgba(255,255,255,.6);width:36px;flex-shrink:0}
+.inp-row select{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);color:#fff;
+  font-size:13px;font-weight:600;padding:5px 10px;border-radius:4px;text-align:center;cursor:pointer}
+.inp-row select:focus{outline:none;border-color:var(--blue);background:var(--bg4)}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:5}
+.tab-btn{flex:1;background:transparent;border:none;color:rgba(255,255,255,0.55);
+  font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  padding:11px 6px;cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+.tab-btn:hover{color:#fff}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);background:var(--bg3)}
+.tab-pane.hidden{display:none}
 .sec-block{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;background:var(--bg2);width:972px;min-width:972px}
 .sec-hdr{background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:10px}
 .sec-tag{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;padding:2px 7px;border-radius:2px}
@@ -238,6 +248,11 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
 <div class="layout">
 <div class="sidebar">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="props" type="button">หน้าตัด / วัสดุ</button>
+    <button class="tab-btn" data-tab="force" type="button">Applied force</button>
+  </div>
+  <div class="tab-pane" id="tab-props">
   <div class="sg">
     <div class="sg-title">ขนาดหน้าตัด</div>
     <div class="inp-row"><span class="lbl">D</span><span class="sym">=</span><input id="inp_D" type="text" value="219.1"><span class="unit">mm</span></div>
@@ -266,6 +281,31 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="inp-row"><span class="lbl">K</span><span class="sym">=</span><input id="inp_K" type="text" value="1"><span class="unit"></span></div>
   </div>
 
+  </div>
+  <div class="tab-pane hidden" id="tab-force">
+  <div class="sg">
+    <div class="sg-title">Applied Force</div>
+    <div class="inp-row"><span class="lbl">Code</span><span class="sym">=</span><select id="inp_code"><option value="LRFD">LRFD</option><option value="ASD">ASD</option></select><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">M<sub>x</sub></span><span class="sym">=</span><input id="inp_Mx" type="text" value="0"><span class="unit">kg·m</span></div>
+    <div class="inp-row"><span class="lbl">M<sub>y</sub></span><span class="sym">=</span><input id="inp_My" type="text" value="0"><span class="unit">kg·m</span></div>
+    <div class="inp-row"><span class="lbl">P</span><span class="sym">=</span><input id="inp_P" type="text" value="0"><span class="unit">kg</span></div>
+    <div class="inp-row"><span class="lbl">V<sub>x</sub></span><span class="sym">=</span><input id="inp_Vx" type="text" value="0"><span class="unit">kg</span></div>
+    <div class="inp-row"><span class="lbl">V<sub>y</sub></span><span class="sym">=</span><input id="inp_Vy" type="text" value="0"><span class="unit">kg</span></div>
+    <div class="inp-row"><span class="lbl">n</span><span class="sym">=</span><input id="inp_n" type="text" value="1"><span class="unit">ea</span></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Combined Check — AISC 360-22</div>
+    <div class="inp-row" style="justify-content:space-between"><span class="lbl" style="width:auto">Design code</span><span id="ck_code" style="font-weight:700;color:var(--blue)">LRFD</span></div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">H1.1 &nbsp;P + M<sub>r</sub></span><span style="font-weight:700" id="ck_pm">0.000</span><span id="ck_pm_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_pm_sub">—</div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">Shear &nbsp;V<sub>r</sub> / φV<sub>n</sub></span><span style="font-weight:700" id="ck_v">0.000</span><span id="ck_v_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0;word-break:break-all" id="ck_v_sub">—</div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">หมายเหตุ</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 §H1.1 (P + M) + §G5 (shear). หน้าตัดกลม axisymmetric → ใช้โมเมนต์/แรงเฉือนลัพธ์ M<sub>r</sub>=√(M<sub>x</sub>²+M<sub>y</sub>²), V<sub>r</sub>=√(V<sub>x</sub>²+V<sub>y</sub>²)<br>P = แรงอัด (kg) · n = จำนวนหน้าตัด</div>
+  </div>
+  </div>
 </div>
 
 <div class="main">
@@ -809,6 +849,34 @@ function calculate(){
   sv('sum_Vn',Vn*kgf,0);sv('sum_phiVn',0.9*Vn*kgf,0);sv('sum_ASDVn',Vn/1.67*kgf,0);
   sv('sum_Pn',Pn_co*kgf,0);sv('sum_phiPn',0.9*Pn_co*kgf,0);sv('sum_ASDPn',Pn_co/1.67*kgf,0);
 
+  // ── Combined Check — AISC 360-22 §H1.1 (axial + flexure) + §G5 shear ──
+  // Round HSS is axisymmetric → use resultant moment / shear
+  const PV=id=>{const x=Math.abs(pi(id));return isFinite(x)?x:0;};
+  const Pap=PV('inp_P'),Mxap=PV('inp_Mx'),Myap=PV('inp_My'),Vxap=PV('inp_Vx'),Vyap=PV('inp_Vy');
+  const Mr=Math.sqrt(Mxap*Mxap+Myap*Myap), Vr=Math.sqrt(Vxap*Vxap+Vyap*Vyap);
+  let nSec=pi('inp_n'); if(!(nSec>0))nSec=1;
+  const cEl=document.getElementById('inp_code');
+  const isASD=cEl&&cEl.value==='ASD';
+  const kfac=isASD?(1/1.67):0.9;
+  // available strengths in kg / kg·m (×kgf, ×n)
+  const Pc =kfac*Pn_co*kgf*nSec;
+  const Mc =kfac*Mn*kgf*nSec;
+  const Vc =kfac*Vn*kgf*nSec;
+  const prr=Pc>0?Pap/Pc:0;
+  const mratio=Mc>0?Mr/Mc:0;
+  // Eq. H1-1a (Pr/Pc ≥ 0.2) / H1-1b (Pr/Pc < 0.2)
+  const IR=prr>=0.2?prr+(8/9)*mratio:prr/2+mratio;
+  const Vrat=Vc>0?Vr/Vc:0;
+  const ckB=(id,rv)=>{const e=document.getElementById(id);if(!e)return;const ok=rv<=1;e.textContent=ok?'OK':'Not OK';e.className='sec-tag '+(ok?'tag-green':'tag-red');};
+  tx('ck_code',isASD?'ASD':'LRFD');
+  sv('ck_pm',IR,3); ckB('ck_pm_st',IR);
+  sv('ck_v',Vrat,3); ckB('ck_v_st',Vrat);
+  tx('ck_pm_sub',(prr>=0.2
+      ? f(Pap,0)+'/'+f(Pc,0)+' + (8/9)('+f(Mr,1)+'/'+f(Mc,1)+')'
+      : f(Pap,0)+'/(2·'+f(Pc,0)+') + '+f(Mr,1)+'/'+f(Mc,1))
+    +'  [H1-1'+(prr>=0.2?'a':'b')+', '+(isASD?'ASD Ω=1.67':'LRFD φ=0.90')+', Mr=√(Mx²+My²)]');
+  tx('ck_v_sub',f(Vr,0)+' / '+f(Vc,0)+'  [§G5, '+(isASD?'Vn/1.67':'0.9·Vn')+' ×n='+f(nSec,0)+', Vr=√(Vx²+Vy²)]');
+
   // ── Failure Mode tags ──
   // Tension
   if(phiTn_y<=phiTn_r){
@@ -839,6 +907,18 @@ function calculate(){
 }
 
 setupInputs();
+(function(){
+  const cs=document.getElementById('inp_code');
+  if(cs) cs.addEventListener('change', calculate);
+  const btns=document.querySelectorAll('.tab-btn');
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    btns.forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.add('hidden'));
+    const pane=document.getElementById('tab-'+b.dataset.tab);
+    if(pane)pane.classList.remove('hidden');
+  }));
+})();
 window.addEventListener('load',()=>{setupInputs();calculate();});
 window.addEventListener('resize',calculate);
 
