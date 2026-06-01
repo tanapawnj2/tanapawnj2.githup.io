@@ -2015,14 +2015,10 @@ function getAllBars(){
   // Column strip — per support: เหล็กต่อเนื่องคร่อม support ยื่นเข้า 2 span (anchored ที่ support, Ld ramp ที่ปลายตัด)
   data.supports.forEach((su,j)=>{
     const sx=supportX(j), rL=reachL(j), rR=reachR(j);
-    su.top.forEach((c,i)=>{ if(c.n>0&&c.d>0){
-      if(rL>0) bars.push({x0:sx-rL,x1:sx,    y:yTop(i),d:c.d,n:c.n,side:'top',grp:'colExt',aS:false,aE:true});
-      if(rR>0) bars.push({x0:sx,   x1:sx+rR, y:yTop(i),d:c.d,n:c.n,side:'top',grp:'colExt',aS:true, aE:false});
-    }});
-    su.bot.forEach((c,i)=>{ if(c.n>0&&c.d>0){
-      if(rL>0) bars.push({x0:sx-rL,x1:sx,    y:yBot(i),d:c.d,n:c.n,side:'bot',grp:'colExt',aS:false,aE:true});
-      if(rR>0) bars.push({x0:sx,   x1:sx+rR, y:yBot(i),d:c.d,n:c.n,side:'bot',grp:'colExt',aS:true, aE:false});
-    }});
+    // ท่อนเดียวคร่อม support (รวมซ้าย+ขวา) — เต็มกำลังตรง support, ramp Ld ที่ปลายตัด · ไม่นับซ้ำที่ x=sx
+    const x0=sx-rL, x1=sx+rR, aS=(rL<=0), aE=(rR<=0);
+    su.top.forEach((c,i)=>{ if(c.n>0&&c.d>0&&x1>x0) bars.push({x0,x1,y:yTop(i),d:c.d,n:c.n,side:'top',grp:'colExt',aS,aE}); });
+    su.bot.forEach((c,i)=>{ if(c.n>0&&c.d>0&&x1>x0) bars.push({x0,x1,y:yBot(i),d:c.d,n:c.n,side:'bot',grp:'colExt',aS,aE}); });
   });
   // Middle strip — per span
   let xL=0;
