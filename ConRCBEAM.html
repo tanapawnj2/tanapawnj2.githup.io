@@ -246,9 +246,9 @@ table.sum tr.section td{background:rgba(244,114,182,.08);color:var(--pink);font-
         <div class="layer-grid">
           <div></div><div class="hd">L1</div><div class="hd">L2</div><div class="hd">L3</div>
           <div class="lbl">n</div>
-          <div class="layer-cell"><input type="number" data-bind="main.top.0.n" min="2" step="1" value="2"><input type="number" data-bind="main.top.0.d" min="0" step="2" value="16"></div>
-          <div class="layer-cell"><input type="number" data-bind="main.top.1.n" min="0" step="1" value="0"><input type="number" data-bind="main.top.1.d" min="0" step="2" value="16"></div>
-          <div class="layer-cell"><input type="number" data-bind="main.top.2.n" min="0" step="1" value="0"><input type="number" data-bind="main.top.2.d" min="0" step="2" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.top.0.n" min="2" step="1" value="2"><input type="number" data-bind="main.top.0.d" min="0" step="1" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.top.1.n" min="0" step="1" value="0"><input type="number" data-bind="main.top.1.d" min="0" step="1" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.top.2.n" min="0" step="1" value="0"><input type="number" data-bind="main.top.2.d" min="0" step="1" value="16"></div>
           <div></div><div class="hd">Ø(mm)</div><div class="hd">Ø(mm)</div><div class="hd">Ø(mm)</div>
         </div>
       </div>
@@ -257,9 +257,9 @@ table.sum tr.section td{background:rgba(244,114,182,.08);color:var(--pink);font-
         <div class="layer-grid">
           <div></div><div class="hd">L1</div><div class="hd">L2</div><div class="hd">L3</div>
           <div class="lbl">n</div>
-          <div class="layer-cell"><input type="number" data-bind="main.bot.0.n" min="2" step="1" value="2"><input type="number" data-bind="main.bot.0.d" min="0" step="2" value="16"></div>
-          <div class="layer-cell"><input type="number" data-bind="main.bot.1.n" min="0" step="1" value="0"><input type="number" data-bind="main.bot.1.d" min="0" step="2" value="16"></div>
-          <div class="layer-cell"><input type="number" data-bind="main.bot.2.n" min="0" step="1" value="0"><input type="number" data-bind="main.bot.2.d" min="0" step="2" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.bot.0.n" min="2" step="1" value="2"><input type="number" data-bind="main.bot.0.d" min="0" step="1" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.bot.1.n" min="0" step="1" value="0"><input type="number" data-bind="main.bot.1.d" min="0" step="1" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.bot.2.n" min="0" step="1" value="0"><input type="number" data-bind="main.bot.2.d" min="0" step="1" value="16"></div>
           <div></div><div class="hd">Ø(mm)</div><div class="hd">Ø(mm)</div><div class="hd">Ø(mm)</div>
         </div>
       </div>
@@ -1129,7 +1129,7 @@ function zoneCardHTML(cls, title, sub, basePath, topKey, botKey, stirKey){
             <div></div><div class="hd">n</div><div class="hd">Ø</div>
             ${[0,1,2].map(i=>`<div class="lbl">L${i+1}</div>
               <input type="number" data-bind="${basePath}.${topKey}.${i}.n" min="0" step="1" value="${g(`${basePath}.${topKey}.${i}.n`)}">
-              <input type="number" data-bind="${basePath}.${topKey}.${i}.d" min="0" step="2" value="${g(`${basePath}.${topKey}.${i}.d`)}">`).join('')}
+              <input type="number" data-bind="${basePath}.${topKey}.${i}.d" min="0" step="1" value="${g(`${basePath}.${topKey}.${i}.d`)}">`).join('')}
           </div>
         </div>
         <div class="mini-card bot">
@@ -1138,7 +1138,7 @@ function zoneCardHTML(cls, title, sub, basePath, topKey, botKey, stirKey){
             <div></div><div class="hd">n</div><div class="hd">Ø</div>
             ${[0,1,2].map(i=>`<div class="lbl">L${i+1}</div>
               <input type="number" data-bind="${basePath}.${botKey}.${i}.n" min="0" step="1" value="${g(`${basePath}.${botKey}.${i}.n`)}">
-              <input type="number" data-bind="${basePath}.${botKey}.${i}.d" min="0" step="2" value="${g(`${basePath}.${botKey}.${i}.d`)}">`).join('')}
+              <input type="number" data-bind="${basePath}.${botKey}.${i}.d" min="0" step="1" value="${g(`${basePath}.${botKey}.${i}.d`)}">`).join('')}
           </div>
         </div>
       </div>
