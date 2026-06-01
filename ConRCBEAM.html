@@ -1,0 +1,2837 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<title>Continuous Beam V1 — Analysis &amp; Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d12;--surface:#13161e;--surface2:#191d28;--border:#222736;--accent:#00e5ff;--accent2:#ff6b35;--accent3:#a8ff78;--accent4:#c084fc;--text:#e8ecf4;--muted:#8896b8;--r:#ffd60a;--pink:#f472b6;--ok:#4ade80;--bad:#ff4d6d;--sub:#c8d0e8;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sans-serif;min-height:100vh;min-width:760px;}
+header{padding:14px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+header h1{font-family:'Space Mono',monospace;font-size:19px;color:var(--accent);}
+#hsub{font-size:14px;color:var(--sub);}
+.badge{font-family:'Space Mono',monospace;font-size:12px;padding:2px 8px;border-radius:9px;background:rgba(192,132,252,.1);color:var(--accent4);border:1px solid rgba(192,132,252,.3);}
+.tabbar{display:flex;border-bottom:1px solid var(--border);background:var(--surface);padding:0 18px;gap:4px;position:sticky;top:0;z-index:20;}
+.tab{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:11px 20px;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);cursor:pointer;margin-bottom:-1px;display:flex;align-items:center;gap:7px;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab.active.dz{color:var(--pink);border-bottom-color:var(--pink);}
+.tab .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.7;}
+.stage{display:none;}
+.stage.active{display:grid;}
+#stage-analysis{grid-template-columns:300px 300px minmax(0,1fr);min-height:calc(100vh - 96px);}
+#stage-design{grid-template-columns:480px minmax(0,1fr);min-height:calc(100vh - 96px);}
+.col{background:var(--surface);border-right:1px solid var(--border);padding:14px 12px;position:sticky;top:41px;align-self:start;max-height:calc(100vh - 41px);overflow-y:auto;}
+.results{padding:18px 22px;overflow-x:hidden;min-width:0;max-width:1280px;}
+.results canvas{width:100%;max-width:100%;display:block;box-sizing:border-box;}
+.preview-block{min-width:0;}
+.sec{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--sub);text-transform:uppercase;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.sec:first-child{margin-top:0;}
+.field{margin-bottom:8px;}
+label{display:block;font-size:13px;color:var(--sub);margin-bottom:3px;font-family:'Space Mono',monospace;}
+input[type=number],select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:5px;font-family:'Space Mono',monospace;font-size:14px;outline:none;}
+input[type=number]:focus,select:focus{border-color:var(--accent);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.card{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 10px;margin-bottom:7px;}
+.card-hd{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.cnum{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,214,10,.18);color:var(--r);border:1px solid rgba(255,214,10,.4);}
+.clbl{font-family:'Space Mono',monospace;font-size:13px;color:var(--muted);flex:1;}
+.xrem{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;}
+.xrem:hover{color:var(--bad);}
+.addbtn{width:100%;padding:7px;background:rgba(0,229,255,.06);border:1px dashed rgba(0,229,255,.3);color:var(--accent);border-radius:5px;cursor:pointer;font-family:'Space Mono',monospace;font-size:13px;margin-bottom:4px;}
+.addbtn:hover{background:rgba(0,229,255,.13);}
+.addbtn.y{background:rgba(255,214,10,.08);border-color:rgba(255,214,10,.3);color:var(--r);}
+.addbtn.o{background:rgba(255,107,53,.08);border-color:rgba(255,107,53,.3);color:var(--accent2);}
+.runbtn{width:100%;padding:11px;background:var(--accent);color:#000;border:none;border-radius:6px;font-family:'Space Mono',monospace;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;letter-spacing:.8px;}
+.runbtn:hover{filter:brightness(1.1);}
+.runbtn.pink{background:var(--pink);}
+.dblock{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px;margin-bottom:14px;}
+.dtitle{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--sub);margin-bottom:10px;}
+canvas{width:100%;display:block;border-radius:4px;background:#0f1117;}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-bottom:12px;}
+.rc{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 11px;border-left:3px solid var(--r);}
+.rc.m{border-left-color:var(--accent2);}
+.rl{font-family:'Space Mono',monospace;font-size:11px;color:var(--sub);margin-bottom:3px;}
+.rv{font-family:'Space Mono',monospace;font-size:17px;color:var(--r);font-weight:700;}
+.rc.m .rv{color:var(--accent2);}
+.ru{font-size:9px;color:var(--muted);margin-left:2px;}
+table.t{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:13px;}
+table.t th{text-align:center;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--sub);font-size:11px;letter-spacing:1px;text-transform:uppercase;background:rgba(0,229,255,.05);white-space:nowrap;}
+table.t td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;white-space:nowrap;}
+table.t td.l{text-align:left;}
+.pass{color:var(--ok);font-weight:700;}
+.fail{color:var(--bad);font-weight:700;}
+.warn{color:var(--r);font-weight:700;}
+.err{background:rgba(255,77,109,.09);border:1px solid rgba(255,77,109,.3);color:var(--bad);padding:10px 14px;border-radius:6px;font-size:14px;margin-bottom:12px;}
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:340px;color:var(--muted);text-align:center;gap:10px;}
+.hint{font-size:12px;color:var(--muted);margin:4px 0 10px;}
+.dnote{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:6px;padding:6px 9px;background:rgba(192,132,252,.07);border-radius:5px;border-left:2px solid var(--accent4);}
+/* ── Step / Zone cards (Design Stage) ── */
+.step{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:14px;position:relative}
+.step.s1{border-top:3px solid var(--r)}
+.step.s2{border-top:3px solid var(--pink)}
+.step-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.step-num{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000}
+.step.s1 .step-num{background:var(--r)}
+.step.s2 .step-num{background:var(--pink)}
+.step-t{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);flex:1}
+.step-sub{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace}
+.side-card{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 11px;margin-bottom:8px}
+.side-h{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.side-icon{font-family:'Space Mono',monospace;font-size:11px;font-weight:700}
+.side-t{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase}
+.side-card.top{border-left:3px solid var(--accent)}
+.side-card.top .side-icon,.side-card.top .side-t{color:var(--accent)}
+.side-card.bot{border-left:3px solid var(--accent3)}
+.side-card.bot .side-icon,.side-card.bot .side-t{color:var(--accent3)}
+.layer-grid{display:grid;grid-template-columns:30px 1fr 1fr 1fr;gap:6px;align-items:center;font-family:'Space Mono',monospace;font-size:11px}
+.layer-grid .hd{color:var(--muted);text-align:center;font-size:10px;letter-spacing:1px}
+.layer-grid .lbl{color:var(--muted);font-weight:700}
+.layer-cell{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.layer-cell input{background:#0f1117;border:1px solid var(--border);color:var(--text);padding:5px 6px;border-radius:4px;font-family:'Space Mono',monospace;font-size:13px;width:100%;text-align:center}
+.layer-cell input:focus{outline:none;border-color:var(--accent)}
+.layer-cell input.zero{color:#444}
+.span-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--border)}
+.span-tab{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;padding:7px 16px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);border-radius:6px;cursor:pointer;transition:all .15s}
+.span-tab:hover{color:#fff;border-color:var(--pink)}
+.span-tab.on{background:rgba(244,114,182,.13);border-color:var(--pink);color:var(--pink)}
+.span-tab.bad{color:var(--bad)}
+.span-tab.bad.on{background:rgba(255,77,109,.12);border-color:var(--bad);color:var(--bad)}
+.span-tab .lbl{font-size:9px;color:var(--muted);font-weight:400;margin-left:4px}
+.zone-card{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 11px;margin-bottom:8px}
+.zone-h{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--sub);margin-bottom:8px;display:flex;align-items:center;gap:7px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.zone-card.col{border-left:3px solid var(--r)}
+.zone-card.col .zone-h{color:var(--r)}
+.zone-card.mid{border-left:3px solid var(--pink)}
+.zone-card.mid .zone-h{color:var(--pink)}
+.zone-sub{font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0}
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mini-card{background:#0f1117;border-radius:5px;padding:7px 8px}
+.mini-h{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.mini-card.top{border-left:2px solid var(--accent)}
+.mini-card.top .mini-h{color:var(--accent)}
+.mini-card.bot{border-left:2px solid var(--accent3)}
+.mini-card.bot .mini-h{color:var(--accent3)}
+.mini-grid{display:grid;grid-template-columns:24px 1fr 1fr;gap:4px;align-items:center;font-family:'Space Mono',monospace;font-size:11px}
+.mini-grid .lbl{color:var(--muted);font-weight:700;font-size:10px}
+.mini-grid .hd{color:var(--muted);text-align:center;font-size:9px;letter-spacing:1px}
+.mini-grid input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:4px 5px;border-radius:3px;font-family:'Space Mono',monospace;font-size:12px;width:100%;text-align:center}
+.mini-grid input:focus{outline:none;border-color:var(--accent)}
+.preview-block{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:14px}
+.pv-t{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.pv-t .pill{font-size:10px;background:rgba(244,114,182,.1);color:var(--pink);padding:2px 8px;border-radius:9px;border:1px solid rgba(244,114,182,.3);text-transform:none;letter-spacing:0}
+#d3wrap{width:100%;height:380px;background:#0f1117;border-radius:5px;position:relative;overflow:hidden}
+#d3msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;color:rgba(255,255,255,.4)}
+.tg{font-family:'Space Mono',monospace;font-size:11px;color:var(--sub);display:inline-flex;align-items:center;gap:5px;padding:5px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;cursor:pointer;user-select:none}
+.tg input{accent-color:var(--accent);cursor:pointer}
+.tg.on{border-color:var(--accent)}
+.tg .sw{width:13px;height:3px;border-radius:2px;display:inline-block}
+.btn{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:5px 11px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--sub);cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;align-items:center}
+.sec-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sec-box{background:#0f1117;border-radius:5px;padding:10px;display:flex;flex-direction:column;align-items:center}
+.sec-box svg{display:block;width:100%;height:auto;margin:0 auto}
+#svgSec-A,#svgSec-B,#secx-cs{max-width:300px}
+#secx-sb{max-width:480px}
+.sec-box-t{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);text-align:center;margin-bottom:5px;font-weight:700}
+.sec-box-sub{font-size:10px;color:var(--muted);text-align:center;margin-bottom:8px;font-family:'Space Mono',monospace}
+table.sum{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:12px}
+table.sum th{padding:6px 8px;border-bottom:1px solid var(--border);color:var(--sub);text-align:center;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:rgba(0,229,255,.04);white-space:nowrap}
+table.sum td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;white-space:nowrap}
+table.sum td.l{text-align:left}
+table.sum tr.section td{background:rgba(244,114,182,.08);color:var(--pink);font-weight:700;letter-spacing:1px;font-size:10px;text-align:left}
+.bar-pill{display:inline-block;padding:1px 6px;border-radius:9px;font-size:11px;font-weight:700;letter-spacing:.5px;margin:0 1px}
+.bar-pill.top{background:rgba(0,229,255,.13);color:var(--accent);border:1px solid rgba(0,229,255,.3)}
+.bar-pill.bot{background:rgba(168,255,120,.13);color:var(--accent3);border:1px solid rgba(168,255,120,.3)}
+.bar-pill.col{background:rgba(255,214,10,.13);color:var(--r);border:1px solid rgba(255,214,10,.3)}
+.bar-pill.mid{background:rgba(244,114,182,.13);color:var(--pink);border:1px solid rgba(244,114,182,.3)}
+.note-y{font-family:'Noto Sans Thai',sans-serif;font-size:12px;color:var(--r);padding:9px 12px;background:rgba(255,214,10,.07);border:1px solid rgba(255,214,10,.25);border-radius:6px;margin-top:10px;line-height:1.6}
+.lgd{display:flex;gap:14px;flex-wrap:wrap;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px;}
+.lgd span{display:flex;align-items:center;gap:5px;}
+.lgd i{width:14px;height:3px;border-radius:2px;display:inline-block;}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<header>
+  <h1>&#11035; CONTINUOUS BEAM V1</h1>
+  <span id="hsub">Analysis &amp; Design — Integrated</span>
+  <span class="badge">MATRIX STIFFNESS</span>
+  <span class="badge" style="background:rgba(244,114,182,.1);color:var(--pink);border-color:rgba(244,114,182,.3);">2-STEP REBAR + 3D + Mn ENVELOPE</span>
+  <span class="badge" style="background:rgba(168,255,120,.1);color:var(--accent3);border-color:rgba(168,255,120,.3);">FACTORED Mu/Vu</span>
+</header>
+
+<div class="tabbar">
+  <button class="tab active" id="tab-a" onclick="switchTab('analysis')"><span class="dot"></span>1 · ANALYSIS</button>
+  <button class="tab dz" id="tab-d" onclick="switchTab('design')"><span class="dot"></span>2 · RC DESIGN</button>
+</div>
+
+<!-- ════════════ STAGE 1 : ANALYSIS ════════════ -->
+<div class="stage active" id="stage-analysis">
+  <div class="col">
+    <div class="sec">Beam Geometry</div>
+    <div class="field"><label>Total Length L (m)</label><input type="number" id="beamL" value="14" step="0.1"></div>
+
+    <div class="sec">Section &amp; Material</div>
+    <div class="hint">EI สำหรับวิเคราะห์ indeterminate คำนวณอัตโนมัติจากหน้าตัด + f'c</div>
+    <div class="g2">
+      <div class="field"><label>b = W (cm)</label><input type="number" id="dW" value="30" step="1"></div>
+      <div class="field"><label>H (cm)</label><input type="number" id="dH" value="60" step="1"></div>
+    </div>
+    <div class="field"><label>f'c (ksc)</label><input type="number" id="dFc" value="240" step="10"></div>
+    <div class="dnote" id="eiInfo" style="font-size:11px;color:var(--accent3)">Ec ≈ — · Ig = — · EI = —</div>
+
+    <button class="runbtn" onclick="analyze()">▶ ANALYZE BEAM</button>
+  </div>
+  <div class="col">
+    <div class="sec">Supports</div>
+    <div id="sc"></div>
+    <button class="addbtn y" onclick="addSupport()">+ Add Support</button>
+    <div class="sec">Loads <span style="font-size:10px;color:var(--muted)">(factored)</span></div>
+    <div class="g2" style="margin-bottom:8px">
+      <button class="addbtn o" style="margin:0" onclick="addLoad('point')">+ Point</button>
+      <button class="addbtn o" style="margin:0" onclick="addLoad('udl')">+ UDL</button>
+      <button class="addbtn o" style="margin:0" onclick="addLoad('trap')">+ Trap</button>
+      <button class="addbtn o" style="margin:0" onclick="addLoad('moment')">+ Moment</button>
+    </div>
+    <div id="lc"></div>
+  </div>
+  <div class="results" id="aresults">
+    <div class="welcome">
+      <div style="font-size:34px">&#11035;</div>
+      <div>กรอกข้อมูลคาน แล้วกด <b style="color:var(--accent)">ANALYZE BEAM</b></div>
+      <div style="font-size:12px">วิเคราะห์ด้วย Matrix Stiffness Method → ส่งแรงไปออกแบบ RC</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ STAGE 2 : DESIGN ════════════ -->
+<div class="stage" id="stage-design">
+  <div class="col" style="overflow-y:auto">
+    <div class="step" style="border-top-color:var(--accent3);padding:11px 14px">
+      <div class="step-h"><span class="step-num" style="background:var(--accent3)">§</span><div class="step-t">DESIGN PARAMETERS</div></div>
+      <div class="dnote" id="dSecInfo" style="font-size:11px;color:var(--accent3);margin-bottom:8px">หน้าตัด &amp; f'c กำหนดในแท็บ ANALYSIS</div>
+      <div class="g2">
+        <div class="field" style="margin:0"><label>cover (cm)</label><input type="number" id="dCov" value="3" step="0.5"></div>
+        <div class="field" style="margin:0"><label>layer sp. (cm)</label><input type="number" id="dSl" value="2.5" step="0.5"></div>
+      </div>
+      <div class="g2" style="margin-top:5px">
+        <div class="field" style="margin:0"><label>φ (flexure)</label><input type="number" id="dPhi" value="0.9" step="0.05"></div>
+        <div class="field" style="margin:0"><label>Main steel</label>
+          <select id="dMainGrade"><option value="2400">SR24</option><option value="3000">SD30</option><option value="4000" selected>SD40</option><option value="5000">SD50</option></select></div>
+      </div>
+      <div class="g2" style="margin-top:5px">
+        <div class="field" style="margin:0"><label>Stirrup grade</label>
+          <select id="dStirGrade"><option value="2400" selected>SR24</option><option value="3000">SD30</option><option value="4000">SD40</option></select></div>
+        <div class="field" style="margin:0"></div>
+      </div>
+      <div class="dnote" style="margin-top:8px;font-size:10px">⊠ Stirrup (Ø, spacing) กำหนดราย span ราย zone ใน Step 2 · zone แบ่ง L/3</div>
+    </div>
+
+    <div class="step s1">
+      <div class="step-h"><span class="step-num">1</span><div class="step-t">MAIN STEEL — ตลอดคาน <span class="step-sub">(ครั้งเดียว)</span></div></div>
+      <div class="side-card top">
+        <div class="side-h"><span class="side-icon">▲</span><span class="side-t">Top Main — เหล็กบนตลอด</span></div>
+        <div class="layer-grid">
+          <div></div><div class="hd">L1</div><div class="hd">L2</div><div class="hd">L3</div>
+          <div class="lbl">n</div>
+          <div class="layer-cell"><input type="number" data-bind="main.top.0.n" min="2" step="1" value="2"><input type="number" data-bind="main.top.0.d" min="0" step="2" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.top.1.n" min="0" step="1" value="0"><input type="number" data-bind="main.top.1.d" min="0" step="2" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.top.2.n" min="0" step="1" value="0"><input type="number" data-bind="main.top.2.d" min="0" step="2" value="16"></div>
+          <div></div><div class="hd">Ø(mm)</div><div class="hd">Ø(mm)</div><div class="hd">Ø(mm)</div>
+        </div>
+      </div>
+      <div class="side-card bot">
+        <div class="side-h"><span class="side-icon">▼</span><span class="side-t">Bot Main — เหล็กล่างตลอด</span></div>
+        <div class="layer-grid">
+          <div></div><div class="hd">L1</div><div class="hd">L2</div><div class="hd">L3</div>
+          <div class="lbl">n</div>
+          <div class="layer-cell"><input type="number" data-bind="main.bot.0.n" min="2" step="1" value="2"><input type="number" data-bind="main.bot.0.d" min="0" step="2" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.bot.1.n" min="0" step="1" value="0"><input type="number" data-bind="main.bot.1.d" min="0" step="2" value="16"></div>
+          <div class="layer-cell"><input type="number" data-bind="main.bot.2.n" min="0" step="1" value="0"><input type="number" data-bind="main.bot.2.d" min="0" step="2" value="16"></div>
+          <div></div><div class="hd">Ø(mm)</div><div class="hd">Ø(mm)</div><div class="hd">Ø(mm)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step s2">
+      <div class="step-h"><span class="step-num">2</span><div class="step-t">EXTRA STEEL <span class="step-sub">(เพิ่มจาก Main)</span></div></div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--r);margin-bottom:6px">◆ COLUMN STRIP — ราย Support (M⁻ ต่อเนื่องคร่อม support)</div>
+      <div class="span-tabs" id="sup-tabs"></div>
+      <div id="sup-content"></div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--pink);margin:14px 0 6px;padding-top:10px;border-top:1px dashed var(--border)">◆ MIDDLE STRIP — ราย Span (M⁺ กลางช่วง)</div>
+      <div class="span-tabs" id="span-tabs"></div>
+      <div id="span-content"></div>
+    </div>
+  </div>
+
+  <div class="results" id="dresults">
+    <div class="welcome">
+      <div style="font-size:34px">&#9636;</div>
+      <div>ยังไม่มีผลวิเคราะห์ — กลับไปแท็บ <b style="color:var(--accent)">ANALYSIS</b> ก่อน</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ PART A : ANALYSIS ENGINE (non-module) ════════════ -->
+<script>
+const TLBL={pin:'Pin',roller:'Roller',fixed:'Fixed',free:'Free',vspring:'V-Spring',ronly:'Rθ only',roller_r:'Roller+Rθ',pin_r:'Pin+Rθ'};
+let supportCount=0, loadCount=0;
+const supports={};
+window.ANALYSIS=null;  // ต้องเป็น window prop เพื่อให้ module script เข้าถึงได้
+
+// คำนวณ EI อัตโนมัติจาก W, H, f'c (Section&Material ที่ user กรอกในแท็บ Analysis)
+function computeAutoSegments(L){
+  const W = +document.getElementById('dW').value || 30;
+  const H = +document.getElementById('dH').value || 60;
+  const fc = +document.getElementById('dFc').value || 240;
+  const Ec = 15100 * Math.sqrt(fc);     // ksc (ACI 318 19.2.2.1, normal-weight concrete)
+  const Ig = W * H * H * H / 12;        // cm⁴ (gross section)
+  // อัปเดต readout
+  const elInfo = document.getElementById('eiInfo');
+  if(elInfo) elInfo.innerHTML = `Ec = ${Math.round(Ec).toLocaleString()} ksc · Ig = ${Math.round(Ig).toLocaleString()} cm⁴ · EI = ${(Ec*Ig*1e-4).toExponential(2)}`;
+  const elDS = document.getElementById('dSecInfo');
+  if(elDS) elDS.innerHTML = `หน้าตัด <b>${W}×${H} cm</b> · f'c <b>${fc} ksc</b> (กำหนดในแท็บ ANALYSIS)`;
+  // 1 segment ครอบคลุมทั้งคาน
+  return { 1: {x1:0, x2:L, E:Ec, I:Ig} };
+}
+// อัปเดต readout เมื่อเปลี่ยน W/H/f'c
+['dW','dH','dFc'].forEach(id=>{
+  document.addEventListener('DOMContentLoaded',()=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.addEventListener('input',()=>{
+      const L=+document.getElementById('beamL').value||14;
+      computeAutoSegments(L);
+    });
+  });
+});
+
+// เรียงเลขที่แสดงบน card ให้เป็น 1..N ต่อเนื่องตามลำดับใน DOM (DOM id ภายในคงเดิม)
+function renumberCards(){
+  document.querySelectorAll('#sc .card').forEach((card,i)=>{ const n=card.querySelector('.cnum'); if(n) n.textContent=i+1; });
+  const LN={point:'Point Pu',udl:'UDL wu',trap:'Trap wu',moment:'Moment Mu'};
+  document.querySelectorAll('#lc .card').forEach((card,i)=>{
+    const n=card.querySelector('.cnum'); if(n) n.textContent=i+1;
+    const lbl=card.querySelector('.clbl'); if(lbl){ lbl.textContent=(LN[lbl.dataset.type]||'Load')+' #'+(i+1); }
+  });
+}
+function addSupport(type,xVal){
+  type=type||'pin'; const id=++supportCount;
+  supports[id]={type,x:xVal??0};
+  const d=document.createElement('div');d.className='card';d.id='sc-'+id;
+  d.innerHTML='<div class="card-hd"><span class="cnum" id="snum-'+id+'">'+id+'</span>'+
+    '<span class="clbl" id="slbl-'+id+'">'+TLBL[type]+'</span><button class="xrem" onclick="removeSupport('+id+')">&#10005;</button></div>'+
+    '<div class="field" style="margin-bottom:6px"><label>Type</label><select id="stype-'+id+'" onchange="setSType('+id+',this.value)">'+
+    '<option value="roller"'+(type==='roller'?' selected':'')+'>○ Roller</option>'+
+    '<option value="pin"'+(type==='pin'?' selected':'')+'>△ Pin</option>'+
+    '<option value="fixed"'+(type==='fixed'?' selected':'')+'>▐ Fixed</option>'+
+    '<option value="vspring"'+(type==='vspring'?' selected':'')+'>↕ V.Spring</option>'+
+    '<option value="pin_r"'+(type==='pin_r'?' selected':'')+'>△+↻ Pin+Rθ</option>'+
+    '<option value="free"'+(type==='free'?' selected':'')+'>✕ Free</option></select></div>'+
+    '<div id="kv-'+id+'" style="display:'+(type==='vspring'?'block':'none')+';margin-bottom:6px"><div class="field" style="margin:0"><label>kv (kg/m)</label><input type="number" id="skv-'+id+'" value="10000" step="1000" oninput="supports['+id+'].kv=+this.value"></div></div>'+
+    '<div id="kt-'+id+'" style="display:'+(type==='pin_r'?'block':'none')+';margin-bottom:6px"><div class="field" style="margin:0"><label>kθ (kg·m/deg)</label><input type="number" id="skt-'+id+'" value="1000" step="100" oninput="supports['+id+'].kt=+this.value"></div></div>'+
+    '<div class="field" style="margin:0"><label>x (m)</label><input type="number" id="sx-'+id+'" value="'+(xVal??0)+'" step="0.1" onchange="supports['+id+'].x=+this.value"></div>';
+  document.getElementById('sc').appendChild(d);
+  renumberCards();
+}
+function removeSupport(id){const e=document.getElementById('sc-'+id);if(e)e.remove();delete supports[id];renumberCards();}
+function setSType(id,val){
+  supports[id].type=val;document.getElementById('slbl-'+id).textContent=TLBL[val];
+  document.getElementById('kv-'+id).style.display=(val==='vspring')?'block':'none';
+  document.getElementById('kt-'+id).style.display=(val==='pin_r')?'block':'none';
+}
+function getSupportList(){
+  return Object.keys(supports).map(id=>{
+    const x=+document.getElementById('sx-'+id).value;supports[id].x=x;
+    const t=supports[id].type;
+    const kvEl=document.getElementById('skv-'+id),ktEl=document.getElementById('skt-'+id);
+    const kv=(t==='vspring'&&kvEl)?+(kvEl.value||0):0;
+    const ktDeg=(t==='pin_r'&&ktEl)?+(ktEl.value||0):0;
+    return {id:+id,type:t,x:x,kv:kv,kt:ktDeg*(180/Math.PI)};
+  }).sort((a,b)=>a.x-b.x);
+}
+
+function addLoad(type){
+  const id=++loadCount;
+  const d=document.createElement('div');d.className='card';d.id='l-'+id;
+  const nm=type==='point'?'Point Pu':type==='udl'?'UDL wu':type==='trap'?'Trap wu':'Moment Mu';
+  let fi='';
+  if(type==='point') fi='<div class="g2"><div class="field" style="margin:0"><label>Pu (kg) ↓+</label><input type="number" id="lp-'+id+'" value="0" step="10"></div><div class="field" style="margin:0"><label>x (m)</label><input type="number" id="lx-'+id+'" value="0" step="0.1"></div></div>';
+  else if(type==='udl') fi='<div class="field" style="margin:0 0 5px"><label>wu (kg/m) ↓+</label><input type="number" id="lw-'+id+'" value="0" step="10"></div><div class="g2"><div class="field" style="margin:0"><label>x₁</label><input type="number" id="lx1-'+id+'" value="0" step="0.1"></div><div class="field" style="margin:0"><label>x₂</label><input type="number" id="lx2-'+id+'" value="0" step="0.1"></div></div>';
+  else if(type==='trap') fi='<div class="g2"><div class="field" style="margin:0"><label>w₁</label><input type="number" id="lw1-'+id+'" value="0" step="10"></div><div class="field" style="margin:0"><label>w₂</label><input type="number" id="lw2-'+id+'" value="0" step="10"></div></div><div class="g2" style="margin-top:5px"><div class="field" style="margin:0"><label>x₁</label><input type="number" id="lx1t-'+id+'" value="0" step="0.1"></div><div class="field" style="margin:0"><label>x₂</label><input type="number" id="lx2t-'+id+'" value="0" step="0.1"></div></div>';
+  else fi='<div class="g2"><div class="field" style="margin:0"><label>Mu (kg·m)</label><input type="number" id="lm-'+id+'" value="0" step="10"></div><div class="field" style="margin:0"><label>x (m)</label><input type="number" id="lx-'+id+'" value="0" step="0.1"></div></div>';
+  d.innerHTML='<div class="card-hd"><span class="cnum" style="background:rgba(255,107,53,.15);color:var(--accent2);border-color:rgba(255,107,53,.3)">'+id+'</span><span class="clbl" data-type="'+type+'">'+nm+' #'+id+'</span><button class="xrem" onclick="rmLoad('+id+')">&#10005;</button></div>'+fi;
+  document.getElementById('lc').appendChild(d);
+  renumberCards();
+}
+function rmLoad(id){const e=document.getElementById('l-'+id);if(e)e.remove();renumberCards();}
+function collectLoads(L){
+  const loads=[];
+  document.querySelectorAll('#lc .card').forEach(row=>{
+    const type=row.querySelector('.clbl').dataset.type;
+    const id=row.id.split('-')[1];
+    if(type==='point') loads.push({type:'point',P:+document.getElementById('lp-'+id).value,x:+document.getElementById('lx-'+id).value});
+    else if(type==='udl') loads.push({type:'udl',w:+document.getElementById('lw-'+id).value,x1:+document.getElementById('lx1-'+id).value,x2:+document.getElementById('lx2-'+id).value});
+    else if(type==='trap') loads.push({type:'trap',w1:+document.getElementById('lw1-'+id).value,w2:+document.getElementById('lw2-'+id).value,x1:+document.getElementById('lx1t-'+id).value,x2:+document.getElementById('lx2t-'+id).value});
+    else loads.push({type:'moment',M:+document.getElementById('lm-'+id).value,x:+document.getElementById('lx-'+id).value});
+  });
+  return loads;
+}
+
+function gaussSolve(Ain,bin){
+  const n=Ain.length, A=Ain.map(r=>r.slice()), b=bin.slice();
+  for(let col=0;col<n;col++){
+    let maxR=col;
+    for(let r=col+1;r<n;r++) if(Math.abs(A[r][col])>Math.abs(A[maxR][col])) maxR=r;
+    [A[col],A[maxR]]=[A[maxR],A[col]];[b[col],b[maxR]]=[b[maxR],b[col]];
+    const piv=A[col][col];
+    if(Math.abs(piv)<1e-14) throw new Error('Singular at col '+col);
+    for(let r=0;r<n;r++){
+      if(r===col) continue;
+      const f=A[r][col]/piv;
+      for(let c=col;c<n;c++) A[r][c]-=f*A[col][c];
+      b[r]-=f*b[col];
+    }
+  }
+  return A.map((r,i)=>b[i]/r[i]);
+}
+function elemK(EI,L){const a=EI/(L*L*L);return [[12*a,6*L*a,-12*a,6*L*a],[6*L*a,4*L*L*a,-6*L*a,2*L*L*a],[-12*a,-6*L*a,12*a,-6*L*a],[6*L*a,2*L*L*a,-6*L*a,4*L*L*a]];}
+function fefElement(loads,xL,Le){
+  const fef=[0,0,0,0], L=Le;
+  for(const ld of loads){
+    if(ld.type==='point'){
+      const a=ld.x-xL; if(a<-1e-9||a>L+1e-9) continue;
+      const ac=Math.min(Math.max(a,0),L), b=L-ac, P=ld.P;
+      if(ac<1e-9||b<1e-9) continue;
+      fef[0]+=P*b*b*(3*ac+b)/(L*L*L);fef[1]+=P*ac*b*b/(L*L);fef[2]+=P*ac*ac*(ac+3*b)/(L*L*L);fef[3]+=-P*ac*ac*b/(L*L);
+    } else if(ld.type==='udl'){
+      const gA=Math.max(ld.x1,xL), gB=Math.min(ld.x2,xL+L);
+      if(gA>=gB) continue;
+      const w=ld.w, a0=gA-xL, a1=gB-xL;
+      const Fi=t=>t-t*t*t/(L*L)+t*t*t*t/(2*L*L*L);
+      const Mi=t=>t*t/2-2*t*t*t/(3*L)+t*t*t*t/(4*L*L);
+      const Fj=t=>t*t*t/(L*L)-t*t*t*t/(2*L*L*L);
+      const Mj=t=>-t*t*t/(3*L)+t*t*t*t/(4*L*L);
+      fef[0]+=w*(Fi(a1)-Fi(a0));fef[1]+=w*(Mi(a1)-Mi(a0));fef[2]+=w*(Fj(a1)-Fj(a0));fef[3]+=w*(Mj(a1)-Mj(a0));
+    } else if(ld.type==='trap'){
+      const gA=Math.max(ld.x1,xL), gB=Math.min(ld.x2,xL+L);
+      if(gA<gB){
+        const Lseg=ld.x2-ld.x1, a0=gA-xL, a1=gB-xL;
+        const w1=ld.w1+(gA-ld.x1)/Lseg*(ld.w2-ld.w1), w2=ld.w1+(gB-ld.x1)/Lseg*(ld.w2-ld.w1);
+        const segL=a1-a0, nq=40;
+        for(let k=0;k<=nq;k++){
+          const s=a0+segL*k/nq, wq=w1+(w2-w1)*k/nq;
+          const wf=(k===0||k===nq)?wq/2:wq, xi=s/L;
+          const Ni=1-3*xi*xi+2*xi*xi*xi, Nj=3*xi*xi-2*xi*xi*xi;
+          const Nmi=s*(1-xi)*(1-xi), Nmj=s*s/L*(xi-1), ds=segL/nq;
+          fef[0]+=wf*ds*Ni;fef[1]+=wf*ds*Nmi;fef[2]+=wf*ds*Nj;fef[3]+=wf*ds*Nmj;
+        }
+      }
+    }
+  }
+  return fef;
+}
+function getSegmentEI(segs,xMid){
+  for(const k of Object.keys(segs)){
+    const s=segs[k];
+    if(xMid>=s.x1-1e-9 && xMid<=s.x2+1e-9) return (s.E*1e4)*(s.I*1e-8);
+  }
+  const k0=Object.keys(segs)[0];
+  if(k0){const s=segs[k0];return (s.E*1e4)*(s.I*1e-8);}
+  return 1e7;
+}
+function matrixSolve(L,segs,supList,loads){
+  let nodeArr=[0,L];
+  for(const s of supList) nodeArr.push(s.x);
+  for(const ld of loads){
+    if(ld.type==='point'||ld.type==='moment'){if(ld.x>=0&&ld.x<=L)nodeArr.push(ld.x);}
+    else {if(ld.x1>=0&&ld.x1<=L)nodeArr.push(ld.x1);if(ld.x2>=0&&ld.x2<=L)nodeArr.push(ld.x2);}
+  }
+  for(const k of Object.keys(segs)){
+    const sg=segs[k];
+    if(sg.x1>=0&&sg.x1<=L)nodeArr.push(sg.x1);
+    if(sg.x2>=0&&sg.x2<=L)nodeArr.push(sg.x2);
+  }
+  const seen={};
+  const nodes=nodeArr.filter(x=>{const k=x.toFixed(9);if(seen[k])return false;seen[k]=true;return true;}).sort((a,b)=>a-b);
+  const nN=nodes.length, nE=nN-1, nDOF=nN*2;
+  const findNode=x=>{for(let i=0;i<nodes.length;i++)if(Math.abs(nodes[i]-x)<1e-9)return i;return -1;};
+  const Kg=Array.from({length:nDOF},()=>new Array(nDOF).fill(0));
+  const F=new Array(nDOF).fill(0);
+  for(let e=0;e<nE;e++){
+    const xL=nodes[e],xR=nodes[e+1],Le=xR-xL,xMid=(xL+xR)/2;
+    const ke=elemK(getSegmentEI(segs,xMid),Le), fef=fefElement(loads,xL,Le);
+    const gd=[2*e,2*e+1,2*e+2,2*e+3];
+    for(let i=0;i<4;i++){F[gd[i]]-=fef[i];for(let j=0;j<4;j++)Kg[gd[i]][gd[j]]+=ke[i][j];}
+  }
+  for(const ld of loads){
+    if(ld.type==='point'){const ni=findNode(ld.x);if(ni>=0)F[2*ni]-=ld.P;}
+    else if(ld.type==='moment'){const ni=findNode(ld.x);if(ni>=0)F[2*ni+1]+=ld.M;}
+  }
+  const constrained=new Set();
+  for(const s of supList){
+    const ni=findNode(s.x);
+    if(ni<0) return {err:'Support x='+s.x+': node not found'};
+    if(s.type==='pin'||s.type==='roller'||s.type==='pin_r') constrained.add(2*ni);
+    else if(s.type==='fixed'){constrained.add(2*ni);constrained.add(2*ni+1);}
+    if(s.type==='vspring'){Kg[2*ni][2*ni]+=(s.kv||0);}
+    if(s.type==='pin_r'){Kg[2*ni+1][2*ni+1]+=(s.kt||0);}
+  }
+  if(constrained.size<1) return {err:'ต้องมี support อย่างน้อย 1 ตัว'};
+  const freeDOFs=[];
+  for(let i=0;i<nDOF;i++) if(!constrained.has(i)) freeDOFs.push(i);
+  const d=new Array(nDOF).fill(0);
+  if(freeDOFs.length>0){
+    const Kff=freeDOFs.map(fi=>freeDOFs.map(fj=>Kg[fi][fj]));
+    const Ff=freeDOFs.map(fi=>F[fi]);
+    let df;
+    try{df=gaussSolve(Kff,Ff);}catch(e){return {err:'Matrix singular: '+e.message};}
+    for(let i=0;i<freeDOFs.length;i++) d[freeDOFs[i]]=df[i];
+  }
+  const R=new Array(nDOF).fill(0);
+  constrained.forEach(ci=>{let s=0;for(let j=0;j<nDOF;j++)s+=Kg[ci][j]*d[j];R[ci]=s-F[ci];});
+  const rxns=supList.map(s=>{
+    const ni=findNode(s.x);
+    const Fy=constrained.has(2*ni)?R[2*ni]:(s.type==='vspring'?-(s.kv||0)*d[2*ni]:0);
+    const Mz=constrained.has(2*ni+1)?R[2*ni+1]:(s.type==='pin_r'?-(s.kt||0)*d[2*ni+1]:0);
+    return {id:s.id,type:s.type,x:s.x,Fy,Mz};
+  });
+  const supS=rxns.slice().sort((a,b)=>a.x-b.x), EPS=1e-9, nBase=800;
+  const sx={}; sx['0']=0; sx[L.toFixed(9)]=L;
+  for(const s of supS){[-1,0,1].forEach(k=>{const v=s.x+k*EPS*10;sx[v.toFixed(9)]=v;});}
+  for(const ld of loads){
+    if(ld.type==='point'||ld.type==='moment'){[-1,0,1].forEach(k=>{const v=ld.x+k*EPS*10;sx[v.toFixed(9)]=v;});}
+    else {sx[ld.x1.toFixed(9)]=ld.x1;sx[ld.x2.toFixed(9)]=ld.x2;}
+  }
+  for(let i=0;i<=nBase;i++){const xg=L*i/nBase;sx[xg.toFixed(9)]=xg;}
+  const XS=Object.values(sx).filter(x=>x>=-EPS&&x<=L+EPS).sort((a,b)=>a-b);
+  const VS=[],MS=[];
+  for(const x of XS){
+    let V=0,M=0;
+    for(const s of supS){if(x>=s.x-EPS){V+=s.Fy;M+=(-s.Mz+s.Fy*(x-s.x));}}
+    for(const ld of loads){
+      if(ld.type==='point'&&x>=ld.x-EPS){V-=ld.P;M-=ld.P*(x-ld.x);}
+      else if(ld.type==='udl'&&x>ld.x1+EPS){
+        const xe=Math.min(x,ld.x2),wl=xe-ld.x1;
+        if(wl>0){V-=ld.w*wl;M-=ld.w*wl*(x-ld.x1-wl/2);}
+      } else if(ld.type==='trap'&&x>ld.x1+EPS){
+        const xe=Math.min(x,ld.x2),wl=xe-ld.x1,Lseg=ld.x2-ld.x1;
+        if(wl>0){const wa=ld.w1, wb=ld.w1+(ld.w2-ld.w1)*wl/Lseg, dx=x-ld.x1;V-=(wa+wb)/2*wl;M-=(wa/2)*wl*(2*dx-wl)+(wb-wa)/6*wl*(3*dx-2*wl);}
+      } else if(ld.type==='moment'){
+        if(Math.abs(ld.x)<EPS||Math.abs(ld.x-L)<EPS) continue;
+        if(x>=ld.x-EPS) M-=ld.M;
+      }
+    }
+    VS.push(V);MS.push(M);
+  }
+  const maxV=Math.max(...VS.map(Math.abs)), maxMp=Math.max(...MS), minMp=Math.min(...MS);
+  return {ok:true,rxns,nodes,nN,nE,xs:XS,Varr:VS,Marr:MS,maxV,maxMp,minMp,maxM:Math.max(Math.abs(maxMp),Math.abs(minMp))};
+}
+
+function detectSpans(L,supList,xs,Marr,Varr){
+  const STR={pin:1,roller:1,fixed:1,pin_r:1};
+  const sx=supList.filter(s=>STR[s.type]).map(s=>s.x).sort((a,b)=>a-b);
+  const uniq=sx.filter((v,i,a)=>i===0||Math.abs(v-a[i-1])>1e-9);
+  const bnd=[];
+  if(uniq.length===0) return [];
+  if(uniq[0]>1e-6) bnd.push(0);
+  uniq.forEach(v=>bnd.push(v));
+  if(uniq[uniq.length-1]<L-1e-6) bnd.push(L);
+  const spans=[];
+  for(let i=0;i<bnd.length-1;i++){
+    const a=bnd[i], b=bnd[i+1];
+    let Mpos=0,xMpos=a,Mneg=0,Vu=0;
+    for(let k=0;k<xs.length;k++){
+      if(xs[k]>=a-1e-9 && xs[k]<=b+1e-9){
+        const m=Marr[k], v=Math.abs(Varr[k]);
+        if(m>Mpos){Mpos=m;xMpos=xs[k];}
+        if(-m>Mneg) Mneg=-m;
+        if(v>Vu) Vu=v;
+      }
+    }
+    const isOH=(i===0&&uniq[0]>1e-6)||(i===bnd.length-2&&uniq[uniq.length-1]<L-1e-6);
+    spans.push({idx:spans.length+1,x1:a,x2:b,Lspan:b-a,MuPos:Mpos,xMuPos:xMpos,MuNeg:Mneg,Vu:Vu,overhang:isOH});
+  }
+  return spans;
+}
+
+function drawDiagram(canvasId,xs,ys,L,col,label,supXs){
+  const cv=document.getElementById(canvasId); if(!cv) return;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const cw=cv.clientWidth||820, ch=260;
+  cv.width=cw*dpr; cv.height=ch*dpr; cv.style.height=ch+'px';
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const ml=64,mr=22,mt=22,mb=34, pw=cw-ml-mr, ph=ch-mt-mb;
+  let yMax=Math.max(...ys,0), yMin=Math.min(...ys,0);
+  const pad=Math.max(Math.abs(yMax),Math.abs(yMin))*0.12||1; yMax+=pad; yMin-=pad;
+  const tX=x=>ml+x/L*pw, tY=y=>mt+(yMax-y)/(yMax-yMin)*ph;
+  ctx.fillStyle='#0f1117'; ctx.fillRect(0,0,cw,ch);
+  ctx.font='10px "Space Mono",monospace'; ctx.textAlign='right';
+  const yStep=niceStep(yMax-yMin,6);
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=.5;
+  for(let yv=Math.ceil(yMin/yStep)*yStep;yv<=yMax;yv+=yStep){
+    const py=tY(yv);
+    ctx.beginPath();ctx.moveTo(ml,py);ctx.lineTo(ml+pw,py);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.fillText(Math.round(yv).toLocaleString(),ml-6,py+3);
+  }
+  ctx.textAlign='center';
+  const xStep=niceStep(L,8);
+  for(let xv=0;xv<=L+1e-3;xv+=xStep){
+    const px=tX(xv);
+    ctx.strokeStyle='rgba(255,255,255,.05)';ctx.beginPath();ctx.moveTo(px,mt);ctx.lineTo(px,mt+ph);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.fillText(xv.toFixed(1),px,mt+ph+15);
+  }
+  ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(ml,tY(0));ctx.lineTo(ml+pw,tY(0));ctx.stroke();
+  (supXs||[]).forEach(sxp=>{
+    const px=tX(sxp);
+    ctx.strokeStyle='rgba(255,214,10,.5)';ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(px,mt);ctx.lineTo(px,mt+ph);ctx.stroke();ctx.setLineDash([]);
+  });
+  ctx.beginPath();ctx.moveTo(tX(xs[0]),tY(0));
+  for(let i=0;i<xs.length;i++) ctx.lineTo(tX(xs[i]),tY(ys[i]));
+  ctx.lineTo(tX(xs[xs.length-1]),tY(0));ctx.closePath();
+  ctx.fillStyle=col;ctx.globalAlpha=.13;ctx.fill();ctx.globalAlpha=1;
+  ctx.strokeStyle=col;ctx.lineWidth=1.8;ctx.beginPath();
+  for(let i=0;i<xs.length;i++){const px=tX(xs[i]),py=tY(ys[i]);i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+  ctx.stroke();
+  ctx.fillStyle=col;ctx.font='bold 11px "Space Mono",monospace';ctx.textAlign='left';
+  ctx.fillText(label,ml+4,mt+12);
+}
+function niceStep(range,maxTicks){
+  const rough=range/maxTicks, mag=Math.pow(10,Math.floor(Math.log10(rough)||0)), n=rough/mag;
+  let s; if(n<=1.5)s=1;else if(n<=3)s=2;else if(n<=7)s=5;else s=10;
+  return s*mag||1;
+}
+
+/* ════════ Beam Element Diagram + Free-Body (Reactions) — port จาก Beamelement.html ════════ */
+const _DCOL={beamFill:'#161b28',beamStroke:'#00e5ff',seg:'#00e5ff',supp:'#ffd60a',pt:'#ff6b35',
+  udl:'#a8ff78',udlFill:'rgba(168,255,120,.10)',trap:'#c084fc',mom:'#f472b6',txt:'#9aa6c0',
+  dash:'rgba(255,255,255,.18)',fy:'#ffd60a',mz:'#ff4d6d'};
+function _diagBase(cv,h){ const dpr=Math.min(window.devicePixelRatio||1,2), cw=cv.clientWidth||820;
+  cv.width=cw*dpr; cv.height=h*dpr; cv.style.height=h+'px'; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.fillStyle='#0f1117'; ctx.fillRect(0,0,cw,h); ctx.lineCap='butt'; return {ctx,cw}; }
+function _suppSym(ctx,type,sx,by,bh,col,cw){
+  ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=1.6;
+  if(type==='pin'||type==='pin_r'){ const tw=11,th=17;
+    ctx.fillStyle=col+'22'; ctx.beginPath();ctx.moveTo(sx,by+bh);ctx.lineTo(sx-tw,by+bh+th);ctx.lineTo(sx+tw,by+bh+th);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=col;ctx.stroke(); ctx.fillStyle=col;ctx.beginPath();ctx.arc(sx,by+bh,3,0,7);ctx.fill();
+    ctx.beginPath();ctx.moveTo(sx-tw-2,by+bh+th);ctx.lineTo(sx+tw+2,by+bh+th);ctx.stroke();
+    ctx.strokeStyle=col+'88';ctx.lineWidth=1;for(let k=0;k<5;k++){const hx=sx-tw+k*tw/2;ctx.beginPath();ctx.moveTo(hx,by+bh+th);ctx.lineTo(hx-4,by+bh+th+6);ctx.stroke();}
+  } else if(type==='roller'||type==='roller_r'){ const rr=9, ry=by+bh+1;
+    ctx.fillStyle=col+'1a';ctx.strokeStyle=col;ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(sx,ry+rr,rr,0,7);ctx.fill();ctx.stroke();
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(sx,ry+rr,2.5,0,7);ctx.fill();
+    const gy=ry+rr*2+2;ctx.strokeStyle=col;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(sx-14,gy);ctx.lineTo(sx+14,gy);ctx.stroke();
+    ctx.strokeStyle=col+'88';ctx.lineWidth=1;for(let k=0;k<5;k++){const hx=sx-12+k*6;ctx.beginPath();ctx.moveTo(hx,gy);ctx.lineTo(hx-4,gy+6);ctx.stroke();}
+  } else if(type==='fixed'){ const ww=12,wh=bh+24,isL=sx<=cw/2,wx=isL?sx-ww:sx;
+    ctx.fillStyle=col+'22';ctx.strokeStyle=col;ctx.fillRect(wx,by-8,ww,wh);ctx.strokeRect(wx,by-8,ww,wh);
+    ctx.strokeStyle=col;ctx.lineWidth=2.4;const ax=isL?wx+ww:wx;ctx.beginPath();ctx.moveTo(ax,by-2);ctx.lineTo(ax,by+bh+2);ctx.stroke();
+  } else if(type==='vspring'){ const sprH=26,sprY=by+bh;ctx.strokeStyle=col;ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(sx,sprY);const nz=5,zw=5,zh=sprH/nz;for(let zi=0;zi<nz;zi++)ctx.lineTo(sx+(zi%2===0?zw:-zw),sprY+(zi+0.5)*zh);ctx.lineTo(sx,sprY+sprH);ctx.stroke();ctx.beginPath();ctx.moveTo(sx-9,sprY+sprH);ctx.lineTo(sx+9,sprY+sprH);ctx.stroke();
+  } else { ctx.strokeStyle=col;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(sx-10,by+bh+8);ctx.lineTo(sx+10,by+bh+8);ctx.stroke();
+    const ar=13;ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(sx,by+bh/2,ar,0.2*Math.PI,1.8*Math.PI);ctx.stroke(); }
+}
+function _drawLoad(ctx,ld,px,by,bh){
+  if(ld.type==='point'){ const x=px(ld.x), down=ld.P>=0; ctx.strokeStyle=_DCOL.pt;ctx.fillStyle=_DCOL.pt;ctx.lineWidth=2;
+    if(down){ ctx.beginPath();ctx.moveTo(x,by-2);ctx.lineTo(x,by-28);ctx.stroke();ctx.beginPath();ctx.moveTo(x,by+1);ctx.lineTo(x-5,by-9);ctx.lineTo(x+5,by-9);ctx.closePath();ctx.fill();
+      ctx.font='bold 12px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText(Math.abs(ld.P).toLocaleString()+' kg',x,by-32); }
+    else { ctx.beginPath();ctx.moveTo(x,by+bh+2);ctx.lineTo(x,by+bh+28);ctx.stroke();ctx.beginPath();ctx.moveTo(x,by+bh-1);ctx.lineTo(x-5,by+bh+9);ctx.lineTo(x+5,by+bh+9);ctx.closePath();ctx.fill();
+      ctx.font='bold 12px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText(Math.abs(ld.P).toLocaleString()+' kg',x,by+bh+40); } }
+  else if(ld.type==='udl'){ const x1=px(ld.x1),x2=px(ld.x2),down=ld.w>=0,arrH=24,uy=by-arrH;
+    ctx.fillStyle=_DCOL.udlFill;ctx.strokeStyle=_DCOL.udl;ctx.lineWidth=1.2;ctx.fillRect(x1,uy,x2-x1,arrH);ctx.strokeRect(x1,uy,x2-x1,arrH);
+    const st=Math.max(2,Math.floor((x2-x1)/16));
+    for(let k=0;k<=st;k++){ const sx=x1+k*(x2-x1)/st; ctx.strokeStyle=_DCOL.udl;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(sx,uy);ctx.lineTo(sx,by);ctx.stroke();ctx.fillStyle=_DCOL.udl;ctx.beginPath();
+      if(down){ctx.moveTo(sx,by);ctx.lineTo(sx-3,by-7);ctx.lineTo(sx+3,by-7);}else{ctx.moveTo(sx,uy);ctx.lineTo(sx-3,uy+7);ctx.lineTo(sx+3,uy+7);}ctx.closePath();ctx.fill(); }
+    ctx.fillStyle=_DCOL.udl;ctx.font='bold 12px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText('w = '+ld.w.toLocaleString()+' kg/m',(x1+x2)/2,uy-3); }
+  else if(ld.type==='trap'&&ld.x1<ld.x2){ const tx1=px(ld.x1),tx2=px(ld.x2),maxW=Math.max(Math.abs(ld.w1),Math.abs(ld.w2),0.001),maxH=30,ty=by,th1=-(Math.abs(ld.w1)/maxW)*maxH,th2=-(Math.abs(ld.w2)/maxW)*maxH,allUp=(ld.w1<=0&&ld.w2<=0);
+    ctx.strokeStyle=_DCOL.trap;ctx.fillStyle='rgba(192,132,252,.12)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(tx1,ty);ctx.lineTo(tx1,ty+th1);ctx.lineTo(tx2,ty+th2);ctx.lineTo(tx2,ty);ctx.closePath();ctx.fill();ctx.stroke();
+    const nT=Math.min(14,Math.max(2,Math.round((tx2-tx1)/22)));
+    for(let ti=0;ti<=nT;ti++){const tf=ti/nT,tx=tx1+(tx2-tx1)*tf,th=th1+(th2-th1)*tf;if(Math.abs(th)<1)continue;ctx.strokeStyle=_DCOL.trap;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(tx,ty+th);ctx.lineTo(tx,ty);ctx.stroke();ctx.fillStyle=_DCOL.trap;ctx.beginPath();if(allUp){ctx.moveTo(tx,ty+th);ctx.lineTo(tx-3,ty+th+7);ctx.lineTo(tx+3,ty+th+7);}else{ctx.moveTo(tx,ty);ctx.lineTo(tx-3,ty-7);ctx.lineTo(tx+3,ty-7);}ctx.closePath();ctx.fill();}
+    ctx.font='bold 11px "Space Mono",monospace';ctx.fillStyle=_DCOL.trap;ctx.textAlign='center';ctx.fillText('w₁='+ld.w1.toLocaleString(),tx1,ty+th1-5);ctx.fillText('w₂='+ld.w2.toLocaleString(),tx2,ty+th2-5); }
+  else if(ld.type==='moment'){ const x=px(ld.x);ctx.strokeStyle=_DCOL.mom;ctx.lineWidth=2;const isCW=ld.M>=0,aS=isCW?-0.3*Math.PI:0.15*Math.PI,aE=isCW?1.85*Math.PI:2.3*Math.PI;ctx.beginPath();ctx.arc(x,by+bh/2,15,aS,aE,!isCW);ctx.stroke();
+    ctx.fillStyle=_DCOL.mom;const aHead=isCW?1.85*Math.PI:0.15*Math.PI,ahx=x+15*Math.cos(aHead),ahy=by+bh/2+15*Math.sin(aHead),tang=isCW?[Math.sin(aHead),-Math.cos(aHead)]:[-Math.sin(aHead),Math.cos(aHead)],hw=4,hl=7;ctx.beginPath();ctx.moveTo(ahx+tang[0]*hl,ahy+tang[1]*hl);ctx.lineTo(ahx-tang[1]*hw,ahy+tang[0]*hw);ctx.lineTo(ahx+tang[1]*hw,ahy-tang[0]*hw);ctx.closePath();ctx.fill();
+    ctx.font='11px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText(ld.M.toLocaleString()+' kg·m'+(isCW?' ↺':' ↻'),x,by+bh/2-26); }
+}
+function drawBeamElement(canvasId,L,segs,supList,loads){
+  const cv=document.getElementById(canvasId); if(!cv||!L) return;
+  const H=190, b=_diagBase(cv,H), ctx=b.ctx, cw=b.cw;
+  const pad=46, by=66, bh=15, pw=cw-pad*2, sc=pw/L, px=x=>pad+x*sc;
+  const segArr=Object.keys(segs||{}).map(k=>segs[k]).sort((a,b)=>a.x1-b.x1);
+  if(!segArr.length){ ctx.fillStyle=_DCOL.beamFill;ctx.fillRect(pad,by,pw,bh);ctx.strokeStyle=_DCOL.beamStroke;ctx.lineWidth=1.6;ctx.strokeRect(pad,by,pw,bh); }
+  else segArr.forEach(sg=>{ const sx1=px(sg.x1),sx2=px(sg.x2),sw=sx2-sx1;
+    ctx.fillStyle=_DCOL.beamFill;ctx.fillRect(sx1,by,sw,bh);ctx.strokeStyle=_DCOL.beamStroke;ctx.lineWidth=1.6;ctx.strokeRect(sx1,by,sw,bh);
+    ctx.fillStyle=_DCOL.seg;ctx.font='9px "Space Mono",monospace';ctx.textAlign='center';
+    if(sw>60){ ctx.fillText('E='+Math.round(sg.E).toLocaleString()+' ksc',(sx1+sx2)/2,by+bh+13); ctx.fillText('I='+Math.round(sg.I).toLocaleString()+' cm⁴',(sx1+sx2)/2,by+bh+23);} });
+  loads.forEach(ld=>_drawLoad(ctx,ld,px,by,bh));
+  supList.forEach(s=>{ const sx=px(s.x); _suppSym(ctx,s.type,sx,by,bh,_DCOL.supp,cw);
+    ctx.fillStyle=_DCOL.supp;ctx.font='10px "Space Mono",monospace';ctx.textAlign='center';
+    const yl=s.type==='fixed'?by+bh+24:(s.type==='roller'||s.type==='roller_r')?by+bh+46:(s.type==='vspring')?by+bh+48:by+bh+36;
+    ctx.fillText(s.x+'m',sx,yl); });
+  ctx.setLineDash([3,4]);ctx.strokeStyle=_DCOL.dash;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,H-16);ctx.lineTo(cw-pad,H-16);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=_DCOL.txt;ctx.font='13px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText('L = '+L+' m',cw/2,H-5);
+}
+function drawFBDReactions(canvasId,L,rxns){
+  const cv=document.getElementById(canvasId); if(!cv||!L) return;
+  const H=244, b=_diagBase(cv,H), ctx=b.ctx, cw=b.cw;
+  const padL=64,padR=64, beamY=78, beamH=16, pw=cw-padL-padR, sc=pw/L, px=x=>padL+x*sc;
+  let maxFy=0; rxns.forEach(rx=>{ if(Math.abs(rx.Fy)>maxFy)maxFy=Math.abs(rx.Fy); }); if(maxFy<0.001)maxFy=1;
+  const arrowMaxH=86, HW=7, HL=13;
+  ctx.fillStyle=_DCOL.beamFill;ctx.fillRect(padL,beamY,pw,beamH);ctx.strokeStyle=_DCOL.beamStroke;ctx.lineWidth=2;ctx.strokeRect(padL,beamY,pw,beamH);
+  rxns.forEach(rx=>{ const sx=px(rx.x);
+    if(Math.abs(rx.Mz)>0.001){ const mv=-rx.Mz, arcDir=mv>0?1:-1, arcR=28, arcCY=beamY+beamH/2;
+      ctx.strokeStyle=_DCOL.mz;ctx.lineWidth=3;ctx.lineCap='round';
+      const aE=arcDir>0?(7/6)*Math.PI:(11/6)*Math.PI, aS=arcDir>0?aE+0.55:aE-0.55;
+      ctx.beginPath();ctx.arc(sx,arcCY,arcR,aS,aE,arcDir<0);ctx.stroke();ctx.lineCap='butt';
+      const epx=sx+arcR*Math.cos(aE),epy=arcCY+arcR*Math.sin(aE),mtx=arcDir>0?-Math.sin(aE):Math.sin(aE),mty=arcDir>0?Math.cos(aE):-Math.cos(aE),ahl=12,ahw=7,bx=epx-ahl*mtx,byh=epy-ahl*mty,wx=-mty*ahw,wy=mtx*ahw;
+      ctx.fillStyle=_DCOL.mz;ctx.beginPath();ctx.moveTo(epx,epy);ctx.lineTo(bx+wx,byh+wy);ctx.lineTo(bx-wx,byh-wy);ctx.closePath();ctx.fill();
+      ctx.fillStyle=_DCOL.mz;ctx.font='bold 13px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText((-mv).toFixed(0)+' kg·m',sx,beamY-arcR-6); }
+    if(Math.abs(rx.Fy)>0.001){ const ah=(Math.abs(rx.Fy)/maxFy)*arrowMaxH, beamBot=beamY+beamH, dir=rx.Fy>0?1:-1, tipY=dir>0?beamBot:beamBot+ah, tailY=dir>0?beamBot+ah:beamBot;
+      ctx.strokeStyle=_DCOL.fy;ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(sx,tailY);ctx.lineTo(sx,tipY+dir*HL);ctx.stroke();ctx.lineCap='butt';
+      ctx.fillStyle=_DCOL.fy;ctx.beginPath();ctx.moveTo(sx,tipY);ctx.lineTo(sx-HW,tipY+dir*HL);ctx.lineTo(sx+HW,tipY+dir*HL);ctx.closePath();ctx.fill();
+      ctx.fillStyle=_DCOL.fy;ctx.font='bold 13px "Space Mono",monospace';ctx.textAlign='center';const lblY=dir>0?tailY+15:tipY+15;ctx.fillText(rx.Fy.toFixed(0)+' kg',sx,lblY); }
+    ctx.fillStyle=_DCOL.txt;ctx.font='12px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText('x='+rx.x+'m',sx,beamY+beamH+13); });
+  ctx.setLineDash([3,5]);ctx.strokeStyle=_DCOL.dash;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,H-16);ctx.lineTo(cw-padR,H-16);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=_DCOL.txt;ctx.font='13px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText('L = '+L+' m',cw/2,H-5);
+}
+
+function showErrA(m){document.getElementById('aresults').innerHTML='<div class="err">&#9888; '+m+'</div>';}
+function analyze(){
+  const L=+document.getElementById('beamL').value;
+  if(isNaN(L)||L<=0) return showErrA('Beam length ต้อง > 0');
+  const W=+document.getElementById('dW').value, H=+document.getElementById('dH').value, fc=+document.getElementById('dFc').value;
+  if(!W||!H||!fc) return showErrA('กรุณากรอก หน้าตัด (W, H) และ f\'c ในกล่อง Section &amp; Material');
+  const supList=getSupportList().filter(s=>s.type!=='free');
+  if(supList.length===0) return showErrA('กรุณาเพิ่ม support อย่างน้อย 1 ตัว');
+  for(const s of supList) if(s.x<0||s.x>L) return showErrA('Support #'+s.id+' x='+s.x+' อยู่นอกช่วง');
+  const loads=collectLoads(L);
+  const segs = computeAutoSegments(L);  // EI = Ec·Ig คำนวณอัตโนมัติ
+  const res=matrixSolve(L,segs,supList,loads);
+  if(!res.ok) return showErrA(res.err);
+  const spans=detectSpans(L,supList,res.xs,res.Marr,res.Varr);
+  window.ANALYSIS={L,supList,loads,res,spans,segs};
+  renderAnalysis();
+  // ── Sync design data with detected spans ──
+  if(window.syncDesignFromAnalysis) window.syncDesignFromAnalysis();
+}
+
+function renderAnalysis(){
+  const {L,supList,res,spans,segs}=window.ANALYSIS;
+  const supXs=supList.map(s=>s.x);
+  let h='';
+  h+='<div class="dblock"><div class="dtitle">◇ Beam Element Diagram</div><canvas id="cv_belem"></canvas></div>';
+  h+='<div class="dblock"><div class="dtitle">◇ Support Reactions</div><div class="rgrid">';
+  res.rxns.forEach(r=>{
+    h+='<div class="rc"><div class="rl">'+TLBL[r.type]+' @ x='+r.x+' m</div><div class="rv">'+r.Fy.toFixed(1)+'<span class="ru">kg ↑</span></div></div>';
+    if(Math.abs(r.Mz)>0.01) h+='<div class="rc m"><div class="rl">M @ x='+r.x+' m (Fixed)</div><div class="rv">'+(-r.Mz).toFixed(1)+'<span class="ru">kg·m</span></div></div>';
+  });
+  h+='</div></div>';
+  h+='<div class="dblock"><div class="dtitle">◇ Free Body Diagram — Reactions</div><canvas id="cv_fbd"></canvas></div>';
+  h+='<div class="dblock"><div class="dtitle">◇ Shear Force Diagram (SFD)</div><canvas id="cv_sfd"></canvas></div>';
+  h+='<div class="dblock"><div class="dtitle">◇ Bending Moment Diagram (BMD)</div><canvas id="cv_bmd"></canvas></div>';
+  h+='<div class="dblock"><div class="dtitle">◇ Per-Span Design Demands</div>';
+  h+='<table class="t"><tr><th>Span</th><th>x₁→x₂ (m)</th><th>L (m)</th><th>+Mu max</th><th>@x</th><th>−Mu max</th><th>Vu max</th></tr>';
+  spans.forEach(s=>{
+    h+='<tr><td class="warn">Span '+s.idx+'</td><td>'+s.x1.toFixed(2)+' → '+s.x2.toFixed(2)+'</td><td>'+s.Lspan.toFixed(2)+'</td>'+
+       '<td style="color:var(--accent2)">'+s.MuPos.toFixed(0)+'</td><td>'+s.xMuPos.toFixed(2)+'</td>'+
+       '<td style="color:var(--r)">'+s.MuNeg.toFixed(0)+'</td><td style="color:var(--ok)">'+s.Vu.toFixed(0)+'</td></tr>';
+  });
+  h+='</table><div class="dnote">→ ไปแท็บ <b style="color:var(--pink)">RC DESIGN</b> เพื่อกรอกเหล็กเสริมและตรวจ capacity</div></div>';
+  document.getElementById('aresults').innerHTML=h;
+  drawBeamElement('cv_belem',L,segs||computeAutoSegments(L),supList,window.ANALYSIS.loads);
+  drawFBDReactions('cv_fbd',L,res.rxns);
+  drawDiagram('cv_sfd',res.xs,res.Varr,L,'#00e5ff','Vu (kg)  |  max |V| = '+res.maxV.toFixed(0),supXs);
+  drawDiagram('cv_bmd',res.xs,res.Marr,L,'#ff6b35','Mu (kg·m)  |  +max = '+res.maxMp.toFixed(0)+'  −max = '+res.minMp.toFixed(0),supXs);
+}
+window.addEventListener('resize',()=>{ if(window.ANALYSIS && document.getElementById('stage-analysis').classList.contains('active')) renderAnalysis(); });
+
+function switchTab(t){
+  document.getElementById('tab-a').classList.toggle('active',t==='analysis');
+  document.getElementById('tab-d').classList.toggle('active',t==='design');
+  document.getElementById('stage-analysis').classList.toggle('active',t==='analysis');
+  document.getElementById('stage-design').classList.toggle('active',t==='design');
+  if(t==='design'){
+    if(!window.ANALYSIS) return;
+    if(window.syncDesignFromAnalysis) window.syncDesignFromAnalysis();
+    // หลังสลับ tab → resize 3D หลัง next frame (ให้ layout settle ก่อน)
+    requestAnimationFrame(()=>{ if(window.resize3DPub) window.resize3DPub(); });
+  }
+}
+
+// Defaults: 3-span 5+4+5 example
+window.addEventListener('DOMContentLoaded',()=>{
+  addSupport('pin',0);
+  addSupport('roller',5);
+  addSupport('roller',9);
+  addSupport('roller',14);
+  addLoad('udl');
+  setTimeout(()=>{
+    document.getElementById('lw-1').value=2500;
+    document.getElementById('lx1-1').value=0;
+    document.getElementById('lx2-1').value=14;
+  },0);
+  // อัปเดต readout EI ครั้งแรก
+  computeAutoSegments(+document.getElementById('beamL').value||14);
+});
+</script>
+
+<!-- ════════════ PART B : DESIGN ENGINE (module, Three.js) ════════════ -->
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ── Design data model ─────────────────────────────────────── */
+const data = {
+  beam:{ L:[500,400,500], W:30, H:60, cover:3, sl:2.5, sDia:0.9 },
+  endTypes:['EXT','INT','INT','EXT'],
+  main:{ top:[{n:2,d:16},{n:0,d:16},{n:0,d:16}], bot:[{n:2,d:16},{n:0,d:16},{n:0,d:16}] },  // Layer 1 (บน/ล่าง) ขั้นต่ำ 2 เส้น
+  spans:[],     // middle strip (M⁺) ราย span
+  supports:[]   // column strip (M⁻) ราย support — เหล็กต่อเนื่องคร่อม support
+};
+let activeSpan = 0, activeSupport = 0;
+const MAT = { Fy:4000, Fys:2400, fc:240, beta1:0.85, phi:0.9, Es:2.04e6 };
+
+// Middle strip ราย span (M⁺ ที่กลางช่วง)
+function defaultSpan(){
+  return {
+    midTop:[{n:0,d:16},{n:0,d:16},{n:0,d:16}], midBot:[{n:0,d:20},{n:0,d:16},{n:0,d:0}],
+    midStir:{d:9,sp:15}
+  };
+}
+// Column strip ราย support (M⁻ ต่อเนื่องคร่อม support → ยื่นเข้า 2 span ข้างเคียง)
+function defaultSupport(){
+  return {
+    top:[{n:0,d:16},{n:0,d:16},{n:0,d:0}], bot:[{n:0,d:16},{n:0,d:16},{n:0,d:16}],
+    stir:{d:9,sp:10}
+  };
+}
+
+// ── Geometry helpers สำหรับ support-based column strip ──
+function supportX(j){ let x=0; for(let k=0;k<j;k++) x+=data.beam.L[k]; return x; }   // ตำแหน่ง support j (cm)
+// extent ที่ support j ยื่นเข้า span ทางขวา (span j) — L/4 ถ้า exterior, L/3 ถ้า interior
+function reachR(j){ const n=data.beam.L.length; if(j>=n) return 0; return (data.endTypes[j]==='EXT'? data.beam.L[j]/4 : data.beam.L[j]/3); }
+// extent ที่ support j ยื่นเข้า span ทางซ้าย (span j-1)
+function reachL(j){ if(j<=0) return 0; return (data.endTypes[j]==='EXT'? data.beam.L[j-1]/4 : data.beam.L[j-1]/3); }
+// stirrup zone ที่ support j (L/3 เสมอ)
+function stirReachR(j){ const n=data.beam.L.length; return j>=n?0:data.beam.L[j]/3; }
+function stirReachL(j){ return j<=0?0:data.beam.L[j-1]/3; }
+
+/* ── Bridge: sync design data from analysis results ─────────────── */
+window.syncDesignFromAnalysis = function(){
+  const A = window.ANALYSIS;
+  if(!A) return;
+  // Update span lengths (m → cm)
+  data.beam.L = A.spans.map(s => Math.round((s.x2-s.x1)*100));
+  // End types: structural supports at span boundaries; exterior if at beam ends (x=0 or x=L)
+  const Ltot = A.L;
+  const STR={pin:1,roller:1,fixed:1,pin_r:1};
+  const supXs = A.supList.filter(s=>STR[s.type]).map(s=>s.x).sort((a,b)=>a-b);
+  // Build boundaries identical to detectSpans
+  const bnd=[];
+  if(supXs.length===0) return;
+  if(supXs[0]>1e-6) bnd.push(0);
+  supXs.forEach(v=>bnd.push(v));
+  if(supXs[supXs.length-1]<Ltot-1e-6) bnd.push(Ltot);
+  // Mark each boundary as EXT if at beam end, else INT
+  data.endTypes = bnd.map((x,i)=>{
+    if(i===0 && Math.abs(x)<1e-6) return 'EXT';
+    if(i===bnd.length-1 && Math.abs(x-Ltot)<1e-6) return 'EXT';
+    return 'INT';
+  });
+  // Resize data.spans (middle strip ราย span)
+  while(data.spans.length < A.spans.length) data.spans.push(defaultSpan());
+  data.spans.length = A.spans.length;
+  // Resize data.supports (column strip ราย support = nSpans+1)
+  const nSup = data.endTypes.length;  // = nSpans+1
+  while(data.supports.length < nSup) data.supports.push(defaultSupport());
+  data.supports.length = nSup;
+  if(activeSupport >= nSup) activeSupport = 0;
+  if(activeSpan >= data.spans.length) activeSpan = 0;
+  // Trigger design render
+  renderDesignPanel();
+};
+
+/* ── Section material from inputs ─────────────────────────── */
+function syncMaterialFromInputs(){
+  data.beam.W   = +document.getElementById('dW').value || 30;
+  data.beam.H   = +document.getElementById('dH').value || 60;
+  data.beam.cover = +document.getElementById('dCov').value || 3;
+  data.beam.sl  = +document.getElementById('dSl').value || 2.5;
+  MAT.fc  = +document.getElementById('dFc').value || 240;
+  MAT.phi = +document.getElementById('dPhi').value || 0.9;
+  MAT.Fy  = +document.getElementById('dMainGrade').value || 4000;
+  MAT.Fys = +document.getElementById('dStirGrade').value || 2400;
+  // β₁ from f'c
+  let b1;
+  if(MAT.fc<=280) b1=0.85;
+  else if(MAT.fc<=560) b1=0.85-0.05*(MAT.fc-280)/70;
+  else b1=0.65;
+  MAT.beta1 = Math.max(0.65, b1);
+}
+['dW','dH','dCov','dSl','dFc','dPhi','dMainGrade','dStirGrade'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{ syncMaterialFromInputs(); scheduleUpdate(); });
+});
+syncMaterialFromInputs();
+
+/* ── Path helpers ─────────────────────────────────────────── */
+function getPath(obj, p){ return p.split('.').reduce((a,k)=>a[isNaN(k)?k:+k], obj); }
+function setPath(obj, p, v){
+  const ks=p.split('.'), last=ks.pop();
+  const par=ks.reduce((a,k)=>a[isNaN(k)?k:+k], obj);
+  par[isNaN(last)?last:+last]=v;
+}
+function barA(n,d){ return Math.PI*(d/10)*(d/10)/4*n; }
+
+/* ── computeSectionLayout (per-section, equal clear spacing) ───── */
+// ระยะ clear ระหว่างผิวในของเหล็กปลอก 2 ข้าง — บาร์ริมวางให้ผิวแตะปลอกพอดี (offset ด้วยรัศมีบาร์เอง)
+function getInnerW(){ const B=data.beam; return B.W - 2*B.cover - 2*B.sDia; }
+function equalSpacingPositions(diaList, innerW){
+  const N=diaList.length; if(N===0) return [];
+  if(N===1) return [0];
+  const sumD=diaList.reduce((a,b)=>a+b,0);
+  const s=(innerW-sumD)/(N-1);
+  const positions=[];
+  let cur=-innerW/2 + diaList[0]/2;
+  positions.push(cur);
+  for(let k=1;k<N;k++){ cur += diaList[k-1]/2 + s + diaList[k]/2; positions.push(cur); }
+  return positions;
+}
+// Resolve the "extra" rebar {n,d} for a zone.
+//   where: 'colL' → support[idx] · 'colR' → support[idx+1] · 'mid' → span[idx] · 'sup' → support[idx]
+function zoneExtraBar(side, layerIdx, idx, where){
+  if(where==='mid'){
+    const sp=data.spans[idx]; if(!sp) return {n:0,d:0};
+    return side==='top'? sp.midTop[layerIdx] : sp.midBot[layerIdx];
+  }
+  let supIdx;
+  if(where==='colL') supIdx=idx;
+  else if(where==='colR') supIdx=idx+1;
+  else supIdx=idx; // 'sup'
+  const su=data.supports[supIdx]; if(!su) return {n:0,d:0};
+  return side==='top'? su.top[layerIdx] : su.bot[layerIdx];
+}
+function computeSectionLayout(side, layerIdx, idx, where){
+  const m = side==='top' ? data.main.top[layerIdx] : data.main.bot[layerIdx];
+  const nMain = (m.n>0 && m.d>0) ? m.n : 0;
+  const dMain = nMain>0 ? m.d/10 : 0;
+  const eb = zoneExtraBar(side, layerIdx, idx, where);
+  let extraN=0, extraD=0;
+  if(eb && eb.n>0 && eb.d>0){ extraN=eb.n; extraD=eb.d/10; }
+  const N = nMain + extraN;
+  if(N===0) return null;
+  const mainIdx=[];
+  if(nMain===1) mainIdx.push(Math.floor(N/2));
+  else if(nMain>1) for(let k=0;k<nMain;k++) mainIdx.push(Math.round(k*(N-1)/(nMain-1)));
+  const mainSet=new Set(mainIdx);
+  const dSeq=new Array(N);
+  for(let k=0;k<N;k++) dSeq[k]=mainSet.has(k)?dMain:extraD;
+  const positions=equalSpacingPositions(dSeq, getInnerW());
+  const mainZ=mainIdx.map(j=>positions[j]).sort((a,b)=>a-b);
+  const extraZ=[]; for(let k=0;k<N;k++) if(!mainSet.has(k)) extraZ.push(positions[k]);
+  return {mainZ, extraZ, dSeq, positions, N, mainIdx};
+}
+
+/* ── Spacing check ──────────────────────────────────────── */
+const S_MIN=2.5;
+function checkLayer(barsList){
+  let totalN=0, sumDiaCm=0, dMaxMm=0;
+  const items=[];
+  barsList.forEach(b=>{
+    if(b.n>0 && b.d>0){
+      totalN += b.n; sumDiaCm += b.n*b.d/10; if(b.d>dMaxMm) dMaxMm=b.d;
+      items.push(`${b.n}-Ø${b.d}${b.group?'('+b.group+')':''}`);
+    }
+  });
+  if(totalN===0) return {N:0, ok:true};
+  const B=data.beam;
+  const Wclear = B.W - 2*B.cover - 2*B.sDia;
+  if(totalN===1) return {N:1, ok:sumDiaCm<=Wclear, Wclear, sumDiaCm, actualGap:Wclear-sumDiaCm, items, dMaxMm};
+  const actualGap=(Wclear-sumDiaCm)/(totalN-1);
+  return {N:totalN, ok:actualGap>=S_MIN-1e-6, Wclear, sumDiaCm, actualGap, items, dMaxMm};
+}
+
+/* ── renderDesignPanel: build the full design panel ─────────── */
+function renderDesignPanel(){
+  if(!data.spans.length){ document.getElementById('dresults').innerHTML='<div class="welcome"><div style="font-size:34px">&#9636;</div><div>กำลังโหลด...</div></div>'; return; }
+  // Build SUPPORT tabs (column strip)
+  const supTabsEl=document.getElementById('sup-tabs');
+  supTabsEl.innerHTML='';
+  data.supports.forEach((su,j)=>{
+    const btn=document.createElement('button');
+    btn.className='span-tab'+(j===activeSupport?' on':'');
+    btn.dataset.idx=j;
+    const et=data.endTypes[j];
+    btn.innerHTML=`Sup ${j+1}<span class="lbl">${et}</span>`;
+    btn.addEventListener('click',()=>{
+      activeSupport=j;
+      document.querySelectorAll('#sup-tabs .span-tab').forEach(t=>t.classList.toggle('on', +t.dataset.idx===j));
+      renderSupportCard();
+      drawSections(); build3D();
+    });
+    supTabsEl.appendChild(btn);
+  });
+  // Build SPAN tabs (middle strip)
+  const tabsEl=document.getElementById('span-tabs');
+  tabsEl.innerHTML='';
+  data.spans.forEach((sp,i)=>{
+    const btn=document.createElement('button');
+    btn.className='span-tab'+(i===activeSpan?' on':'');
+    btn.dataset.idx=i;
+    const Lm=(data.beam.L[i]/100).toFixed(1);
+    btn.innerHTML=`Span ${i+1}<span class="lbl">${Lm} m</span>`;
+    btn.addEventListener('click',()=>{
+      activeSpan=i;
+      document.querySelectorAll('#span-tabs .span-tab').forEach(t=>t.classList.toggle('on', +t.dataset.idx===i));
+      renderSpanCard();
+      drawSections(); drawSummary(); drawMnEnvelope(); build3D();
+    });
+    tabsEl.appendChild(btn);
+  });
+  renderSupportCard();
+  renderSpanCard();
+  // Build right panel
+  if(!document.getElementById('cv_mn_env')){
+    document.getElementById('dresults').innerHTML = `
+      <div class="preview-block">
+        <div class="pv-t">◇ Cross-Section <span class="pill" id="cs-span-label">Span 1</span></div>
+        <div class="sec-row">
+          <div class="sec-box"><div class="sec-box-t">SECTION A-A · @ Column Strip</div><div class="sec-box-sub">Support · Main + Col Extra</div><svg id="svgSec-A" width="100%" viewBox="0 0 220 280"></svg></div>
+          <div class="sec-box"><div class="sec-box-t">SECTION B-B · @ Middle Strip</div><div class="sec-box-sub">Midspan · Main + Mid Extra</div><svg id="svgSec-B" width="100%" viewBox="0 0 220 280"></svg></div>
+        </div>
+      </div>
+      <div class="preview-block">
+        <div class="pv-t">◇ 3D Live Preview <span class="pill">อัปเดตอัตโนมัติ</span></div>
+        <div class="ctrl-row">
+          <label class="tg on" data-key="concrete"><input type="checkbox" checked><span class="sw" style="background:#6b7280"></span>คอนกรีต</label>
+          <label class="tg on" data-key="mainBot"><input type="checkbox" checked><span class="sw" style="background:#a8ff78"></span>Main Bot</label>
+          <label class="tg on" data-key="mainTop"><input type="checkbox" checked><span class="sw" style="background:#38bdf8"></span>Main Top</label>
+          <label class="tg on" data-key="colExtra"><input type="checkbox" checked><span class="sw" style="background:#ffd60a"></span>Col Extras</label>
+          <label class="tg on" data-key="midExtra"><input type="checkbox" checked><span class="sw" style="background:#f472b6"></span>Mid Extras</label>
+          <label class="tg on" data-key="stirrup"><input type="checkbox" checked><span class="sw" style="background:#c084fc"></span>Stirrup</label>
+          <span style="flex:1"></span>
+          <button class="btn" id="b-iso">ISO</button>
+          <button class="btn" id="b-side">Side</button>
+          <button class="btn" id="b-top">Top</button>
+          <button class="btn" id="b-end">End</button>
+          <button class="btn" id="b-ifc" title="Export IFC (ขนาดจริง · BIM)" style="border-color:#a8ff78;color:#a8ff78">⭳ IFC</button>
+          <button class="btn" id="b-dae" title="Export COLLADA .dae (นำเข้า SketchUp ได้เลย · ขนาดจริง)" style="border-color:#38bdf8;color:#38bdf8">⭳ DAE</button>
+        </div>
+        <div id="d3wrap"><div id="d3msg">กำลังโหลด 3D…</div></div>
+      </div>
+      <div class="preview-block" id="secx-block">
+        <div class="pv-t">◇ Section Explorer — เลื่อนดูตามความยาวคาน <span class="pill" id="secx-pos">x = 0.00 m</span></div>
+        <input type="range" id="secx-slider" min="0" max="100" value="50" step="0.5" style="width:100%;accent-color:#38bdf8;margin:4px 0 10px">
+        <div class="sec-row">
+          <div class="sec-box"><div class="sec-box-t">Cross-Section @ x</div><div class="sec-box-sub" id="secx-cs-sub">—</div><svg id="secx-cs" width="100%" viewBox="0 0 220 280"></svg></div>
+          <div class="sec-box"><div class="sec-box-t">Strain & Stress Block (ที่กำลังประลัย ULT)</div><div class="sec-box-sub">εcu=0.003 · Whitney 0.85f'c·a · แสดงทั้ง +M และ −M</div><svg id="secx-sb" width="100%" viewBox="0 0 460 300"></svg></div>
+        </div>
+        <div class="sec-box-t" style="margin-top:6px">Moment–Curvature (M–φ) · fiber analysis</div>
+        <canvas id="secx-mphi" style="height:260px"></canvas>
+        <div class="sec-box-t" style="margin-top:8px">รายการคำนวณ (Section Analysis · ACI 318-22)</div>
+        <div id="secx-report"></div>
+      </div>
+      <div class="preview-block" id="spc-block">
+        <div class="pv-t">◇ ตรวจระยะห่างเหล็กใน Layer เดียวกัน <span class="pill" id="spc-pill">— กำลังตรวจ —</span></div>
+        <div id="spc-content"></div>
+      </div>
+      <div class="preview-block">
+        <div class="pv-t">◇ Moment Capacity Envelope vs Demand <span class="pill">Trapezoid + Ld + Real Mu</span></div>
+        <div class="ctrl-row" style="font-size:11px">
+          <label class="tg on" data-mnkey="total"><input type="checkbox" checked><span class="sw" style="background:#fff"></span>Total envelope (±φMn)</label>
+          <label class="tg on" data-mnkey="demand"><input type="checkbox" checked><span class="sw" style="background:#ff4d6d"></span>Mu from analysis</label>
+        </div>
+        <canvas id="cv_mn_env" style="height:380px"></canvas>
+      </div>
+      <div class="preview-block">
+        <div class="pv-t">◇ Shear Capacity Envelope vs Demand <span class="pill">φVn (top+bot) + Vu @ d from support</span></div>
+        <div class="ctrl-row" style="font-size:11px">
+          <label class="tg on" data-vkey="phiVnGov"><input type="checkbox" checked><span class="sw" style="background:#fff"></span>Governing φVn</label>
+          <label class="tg on" data-vkey="demand"><input type="checkbox" checked><span class="sw" style="background:#ff4d6d"></span>Vu from analysis</label>
+          <label class="tg on" data-vkey="dShift"><input type="checkbox" checked><span class="sw" style="background:#ffd60a"></span>Vu @ d-from-support</label>
+        </div>
+        <canvas id="cv_v_env" style="height:340px"></canvas>
+      </div>
+      <div class="preview-block" style="display:none">
+        <div class="pv-t">◇ Per-Span Summary</div>
+        <table class="sum" id="sum-table"></table>
+      </div>
+      <div class="preview-block" id="defl-block">
+        <div class="pv-t">◇ การแอ่นตัว Deflection (ACI 318-22) <span class="pill" id="defl-pill">—</span></div>
+        <div class="ctrl-row" style="font-size:11px;gap:18px;flex-wrap:wrap;align-items:center">
+          <label>Sustained (%) <input type="number" id="defl-sus" value="100" step="5" min="0" max="100" style="width:90px"></label>
+          <label>ระยะเวลาค้าง (ปี) <input type="number" id="defl-yr" value="5" step="0.5" min="0" style="width:90px"> <span id="defl-xi-out" style="color:var(--accent3)">ξ=2.00</span></label>
+          <label>Limit L/ <input type="number" id="defl-lim" value="360" step="10" min="1" style="width:90px"></label>
+        </div>
+        <canvas id="defl-canvas" style="height:240px"></canvas>
+        <table class="sum" id="defl-table"></table>
+      </div>
+    `;
+    // Hook toggles & buttons
+    attachInputs();
+    setupThree();
+    document.querySelectorAll('.tg[data-key]').forEach(el=>{
+      const k=el.dataset.key, cb=el.querySelector('input');
+      cb.addEventListener('change',()=>{ groups[k].visible=cb.checked; el.classList.toggle('on',cb.checked); });
+    });
+    document.querySelectorAll('.tg[data-mnkey]').forEach(el=>{
+      const k=el.dataset.mnkey, cb=el.querySelector('input');
+      cb.addEventListener('change',()=>{ mnToggle[k]=cb.checked; el.classList.toggle('on',cb.checked); drawMnEnvelope(); });
+    });
+    document.querySelectorAll('.tg[data-vkey]').forEach(el=>{
+      const k=el.dataset.vkey, cb=el.querySelector('input');
+      cb.addEventListener('change',()=>{ vToggle[k]=cb.checked; el.classList.toggle('on',cb.checked); drawShearEnvelope(); });
+    });
+    document.getElementById('b-iso').onclick=()=>goTo(presets.iso());
+    document.getElementById('b-side').onclick=()=>goTo(presets.side());
+    document.getElementById('b-top').onclick=()=>goTo(presets.top());
+    document.getElementById('b-end').onclick=()=>goTo(presets.end());
+    const ifcBtn=document.getElementById('b-ifc'); if(ifcBtn) ifcBtn.onclick=exportIFC;
+    const daeBtn=document.getElementById('b-dae'); if(daeBtn) daeBtn.onclick=exportDAE;
+    const secxS=document.getElementById('secx-slider');
+    if(secxS){ const Lt=data.beam.L.reduce((a,b)=>a+b,0); secxS.max=Lt; secxS.value=Lt/2;
+      secxS.addEventListener('input',()=>drawSectionExplorer(+secxS.value)); }
+    ['defl-sus','defl-yr','defl-lim'].forEach(id=>{ const e=document.getElementById(id); if(e) e.addEventListener('input',redrawDeflection); });
+    window.addEventListener('resize', drawMnEnvelope);
+    window.addEventListener('resize', drawShearEnvelope);
+    window.addEventListener('resize', redrawSectionExplorer);
+    window.addEventListener('resize', redrawDeflection);
+  }
+  attachInputs();
+  build3D();
+  drawSections();
+  drawSummary();
+  drawMnEnvelope();
+  drawShearEnvelope();
+  redrawSectionExplorer();
+  redrawDeflection();
+}
+
+/* ── zone card template (generic base path) ───────────────── */
+//  basePath เช่น "supports.2" หรือ "spans.0" · topKey/botKey/stirKey = ชื่อ field
+function zoneCardHTML(cls, title, sub, basePath, topKey, botKey, stirKey){
+  const g=p=>getPath(data,p);
+  return `
+    <div class="zone-card ${cls}">
+      <div class="zone-h">${title} <span class="zone-sub">${sub}</span></div>
+      <div class="sides">
+        <div class="mini-card top">
+          <div class="mini-h">▲ Top</div>
+          <div class="mini-grid">
+            <div></div><div class="hd">n</div><div class="hd">Ø</div>
+            ${[0,1,2].map(i=>`<div class="lbl">L${i+1}</div>
+              <input type="number" data-bind="${basePath}.${topKey}.${i}.n" min="0" step="1" value="${g(`${basePath}.${topKey}.${i}.n`)}">
+              <input type="number" data-bind="${basePath}.${topKey}.${i}.d" min="0" step="2" value="${g(`${basePath}.${topKey}.${i}.d`)}">`).join('')}
+          </div>
+        </div>
+        <div class="mini-card bot">
+          <div class="mini-h">▼ Bot</div>
+          <div class="mini-grid">
+            <div></div><div class="hd">n</div><div class="hd">Ø</div>
+            ${[0,1,2].map(i=>`<div class="lbl">L${i+1}</div>
+              <input type="number" data-bind="${basePath}.${botKey}.${i}.n" min="0" step="1" value="${g(`${basePath}.${botKey}.${i}.n`)}">
+              <input type="number" data-bind="${basePath}.${botKey}.${i}.d" min="0" step="2" value="${g(`${basePath}.${botKey}.${i}.d`)}">`).join('')}
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);display:grid;grid-template-columns:auto 1fr 1fr;gap:8px;align-items:center">
+        <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent4);letter-spacing:.5px">⊠ STIRRUP</span>
+        <div style="display:flex;align-items:center;gap:5px">
+          <span style="font-size:10px;color:var(--muted);width:24px">Ø</span>
+          <input type="number" data-bind="${basePath}.${stirKey}.d" min="0" step="1" value="${g(`${basePath}.${stirKey}.d`)}" style="background:#0f1117;border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:3px;font-family:'Space Mono',monospace;font-size:12px;width:100%;text-align:center">
+        </div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <span style="font-size:10px;color:var(--muted);width:24px">@</span>
+          <input type="number" data-bind="${basePath}.${stirKey}.sp" min="1" step="1" value="${g(`${basePath}.${stirKey}.sp`)}" style="background:#0f1117;border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:3px;font-family:'Space Mono',monospace;font-size:12px;width:100%;text-align:center">
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── Support card (column strip M⁻) ───────────────────────── */
+function renderSupportCard(){
+  const j = activeSupport;
+  const su = data.supports[j];
+  if(!su || !window.ANALYSIS) return;
+  const et = data.endTypes[j];
+  const n = data.beam.L.length;
+  // describe reach
+  const parts=[];
+  if(j>0) parts.push(`ซ้าย ${(reachL(j)/100).toFixed(2)}m (เข้า Span ${j})`);
+  if(j<n) parts.push(`ขวา ${(reachR(j)/100).toFixed(2)}m (เข้า Span ${j+1})`);
+  const sub = `${et} · ${parts.join(' · ')} · stirrup zone L/3`;
+  const html = zoneCardHTML('col', `SUPPORT ${j+1} (M⁻)`, sub, `supports.${j}`, 'top','bot','stir');
+  document.getElementById('sup-content').innerHTML=html;
+  attachInputs('#sup-content');
+}
+
+/* ── Span card (middle strip M⁺) ──────────────────────────── */
+function renderSpanCard(){
+  const sIdx = activeSpan;
+  const sp = data.spans[sIdx];
+  if(!sp || !window.ANALYSIS) return;
+  const L = data.beam.L[sIdx];
+  const midX0 = L/8, midX1 = L - L/8;
+  const csLbl=document.getElementById('cs-span-label');
+  if(csLbl) csLbl.textContent = `Span ${sIdx+1} · Sup ${activeSupport+1}`;
+  const sub = `กลาง ${(midX0/100).toFixed(2)}–${(midX1/100).toFixed(2)} m · Lₙ/8 cut · stirrup mid L/3`;
+  const html = zoneCardHTML('mid', `SPAN ${sIdx+1} MIDSPAN (M⁺)`, sub, `spans.${sIdx}`, 'midTop','midBot','midStir');
+  document.getElementById('span-content').innerHTML=html;
+  attachInputs('#span-content');
+}
+
+function attachInputs(scope='document'){
+  const root = scope==='document' ? document : document.querySelector(scope);
+  if(!root) return;
+  root.querySelectorAll('input[data-bind]').forEach(inp=>{
+    if(inp.dataset.bound) return; inp.dataset.bound='1';
+    inp.addEventListener('input', e=>{
+      const path = e.target.dataset.bind;
+      const val = +e.target.value || 0;
+      setPath(data, path, val);
+      e.target.classList.toggle('zero', val===0);
+      scheduleUpdate();
+    });
+    // Main steel Layer 1 (บน/ล่าง) ขั้นต่ำ 2 เส้น → บังคับตอนแก้ค่าเสร็จ (blur/enter) ไม่รบกวนระหว่างพิมพ์
+    if(inp.dataset.bind==='main.top.0.n' || inp.dataset.bind==='main.bot.0.n'){
+      inp.addEventListener('change', e=>{
+        if((+e.target.value||0) < 2){ e.target.value=2; setPath(data, e.target.dataset.bind, 2); e.target.classList.remove('zero'); scheduleUpdate(); }
+      });
+    }
+    if(+inp.value===0) inp.classList.add('zero');
+  });
+}
+
+let updT;
+function scheduleUpdate(){
+  clearTimeout(updT);
+  updT = setTimeout(()=>{ build3D(); drawSections(); drawSummary(); drawMnEnvelope(); drawShearEnvelope(); redrawSectionExplorer(); redrawDeflection(); }, 80);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Three.js scene (lazy init)
+   ───────────────────────────────────────────────────────────── */
+let scene, cam, renderer, ctrls, groups, COL3, animId, sliderCut=null;
+function setupThree(){
+  const wrap=document.getElementById('d3wrap');
+  const msg=document.getElementById('d3msg');
+  if(!wrap || scene) return;
+  // ถ้า wrap ยังไม่ render (width=0 เช่น stage ซ่อนอยู่) → retry ด้วย setTimeout (ยิงได้แม้ tab ซ่อน)
+  if(wrap.clientWidth === 0 || wrap.clientHeight === 0){
+    setTimeout(setupThree, 120); return;
+  }
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0f1117);
+  scene.add(new THREE.AmbientLight(0xffffff,0.55));
+  const dL1=new THREE.DirectionalLight(0xffffff,0.85); dL1.position.set(700,1000,500); scene.add(dL1);
+  const dL2=new THREE.DirectionalLight(0xffffff,0.35); dL2.position.set(-500,500,-400); scene.add(dL2);
+  cam=new THREE.PerspectiveCamera(32, wrap.clientWidth/Math.max(wrap.clientHeight,1), 1, 10000);
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  wrap.appendChild(renderer.domElement);
+  msg.style.display='none';
+  ctrls=new OrbitControls(cam, renderer.domElement);
+  ctrls.enableDamping=true; ctrls.dampingFactor=0.08; ctrls.minDistance=80; ctrls.maxDistance=5000;
+  window._cam=cam; window._ctrls=ctrls; window._groups=()=>groups;  // expose for debug
+  groups={ concrete:new THREE.Group(), mainTop:new THREE.Group(), mainBot:new THREE.Group(), colExtra:new THREE.Group(), midExtra:new THREE.Group(), stirrup:new THREE.Group() };
+  Object.values(groups).forEach(g=>scene.add(g));
+  COL3={mainTop:0x38bdf8, mainBot:0xa8ff78, col:0xffd60a, mid:0xf472b6, stir:0xc084fc};
+  setupOrbitAroundCursor();   // หมุนโดยยึดจุดหมุนที่ตำแหน่งเมาส์
+  (function loop(){ ctrls.update(); renderer.render(scene,cam); animId=requestAnimationFrame(loop); })();
+  // ResizeObserver — auto resize เมื่อ wrap เปลี่ยนขนาด (เช่น เปลี่ยน window/tab)
+  new ResizeObserver(()=>resize3D()).observe(wrap);
+  window.addEventListener('resize', resize3D);  // จับ browser zoom (DPR เปลี่ยน) ด้วย
+  build3D();
+  goTo(presets.iso(), false);
+}
+/* ── หมุนมุมมองโดยยึดจุดหมุน = จุดที่เมาส์คลิก (rotate around cursor) ──
+   ลากซ้าย = หมุนรอบจุดใต้เมาส์ (จุดนั้นอยู่นิ่งบนจอ) · ขวา = pan · ล้อ = zoom */
+function setupOrbitAroundCursor(){
+  const el=renderer.domElement;
+  ctrls.mouseButtons={ LEFT:null, MIDDLE:THREE.MOUSE.DOLLY, RIGHT:THREE.MOUSE.PAN }; // ปิด rotate เดิมของปุ่มซ้าย (จัดการเอง)
+  const ray=new THREE.Raycaster(), ndc=new THREE.Vector2();
+  let rot=null;
+  const pickPivot=(ev)=>{
+    const r=el.getBoundingClientRect();
+    ndc.x=((ev.clientX-r.left)/r.width)*2-1; ndc.y=-((ev.clientY-r.top)/r.height)*2+1;
+    ray.setFromCamera(ndc, cam);
+    const hits=ray.intersectObjects(Object.values(groups), true);
+    return hits.length ? hits[0].point.clone() : ctrls.target.clone(); // คลิกที่ว่าง → ใช้จุดหมุนเดิม
+  };
+  el.addEventListener('pointerdown',(ev)=>{
+    if(ev.button!==0 || ev.pointerType==='touch') return;   // เฉพาะปุ่มซ้าย (เมาส์) · touch ปล่อยให้ OrbitControls
+    rot={ pivot:pickPivot(ev), lx:ev.clientX, ly:ev.clientY };
+    try{ el.setPointerCapture(ev.pointerId); }catch(e){}
+  });
+  el.addEventListener('pointermove',(ev)=>{
+    if(!rot) return;
+    const dx=ev.clientX-rot.lx, dy=ev.clientY-rot.ly; rot.lx=ev.clientX; rot.ly=ev.clientY;
+    if(!dx && !dy) return;
+    const sp=2*Math.PI/Math.max(el.clientHeight,1);           // ความเร็วหมุนให้ใกล้เคียง OrbitControls
+    const P=rot.pivot;
+    const right=new THREE.Vector3(1,0,0).applyQuaternion(cam.quaternion);
+    const qYaw=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), -dx*sp);
+    const qPitch=new THREE.Quaternion().setFromAxisAngle(right, -dy*sp);
+    let R=qYaw.clone().multiply(qPitch);
+    // กันพลิกขั้ว: ถ้ามุมก้ม/เงยใกล้แนวดิ่งเกินไป → ใช้เฉพาะ yaw
+    const fwdN=new THREE.Vector3(0,0,-1).applyQuaternion(cam.quaternion).applyQuaternion(R);
+    const a=fwdN.angleTo(new THREE.Vector3(0,1,0));
+    if(a<0.04 || a>Math.PI-0.04) R=qYaw.clone();
+    cam.position.sub(P).applyQuaternion(R).add(P);            // หมุนตำแหน่งกล้องรอบจุด P
+    cam.quaternion.premultiply(R);                            // หมุนทิศกล้องตาม → P อยู่นิ่งบนจอ
+    const fwd=new THREE.Vector3(0,0,-1).applyQuaternion(cam.quaternion);
+    ctrls.target.copy(cam.position).addScaledVector(fwd, cam.position.distanceTo(P)); // sync target บนแกนมอง (กัน update() ดึงกลับ)
+  });
+  const end=(ev)=>{ if(rot){ rot=null; try{ el.releasePointerCapture(ev.pointerId); }catch(e){} } };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+}
+function resize3D(){
+  const wrap=document.getElementById('d3wrap');
+  if(!renderer || !wrap || !cam) return;
+  const w=wrap.clientWidth, h=wrap.clientHeight;
+  if(w<=0||h<=0) return;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2)); // อัปเดต DPR ด้วย — กัน 3D เพี้ยนเวลา zoom เบราว์เซอร์ (Edge)
+  renderer.setSize(w,h);
+  cam.aspect=w/Math.max(h,1);
+  cam.updateProjectionMatrix();
+}
+window.resize3DPub = resize3D;
+function clearGroup(g){
+  while(g.children.length){
+    const c=g.children[0];
+    c.traverse(o=>{ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); });
+    g.remove(c);
+  }
+}
+function makeBar(x0,x1,y,z,diaCm,color){
+  const len=Math.max(x1-x0,0.1);
+  const g=new THREE.CylinderGeometry(diaCm/2,diaCm/2,len,12);
+  const m=new THREE.MeshStandardMaterial({color,metalness:0.55,roughness:0.42});
+  const mesh=new THREE.Mesh(g,m);
+  mesh.rotation.z=Math.PI/2;
+  mesh.position.set((x0+x1)/2,y,z);
+  mesh.userData.ifc={ pts:[{x:x0,y,z},{x:x1,y,z}], r:diaCm/2 }; // เส้นกึ่งกลางสำหรับ export IFC
+  return mesh;
+}
+// สร้าง path ที่มุมโค้งมน (fillet) จากชุดจุดศูนย์กลางเหล็ก — ใช้ quadratic bezier ที่แต่ละมุม
+function roundedPath(corners, fillet){
+  const path=new THREE.CurvePath();
+  const n=corners.length;
+  if(n<2) return path;
+  if(n===2){ path.add(new THREE.LineCurve3(corners[0].clone(),corners[1].clone())); return path; }
+  let cur=corners[0].clone();
+  for(let i=1;i<n-1;i++){
+    const P=corners[i];
+    const inV=new THREE.Vector3().subVectors(P,corners[i-1]); const inLen=inV.length(); inV.normalize();
+    const outV=new THREE.Vector3().subVectors(corners[i+1],P); const outLen=outV.length(); outV.normalize();
+    const d=Math.min(fillet, inLen*0.5, outLen*0.5);
+    const A=new THREE.Vector3().copy(P).addScaledVector(inV,-d);
+    const Bp=new THREE.Vector3().copy(P).addScaledVector(outV, d);
+    path.add(new THREE.LineCurve3(cur.clone(), A));
+    path.add(new THREE.QuadraticBezierCurve3(A, P.clone(), Bp));
+    cur=Bp;
+  }
+  path.add(new THREE.LineCurve3(cur.clone(), corners[n-1].clone()));
+  return path;
+}
+// มนเฉพาะมุมที่หักคม (> angThreshDeg) ด้วยอาร์คเล็ก k จุด — มุมตื้นเก็บจุดเดิม
+// ใช้ทำเส้นกึ่งกลางสำหรับ export tube ไม่ให้เกิด miter bulge ที่มุมคม (หน้าตัดคงที่ตลอดแนว)
+function roundCorners(corners, fillet, k, angThreshDeg){
+  const V=corners.map(p=>new THREE.Vector3(p.x,p.y,p.z));
+  if(V.length<3) return V;
+  const cosThr=Math.cos((angThreshDeg||25)*Math.PI/180);
+  const out=[V[0].clone()];
+  for(let i=1;i<V.length-1;i++){
+    const P=V[i];
+    const inV=new THREE.Vector3().subVectors(P,V[i-1]); const inL=inV.length();
+    const outV=new THREE.Vector3().subVectors(V[i+1],P); const outL=outV.length();
+    if(inL<1e-6||outL<1e-6) continue;
+    inV.normalize(); outV.normalize();
+    if(inV.dot(outV) > cosThr){ out.push(P.clone()); continue; }   // มุมตื้น → เก็บจุดเดิม
+    const d=Math.min(fillet, inL*0.45, outL*0.45);
+    const A=new THREE.Vector3().copy(P).addScaledVector(inV,-d);
+    const Bp=new THREE.Vector3().copy(P).addScaledVector(outV, d);
+    out.push(A);
+    for(let j=1;j<k;j++){ const t=j/k; const a=A.clone().lerp(P,t), b=P.clone().lerp(Bp,t); out.push(a.lerp(b,t)); } // quadratic bezier A,P,Bp
+    out.push(Bp);
+  }
+  out.push(V[V.length-1].clone());
+  return out;
+}
+// เหล็กปลอกจริง: เส้นเปิด มีช่องต่อด้านบน + ปลายทั้งสองงอขอเกี่ยว 135° สอดเข้าแกนคอนกรีต
+// mainDia = เส้นผ่านศูนย์กลางเหล็กยืนมุม (ซม.) → มุมโอบเหล็กยืน + ขอเกี่ยว 135° คล้องรอบเหล็กยืนบน
+function makeStirrup(x, yT, yB, zL, zR, dia, color, mainDia){
+  const md = mainDia>0 ? mainDia : dia*2;
+  const rW=(dia+md)/2;                              // รัศมีโอบเหล็กยืนมุม (ศูนย์กลางส่วนโค้ง = ศูนย์กลางเหล็กยืน)
+  const fillet=Math.min(Math.max(rW, 1.2), 5);     // มุมล่าง/ขวา โอบเหล็กยืนมุมพอดี (ผิวในปลอกแนบเหล็กยืน)
+  const innerW=zR-zL;                              // ความกว้างภายในปลอก
+  const tail=Math.min(6*dia, innerW*0.42);         // หางขอเกี่ยว 135° = 6db (ยาวตามขนาดปลอก) cap กันยาวเกินเฉพาะกรณีสุดโต่ง
+  const D=Math.PI/180;
+  // เหล็กยืนมุมบนซ้าย = จุดที่ขอเกี่ยวทั้งสองคล้องรอบ
+  const yC=yT-rW, zC=zL+rW;
+  const P=th=>new THREE.Vector3(x, yC+rW*Math.sin(th), zC+rW*Math.cos(th)); // จุดบนวงรอบเหล็กยืน (ระนาบ YZ)
+  const arc=(a,b,n)=>{const o=[];for(let i=0;i<=n;i++)o.push(P(a+(b-a)*i/n));return o;};
+  const dir=new THREE.Vector3(0,-Math.SQRT1_2,Math.SQRT1_2); // ทแยงลง-เข้าแกน (หางขอ 135°)
+  const BL=new THREE.Vector3(x,yB,zL), BR=new THREE.Vector3(x,yB,zR), TR=new THREE.Vector3(x,yT,zR);
+  // ขอ A: หางในแกน → คล้องอ้อมเหล็กยืน (45°→180°) → ลงขาซ้าย (จุดสัมผัสซ้ายสุด=ขาปลอก)
+  const hookA=arc(45*D,180*D,16);
+  const tipA=hookA[0].clone().addScaledVector(dir,tail);
+  // ขอ B: แนวบนจาก TR → สัมผัสยอด(90°) → คล้องอ้อมเหล็กยืน (90°→225°) → หางในแกน
+  const hookB=arc(90*D,225*D,16);
+  const tipB=hookB[hookB.length-1].clone().addScaledVector(dir,tail);
+  const corners=[tipA, ...hookA, BL, BR, TR, ...hookB, tipB]; // เส้นเปิดต่อเนื่อง ปลายขอเกี่ยวคล้องเหล็กยืนบน
+  // เยื้องแนวแกนคาน (X): ขอเกี่ยว "ทั้งเส้น" A อยู่หน้า / B อยู่หลัง คงที่ ±dia/2 (ตัวลูปอยู่ระนาบกลาง)
+  // → ช่วงที่ขอ A กับ B คล้องทับกันรอบเหล็กยืน (90°–180°) จึงห่างกัน = dia เต็ม ไม่ทับกันตรงรอยงอ
+  const nA=1+hookA.length, nB=hookB.length+1;
+  corners.forEach((c,i)=>{
+    if(i<nA) c.x = x - dia/2;                          // ขอเกี่ยวต้น (A) → เยื้องหน้า
+    else if(i >= corners.length-nB) c.x = x + dia/2;   // ขอเกี่ยวปลาย (B) → เยื้องหลัง
+    else c.x = x;                                      // ตัวปลอก (มุมล่าง/ขวา) อยู่ระนาบกลาง · ขา/แนวบนเอียงเล็กน้อยเชื่อมขอเกี่ยว
+  });
+  const path=roundedPath(corners, fillet);
+  const seg=Math.min(900, Math.max(96, Math.ceil(path.getLength()/(rW*Math.PI/90)))); // จุดต่อทุก ~2° ของส่วนโค้ง
+  const m=new THREE.MeshStandardMaterial({color,metalness:0.5,roughness:0.45});
+  const grp=new THREE.Group();
+  grp.add(new THREE.Mesh(new THREE.TubeGeometry(path, seg, dia/2, 12, false), m));
+  const cap=new THREE.SphereGeometry(dia/2,10,8); // ปิดปลายขอเกี่ยว
+  const c1=new THREE.Mesh(cap,m); c1.position.copy(tipA); grp.add(c1);
+  const c2=new THREE.Mesh(cap.clone(),m); c2.position.copy(tipB); grp.add(c2);
+  grp.userData.ifc={ pts:roundCorners(corners, Math.min(fillet,2.5), 5, 25).map(p=>({x:p.x,y:p.y,z:p.z})), r:dia/2 }; // เส้นกึ่งกลาง export (มนมุมคม → หน้าตัดคงที่)
+  return grp;
+}
+// เหล็กเส้นเดียว (แนวนอน + ขางอที่ปลาย) เป็น tube ต่อเนื่อง โค้งมนตรงรอยงอ
+function makeSmoothBar(corners, diaCm, color){
+  const r=diaCm/2;
+  const fillet=Math.min(Math.max(diaCm*2, 3), 7); // รัศมีงอ ~2·d (จำกัด 3–7 ซม.)
+  const path=roundedPath(corners, fillet);
+  const seg=Math.min(900, Math.max(48, Math.ceil(path.getLength()/(fillet*Math.PI/90)))); // จุดต่อทุก ~2° ของส่วนโค้ง
+  const m=new THREE.MeshStandardMaterial({color,metalness:0.55,roughness:0.42});
+  const grp=new THREE.Group();
+  grp.add(new THREE.Mesh(new THREE.TubeGeometry(path, seg, r, 16, false), m));
+  const capGeo=new THREE.SphereGeometry(r,14,10); // ปิดปลาย tube ให้ดูตัน
+  const c0=new THREE.Mesh(capGeo,m); c0.position.copy(corners[0]); grp.add(c0);
+  const c1=new THREE.Mesh(capGeo.clone(),m); c1.position.copy(corners[corners.length-1]); grp.add(c1);
+  grp.userData.ifc={ pts:roundCorners(corners, fillet, 5, 25).map(p=>({x:p.x,y:p.y,z:p.z})), r }; // เส้นกึ่งกลาง export (มนมุมคม → หน้าตัดคงที่)
+  return grp;
+}
+/* ─────────────────────────────────────────────────────────────
+   Export IFC4 (.ifc) — ขนาดจริง (คอนกรีต + เหล็กเสริมทั้งหมด)
+   ───────────────────────────────────────────────────────────── */
+function ifcGuid(){
+  const ch='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$';
+  let s=''; for(let i=0;i<22;i++) s+=ch[Math.floor(Math.random()*64)];
+  return s;
+}
+// วงแหวนหน้าตัดเหล็ก (parallel-transport frames · ไม่บิด) ตามเส้นกึ่งกลาง — คืน array ของ ring (แต่ละ ring = Vector3[] หน่วย ซม.)
+function rebarTubeRings(pts,radius,sides){
+  sides=sides||6;
+  if(!pts||pts.length<2||!(radius>0)) return [];
+  const C=[]; for(const p of pts){ const v=new THREE.Vector3(p.x,p.y,p.z); if(!C.length||C[C.length-1].distanceTo(v)>1e-4) C.push(v); }
+  const n=C.length; if(n<2) return [];
+  const T=[];
+  for(let i=0;i<n;i++){ let t; if(i===0)t=new THREE.Vector3().subVectors(C[1],C[0]); else if(i===n-1)t=new THREE.Vector3().subVectors(C[n-1],C[n-2]); else t=new THREE.Vector3().subVectors(C[i+1],C[i-1]); if(t.lengthSq()<1e-12)t.set(0,0,1); T.push(t.normalize()); }
+  const up=Math.abs(T[0].y)>0.9?new THREE.Vector3(1,0,0):new THREE.Vector3(0,1,0);
+  let N0=new THREE.Vector3().crossVectors(up,T[0]); if(N0.lengthSq()<1e-9)N0=new THREE.Vector3().crossVectors(new THREE.Vector3(1,0,0),T[0]); N0.normalize();
+  const N=[N0];
+  for(let i=1;i<n;i++){ const ax=new THREE.Vector3().crossVectors(T[i-1],T[i]); const sn=ax.length(),cs=T[i-1].dot(T[i]); const nrm=N[i-1].clone(); if(sn>1e-6){ax.normalize(); nrm.applyAxisAngle(ax,Math.atan2(sn,cs));} nrm.addScaledVector(T[i],-nrm.dot(T[i])); if(nrm.lengthSq()<1e-9)nrm.crossVectors(up,T[i]); nrm.normalize(); N.push(nrm); }
+  const rings=[];
+  for(let i=0;i<n;i++){ const B=new THREE.Vector3().crossVectors(T[i],N[i]).normalize(); const ring=[]; for(let s=0;s<sides;s++){ const a=2*Math.PI*s/sides; ring.push(new THREE.Vector3().copy(C[i]).addScaledVector(N[i],Math.cos(a)*radius).addScaledVector(B,Math.sin(a)*radius)); } rings.push(ring); }
+  return rings;
+}
+function exportIFC(){
+  try{ build3D(); }catch(e){}                       // รีเฟรชเรขาคณิตให้ครบก่อน export
+  const B=data.beam;
+  const Wm=B.W/100, Hm=B.H/100, Ltot=B.L.reduce((a,b)=>a+b,0), Lm=Ltot/100;
+  // เก็บเหล็กเสริมทั้งหมด (เส้นกึ่งกลาง + รัศมี) จาก groups
+  const rebars=[];
+  const cats=[['mainTop','MAIN','Main Top Bar'],['mainBot','MAIN','Main Bottom Bar'],
+              ['colExtra','MAIN','Support Extra Bar'],['midExtra','MAIN','Midspan Extra Bar'],
+              ['stirrup','LIGATURE','Stirrup']];
+  if(groups) cats.forEach(([key,ptype,nm])=>{
+    const g=groups[key]; if(!g||g.visible===false) return;   // ข้ามหมวดที่ถูกปิดไว้ (เช่นปิด "คอนกรีต" → export เฉพาะเหล็ก)
+    g.traverse(o=>{ const u=o.userData&&o.userData.ifc; if(u&&u.pts&&u.pts.length>=2&&u.r>0) rebars.push({pts:u.pts,r:u.r,type:ptype,name:nm}); });
+  });
+  const wantConcrete = !groups || !groups.concrete || groups.concrete.visible!==false;
+  // ── เขียนไฟล์ IFC4 (STEP) ──
+  let id=0; const L=[];
+  const add=(body)=>{ const ref='#'+(++id); L.push(ref+'='+body+';'); return ref; };
+  const fmt=(v)=>{ if(!isFinite(v)) v=0; return (+v).toFixed(6).replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'.0'); };
+  const P3=(x,y,z)=>add(`IFCCARTESIANPOINT((${fmt(x)},${fmt(y)},${fmt(z)}))`);
+  // owner history
+  const person=add("IFCPERSON($,$,'CivilToolkit',$,$,$,$,$)");
+  const org=add("IFCORGANIZATION($,'CivilToolkit',$,$,$)");
+  const pao=add(`IFCPERSONANDORGANIZATION(${person},${org},$)`);
+  const app=add(`IFCAPPLICATION(${org},'1.0','CivilToolkit BeamCAD','CivilToolkitBeamCAD')`);
+  const ts=Math.floor(Date.now()/1000);
+  const owner=add(`IFCOWNERHISTORY(${pao},${app},$,.ADDED.,$,$,$,${ts})`);
+  // units (SI metre)
+  const uL=add("IFCSIUNIT(*,.LENGTHUNIT.,$,.METRE.)");
+  const uA=add("IFCSIUNIT(*,.AREAUNIT.,$,.SQUARE_METRE.)");
+  const uV=add("IFCSIUNIT(*,.VOLUMEUNIT.,$,.CUBIC_METRE.)");
+  const uAng=add("IFCSIUNIT(*,.PLANEANGLEUNIT.,$,.RADIAN.)");
+  const units=add(`IFCUNITASSIGNMENT((${uL},${uA},${uV},${uAng}))`);
+  // geometric context (Z up)
+  const o0=P3(0,0,0);
+  const dZ=add("IFCDIRECTION((0.,0.,1.))");
+  const dX=add("IFCDIRECTION((1.,0.,0.))");
+  const dY=add("IFCDIRECTION((0.,1.,0.))");
+  const wcs=add(`IFCAXIS2PLACEMENT3D(${o0},${dZ},${dX})`);
+  const ctx=add(`IFCGEOMETRICREPRESENTATIONCONTEXT($,'Model',3,1.0E-5,${wcs},$)`);
+  const sub=add(`IFCGEOMETRICREPRESENTATIONSUBCONTEXT('Body','Model',*,*,*,*,${ctx},$,.MODEL_VIEW.,$)`);
+  // project + spatial structure
+  const project=add(`IFCPROJECT('${ifcGuid()}',${owner},'Continuous Beam',$,$,$,$,(${ctx}),${units})`);
+  const sitePlc=add(`IFCLOCALPLACEMENT($,${wcs})`);
+  const site=add(`IFCSITE('${ifcGuid()}',${owner},'Site',$,$,${sitePlc},$,$,.ELEMENT.,$,$,$,$,$)`);
+  const bldgPlc=add(`IFCLOCALPLACEMENT(${sitePlc},${wcs})`);
+  const bldg=add(`IFCBUILDING('${ifcGuid()}',${owner},'Building',$,$,${bldgPlc},$,$,.ELEMENT.,$,$,$)`);
+  const stPlc=add(`IFCLOCALPLACEMENT(${bldgPlc},${wcs})`);
+  const storey=add(`IFCBUILDINGSTOREY('${ifcGuid()}',${owner},'Storey',$,$,${stPlc},$,$,.ELEMENT.,0.)`);
+  add(`IFCRELAGGREGATES('${ifcGuid()}',${owner},$,$,${project},(${site}))`);
+  add(`IFCRELAGGREGATES('${ifcGuid()}',${owner},$,$,${site},(${bldg}))`);
+  add(`IFCRELAGGREGATES('${ifcGuid()}',${owner},$,$,${bldg},(${storey}))`);
+  const products=[];
+  // คอนกรีต (IfcBeam) — กล่องอัดรีดตามขนาดจริง
+  if(wantConcrete){
+    const plc=add(`IFCLOCALPLACEMENT(${stPlc},${wcs})`);
+    const p2=add("IFCCARTESIANPOINT((0.,0.))");
+    const pl2=add(`IFCAXIS2PLACEMENT2D(${p2},$)`);
+    const prof=add(`IFCRECTANGLEPROFILEDEF(.AREA.,'BeamSection',${pl2},${fmt(Wm)},${fmt(Hm)})`);
+    const sLoc=P3(0,0,Hm/2);
+    const sPlc=add(`IFCAXIS2PLACEMENT3D(${sLoc},${dX},${dY})`); // local Z=worldX(ยาว), local X=worldY(กว้าง)
+    const solid=add(`IFCEXTRUDEDAREASOLID(${prof},${sPlc},${dZ},${fmt(Lm)})`);
+    const shp=add(`IFCSHAPEREPRESENTATION(${sub},'Body','SweptSolid',(${solid}))`);
+    const pds=add(`IFCPRODUCTDEFINITIONSHAPE($,$,(${shp}))`);
+    products.push(add(`IFCBEAM('${ifcGuid()}',${owner},'Concrete Beam ${B.W}x${B.H}cm',$,$,${plc},${pds},$)`)); // IFC2x3 IfcBeam = 8 attr (ไม่มี PredefinedType)
+    // เสาคอนกรีตที่ support — กล่องอัดรีดยื่นลงใต้คาน (IfcColumn)
+    const colW=B.W, colHc=Math.max(2*B.H,120), colWm=colW/100, colHm=colHc/100;
+    const cprof=add(`IFCRECTANGLEPROFILEDEF(.AREA.,'Column',${add(`IFCAXIS2PLACEMENT2D(${add("IFCCARTESIANPOINT((0.,0.))")},$)`)},${fmt(colWm)},${fmt(colWm)})`);
+    let xc=0;
+    for(let ci=0;ci<=B.L.length;ci++){
+      const cloc=add(`IFCCARTESIANPOINT((${fmt(xc/100)},0.,${fmt(-colHm)}))`);
+      const csolid=add(`IFCEXTRUDEDAREASOLID(${cprof},${add(`IFCAXIS2PLACEMENT3D(${cloc},$,$)`)},${dZ},${fmt(colHm)})`);
+      const cshp=add(`IFCSHAPEREPRESENTATION(${sub},'Body','SweptSolid',(${csolid}))`);
+      const cpds=add(`IFCPRODUCTDEFINITIONSHAPE($,$,(${cshp}))`);
+      const cplc=add(`IFCLOCALPLACEMENT(${stPlc},${wcs})`);
+      products.push(add(`IFCCOLUMN('${ifcGuid()}',${owner},'Concrete Column',$,$,${cplc},${cpds},$)`));
+      if(ci<B.L.length) xc += B.L[ci];
+    }
+  }
+  // เหล็กเสริม (IfcReinforcingBar) — geometry แบบ faceted Brep (รองรับทุก viewer · ไม่พึ่ง sweep kernel)
+  const SIDES=6;
+  rebars.forEach(rb=>{
+    const rings=rebarTubeRings(rb.pts, rb.r, SIDES); const nR=rings.length;
+    if(nR<2) return;
+    const pr=[]; for(let i=0;i<nR;i++){ pr[i]=[]; for(let s=0;s<SIDES;s++){ const v=rings[i][s]; pr[i][s]=P3(v.x/100, v.z/100, v.y/100); } } // cm→m, app→IFC(x,z,y)
+    const mkFace=(lp)=>{ const loop=add(`IFCPOLYLOOP((${lp.join(',')}))`); const fb=add(`IFCFACEOUTERBOUND(${loop},.T.)`); return add(`IFCFACE((${fb}))`); };
+    const faces=[];
+    for(let i=0;i<nR-1;i++) for(let s=0;s<SIDES;s++){ const s2=(s+1)%SIDES; faces.push(mkFace([pr[i][s],pr[i][s2],pr[i+1][s2],pr[i+1][s]])); } // ผิวข้าง (quad)
+    faces.push(mkFace(pr[0].slice().reverse()));   // ฝาปลายต้น
+    faces.push(mkFace(pr[nR-1].slice()));           // ฝาปลายปลาย
+    const shell=add(`IFCCLOSEDSHELL((${faces.join(',')}))`);
+    const brep=add(`IFCFACETEDBREP(${shell})`);
+    const shp=add(`IFCSHAPEREPRESENTATION(${sub},'Body','Brep',(${brep}))`);
+    const pds=add(`IFCPRODUCTDEFINITIONSHAPE($,$,(${shp}))`);
+    const plc=add(`IFCLOCALPLACEMENT(${stPlc},${wcs})`);
+    let len=0; for(let i=1;i<rb.pts.length;i++){ const a=rb.pts[i-1],b=rb.pts[i]; len+=Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z); }
+    const dia_m=2*rb.r/100, area=Math.PI*(rb.r/100)*(rb.r/100), grade=rb.type==='LIGATURE'?'SR24':'SD40';
+    products.push(add(`IFCREINFORCINGBAR('${ifcGuid()}',${owner},'${rb.name}',$,$,${plc},${pds},$,'${grade}',${fmt(dia_m)},${fmt(area)},${fmt(len/100)},.${rb.type}.,$)`));
+  });
+  if(products.length) add(`IFCRELCONTAINEDINSPATIALSTRUCTURE('${ifcGuid()}',${owner},$,$,(${products.join(',')}),${storey})`);
+  // header + ประกอบไฟล์
+  const now=new Date().toISOString().replace(/\.\d+Z$/,'');
+  const header='ISO-10303-21;\nHEADER;\n'+
+    "FILE_DESCRIPTION(('ViewDefinition [CoordinationView_V2.0]'),'2;1');\n"+
+    `FILE_NAME('beam.ifc','${now}',(''),(''),'CivilToolkit BeamCAD','CivilToolkit BeamCAD','');\n`+
+    "FILE_SCHEMA(('IFC2X3'));\nENDSEC;\nDATA;\n";
+  const text=header + L.join('\n') + '\nENDSEC;\nEND-ISO-10303-21;\n';
+  // ดาวน์โหลด
+  const blob=new Blob([text],{type:'application/x-step'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='beam_'+B.W+'x'+B.H+'cm.ifc';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+  console.log('IFC exported:', rebars.length, 'rebars,', id, 'entities');
+}
+/* ─────────────────────────────────────────────────────────────
+   Export COLLADA (.dae) — นำเข้า SketchUp ได้โดยตรง · ขนาดจริง (เมตร)
+   ───────────────────────────────────────────────────────────── */
+function exportDAE(){
+  try{ build3D(); }catch(e){}
+  if(scene) scene.updateMatrixWorld(true);
+  const B=data.beam, Ltot=B.L.reduce((a,b)=>a+b,0);
+  const cats=[ ['concrete','Concrete','9ca3af'],['mainTop','MainTop','38bdf8'],
+    ['mainBot','MainBot','a8ff78'],['colExtra','SupportExtra','ffd60a'],
+    ['midExtra','MidspanExtra','f472b6'],['stirrup','Stirrup','c084fc'] ];
+  const pushTri=(out,a,b,c)=>{ out.push(a.x/100,a.y/100,a.z/100, b.x/100,b.y/100,b.z/100, c.x/100,c.y/100,c.z/100); };
+  // tube หกเหลี่ยมจากเส้นกึ่งกลาง (ใช้ rebarTubeRings ร่วมกับ IFC) → สามเหลี่ยม (ซม.) แล้ว pushTri หาร 100
+  function tubeTris(pts,radius,out,sides){
+    sides=sides||6;
+    const rings=rebarTubeRings(pts,radius,sides); const n=rings.length; if(n<2) return;
+    for(let i=0;i<n-1;i++){ for(let s=0;s<sides;s++){ const s2=(s+1)%sides; pushTri(out,rings[i][s],rings[i][s2],rings[i+1][s2]); pushTri(out,rings[i][s],rings[i+1][s2],rings[i+1][s]); } }
+    for(let s=1;s<sides-1;s++){ pushTri(out,rings[0][0],rings[0][s+1],rings[0][s]); pushTri(out,rings[n-1][0],rings[n-1][s],rings[n-1][s+1]); } // ปิดปลายสองข้าง
+  }
+  const geom={}; cats.forEach(([k])=>geom[k]=[]);
+  const vis=(k)=>!groups || !groups[k] || groups[k].visible!==false;  // export เฉพาะหมวดที่เปิดอยู่ (ปิด "คอนกรีต" → เหล็กล้วน)
+  // คอนกรีต: กล่องคาน + เสาที่ support ตามขนาดจริง — หน่วยเมตร, Y ขึ้น
+  if(vis('concrete')){
+    const f=[[0,1,2],[0,2,3],[5,4,7],[5,7,6],[4,0,3],[4,3,7],[1,5,6],[1,6,2],[3,2,6],[3,6,7],[4,5,1],[4,1,0]];
+    const pushBox=(x0,x1,y0,y1,z0,z1)=>{
+      const c=[[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
+      f.forEach(t=>t.forEach(i=>geom.concrete.push(c[i][0],c[i][1],c[i][2])));
+    };
+    pushBox(0, Ltot/100, 0, B.H/100, -B.W/200, B.W/200);   // คาน
+    const colW=B.W, colHc=Math.max(2*B.H,120); let xc=0;     // เสาที่ support
+    for(let ci=0;ci<=B.L.length;ci++){
+      pushBox((xc-colW/2)/100,(xc+colW/2)/100, -colHc/100,0, -colW/200,colW/200);
+      if(ci<B.L.length) xc += B.L[ci];
+    }
+  }
+  // เหล็กเสริม: สร้าง tube low-poly จากเส้นกึ่งกลางที่เก็บไว้ (userData.ifc)
+  if(groups) cats.forEach(([k])=>{ if(k==='concrete')return; const g=groups[k]; if(!g||!vis(k))return;
+    g.traverse(o=>{ const u=o.userData&&o.userData.ifc; if(u&&u.pts) tubeTris(u.pts,u.r,geom[k]); }); });
+  let effects='',materials='',geometries='',nodes='';
+  cats.forEach(([key,name,hex])=>{
+    const arr=geom[key]; if(!arr||arr.length<9) return;
+    const r=(parseInt(hex.slice(0,2),16)/255).toFixed(4), gg=(parseInt(hex.slice(2,4),16)/255).toFixed(4), b=(parseInt(hex.slice(4,6),16)/255).toFixed(4);
+    const nV=arr.length/3, gid='geo_'+key;
+    effects+=`<effect id="eff_${key}"><profile_COMMON><technique sid="t"><lambert><diffuse><color>${r} ${gg} ${b} 1</color></diffuse></lambert></technique></profile_COMMON></effect>`;
+    materials+=`<material id="mat_${key}" name="${name}"><instance_effect url="#eff_${key}"/></material>`;
+    let p=''; for(let i=0;i<nV;i++) p+=(i?' ':'')+i;
+    geometries+=`<geometry id="${gid}" name="${name}"><mesh>`+
+      `<source id="${gid}-pos"><float_array id="${gid}-arr" count="${arr.length}">${arr.map(n=>(+n.toFixed(4))).join(' ')}</float_array>`+
+      `<technique_common><accessor source="#${gid}-arr" count="${nV}" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>`+
+      `<vertices id="${gid}-vtx"><input semantic="POSITION" source="#${gid}-pos"/></vertices>`+
+      `<triangles count="${nV/3}" material="sym_${key}"><input semantic="VERTEX" source="#${gid}-vtx" offset="0"/><p>${p}</p></triangles>`+
+      `</mesh></geometry>`;
+    nodes+=`<node id="n_${key}" name="${name}"><instance_geometry url="#${gid}"><bind_material><technique_common><instance_material symbol="sym_${key}" target="#mat_${key}"/></technique_common></bind_material></instance_geometry></node>`;
+  });
+  const now=new Date().toISOString();
+  const dae='<?xml version="1.0" encoding="utf-8"?>\n'+
+    '<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">'+
+    `<asset><contributor><authoring_tool>CivilToolkit BeamCAD</authoring_tool></contributor><created>${now}</created><modified>${now}</modified><unit meter="1" name="meter"/><up_axis>Y_UP</up_axis></asset>`+
+    `<library_effects>${effects}</library_effects><library_materials>${materials}</library_materials>`+
+    `<library_geometries>${geometries}</library_geometries>`+
+    `<library_visual_scenes><visual_scene id="scene" name="scene">${nodes}</visual_scene></library_visual_scenes>`+
+    '<scene><instance_visual_scene url="#scene"/></scene></COLLADA>';
+  const blob=new Blob([dae],{type:'model/vnd.collada+xml'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='beam_'+B.W+'x'+B.H+'cm.dae';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+  const tris=Object.values(geom).reduce((s,arr)=>s+arr.length/9,0);
+  console.log('DAE exported:', tris|0, 'triangles');
+}
+function build3D(){
+  if(!scene) return;
+  Object.values(groups).forEach(clearGroup);
+  const B=data.beam; const W=B.W,H=B.H,cover=B.cover,sl=B.sl; let sDia=B.sDia;
+  const Ltot=data.beam.L.reduce((a,b)=>a+b,0);
+  if(Ltot<=0) return;
+  // วาดบาร์ + ขางอ 90° ที่ปลายคาน (x≈0 หรือ x≈Ltot) เข้าในคาน 12·d
+  function addBarH(grp,a,b,y,z,diaCm,color,side,layer){
+    // ความยาวขางอ 12·d เข้าในคาน (จำกัดไม่ให้ทะลุปลอกฝั่งตรงข้าม)
+    let hl=12*diaCm; const room=H-2*cover-2*sDia-diaCm; if(hl>room) hl=room;
+    const dy = side==='top' ? -hl : hl;
+    // เลื่อนปลาย+ขางอเข้าในแกน x ตามชั้น (Layer 2,3) เพื่อไม่ให้ขางอที่ปลายคานทับกัน
+    const stag = Math.min((layer||0)*Math.max(3, 2.5*diaCm), (b-a)*0.4);
+    const hasL=(a<=0.5), hasR=(b>=Ltot-0.5);
+    const aa = hasL ? a+stag : a, bb = hasR ? b-stag : b;
+    const corners=[];
+    if(hasL) corners.push(new THREE.Vector3(aa, y+dy, z)); // ปลายขางอซ้าย (เลื่อนตามชั้น)
+    corners.push(new THREE.Vector3(aa,y,z));
+    corners.push(new THREE.Vector3(bb,y,z));
+    if(hasR) corners.push(new THREE.Vector3(bb, y+dy, z)); // ปลายขางอขวา (เลื่อนตามชั้น)
+    grp.add(makeSmoothBar(corners, diaCm, color));
+  }
+  const maxD=2.5;
+  // y ของบาร์: layer 0 ใช้รัศมีบาร์เอง → ผิวแตะปลอกบน/ล่างพอดี · layer ลึกขึ้นเว้น (maxD+sl)
+  const yAt=(side,i,diaCm)=> side==='top'
+    ? (H - (cover + sDia + diaCm/2 + i*(maxD+sl)))
+    : (cover + sDia + diaCm/2 + i*(maxD+sl));
+  // Concrete + support markers
+  const concGeo=new THREE.BoxGeometry(Ltot,H,W);
+  const conc=new THREE.Mesh(concGeo, new THREE.MeshStandardMaterial({color:0x9ca3af,transparent:true,opacity:0.13,roughness:0.95,depthWrite:false}));
+  conc.position.set(Ltot/2,H/2,0); groups.concrete.add(conc);
+  const wire=new THREE.LineSegments(new THREE.EdgesGeometry(concGeo), new THREE.LineBasicMaterial({color:0xa8ff78,transparent:true,opacity:0.5}));
+  wire.position.copy(conc.position); groups.concrete.add(wire);
+  // เสาคอนกรีตที่ตำแหน่ง support (แทนหมุดสัญลักษณ์เดิม) — หน้าตัด W×W ยื่นลงจากใต้คาน
+  const colMat=new THREE.MeshStandardMaterial({color:0x9ca3af,transparent:true,opacity:0.4,roughness:0.92,depthWrite:false});
+  const colW=W, colH=Math.max(2*H,120);
+  let xCur=0;
+  for(let i=0;i<=data.beam.L.length;i++){
+    const colGeo=new THREE.BoxGeometry(colW, colH, colW);
+    const col=new THREE.Mesh(colGeo, colMat); col.position.set(xCur, -colH/2, 0); groups.concrete.add(col);
+    const cw=new THREE.LineSegments(new THREE.EdgesGeometry(colGeo), new THREE.LineBasicMaterial({color:0xa8ff78,transparent:true,opacity:0.45}));
+    cw.position.copy(col.position); groups.concrete.add(cw);
+    if(i<data.beam.L.length) xCur += data.beam.L[i];
+  }
+  // เส้นผ่านศูนย์กลางเหล็กยืนมุม (สูงสุด) → ใช้คำนวณรัศมีงอของปลอกให้โอบเหล็กยืนพอดี
+  let maxMainDiaCm=1.6;
+  (data.main.top||[]).concat(data.main.bot||[]).forEach(mm=>{ if(mm&&mm.n>0&&mm.d>0) maxMainDiaCm=Math.max(maxMainDiaCm, mm.d/10); });
+  // เส้นผ่านศูนย์กลางเหล็กปลอกสูงสุดในคาน → ใช้จัดตำแหน่งเหล็กยืนให้แตะผิวในปลอก (เหล็กยืนเส้นตรงต่อเนื่อง อยู่ในปลอกทุก zone)
+  let maxStirDiaCm=0.9;
+  data.spans.forEach((sp,idx)=>{
+    const sL=data.supports[idx], sR=data.supports[idx+1];
+    if(sL&&sL.stir&&sL.stir.d>0) maxStirDiaCm=Math.max(maxStirDiaCm, sL.stir.d/10);
+    if(sR&&sR.stir&&sR.stir.d>0) maxStirDiaCm=Math.max(maxStirDiaCm, sR.stir.d/10);
+    if(sp.midStir&&sp.midStir.d>0) maxStirDiaCm=Math.max(maxStirDiaCm, sp.midStir.d/10);
+  });
+  const _sDia0=B.sDia; sDia=maxStirDiaCm; B.sDia=maxStirDiaCm; // ใช้ขนาดปลอกจริงจัดตำแหน่งเหล็กยืน (yAt + computeSectionLayout)
+  // Bars per span per zone
+  let xL=0;
+  data.spans.forEach((sp,idx)=>{
+    const L=B.L[idx];
+    const lt=data.endTypes[idx], rt=data.endTypes[idx+1];
+    const tLeft = lt==='EXT'?L/4:L/3, tRight = rt==='EXT'?L/4:L/3;
+    const colLseg=[xL,xL+tLeft], colRseg=[xL+L-tRight,xL+L];
+    const midSegMain=[xL+tLeft,xL+L-tRight], midSegExtra=[xL+L/8,xL+L-L/8];
+    const suL=data.supports[idx]||{top:[],bot:[]}, suR=data.supports[idx+1]||{top:[],bot:[]};
+    for(let i=0;i<3;i++){
+      const mT=data.main.top[i], mB=data.main.bot[i];
+      const mt=sp.midTop[i], mb=sp.midBot[i];
+      // Left col-zone (support idx) and Right col-zone (support idx+1) — แยกข้อมูลกัน
+      [['colL',colLseg,suL],['colR',colRseg,suR]].forEach(([w,seg,su])=>{
+        const a=seg[0],b=seg[1];
+        const ct=(su.top&&su.top[i])||{n:0,d:0}, cb=(su.bot&&su.bot[i])||{n:0,d:0};
+        const loT=computeSectionLayout('top',i,idx,w), loB=computeSectionLayout('bot',i,idx,w);
+        if(mT.n>0&&mT.d>0&&loT) loT.mainZ.forEach(z=>addBarH(groups.mainTop,a,b,yAt('top',i,mT.d/10),z,mT.d/10,COL3.mainTop,'top',i));
+        if(ct.n>0&&ct.d>0&&loT) loT.extraZ.forEach(z=>addBarH(groups.colExtra,a,b,yAt('top',i,ct.d/10),z,ct.d/10,COL3.col,'top',i));
+        if(mB.n>0&&mB.d>0&&loB) loB.mainZ.forEach(z=>addBarH(groups.mainBot,a,b,yAt('bot',i,mB.d/10),z,mB.d/10,COL3.mainBot,'bot',i));
+        if(cb.n>0&&cb.d>0&&loB) loB.extraZ.forEach(z=>addBarH(groups.colExtra,a,b,yAt('bot',i,cb.d/10),z,cb.d/10,COL3.col,'bot',i));
+      });
+      const midLoT=computeSectionLayout('top',i,idx,'mid'), midLoB=computeSectionLayout('bot',i,idx,'mid');
+      if(mT.n>0&&mT.d>0&&midLoT) midLoT.mainZ.forEach(z=>addBarH(groups.mainTop,midSegMain[0],midSegMain[1],yAt('top',i,mT.d/10),z,mT.d/10,COL3.mainTop,'top'));
+      if(mt.n>0&&mt.d>0&&midLoT) midLoT.extraZ.forEach(z=>groups.midExtra.add(makeBar(midSegExtra[0],midSegExtra[1],yAt('top',i,mt.d/10),z,mt.d/10,COL3.mid)));
+      if(mB.n>0&&mB.d>0&&midLoB) midLoB.mainZ.forEach(z=>addBarH(groups.mainBot,midSegMain[0],midSegMain[1],yAt('bot',i,mB.d/10),z,mB.d/10,COL3.mainBot,'bot'));
+      if(mb.n>0&&mb.d>0&&midLoB) midLoB.extraZ.forEach(z=>groups.midExtra.add(makeBar(midSegExtra[0],midSegExtra[1],yAt('bot',i,mb.d/10),z,mb.d/10,COL3.mid)));
+    }
+    // Stirrups per zone (L/3) — col zones ใช้ stirrup ของ support ที่ติด, mid ใช้ของ span
+    const colSL = suL.stir || {d:9,sp:10}, colSR = suR.stir || {d:9,sp:10}, midS = sp.midStir || {d:9,sp:15};
+    const colDiaL=(colSL.d||9)/10, colDiaR=(colSR.d||9)/10, midDia=(midS.d||9)/10;
+    const third=L/3;
+    function stirAt(x,dia){
+      const yT=H-cover-dia/2, yB=cover+dia/2;
+      const zStL=-(W/2-cover-dia/2), zStR=W/2-cover-dia/2;
+      groups.stirrup.add(makeStirrup(x,yT,yB,zStL,zStR,dia,COL3.stir,maxMainDiaCm));
+    }
+    for(let x=xL+5;        x<xL+third;     x+=colSL.sp||10) stirAt(x,colDiaL);
+    for(let x=xL+third+5;  x<xL+2*third;   x+=midS.sp||15) stirAt(x,midDia);
+    for(let x=xL+2*third+5;x<xL+L;         x+=colSR.sp||10) stirAt(x,colDiaR);
+    xL += L;
+  });
+  B.sDia=_sDia0;                              // คืนค่า sDia เดิม (ปลอกใช้ขนาดราย zone ตามเดิม ไม่กระทบ)
+  // Section markers — A-A ที่ active support, B-B ที่ midspan ของ active span
+  const xSecA = supportX(activeSupport);
+  let xActive=0; for(let k=0;k<activeSpan;k++) xActive+=data.beam.L[k];
+  const xSecB = xActive + data.beam.L[activeSpan]/2;
+  function makeSecFrame(x,color,label){
+    const hex=parseInt(color.replace('#',''),16);
+    const pts=[new THREE.Vector3(x,-2,-W/2-3),new THREE.Vector3(x,-2,W/2+3),new THREE.Vector3(x,-2,W/2+3),new THREE.Vector3(x,H+10,W/2+3),new THREE.Vector3(x,H+10,W/2+3),new THREE.Vector3(x,H+10,-W/2-3),new THREE.Vector3(x,H+10,-W/2-3),new THREE.Vector3(x,-2,-W/2-3)];
+    const g=new THREE.BufferGeometry().setFromPoints(pts);
+    groups.concrete.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color,transparent:true,opacity:0.9})));
+    const pg=new THREE.PlaneGeometry(W+10,H+15);
+    const pm=new THREE.MeshBasicMaterial({color,transparent:true,opacity:0.06,side:THREE.DoubleSide,depthWrite:false});
+    const plane=new THREE.Mesh(pg,pm); plane.rotation.y=Math.PI/2; plane.position.set(x,H/2,0); groups.concrete.add(plane);
+    const cv=document.createElement('canvas'); cv.width=160;cv.height=80;
+    const cxn=cv.getContext('2d'); cxn.font='bold 38px "Space Mono",monospace'; cxn.fillStyle=color; cxn.strokeStyle='rgba(0,0,0,0.65)'; cxn.lineWidth=4;
+    cxn.textAlign='center'; cxn.textBaseline='middle'; cxn.strokeText(label,80,40); cxn.fillText(label,80,40);
+    const sm=new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthTest:false});
+    const sprite=new THREE.Sprite(sm); sprite.scale.set(70,35,1); sprite.position.set(x+30,H+30,W/2+15); groups.concrete.add(sprite);
+  }
+  makeSecFrame(xSecA,'#f472b6','A-A');
+  makeSecFrame(xSecB,'#fb7dd2','B-B');
+  // Live section-cut ของ Section Explorer (ตาม slider) — สีฟ้า
+  buildSliderCut();
+  const _ss=document.getElementById('secx-slider'); if(sliderCut&&_ss) sliderCut.position.x=+_ss.value;
+  // อย่าเปลี่ยน target ของ OrbitControls ทุก rebuild — กล้องจะ snap
+  // update เฉพาะเมื่อ Ltot หรือ H เปลี่ยนจริง (เช่น re-analyze ด้วยคานยาวใหม่)
+  const newTgtX = Ltot/2, newTgtY = H/2;
+  if(Math.abs(ctrls.target.x - newTgtX) > 0.5 || Math.abs(ctrls.target.y - newTgtY) > 0.5){
+    ctrls.target.set(newTgtX, newTgtY, 0);
+    ctrls.update();
+  }
+}
+// สัญลักษณ์ภาพตัด (section cut) แบบ live ที่เลื่อนตาม slider ของ Section Explorer
+function buildSliderCut(){
+  if(sliderCut){ scene.remove(sliderCut); sliderCut.traverse(o=>{ if(o.geometry)o.geometry.dispose(); if(o.material&&o.material.dispose)o.material.dispose(); }); sliderCut=null; }
+  if(!scene) return;
+  const B=data.beam, W=B.W, H=B.H, col=0x38bdf8;
+  const g=new THREE.Group();
+  // ระนาบตัดโปร่งแสง (ใหญ่กว่าหน้าตัดเล็กน้อย)
+  const pg=new THREE.PlaneGeometry(W+12,H+16);
+  const plane=new THREE.Mesh(pg, new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.15,side:THREE.DoubleSide,depthWrite:false}));
+  plane.rotation.y=Math.PI/2; plane.position.set(0,H/2,0); g.add(plane);
+  // กรอบเส้นสว่าง
+  const o=W/2+6;
+  const pts=[new THREE.Vector3(0,-4,-o),new THREE.Vector3(0,-4,o), new THREE.Vector3(0,-4,o),new THREE.Vector3(0,H+8,o),
+    new THREE.Vector3(0,H+8,o),new THREE.Vector3(0,H+8,-o), new THREE.Vector3(0,H+8,-o),new THREE.Vector3(0,-4,-o)];
+  g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color:col})));
+  // ลูกศรชี้ลงเหนือคาน
+  const cone=new THREE.Mesh(new THREE.ConeGeometry(8,18,16), new THREE.MeshBasicMaterial({color:col}));
+  cone.position.set(0,H+34,0); cone.rotation.z=Math.PI; g.add(cone);
+  // ป้าย SECTION
+  const cv=document.createElement('canvas'); cv.width=220; cv.height=64;
+  const cx=cv.getContext('2d'); cx.font='bold 32px "Space Mono",monospace'; cx.textAlign='center'; cx.textBaseline='middle';
+  cx.strokeStyle='rgba(0,0,0,.7)'; cx.lineWidth=5; cx.strokeText('SECTION',110,32); cx.fillStyle='#38bdf8'; cx.fillText('SECTION',110,32);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthTest:false}));
+  sp.scale.set(95,28,1); sp.position.set(0,H+60,0); g.add(sp);
+  scene.add(g); sliderCut=g;
+}
+const presets={
+  iso:()=>{const Lt=data.beam.L.reduce((a,b)=>a+b,0); return {x:Lt/2+800,y:data.beam.H+650,z:700};},
+  side:()=>{const Lt=data.beam.L.reduce((a,b)=>a+b,0); return {x:Lt/2,y:data.beam.H/2,z:1200};},
+  top:()=>{const Lt=data.beam.L.reduce((a,b)=>a+b,0); return {x:Lt/2,y:1300,z:0.01};},
+  end:()=>{const Lt=data.beam.L.reduce((a,b)=>a+b,0); return {x:Lt+700,y:data.beam.H/2,z:90};}
+};
+function goTo(p,anim=true){
+  if(!cam || !ctrls) return;
+  const tgt=new THREE.Vector3(data.beam.L.reduce((a,b)=>a+b,0)/2, data.beam.H/2, 0);
+  if(!anim){cam.position.set(p.x,p.y,p.z); ctrls.target.copy(tgt); ctrls.update(); return;}
+  const from={x:cam.position.x,y:cam.position.y,z:cam.position.z}, t0=performance.now();
+  (function step(now){
+    const k=Math.min((now-t0)/500,1), e=1-(1-k)*(1-k);
+    cam.position.set(from.x+(p.x-from.x)*e, from.y+(p.y-from.y)*e, from.z+(p.z-from.z)*e);
+    ctrls.target.copy(tgt); ctrls.update();
+    if(k<1) requestAnimationFrame(step);
+  })(performance.now());
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Cross-section SVG
+   ───────────────────────────────────────────────────────────── */
+function drawSections(){ drawSection('svgSec-A','support'); drawSection('svgSec-B','midspan'); }
+function drawSection(svgId, where){
+  const isSupport=where==='support';
+  const idx = isSupport ? activeSupport : activeSpan;
+  const src = isSupport ? data.supports[idx] : data.spans[idx];
+  if(!src) return;
+  const zoneW = isSupport ? 'sup' : 'mid';
+  const B=data.beam; const W=B.W,H=B.H,cov=B.cover,sl=B.sl;
+  // ขนาดปลอกจริงของ zone นี้ → ใช้ทั้งวาดปลอกและจัดตำแหน่งเหล็กยืน เพื่อให้ผิวเหล็กยืนแตะผิวในปลอกพอดี
+  const stir = isSupport ? (src.stir||{d:9}) : (src.midStir||{d:9});
+  const sDia = (stir.d||9)/10;
+  const _sDia0 = B.sDia; B.sDia = sDia;   // override ชั่วคราว → computeSectionLayout/getInnerW ใช้ขนาดปลอกจริง
+  const svgW=220,svgH=280,pad=18;
+  const scale=Math.min((svgW-2*pad-30)/W,(svgH-2*pad)/H);
+  const bw=W*scale, bh=H*scale;
+  const ox=(svgW-bw)/2-10, oy=(svgH-bh)/2;
+  let svg='';
+  svg+=`<rect x="${ox}" y="${oy}" width="${bw}" height="${bh}" fill="#1c2030" stroke="#a8ff78" stroke-width="1.2"/>`;
+  // เหล็กปลอก: วาดเส้นจริง — มุมโอบเหล็กยืน + ขอเกี่ยว 135° คล้องเหล็กยืนบน (สูตรเดียวกับ 3D makeStirrup)
+  {
+    const dia=sDia;                              // ขนาดปลอกจริง (ตัวเดียวกับที่ใช้จัดตำแหน่งเหล็กยืน)
+    const stiW=Math.max(dia*scale,1.5);
+    let md=1.6;                                  // เส้นผ่านศูนย์กลางเหล็กยืนมุม (ใหญ่สุด) เท่ากับที่ 3D ใช้
+    for(let i=0;i<3;i++){ const mt=data.main.top[i], mb=data.main.bot[i];
+      if(mt&&mt.n>0&&mt.d>0) md=Math.max(md,mt.d/10);
+      if(mb&&mb.n>0&&mb.d>0) md=Math.max(md,mb.d/10); }
+    const rW=(dia+md)/2, fillet=Math.min(Math.max(rW,1.2),5);
+    const zL=-(W/2-cov-dia/2), zR=W/2-cov-dia/2, yB=cov+dia/2, yT=H-cov-dia/2;
+    const innerW=zR-zL, tail=Math.min(6*dia, innerW*0.42); // หางขอเกี่ยว = 6db (ยาวตามขนาดปลอก)
+    const yC=yT-rW, zC=zL+rW, D=Math.PI/180, s1=Math.SQRT1_2;
+    const P=th=>({y:yC+rW*Math.sin(th), z:zC+rW*Math.cos(th)});
+    const arc=(a,b,n)=>{const o=[];for(let i=0;i<=n;i++)o.push(P(a+(b-a)*i/n));return o;};
+    const hookA=arc(45*D,180*D,16), hookB=arc(90*D,225*D,16);
+    const tipA={y:hookA[0].y-s1*tail, z:hookA[0].z+s1*tail};
+    const tipB={y:hookB[hookB.length-1].y-s1*tail, z:hookB[hookB.length-1].z+s1*tail};
+    const pts=[tipA,...hookA,{y:yB,z:zL},{y:yB,z:zR},{y:yT,z:zR},...hookB,tipB];
+    const S=pts.map(p=>({x:ox+bw/2+p.z*scale, y:oy+bh-p.y*scale})); // → พิกัด SVG (z→x, y กลับด้าน)
+    const fpx=fillet*scale, len=v=>Math.hypot(v.x,v.y), V=(a,b)=>({x:b.x-a.x,y:b.y-a.y});
+    let d=`M ${S[0].x.toFixed(2)} ${S[0].y.toFixed(2)}`;
+    for(let i=1;i<S.length-1;i++){                // โค้งมนทุกจุดหัก (line + quadratic) แบบ roundedPath
+      const Pc=S[i], inV=V(S[i-1],Pc), outV=V(Pc,S[i+1]);
+      const il=len(inV)||1e-6, ol=len(outV)||1e-6, dd=Math.min(fpx, il*0.5, ol*0.5);
+      const A={x:Pc.x-inV.x/il*dd, y:Pc.y-inV.y/il*dd}, Bp={x:Pc.x+outV.x/ol*dd, y:Pc.y+outV.y/ol*dd};
+      d+=` L ${A.x.toFixed(2)} ${A.y.toFixed(2)} Q ${Pc.x.toFixed(2)} ${Pc.y.toFixed(2)} ${Bp.x.toFixed(2)} ${Bp.y.toFixed(2)}`;
+    }
+    const last=S[S.length-1]; d+=` L ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
+    svg+=`<path d="${d}" fill="none" stroke="#c084fc" stroke-width="${stiW}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  const layerY=(side,i,diaCm)=>{ const maxD=2.5; const off=cov+sDia+diaCm/2+i*(maxD+sl); return side==='top'? H-off : off; };
+  function drawBar(zCm,yCm,diaMm,color){
+    const cx=ox+bw/2+zCm*scale, cy=oy+bh-yCm*scale, r=Math.max((diaMm/10/2)*scale,2.5);
+    svg+=`<circle cx="${cx}" cy="${cy}" r="${r+1}" fill="${color}" opacity="0.18"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" stroke="rgba(0,0,0,.35)" stroke-width="0.5"/>`;
+  }
+  const COLS={mainTop:'#38bdf8',mainBot:'#a8ff78',col:'#ffd60a',mid:'#f472b6'};
+  const extraColor=isSupport?COLS.col:COLS.mid;
+  const topKey=isSupport?'top':'midTop', botKey=isSupport?'bot':'midBot';
+  for(let i=0;i<3;i++){
+    const loT=computeSectionLayout('top',i,idx,zoneW);
+    if(loT){
+      const main=data.main.top[i];
+      if(main.n>0&&main.d>0) loT.mainZ.forEach(z=>drawBar(z,layerY('top',i,main.d/10),main.d,COLS.mainTop));
+      const ext=src[topKey][i];
+      if(ext&&ext.n>0&&ext.d>0) loT.extraZ.forEach(z=>drawBar(z,layerY('top',i,ext.d/10),ext.d,extraColor));
+    }
+    const loB=computeSectionLayout('bot',i,idx,zoneW);
+    if(loB){
+      const main=data.main.bot[i];
+      if(main.n>0&&main.d>0) loB.mainZ.forEach(z=>drawBar(z,layerY('bot',i,main.d/10),main.d,COLS.mainBot));
+      const ext=src[botKey][i];
+      if(ext&&ext.n>0&&ext.d>0) loB.extraZ.forEach(z=>drawBar(z,layerY('bot',i,ext.d/10),ext.d,extraColor));
+    }
+  }
+  const secLbl=isSupport?'A-A':'B-B';
+  const secCol=isSupport?'#f472b6':'#fb7dd2';
+  // label หน้าตัด — วางเหนือกรอบ (นอกหน้าตัด) มุมบนซ้าย ไม่ทับเหล็ก
+  svg+=`<text x="${ox}" y="${oy-6}" text-anchor="start" font-family="Space Mono,monospace" font-size="12" font-weight="700" fill="${secCol}">${secLbl}</text>`;
+  svg+=`<text x="${svgW-12}" y="${svgH/2}" text-anchor="end" font-family="Space Mono" font-size="10" fill="#8896b8">H=${H}cm</text>`;
+  svg+=`<text x="${ox+bw/2}" y="${oy+bh+14}" text-anchor="middle" font-family="Space Mono" font-size="10" fill="#8896b8">W=${W}cm</text>`;
+  B.sDia = _sDia0;                              // คืนค่า sDia เดิม
+  const el=document.getElementById(svgId); if(el) el.innerHTML=svg;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Per-span summary table + spacing check
+   ───────────────────────────────────────────────────────────── */
+function drawSummary(){
+  const violations=[];
+  let html='<tr><th>Location</th><th>Side</th><th>L1 (n·Ø)</th><th>L2</th><th>L3</th><th>ΣAs (cm²)</th><th>Spacing</th></tr>';
+  // generic row builder
+  function addRows(label, locTag, rows){
+    rows.forEach(([side,extras,mains,extraTag])=>{
+      const checks=[0,1,2].map(i=>{
+        const m=mains[i], e=extras[i], bars=[];
+        if(m.n>0&&m.d>0) bars.push({n:m.n,d:m.d,group:'main'});
+        if(e&&e.n>0&&e.d>0) bars.push({n:e.n,d:e.d,group:extraTag});
+        return checkLayer(bars);
+      });
+      const cell=i=>{
+        const m=mains[i], e=extras[i], chk=checks[i], parts=[];
+        if(m.n>0&&m.d>0) parts.push(`<span class="bar-pill ${side.includes('▲')?'top':'bot'}">${m.n}-Ø${m.d}</span>`);
+        if(e&&e.n>0&&e.d>0) parts.push(`<span class="bar-pill ${extraTag}">${e.n}-Ø${e.d}</span>`);
+        let c=parts.length?parts.join(' '):'—';
+        if(chk.N>1 && !chk.ok) c+=` <span style="color:var(--bad);font-size:10px">⚠ ${chk.actualGap.toFixed(1)}</span>`;
+        return c;
+      };
+      const sumAs=[0,1,2].reduce((s,i)=>s+barA(mains[i].n,mains[i].d)+barA((extras[i]||{}).n||0,(extras[i]||{}).d||0),0);
+      const worst=checks.reduce((w,c)=>{ if(c.N<2)return w; if(!w||c.actualGap<w.actualGap) return c; return w;}, null);
+      let stat='—', color='var(--muted)';
+      if(worst){ if(worst.ok){stat='✓ '+worst.actualGap.toFixed(2)+' cm'; color='var(--ok)';} else {stat='⚠ '+worst.actualGap.toFixed(2)+' cm'; color='var(--bad)';} }
+      checks.forEach((c,i)=>{ if(c.N>=2 && !c.ok) violations.push({span:locTag,zone:label,side,layer:i+1,gap:c.actualGap,N:c.N,Wclear:c.Wclear,sumDia:c.sumDiaCm,items:c.items}); });
+      html+=`<tr><td class="warn">${locTag}</td><td class="l">${side}</td><td>${cell(0)}</td><td>${cell(1)}</td><td>${cell(2)}</td><td style="font-weight:700;color:var(--r)">${sumAs.toFixed(2)}</td><td style="color:${color};font-weight:700">${stat}</td></tr>`;
+    });
+  }
+  // Column strip — per support
+  data.supports.forEach((su,j)=>{
+    html+=`<tr class="section"><td colspan="7">SUPPORT ${j+1} · ${data.endTypes[j]} · Column Strip (M⁻)</td></tr>`;
+    addRows('Support','Sup '+(j+1), [
+      ['▲ Top (M⁻)', su.top, data.main.top, 'col'],
+      ['▼ Bot (Comp.)', su.bot, data.main.bot, 'col']
+    ]);
+  });
+  // Middle strip — per span
+  data.spans.forEach((sp,idx)=>{
+    const Lm=(data.beam.L[idx]/100).toFixed(1);
+    html+=`<tr class="section"><td colspan="7">SPAN ${idx+1} · L=${Lm}m · Middle Strip (M⁺)</td></tr>`;
+    addRows('Midspan','Span '+(idx+1), [
+      ['▲ Top (Comp.)', sp.midTop, data.main.top, 'mid'],
+      ['▼ Bot (M⁺)', sp.midBot, data.main.bot, 'mid']
+    ]);
+  });
+  const tbl=document.getElementById('sum-table'); if(tbl) tbl.innerHTML=html;
+  drawSpacingPanel(violations);
+}
+// ตรวจโอกาสเหล็ก Midspan ทับเหล็ก Support: ช่วง x ซ้อนกัน + ตำแหน่ง z (และ layer) ตรงกัน
+function zSetsOverlap(zA, zB, dA, dB){
+  const tol=(dA+dB)/20;  // ผลรวมรัศมี (ซม.) — ระยะที่ผิวเหล็กเริ่มแตะ/ทับกัน
+  for(const za of zA) for(const zb of zB) if(Math.abs(za-zb)<tol) return true;
+  return false;
+}
+function detectMidSupportOverlap(){
+  const issues=[], B=data.beam;
+  data.spans.forEach((sp,idx)=>{
+    const L=B.L[idx];
+    const tLeft=(data.endTypes[idx]||'INT')==='EXT'?L/4:L/3;
+    const tRight=(data.endTypes[idx+1]||'INT')==='EXT'?L/4:L/3;
+    const ovL=(L/8)<tLeft, ovR=(L-L/8)>(L-tRight);   // ช่วง x ของ mid extra ([L/8,L-L/8]) ซ้อนโซน support?
+    [['top','▲ บน'],['bot','▼ ล่าง']].forEach(([side,sLbl])=>{
+      for(let i=0;i<3;i++){
+        const mid = side==='top'?sp.midTop[i]:sp.midBot[i];
+        if(!(mid&&mid.n>0&&mid.d>0)) continue;
+        const zMid=computeSectionLayout(side,i,idx,'mid'); if(!zMid) continue;
+        [['colL',idx,ovL,'ซ้าย'],['colR',idx+1,ovR,'ขวา']].forEach(([w,sj,act,wlbl])=>{
+          if(!act) return;
+          const su=data.supports[sj]; const ce=su&&(side==='top'?su.top[i]:su.bot[i]);
+          if(!(ce&&ce.n>0&&ce.d>0)) return;
+          const zCol=computeSectionLayout(side,i,idx,w);
+          if(zCol && zSetsOverlap(zMid.extraZ, zCol.extraZ, mid.d, ce.d))
+            issues.push({span:idx+1, sup:sj+1, side:sLbl, layer:i+1, where:wlbl, mid:mid.n+'-Ø'+mid.d, col:ce.n+'-Ø'+ce.d});
+        });
+      }
+    });
+  });
+  return issues;
+}
+function drawSpacingPanel(viols){
+  const pill=document.getElementById('spc-pill'); const cont=document.getElementById('spc-content');
+  if(!pill||!cont) return;
+  const ovl=detectMidSupportOverlap();
+  let h='';
+  if(viols.length===0){
+    h+='<div style="font-family:Space Mono,monospace;font-size:12px;color:var(--ok);padding:6px 0">✓ ระยะห่าง clear ทุกเลเยอร์ ≥ '+S_MIN.toFixed(1)+' cm (Wclear='+(data.beam.W-2*data.beam.cover-2*data.beam.sDia).toFixed(1)+' cm)</div>';
+  } else {
+    h+='<table class="sum"><tr><th>Location</th><th>Section</th><th>Layer</th><th>Bars</th><th>Gap (cm)</th></tr>';
+    viols.forEach(v=>{
+      h+=`<tr><td>${v.span}</td><td class="l">${v.zone} · ${v.side}</td><td>L${v.layer}</td><td class="l" style="font-size:11px">${v.items.join(', ')}</td><td style="color:var(--bad);font-weight:700">${v.gap.toFixed(2)}</td></tr>`; });
+    h+='</table>';
+  }
+  if(ovl.length>0){
+    h+='<div style="font-family:Space Mono,monospace;font-size:12px;color:#fb923c;padding:10px 0 4px;font-weight:700">⚠ เหล็ก Midspan อาจทับเหล็ก Support (ช่วง x ซ้อน + ตำแหน่ง z ตรงกัน)</div>';
+    h+='<table class="sum"><tr><th>Span</th><th>ด้าน</th><th>ฝั่ง</th><th>Layer</th><th>Mid</th><th>Support</th></tr>';
+    ovl.forEach(o=>{ h+=`<tr><td>Span ${o.span}</td><td class="l">${o.side}</td><td>${o.where} (Sup ${o.sup})</td><td>L${o.layer}</td><td class="l">${o.mid}</td><td class="l">${o.col}</td></tr>`; });
+    h+='</table>';
+  }
+  const n=viols.length+ovl.length;
+  if(n===0){ pill.style.background='rgba(74,222,128,.13)'; pill.style.color='var(--ok)'; pill.style.borderColor='rgba(74,222,128,.4)'; pill.textContent='✓ ผ่านทุก Layer'; }
+  else { pill.style.background='rgba(255,77,109,.13)'; pill.style.color='var(--bad)'; pill.style.borderColor='rgba(255,77,109,.4)';
+    pill.textContent='⚠ '+[viols.length?viols.length+' ระยะห่าง':'', ovl.length?ovl.length+' ทับกัน':''].filter(Boolean).join(' · '); }
+  cont.innerHTML=h;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Moment Capacity Envelope vs Demand (Real Mu from analysis)
+   ───────────────────────────────────────────────────────────── */
+const mnToggle={mainTop:false,mainBot:false,colExt:false,midExt:false,total:true,demand:true};
+function getLdCm(dia_mm){ return 50 * (dia_mm/10); }
+function getAllBars(){
+  const bars=[]; const B=data.beam;
+  const Ltot=B.L.reduce((a,b)=>a+b,0);
+  const maxD=2.5;
+  const yTop=i=>B.cover+B.sDia+maxD/2+i*(maxD+B.sl);
+  const yBot=i=>B.H-B.cover-B.sDia-maxD/2-i*(maxD+B.sl);
+  data.main.top.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({x0:0,x1:Ltot,y:yTop(i),d:m.d,n:m.n,side:'top',grp:'mainTop',aS:true,aE:true}); });
+  data.main.bot.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({x0:-15,x1:Ltot+15,y:yBot(i),d:m.d,n:m.n,side:'bot',grp:'mainBot',aS:true,aE:true}); });
+  // Column strip — per support: เหล็กต่อเนื่องคร่อม support ยื่นเข้า 2 span (anchored ที่ support, Ld ramp ที่ปลายตัด)
+  data.supports.forEach((su,j)=>{
+    const sx=supportX(j), rL=reachL(j), rR=reachR(j);
+    su.top.forEach((c,i)=>{ if(c.n>0&&c.d>0){
+      if(rL>0) bars.push({x0:sx-rL,x1:sx,    y:yTop(i),d:c.d,n:c.n,side:'top',grp:'colExt',aS:false,aE:true});
+      if(rR>0) bars.push({x0:sx,   x1:sx+rR, y:yTop(i),d:c.d,n:c.n,side:'top',grp:'colExt',aS:true, aE:false});
+    }});
+    su.bot.forEach((c,i)=>{ if(c.n>0&&c.d>0){
+      if(rL>0) bars.push({x0:sx-rL,x1:sx,    y:yBot(i),d:c.d,n:c.n,side:'bot',grp:'colExt',aS:false,aE:true});
+      if(rR>0) bars.push({x0:sx,   x1:sx+rR, y:yBot(i),d:c.d,n:c.n,side:'bot',grp:'colExt',aS:true, aE:false});
+    }});
+  });
+  // Middle strip — per span
+  let xL=0;
+  data.spans.forEach((sp,sIdx)=>{
+    const L=B.L[sIdx];
+    sp.midTop.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({x0:xL+L/8,x1:xL+L-L/8,y:yTop(i),d:m.d,n:m.n,side:'top',grp:'midExt',aS:false,aE:false}); });
+    sp.midBot.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({x0:xL+L/8,x1:xL+L-L/8,y:yBot(i),d:m.d,n:m.n,side:'bot',grp:'midExt',aS:false,aE:false}); });
+    xL += L;
+  });
+  return bars;
+}
+function barMnContrib(bar){
+  const As=bar.n*Math.PI*(bar.d/10)*(bar.d/10)/4;
+  const H=data.beam.H;
+  const d_eff = bar.side==='top' ? (H-bar.y) : bar.y;
+  const a_half = 0.05*H;
+  return As * MAT.Fy * Math.max(0, d_eff - a_half) / 100;
+}
+function devFactor(bar,x){
+  if(x<bar.x0||x>bar.x1) return 0;
+  const Ld=getLdCm(bar.d);
+  const fromStart = bar.aS ? Infinity : (x-bar.x0)/Ld;
+  const fromEnd   = bar.aE ? Infinity : (bar.x1-x)/Ld;
+  return Math.max(0, Math.min(1, Math.min(fromStart,fromEnd)));
+}
+// φ จากความเครียดเหล็กรับแรงดึงสุทธิ εt (ACI 318-22 §21.2.2, Table 21.2.2 — tied)
+function phiFromStrain(et){
+  const ety = MAT.Fy / MAT.Es;                 // ความเครียดคราก
+  if(et <= ety)        return 0.65;            // compression-controlled
+  if(et >= ety+0.003)  return 0.90;            // tension-controlled
+  return 0.65 + 0.25*(et-ety)/0.003;           // ช่วงเปลี่ยนผ่าน (interpolate)
+}
+// φMn ของหน้าตัด (เหล็กฝั่งเดียว, รองรับหลายชั้น) — a จากสมดุลแรงจริง · φ จาก εt
+// tensBars: [{As, d}] · As = เหล็กที่พัฒนากำลังแล้ว (cm²) · d = ความลึกประสิทธิผลจากผิวรับแรงอัด (cm)
+function sectionPhiMn(tensBars){
+  let sumAs=0, sumAsd=0, dt=0;
+  tensBars.forEach(b=>{ sumAs+=b.As; sumAsd+=b.As*b.d; if(b.d>dt) dt=b.d; });
+  if(sumAs<=0) return {phiMn:0, et:Infinity};
+  const b=data.beam.W, fc=MAT.fc, fy=MAT.Fy, b1=MAT.beta1;
+  const a   = (sumAs*fy)/(0.85*fc*b);          // ACI 22.2.2.4.1: a = As·fy/(0.85 f'c b)
+  const dbar= sumAsd/sumAs;                     // ความลึกประสิทธิผลเฉลี่ย (centroid เหล็กดึง)
+  const c   = a/b1;                             // ระยะแกนสะเทิน c = a/β1
+  const et  = c>1e-6 ? 0.003*(dt-c)/c : 0.005;  // εt ที่เหล็กชั้นนอกสุด (εcu=0.003)
+  const Mn  = sumAs*fy*Math.max(0, dbar - a/2)/100;  // Mn = As·fy·(d−a/2)  [kg·m]
+  return {phiMn: phiFromStrain(et)*Mn, et};
+}
+function computeMnEnvelope(bars, nPts=400){
+  const Ltot=data.beam.L.reduce((a,b)=>a+b,0), H=data.beam.H;
+  const xs=[], phiMnPos=[], phiMnNeg=[]; let minEt=Infinity;
+  for(let i=0;i<=nPts;i++){
+    const x=Ltot*i/nPts; xs.push(x);
+    const botT=[], topT=[];   // เหล็กรับแรงดึงที่พัฒนากำลังแล้ว แยกฝั่งล่าง/บน
+    bars.forEach(bar=>{
+      const k=devFactor(bar,x); if(k<=0) return;
+      const As=bar.n*Math.PI*(bar.d/10)*(bar.d/10)/4 * k;
+      const d_eff = bar.side==='top' ? (H-bar.y) : bar.y;
+      (bar.side==='top'?topT:botT).push({As, d:d_eff});
+    });
+    const rp=sectionPhiMn(botT), rn=sectionPhiMn(topT);   // +M: เหล็กล่างดึง · −M: เหล็กบนดึง
+    phiMnPos.push(rp.phiMn); phiMnNeg.push(rn.phiMn);
+    if(isFinite(rp.et)) minEt=Math.min(minEt,rp.et);
+    if(isFinite(rn.et)) minEt=Math.min(minEt,rn.et);
+  }
+  return {xs, phiMnPos, phiMnNeg, minEt};
+}
+/* Real Mu(x) from ANALYSIS — convert m to cm */
+function getRealDemand(){
+  const A=window.ANALYSIS;
+  if(!A || !A.res) return {xs:[], Mu:[]};
+  // map ANALYSIS.res.xs (m) → cm · Mu คือโมเมนต์ใช้งาน (factored) เทียบกับ φMn โดยตรง
+  const Ltot_cm = data.beam.L.reduce((a,b)=>a+b,0);
+  const scale = Ltot_cm / A.L;  // cm per m
+  return { xs: A.res.xs.map(x=>x*scale), Mu: A.res.Marr.slice() };
+}
+function interpAt(xs,ys,x){
+  if(x<=xs[0]) return ys[0];
+  if(x>=xs[xs.length-1]) return ys[ys.length-1];
+  for(let i=0;i<xs.length-1;i++) if(x>=xs[i] && x<=xs[i+1]){
+    const t=(x-xs[i])/(xs[i+1]-xs[i]);
+    return ys[i] + t*(ys[i+1]-ys[i]);
+  }
+  return 0;
+}
+/* ════════════════ Section Explorer (fiber section analysis) ════════════════ */
+function secxEc(){ return 15100*Math.sqrt(MAT.fc); }
+function secxConc(eps){
+  if(eps<=0) return 0;
+  const fc=MAT.fc, e0=2*fc/secxEc(), ecu=0.003;
+  if(eps<=e0) return fc*(2*eps/e0-(eps/e0)*(eps/e0));
+  if(eps<=ecu) return fc*(1-0.15*(eps-e0)/(ecu-e0));
+  return 0.85*fc;
+}
+function secxForces(steel,b,h,ec,c){
+  const fy=MAT.Fy, Es=MAT.Es; let Cc=0,Mc=0; const top=Math.min(c,h), n=40, ds=top/n;
+  for(let k=0;k<n;k++){ const dc=(k+0.5)*ds, f=secxConc(ec*(c-dc)/c); Cc+=f*b*ds; Mc+=f*b*ds*(h/2-dc); }
+  let Ns=0,Ms=0;
+  steel.forEach(s=>{ let fs=Es*ec*(c-s.dc)/c; if(fs>fy)fs=fy; if(fs<-fy)fs=-fy; Ns+=s.As*fs; Ms+=s.As*fs*(h/2-s.dc); });
+  return {N:Cc+Ns, M:Mc+Ms};
+}
+function secxSolveC(steel,b,h,ec){
+  let lo=0.05, hi=3*h, flo=secxForces(steel,b,h,ec,lo).N;
+  if(flo*secxForces(steel,b,h,ec,hi).N>0) return null;
+  for(let it=0;it<70;it++){ const m=(lo+hi)/2, fm=secxForces(steel,b,h,ec,m).N; if(flo*fm<=0) hi=m; else {lo=m;flo=fm;} }
+  return (lo+hi)/2;
+}
+function secxMphi(steel,b,h){
+  const ey=MAT.Fy/MAT.Es, ecu=0.003, NS=80, dt=Math.max(...steel.map(s=>s.dc));
+  const pts=[]; let yieldPt=null;
+  for(let i=1;i<=NS;i++){
+    const ec=ecu*i/NS, c=secxSolveC(steel,b,h,ec); if(c==null||c<=0) continue;
+    const M=Math.abs(secxForces(steel,b,h,ec,c).M);
+    pts.push({phi:ec/c, M, ec, c});
+    if(!yieldPt && (-(ec*(c-dt)/c))>=ey) yieldPt={phi:ec/c, M};
+  }
+  return {pts, yieldPt, ult: pts.length?pts[pts.length-1]:null};
+}
+function secxStir(x){   // หา stirrup (Ø, spacing) ที่ตำแหน่ง x ตามโซน L/3
+  const B=data.beam; let xL=0;
+  for(let i=0;i<B.L.length;i++){ const L=B.L[i];
+    if(x<=xL+L+1e-6){ const loc=x-xL, t=L/3;
+      if(loc<t) return (data.supports[i]&&data.supports[i].stir)||{d:9,sp:10};
+      if(loc<2*t) return (data.spans[i]&&data.spans[i].midStir)||{d:9,sp:15};
+      return (data.supports[i+1]&&data.supports[i+1].stir)||{d:9,sp:10};
+    } xL+=L; }
+  return {d:9,sp:10};
+}
+function secxShearCap(b,d,stir){   // ACI 318-22: φVn=0.75(Vc+Vs)
+  if(!d||d<=0) return null;
+  const Vc=0.53*Math.sqrt(MAT.fc)*b*d, dS=(stir.d||9)/10, Av=2*Math.PI*dS*dS/4, s=stir.sp||10, Vs=Av*MAT.Fys*d/s;
+  return {d, Vc, Vs, phiVn:0.75*(Vc+Vs), dS, s, Av};
+}
+function secxWhitney(tensBars,b){   // กำลังออกแบบ ACI Whitney (เหล็กดึงอย่างเดียว) — ตรงกับ Mn envelope + RC tools
+  let As=0,Asd=0,dt=0; tensBars.forEach(t=>{As+=t.As; Asd+=t.As*t.d; if(t.d>dt)dt=t.d;});
+  if(As<=0) return null;
+  const fc=MAT.fc, fy=MAT.Fy, b1=MAT.beta1, a=As*fy/(0.85*fc*b), d=Asd/As, c=a/b1;
+  const et=c>0?0.003*(dt-c)/c:0, phi=phiFromStrain(et), Mn=As*fy*Math.max(0,d-a/2)/100;
+  return {As,d,dt,a,c,et,phi,Mn,phiMn:phi*Mn};
+}
+function secxDirFull(tensBars, sl, b, h){   // tensBars=เหล็กดึง (Whitney) · sl=เหล็กทั้งหมด (fiber M–φ)
+  const w=secxWhitney(tensBars,b); if(!w) return null;
+  const r={...w, Asten:w.As, sl};
+  if(sl.some(s=>s.As>0)){
+    const fib=secxMphi(sl,b,h); r.mphi=fib;
+    r.My=fib.yieldPt?fib.yieldPt.M/100:null; r.phiY=fib.yieldPt?fib.yieldPt.phi:null; r.phiU=fib.ult?fib.ult.phi:null;
+    if(fib.ult){ const c=fib.ult.c, ey=MAT.Fy/MAT.Es;
+      const sy=sd=>{ const ss=sl.filter(s=>s.side===sd&&s.As>0); return ss.length? ss.some(s=>Math.abs(0.003*(c-s.dc)/c)>=ey):null; };
+      r.topYield=sy('top'); r.botYield=sy('bot'); }
+  }
+  return r;
+}
+function secxAnalyze(x){
+  const b=data.beam.W, h=data.beam.H, top=[], bot=[];
+  getAllBars().forEach(bb=>{ const k=devFactor(bb,x); if(k<=0) return;
+    const As=bb.n*Math.PI*(bb.d/10)*(bb.d/10)/4*k; (bb.side==='top'?top:bot).push({As,yt:bb.y,d:bb.d,n:bb.n}); });
+  const dem=getRealDemand(), Mu=dem.xs.length?interpAt(dem.xs,dem.Mu,x):0;
+  const vdem=getRealShearDemand(), Vu=vdem.xs.length?interpAt(vdem.xs,vdem.Vu,x):0;
+  const slPos=[...top.map(s=>({As:s.As,dc:s.yt,side:'top'})),  ...bot.map(s=>({As:s.As,dc:s.yt,side:'bot'}))];    // +M: อัดบน · ดึงล่าง
+  const slNeg=[...top.map(s=>({As:s.As,dc:h-s.yt,side:'top'})),...bot.map(s=>({As:s.As,dc:h-s.yt,side:'bot'}))];  // −M: อัดล่าง · ดึงบน
+  const r={x,b,h,Mu,Vu,top,bot};
+  r.Mcr=2.0*Math.sqrt(MAT.fc)*(b*h*h/6)/100;
+  r.pos=secxDirFull(bot.map(s=>({As:s.As,d:s.yt})),     slPos, b, h);   // +M: เหล็กดึง=ล่าง (d=ลึกจากบน)
+  r.neg=secxDirFull(top.map(s=>({As:s.As,d:h-s.yt})),   slNeg, b, h);   // −M: เหล็กดึง=บน (d=h−ลึกจากบน)
+  const cen=arr=>{ let sA=0,sAy=0; arr.forEach(o=>{sA+=o.As;sAy+=o.As*o.yt;}); return sA>0?sAy/sA:null; };
+  const cb=cen(bot), ct=cen(top); r.stir=secxStir(x);
+  r.vPos = cb!=null? secxShearCap(b, cb,     r.stir):null;   // +shear: d=centroid เหล็กล่าง (จากบน)
+  r.vNeg = ct!=null? secxShearCap(b, h-ct,   r.stir):null;   // −shear: d=h−centroid เหล็กบน
+  return r;
+}
+function drawSectionExplorer(x){
+  const r=secxAnalyze(x);
+  if(sliderCut) sliderCut.position.x=x;   // เลื่อนสัญลักษณ์ภาพตัดใน 3D ตาม slider
+  const pos=document.getElementById('secx-pos'); if(pos) pos.textContent='x = '+(x/100).toFixed(2)+' m';
+  const sub=document.getElementById('secx-cs-sub'); if(sub) sub.textContent='Mu='+Math.round(r.Mu).toLocaleString()+' kg·m · Vu='+Math.round(Math.abs(r.Vu)).toLocaleString()+' kg';
+  drawSecxCS(r); drawSecxSB(r); drawSecxMphiChart(r); drawSecxReport(r);
+}
+function redrawSectionExplorer(){ const s=document.getElementById('secx-slider'); if(!s) return;
+  const Ltot=data.beam.L.reduce((a,b)=>a+b,0); if(+s.max!==Ltot){ s.max=Ltot; if(+s.value>Ltot) s.value=Ltot/2; }
+  drawSectionExplorer(+s.value); }
+function drawSecxCS(r){
+  const el=document.getElementById('secx-cs'); if(!el) return;
+  const B=data.beam, W=B.W,H=B.H,cov=B.cover,sDia=B.sDia;
+  const svgW=220,svgH=280,pad=18, scale=Math.min((svgW-2*pad-30)/W,(svgH-2*pad)/H);
+  const bw=W*scale, bh=H*scale, ox=(svgW-bw)/2-10, oy=(svgH-bh)/2;
+  let s=`<rect x="${ox}" y="${oy}" width="${bw}" height="${bh}" fill="#1c2030" stroke="#a8ff78" stroke-width="1.2"/>`;
+  const inset=(cov+sDia/2)*scale;
+  s+=`<rect x="${ox+inset}" y="${oy+inset}" width="${bw-2*inset}" height="${bh-2*inset}" fill="none" stroke="#c084fc" stroke-width="1.2" rx="2"/>`;
+  // เส้นแกนสะเทินทั้งสองทิศ: +M (อัดบน, c วัดจากบน) · −M (อัดล่าง, c วัดจากล่าง)
+  const naLine=(yNA,col,lbl,below)=>{ s+=`<line x1="${ox-4}" y1="${yNA.toFixed(1)}" x2="${ox+bw+4}" y2="${yNA.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4 3"/><text x="${ox+bw+3}" y="${(yNA+(below?9:-2)).toFixed(1)}" text-anchor="end" font-size="8" fill="${col}">${lbl}</text>`; };
+  if(r.pos&&r.pos.c) naLine(oy+r.pos.c*scale,'#ff6b35','NA(+M)',false);
+  if(r.neg&&r.neg.c) naLine(oy+(H-r.neg.c)*scale,'#00e5ff','NA(−M)',true);
+  // รวมเหล็กทุกกลุ่ม (main+extra) ที่อยู่ชั้นเดียวกัน (yt เท่ากัน) มาเรียงด้วยกัน → แสดงครบ ไม่ทับ
+  const drawSide=(arr,side)=>{
+    const col=side==='top'?'#38bdf8':'#a8ff78', byY={};
+    arr.forEach(g=>{ if(g.n>0){ const key=g.yt.toFixed(2); (byY[key]=byY[key]||[]).push(...Array(g.n).fill(g.d)); } });
+    Object.keys(byY).forEach(key=>{
+      const dias=byY[key], yt=+key, cyp=oy+yt*scale, n=dias.length, maxr=Math.max(...dias.map(d=>(d/10/2)*scale),2.5);
+      const x0=ox+inset+maxr, x1=ox+bw-inset-maxr;
+      dias.forEach((d,k)=>{ const rad=Math.max((d/10/2)*scale,2.5), cx=n===1?ox+bw/2:(x0+(x1-x0)*k/(n-1));
+        s+=`<circle cx="${cx.toFixed(1)}" cy="${cyp.toFixed(1)}" r="${rad.toFixed(1)}" fill="${col}" stroke="rgba(0,0,0,.4)" stroke-width="0.5"/>`; });
+    });
+  };
+  drawSide(r.top,'top'); drawSide(r.bot,'bot');
+  el.innerHTML=s;
+}
+function drawSecxSB(r){
+  const el=document.getElementById('secx-sb'); if(!el) return;
+  const H=data.beam.H, top=48, bot=270, sc=(bot-top)/H, yD=d=>top+d*sc;
+  // วาดครึ่งหนึ่งของ panel สำหรับทิศหนึ่ง (dir.sl: dc วัดจากผิวอัด)
+  const half=(dir,X,title,face,accent)=>{
+    const stripX=X+20, stripW=30, cx=stripX+stripW/2, zx=X+126;
+    let s=`<text x="${X+115}" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="${accent}">${title}</text>`;
+    s+=`<text x="${X+115}" y="33" text-anchor="middle" font-size="8" fill="#8896b8">ผิวอัด: ${face}</text>`;
+    s+=`<rect x="${stripX}" y="${top}" width="${stripW}" height="${(bot-top).toFixed(1)}" fill="#1c2030" stroke="#8896b8" stroke-width="1"/>`;
+    if(!dir||!dir.c){ s+=`<text x="${X+115}" y="160" text-anchor="middle" font-size="10" fill="#8896b8">— ไม่มีเหล็กรับแรงดึง —</text>`; return s; }
+    const c=dir.c, a=dir.a, et=dir.et, yNA=yD(c), yA=yD(a);
+    // Whitney stress block (โซนอัด ลึก a จากผิวอัด=บนของแถบ)
+    s+=`<rect x="${stripX}" y="${top}" width="${stripW}" height="${(yA-top).toFixed(1)}" fill="rgba(56,189,248,.28)" stroke="#38bdf8" stroke-width="1"/>`;
+    s+=`<text x="${cx}" y="${(top+(yA-top)/2+3).toFixed(1)}" text-anchor="middle" font-size="7.5" fill="#bfe9ff">0.85f'c</text>`;
+    s+=`<text x="${stripX+stripW+2}" y="${(yA+3).toFixed(1)}" font-size="8" fill="#38bdf8">a=${a.toFixed(1)}</text>`;
+    // เหล็ก
+    dir.sl.forEach(st=>{ if(st.As<=0) return; const yy=yD(st.dc), tens=st.dc>c; s+=`<circle cx="${cx}" cy="${yy.toFixed(1)}" r="2.6" fill="${tens?'#ff4d6d':'#38bdf8'}" stroke="rgba(0,0,0,.4)" stroke-width="0.4"/>`; });
+    // แกนสะเทิน NA
+    s+=`<line x1="${stripX-5}" y1="${yNA.toFixed(1)}" x2="${zx+6}" y2="${yNA.toFixed(1)}" stroke="#ff6b35" stroke-width="0.9" stroke-dasharray="3 2"/><text x="${stripX-6}" y="${(yNA-2).toFixed(1)}" text-anchor="end" font-size="8" fill="#ff6b35">c=${c.toFixed(1)}</text>`;
+    // strain diagram
+    const sMax=Math.max(0.003,Math.abs(et))*1.18, sw=40/sMax, strainX=d=>zx+(0.003*(c-d)/c)*sw;
+    s+=`<line x1="${zx}" y1="${top-6}" x2="${zx}" y2="${bot+6}" stroke="#555" stroke-width="0.7"/>`;
+    s+=`<polyline points="${strainX(0).toFixed(1)},${top} ${zx},${yNA.toFixed(1)} ${strainX(H).toFixed(1)},${bot}" fill="none" stroke="#00e5ff" stroke-width="1.6"/>`;
+    s+=`<text x="${strainX(0).toFixed(1)}" y="${top-1}" text-anchor="middle" font-size="7.5" fill="#00e5ff">εcu=.003</text>`;
+    s+=`<text x="${strainX(H).toFixed(1)}" y="${(bot+11).toFixed(1)}" text-anchor="middle" font-size="7.5" fill="#ff4d6d">εt=${et.toFixed(4)}</text>`;
+    s+=`<text x="${X+115}" y="293" text-anchor="middle" font-size="8" fill="#9aa6c0">φ=${dir.phi.toFixed(3)} · φMn=${Math.round(dir.phiMn).toLocaleString()} kg·m</text>`;
+    return s;
+  };
+  let s=half(r.pos,0,'+M','บน','#a8ff78');
+  s+=`<line x1="230" y1="6" x2="230" y2="296" stroke="rgba(255,255,255,.12)" stroke-width="1"/>`;
+  s+=half(r.neg,230,'−M','ล่าง','#38bdf8');
+  el.innerHTML=s;
+}
+function drawSecxMphiChart(r){
+  const cv=document.getElementById('secx-mphi'); if(!cv) return;
+  const dpr=Math.min(window.devicePixelRatio||1,2), cw=cv.clientWidth||900, ch=260;
+  cv.width=cw*dpr; cv.height=ch*dpr; cv.style.height=ch+'px'; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.fillStyle='#0f1117'; ctx.fillRect(0,0,cw,ch);
+  const pos=r.pos&&r.pos.mphi&&r.pos.mphi.pts||[], neg=r.neg&&r.neg.mphi&&r.neg.mphi.pts||[];
+  const ml=72,mr=20,mt=14,mb=28, pw=cw-ml-mr, ph=ch-mt-mb, midY=mt+ph/2;
+  if(pos.length<2 && neg.length<2){ ctx.fillStyle='#8896b8'; ctx.font='12px "Space Mono",monospace'; ctx.textAlign='center'; ctx.fillText('ไม่มีเหล็กพอจะคำนวณ M–φ', cw/2, ch/2); return; }
+  const phiMax=Math.max(...[...pos,...neg].map(p=>p.phi),1e-6)*1.08;
+  const Mmax=Math.max(...[...pos.map(p=>p.M),...neg.map(p=>p.M), Math.abs(r.Mu)*100],1)/100*1.12;
+  const tX=p=>ml+p/phiMax*pw, tY=m=>midY-(m/Mmax)*(ph/2);
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=.5; ctx.font='9px "Space Mono",monospace'; ctx.fillStyle='rgba(255,255,255,.4)'; ctx.textAlign='right';
+  for(let i=-3;i<=3;i++){ const m=Mmax*i/3, py=tY(m); ctx.beginPath();ctx.moveTo(ml,py);ctx.lineTo(ml+pw,py);ctx.stroke(); ctx.fillText(Math.round(m).toLocaleString(),ml-6,py+3); }
+  ctx.strokeStyle='rgba(255,255,255,.28)'; ctx.lineWidth=1; ctx.beginPath();ctx.moveTo(ml,midY);ctx.lineTo(ml+pw,midY);ctx.stroke();
+  ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,.4)'; ctx.fillText('φ (1/cm)', ml+pw/2, ch-2);
+  ctx.textAlign='left'; ctx.fillStyle='#a8ff78'; ctx.fillText('+M ↑', ml+4, mt+9); ctx.fillStyle='#38bdf8'; ctx.fillText('−M ↓', ml+4, mt+ph-3);
+  if(Math.abs(r.Mu)>0){ const py=tY(r.Mu); ctx.strokeStyle='#ff4d6d'; ctx.setLineDash([6,3]); ctx.lineWidth=1.4; ctx.beginPath();ctx.moveTo(ml,py);ctx.lineTo(ml+pw,py);ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='#ff4d6d'; ctx.textAlign='right'; ctx.fillText('Mu='+Math.round(r.Mu).toLocaleString(), ml+pw-2, py-3); }
+  const curve=(pp,sg,col)=>{ if(pp.length<2) return; ctx.strokeStyle=col; ctx.lineWidth=2.2; ctx.beginPath(); pp.forEach((p,i)=>{ const px=tX(p.phi),py=tY(sg*p.M/100); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); }); ctx.stroke(); };
+  const mark=(mphi,sg,col,dMn)=>{ if(!mphi) return; ctx.font='8.5px "Space Mono",monospace';
+    if(mphi.yieldPt){const p=mphi.yieldPt, px=tX(p.phi), py=tY(sg*p.M/100);
+      ctx.fillStyle='#ffd60a'; ctx.beginPath();ctx.arc(px,py,4,0,7);ctx.fill();
+      ctx.textAlign='left'; ctx.fillText('● Yield · My='+Math.round(p.M/100).toLocaleString()+' · φy='+p.phi.toExponential(2), px+6, py+(sg>0?-7:14)); }
+    if(mphi.ult){const p=mphi.ult, px=tX(p.phi), py=tY(sg*p.M/100);
+      ctx.fillStyle=col; ctx.beginPath();ctx.arc(px,py,4,0,7);ctx.fill();
+      ctx.textAlign='right'; ctx.fillText('Ultimate · Mn='+Math.round(dMn||p.M/100).toLocaleString()+' · φu='+p.phi.toExponential(2)+' ●', px-2, py+(sg>0?14:-7)); } };
+  curve(pos,1,'#a8ff78'); curve(neg,-1,'#38bdf8');
+  mark(r.pos&&r.pos.mphi,1,'#a8ff78', r.pos&&r.pos.Mn); mark(r.neg&&r.neg.mphi,-1,'#38bdf8', r.neg&&r.neg.Mn);
+}
+// พฤติกรรมการวิบัติของหน้าตัด (ตาม εt เทียบ εty) — Steel Yielding / Balanced / Concrete Crushing
+function failMode(g){
+  if(!g||!g.c) return null;
+  const ey=MAT.Fy/MAT.Es, et=g.et, tcl=ey+0.003, tol=0.08*ey;
+  if(Math.abs(et-ey)<=tol) return {t:'Balanced Failure', sh:'Balanced', d:'εt ≈ εty — เหล็กรับแรงดึงครากพร้อมคอนกรีตแตกที่ εcu=0.003 (จุดสมดุล ρ≈ρb)', col:'#fb923c'};
+  if(et>ey)  return {t:'Steel Yielding', sh:'Steel Yielding', d:(et>=tcl?'เหล็กรับแรงดึงครากก่อน คอนกรีตยังไม่แตก → Tension-controlled · วิบัติแบบเหนียว (ductile) มีการเตือนล่วงหน้า':'เหล็กรับแรงดึงครากแล้ว แต่อยู่ช่วง Transition (εty<εt<εty+0.003) → φ ลดจาก 0.9'), col:'#4ade80'};
+  return {t:'Concrete Crushing', sh:'Concrete Crushing', d:'คอนกรีตแตกที่ εcu=0.003 ก่อนเหล็กรับแรงดึงคราก → Compression-controlled · วิบัติแบบเปราะ (brittle) ไม่เตือนล่วงหน้า', col:'#ff4d6d'};
+}
+function drawSecxStatus(r){
+  const el=document.getElementById('secx-status'); if(!el) return;
+  const badge=(lbl,val,col)=>`<span style="display:inline-block;background:rgba(255,255,255,.05);border:1px solid ${col}55;color:${col};border-radius:6px;padding:3px 9px;margin:2px 4px 2px 0;font-family:Space Mono,monospace;font-size:11px">${lbl}: <b>${val}</b></span>`;
+  const gov=r.Mu>=0?r.pos:r.neg, govV=r.Mu>=0?r.vPos:r.vNeg, ey=MAT.Fy/MAT.Es; let h='';
+  if(gov&&gov.c){
+    const ctrl = gov.et>=ey+0.003?['Tension-ctrl','#4ade80']:(gov.et<=ey?['Compression-ctrl','#ff4d6d']:['Transition','#fb923c']);
+    const dcrM=gov.phiMn>0?Math.abs(r.Mu)/gov.phiMn:0, fm=failMode(gov);
+    h+=badge('ทิศ governing',(r.Mu>=0?'+M':'−M'),'#fbbf24')+badge('Control',ctrl[0],ctrl[1])+badge('φ',gov.phi.toFixed(3),'#38bdf8')+badge('Mu/φMn',dcrM.toFixed(2),dcrM<=1?'#4ade80':'#ff4d6d');
+    if(fm) h+=badge('พฤติกรรมวิบัติ',fm.t,fm.col);
+  }
+  if(govV){ const dcrV=govV.phiVn>0?Math.abs(r.Vu)/govV.phiVn:0; h+=badge('Vu/φVn',dcrV.toFixed(2),dcrV<=1?'#4ade80':'#ff4d6d'); }
+  el.innerHTML = h || '<span style="color:#8896b8;font-size:12px">— ไม่มีเหล็กที่หน้าตัดนี้ —</span>';
+}
+function drawSecxReport(r){
+  const el=document.getElementById('secx-report'); if(!el) return;
+  const f=(v,u,dp=0)=> (v==null||!isFinite(v))?'—':(v.toLocaleString(undefined,{maximumFractionDigits:dp})+(u?' '+u:''));
+  const ey=MAT.Fy/MAT.Es, P=r.pos, N=r.neg, VP=r.vPos, VN=r.vNeg;
+  const ctrl=g=>!g||!g.c?'—':(g.et>=ey+0.003?'<span style="color:#4ade80">Tension-ctrl</span>':(g.et<=ey?'<span style="color:#ff4d6d">Compression-ctrl</span>':'<span style="color:#fb923c">Transition</span>'));
+  const yld=v=>v===null?'—':(v?'<span style="color:#4ade80">คราก ✓</span>':'<span style="color:#8896b8">ยังไม่คราก</span>');
+  const row=(k,p,n,bold)=>`<tr><td class="l">${bold?'<b>'+k+'</b>':k}</td><td>${bold?'<b>'+p+'</b>':p}</td><td>${bold?'<b>'+n+'</b>':n}</td></tr>`;
+  const sec=t=>`<tr class="section"><td colspan="3">${t}</td></tr>`;
+  const pf=d=> d==null?'<span style="color:#8896b8">— ไม่ governing</span>':(d<=1?`<b style="color:#4ade80">${d.toFixed(2)} ✓ PASS</b>`:`<b style="color:#ff4d6d">${d.toFixed(2)} ✗ FAIL</b>`);
+  const fmCell=g=>{ const m=failMode(g); return m?`<b style="color:${m.col}">${m.t}</b>`:'—'; };
+  const chip=(l,v)=>`<span style="display:inline-block;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:5px;padding:2px 8px;margin:0 5px 5px 0;font-family:'Space Mono',monospace;font-size:10px;color:#8896b8">${l} <b style="color:#cdd6f4">${v}</b></span>`;
+  // ── Header chips ──
+  let h=`<div style="margin:2px 0 9px">${chip('x',f(r.x/100,'m',2))}${chip('b×h',r.b+'×'+r.h+' cm')}${chip("f'c",MAT.fc+' ksc')}${chip('fy',MAT.Fy+' ksc')}${chip('β1',MAT.beta1.toFixed(2))}${chip('εty',ey.toFixed(5))}${chip('Mu',f(r.Mu,'kg·m'))}${chip('Vu',f(Math.abs(r.Vu),'kg'))}${chip('Mcr',f(r.Mcr,'kg·m'))}</div>`;
+  // ── FLEXURE ──
+  h+='<table class="sum" style="font-size:11px"><tr><th style="text-align:left">รายการ</th><th style="color:#a8ff78">+M</th><th style="color:#38bdf8">−M</th></tr>';
+  h+=sec('◤ กำลังรับโมเมนต์ดัด (Flexure · ACI 318-22)');
+  h+=row('As รับแรงดึง (cm²)', f(P&&P.Asten,'',2), f(N&&N.Asten,'',2));
+  h+=row('c = แกนสะเทิน (cm)', f(P&&P.c,'',2), f(N&&N.c,'',2));
+  h+=row('a = β1·c · stress block (cm)', f(P&&P.a,'',2), f(N&&N.a,'',2));
+  h+=row('Mn (kg·m)', f(P&&P.Mn,''), f(N&&N.Mn,''));
+  h+=row('φ (ACI 21.2.2)', f(P&&P.phi,'',3), f(N&&N.phi,'',3));
+  h+=row('φMn (kg·m)', P?'<span style="color:#a8ff78">'+f(P.phiMn,'')+'</span>':'—', N?'<span style="color:#38bdf8">'+f(N.phiMn,'')+'</span>':'—', true);
+  h+=row('DCR = Mu / φMn', pf(P&&P.phiMn>0&&r.Mu>0?r.Mu/P.phiMn:null), pf(N&&N.phiMn>0&&r.Mu<0?-r.Mu/N.phiMn:null));
+  h+=sec('◤ พฤติกรรมการวิบัติ (Failure Mode)');
+  h+=row('εt (net tensile strain)', P&&P.c?f(P.et,'',5):'—', N&&N.c?f(N.et,'',5):'—');
+  h+=row('Control section', ctrl(P), ctrl(N));
+  h+=row('พฤติกรรมเมื่อวิบัติ', fmCell(P), fmCell(N), true);
+  h+=row('เหล็กคราก — บน / ล่าง', P&&P.c?yld(P.topYield)+' / '+yld(P.botYield):'—', N&&N.c?yld(N.topYield)+' / '+yld(N.botYield):'—');
+  h+='</table>';
+  // ── SHEAR ──
+  h+='<table class="sum" style="font-size:11px;margin-top:12px"><tr><th style="text-align:left">รายการ</th><th style="color:#a8ff78">+side (ดึงล่าง)</th><th style="color:#38bdf8">−side (ดึงบน)</th></tr>';
+  h+=sec('◤ กำลังรับแรงเฉือน (Shear · ACI 318-22)');
+  h+=row('d ประสิทธิผล (cm)', f(VP&&VP.d,'',1), f(VN&&VN.d,'',1));
+  h+=row('เหล็กปลอก', `Ø${r.stir.d}@${r.stir.sp} cm`, `Ø${r.stir.d}@${r.stir.sp} cm`);
+  h+=row("Vc = 0.53√f'c·b·d (kg)", f(VP&&VP.Vc,''), f(VN&&VN.Vc,''));
+  h+=row('Vs = Av·fyt·d/s (kg)', f(VP&&VP.Vs,''), f(VN&&VN.Vs,''));
+  h+=row('φVn = 0.75(Vc+Vs) (kg)', VP?'<span style="color:#a8ff78">'+f(VP.phiVn,'')+'</span>':'—', VN?'<span style="color:#38bdf8">'+f(VN.phiVn,'')+'</span>':'—', true);
+  h+=row('DCR = Vu / φVn', pf(VP&&VP.phiVn>0?Math.abs(r.Vu)/VP.phiVn:null), pf(VN&&VN.phiVn>0?Math.abs(r.Vu)/VN.phiVn:null));
+  h+='</table>';
+  // ── คำอธิบายพฤติกรรมวิบัติ ──
+  const gv=r.Mu>=0?P:N, fmg=failMode(gv);
+  if(fmg) h+=`<div style="margin-top:10px;padding:8px 10px;border-left:3px solid ${fmg.col};background:${fmg.col}14;border-radius:0 5px 5px 0;font-size:11px"><b style="color:${fmg.col}">พฤติกรรมวิบัติ (ทิศ governing ${r.Mu>=0?'+M':'−M'}): ${fmg.t}</b><br><span style="color:#9aa6c0">${fmg.d}</span></div>`;
+  el.innerHTML=h;
+}
+/* ════════════════ Deflection (ACI 318-22) ════════════════ */
+// แปลงระยะเวลารับน้ำหนักค้าง (ปี) → ξ (ACI 318-22 §24.2.4.1.3, interp ระหว่างจุดในตาราง)
+function xiFromYears(y){
+  const m=y*12, pts=[[3,1.0],[6,1.2],[12,1.4],[60,2.0]];
+  if(m<=pts[0][0]) return pts[0][1];
+  if(m>=pts[pts.length-1][0]) return 2.0;
+  for(let i=0;i<pts.length-1;i++) if(m>=pts[i][0]&&m<=pts[i+1][0]){ const t=(m-pts[i][0])/(pts[i+1][0]-pts[i][0]); return pts[i][1]+t*(pts[i+1][1]-pts[i][1]); }
+  return 2.0;
+}
+function defServiceLoads(ksvc){
+  const A=window.ANALYSIS; if(!A) return [];
+  return A.loads.map(ld=>{ const o=Object.assign({},ld);
+    if(o.P!=null)o.P*=ksvc; if(o.w!=null)o.w*=ksvc; if(o.w1!=null)o.w1*=ksvc; if(o.w2!=null)o.w2*=ksvc; if(o.M!=null)o.M*=ksvc; return o; });
+}
+function crackedI(As,d,Asp,dp,b){   // Icr = transformed cracked section (n=Es/Ec)
+  if(As<=0) return null;
+  const n=MAT.Es/secxEc(), Bc=(n-1)*Asp+n*As, Cc=(n-1)*Asp*dp+n*As*d;
+  const kd=(-Bc+Math.sqrt(Bc*Bc+2*b*Cc))/b;                       // ระยะแกนสะเทินจากผิวอัด
+  return b*kd*kd*kd/3 + (n-1)*Asp*Math.pow(Math.max(kd-dp,0),2) + n*As*Math.pow(d-kd,2);
+}
+function spanFlexSteel(idx){        // +M region: tension=ล่าง, compression=บน
+  const B=data.beam,H=B.H,cov=B.cover,sDia=B.sDia,maxD=2.5,sl=B.sl;
+  const yTop=i=>cov+sDia+maxD/2+i*(maxD+sl), yBot=i=>H-cov-sDia-maxD/2-i*(maxD+sl);
+  let As=0,Asd=0,Asp=0,Aspd=0, sp=data.spans[idx];
+  for(let i=0;i<3;i++){
+    [data.main.bot[i], sp&&sp.midBot[i]].forEach(m=>{ if(m&&m.n>0&&m.d>0){ const a=m.n*Math.PI*(m.d/10)*(m.d/10)/4; As+=a; Asd+=a*yBot(i);} });
+    [data.main.top[i], sp&&sp.midTop[i]].forEach(m=>{ if(m&&m.n>0&&m.d>0){ const a=m.n*Math.PI*(m.d/10)*(m.d/10)/4; Asp+=a; Aspd+=a*yTop(i);} });
+  }
+  return {As, d:As>0?Asd/As:0, Asp, dp:Asp>0?Aspd/Asp:0};
+}
+function computeDeflection(){
+  const tbl=document.getElementById('defl-table'), pill=document.getElementById('defl-pill'); if(!tbl) return;
+  const A=window.ANALYSIS;
+  if(!A||!A.res||typeof window.matrixSolve!=='function'){ tbl.innerHTML='<tr><td style="padding:8px;color:#8896b8">— กรุณา Analyze ก่อน —</td></tr>'; if(pill)pill.textContent='—'; return; }
+  const gv=id=>{ const e=document.getElementById(id); return e?+e.value:NaN; };
+  const yr=gv('defl-yr'); const xi=xiFromYears(isFinite(yr)?yr:5);
+  const xiOut=document.getElementById('defl-xi-out'); if(xiOut) xiOut.textContent='ξ='+xi.toFixed(2);
+  const ksvc=1, susF=Math.min(Math.max((gv('defl-sus')||100)/100,0),1), limN=gv('defl-lim')||360;
+  const B=data.beam, Ec=secxEc(), Ig=B.W*Math.pow(B.H,3)/12, fr=2*Math.sqrt(MAT.fc), Mcr=fr*Ig/(B.H/2)/100; // kg·m
+  const spans=A.spans||[]; if(!spans.length){ tbl.innerHTML='<tr><td style="padding:8px;color:#8896b8">— ไม่มีช่วงคาน —</td></tr>'; return; }
+  const Ie=[], inf=[];
+  spans.forEach((s,i)=>{
+    let Ma=0; for(let k=0;k<A.res.xs.length;k++){ if(A.res.xs[k]>=s.x1-1e-9&&A.res.xs[k]<=s.x2+1e-9) Ma=Math.max(Ma,Math.abs(A.res.Marr[k])); }
+    Ma*=ksvc;
+    const st=spanFlexSteel(i), Icr=st.As>0?crackedI(st.As,st.d,st.Asp,st.dp,B.W):Ig;
+    let ie=Ig;
+    if(st.As>0 && Ma>(2/3)*Mcr){ ie=Icr/(1-Math.pow((2/3)*Mcr/Ma,2)*(1-Icr/Ig)); ie=Math.min(Math.max(ie,Icr),Ig); } // ACI 318-19/22 Eq.24.2.3.5a ใช้ (⅔Mcr/Ma)²
+    Ie[i]=ie; inf[i]={Ma,Icr,ie,st};
+  });
+  const segs={}; spans.forEach((s,i)=>{ segs[i+1]={x1:s.x1,x2:s.x2,E:Ec,I:Ie[i]}; });
+  const res2=window.matrixSolve(A.L, segs, A.supList, defServiceLoads(ksvc));
+  if(!res2||!res2.ok){ tbl.innerHTML='<tr><td style="padding:8px;color:#ff4d6d">คำนวณ stiffness ไม่ได้</td></tr>'; return; }
+  const xs=res2.xs, M=res2.Marr, n=xs.length;
+  const EIx=x=>{ for(let i=0;i<spans.length;i++) if(x>=spans[i].x1-1e-6&&x<=spans[i].x2+1e-6) return Ec*Ie[i]*1e-4; return Ec*Ie[spans.length-1]*1e-4; };
+  const th=new Array(n).fill(0), dl=new Array(n).fill(0);
+  for(let k=1;k<n;k++){ const dx=xs[k]-xs[k-1]; th[k]=th[k-1]+(M[k-1]/EIx(xs[k-1])+M[k]/EIx(xs[k]))/2*dx; }
+  for(let k=1;k<n;k++){ const dx=xs[k]-xs[k-1]; dl[k]=dl[k-1]+(th[k-1]+th[k])/2*dx; }
+  const supX=A.supList.map(s=>s.x).sort((a,b)=>a-b), s1=supX[0], s2=supX[supX.length-1];
+  const ip=(arr,x)=>{ if(x<=xs[0])return arr[0]; if(x>=xs[n-1])return arr[n-1]; for(let k=0;k<n-1;k++) if(x>=xs[k]&&x<=xs[k+1]){const t=(x-xs[k])/(xs[k+1]-xs[k]);return arr[k]+t*(arr[k+1]-arr[k]);} return 0; };
+  let th0=0,dl0=0; if(s2>s1){ th0=-(ip(dl,s2)-ip(dl,s1))/(s2-s1); dl0=-ip(dl,s1)-th0*s1; }
+  const defl=xs.map((x,k)=>dl[k]+th0*x+dl0); // m (immediate)
+  let rows='<tr><th>Span</th><th>L (m)</th><th>Ie/Ig</th><th>δi (mm)</th><th>λΔ</th><th>δlt (mm)</th><th>δtotal (mm)</th><th>Limit (mm)</th><th>ผล</th></tr>';
+  let worst=0, anyFail=false;
+  spans.forEach((s,i)=>{
+    let dmax=0; for(let k=0;k<n;k++){ if(xs[k]>=s.x1-1e-9&&xs[k]<=s.x2+1e-9) dmax=Math.max(dmax,Math.abs(defl[k])); }
+    const di=dmax*1000, rho2=inf[i].st.Asp/(B.W*(inf[i].st.d||1)), lam=xi/(1+50*rho2);
+    const dlt=lam*susF*di, dtot=di+dlt, Lsp=(s.x2-s.x1)*1000, lim=Lsp/limN, pass=dtot<=lim;
+    if(!pass)anyFail=true; const ratio=lim>0?dtot/lim:0; if(ratio>worst)worst=ratio;
+    rows+=`<tr><td>Span ${i+1}</td><td>${(s.x2-s.x1).toFixed(2)}</td><td>${(Ie[i]/Ig).toFixed(2)}</td><td>${di.toFixed(2)}</td><td>${lam.toFixed(2)}</td><td>${dlt.toFixed(2)}</td><td><b>${dtot.toFixed(2)}</b></td><td>${lim.toFixed(2)}<br><span style="font-size:9px;color:#8896b8">L/${limN}</span></td><td>${pass?'<b style="color:#4ade80">PASS</b>':'<b style="color:#ff4d6d">FAIL</b>'}</td></tr>`;
+  });
+  tbl.innerHTML=rows;
+  if(pill){ pill.textContent = anyFail? '⚠ เกิน limit (สูงสุด '+(worst*100).toFixed(0)+'%)' : '✓ ผ่าน (สูงสุด '+(worst*100).toFixed(0)+'% ของ limit)';
+    pill.style.color=anyFail?'var(--bad)':'var(--ok)'; }
+  drawDeflCurve(xs, defl, supX);
+}
+function drawDeflCurve(xs, defl, supX){
+  const cv=document.getElementById('defl-canvas'); if(!cv) return;
+  const dpr=Math.min(window.devicePixelRatio||1,2), cw=cv.clientWidth||900, ch=240;
+  cv.width=cw*dpr; cv.height=ch*dpr; cv.style.height=ch+'px'; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.fillStyle='#0f1117'; ctx.fillRect(0,0,cw,ch);
+  const L=xs[xs.length-1]||1, ml=70,mr=24,mt=30,mb=24, pw=cw-ml-mr, ph=ch-mt-mb;
+  // dl = deflection (บวก=ขึ้น). แปลงเป็น "บวก=ลงล่าง (sag)" สำหรับการแสดงผล
+  const dmm=defl.map(d=>-d*1000);
+  let hi=0, lo=0; dmm.forEach(d=>{ if(d>hi)hi=d; if(d<lo)lo=d; });
+  const span=Math.max(hi-lo,1e-3), pad=span*0.12; hi+=pad; lo-=pad;
+  const tX=x=>ml+x/L*pw, tY=d=>mt+(d-lo)/(hi-lo)*ph;   // dmm บวก(sag) → ลงล่างจอ (y มาก)
+  const zeroY=tY(0);
+  // กรอบ + เส้นแนวตั้งที่ support
+  ctx.strokeStyle='rgba(255,255,255,.07)'; ctx.lineWidth=1;
+  (supX||[]).forEach(sx=>{ const px=tX(sx); ctx.beginPath(); ctx.moveTo(px,mt); ctx.lineTo(px,mt+ph); ctx.stroke(); });
+  // เส้นศูนย์ (แนวคานเดิม)
+  ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.setLineDash([5,4]); ctx.beginPath(); ctx.moveTo(ml,zeroY); ctx.lineTo(ml+pw,zeroY); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,.5)'; ctx.font='10px "Space Mono",monospace'; ctx.textAlign='right';
+  ctx.fillText('0',ml-6,zeroY+3);
+  if(hi>1e-2) ctx.fillText('↓'+hi.toFixed(1),ml-6,mt+ph-2);   // ค่าลงสูงสุด (sag)
+  if(lo<-1e-2) ctx.fillText('↑'+(-lo).toFixed(1),ml-6,mt+9);  // ค่าขึ้นสูงสุด
+  // เส้นแอ่นตัว
+  ctx.strokeStyle='#ff6b35'; ctx.lineWidth=2.5; ctx.beginPath();
+  for(let k=0;k<xs.length;k++){ const px=tX(xs[k]),py=tY(dmm[k]); k===0?ctx.moveTo(px,py):ctx.lineTo(px,py); } ctx.stroke();
+  // หา + ป้ายค่า sag สูงสุดต่อช่วง (ระหว่าง support)
+  ctx.fillStyle='#ffd60a';
+  (supX||[]).forEach(sx=>{ const px=tX(sx); ctx.beginPath(); ctx.moveTo(px,zeroY-6); ctx.lineTo(px-5,zeroY+3); ctx.lineTo(px+5,zeroY+3); ctx.closePath(); ctx.fill(); });
+  ctx.font='9px "Space Mono",monospace'; ctx.textAlign='center'; ctx.fillStyle='#ffb38a';
+  if(supX&&supX.length>1){ for(let i=0;i<supX.length-1;i++){ let bx=0,bd=0; for(let k=0;k<xs.length;k++){ if(xs[k]>=supX[i]&&xs[k]<=supX[i+1]&&Math.abs(dmm[k])>Math.abs(bd)){bd=dmm[k];bx=xs[k];} }
+      if(Math.abs(bd)>0.05){ const px=tX(bx),py=tY(bd); ctx.fillText((bd>0?'↓':'↑')+Math.abs(bd).toFixed(2)+'mm',px,py+(bd>0?14:-7)); } } }
+  ctx.fillStyle='#ff6b35'; ctx.textAlign='left'; ctx.font='11px "Space Mono",monospace';
+  ctx.fillText('เส้นแอ่นตัวทันที δi  (↓ = sag ลงล่าง, ↑ = โก่งขึ้น)', ml, mt-12);
+}
+function redrawDeflection(){ try{ computeDeflection(); }catch(e){ const t=document.getElementById('defl-table'); if(t)t.innerHTML='<tr><td style="padding:8px;color:#ff4d6d">err: '+e.message+'</td></tr>'; } }
+function drawMnEnvelope(){
+  const cv=document.getElementById('cv_mn_env'); if(!cv) return;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const cw=cv.clientWidth||900, ch=380;
+  cv.width=cw*dpr; cv.height=ch*dpr; cv.style.height=ch+'px';
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.fillStyle='#0f1117'; ctx.fillRect(0,0,cw,ch);
+  const Ltot=data.beam.L.reduce((a,b)=>a+b,0);
+  if(Ltot<=0) return;
+  const bars=getAllBars();
+  const env=computeMnEnvelope(bars);
+  const dem=getRealDemand();
+  let yMax=Math.max(...env.phiMnNeg, ...dem.Mu.map(m=>Math.max(0,-m)))*1.15 || 1000;
+  let yMin=-Math.max(...env.phiMnPos, ...dem.Mu.map(m=>Math.max(0,m)))*1.15 || -1000;
+  const yAbs=Math.max(Math.abs(yMax),Math.abs(yMin));
+  yMax=yAbs; yMin=-yAbs;
+  const ml=70,mr=30,mt=20,mb=30, pw=cw-ml-mr, ph=ch-mt-mb;
+  const tX=x=>ml+x/Ltot*pw, tY=y=>mt+(yMax-y)/(yMax-yMin)*ph;
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=.5;
+  ctx.font='10px "Space Mono",monospace'; ctx.fillStyle='rgba(255,255,255,.4)'; ctx.textAlign='right';
+  const yStep=niceStepMn(2*yAbs,6);
+  for(let yv=Math.ceil(yMin/yStep)*yStep; yv<=yMax; yv+=yStep){
+    const py=tY(yv);
+    ctx.beginPath();ctx.moveTo(ml,py);ctx.lineTo(ml+pw,py);ctx.stroke();
+    ctx.fillText(Math.round(yv).toLocaleString(),ml-6,py+3);
+  }
+  ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(ml,tY(0));ctx.lineTo(ml+pw,tY(0));ctx.stroke();
+  ctx.textAlign='center';
+  const xStep=niceStepMn(Ltot/100,8)*100;
+  for(let xv=0;xv<=Ltot+0.1;xv+=xStep){const px=tX(xv);ctx.fillText((xv/100).toFixed(1),px,mt+ph+14);}
+  ctx.fillText('Length (m)', ml+pw/2, ch-2);
+  let xCur=0;
+  for(let i=0;i<=data.beam.L.length;i++){
+    const px=tX(xCur);
+    ctx.strokeStyle='rgba(255,214,10,.5)'; ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(px,mt);ctx.lineTo(px,mt+ph);ctx.stroke();
+    if(i<data.beam.L.length) xCur+=data.beam.L[i];
+  }
+  ctx.setLineDash([]);
+  const COLS={mainTop:'#38bdf8',mainBot:'#a8ff78',colExt:'#ffd60a',midExt:'#f472b6'};
+  bars.forEach(bar=>{
+    if(!mnToggle[bar.grp]) return;
+    const Mn=barMnContrib(bar); if(Mn<1) return;
+    const Ld=getLdCm(bar.d);
+    const yPeak=bar.side==='top'?Mn:-Mn;
+    const x0=bar.x0,x1=bar.x1,Lbar=x1-x0;
+    let rS=bar.aS?0:Ld, rE=bar.aE?0:Ld;
+    if(rS+rE>Lbar){const f=Lbar/(rS+rE); rS*=f; rE*=f;}
+    const yStart=bar.aS?yPeak:0, yEnd=bar.aE?yPeak:0;
+    ctx.beginPath();
+    ctx.moveTo(tX(x0),tY(yStart));
+    ctx.lineTo(tX(x0+rS),tY(yPeak));
+    ctx.lineTo(tX(x1-rE),tY(yPeak));
+    ctx.lineTo(tX(x1),tY(yEnd));
+    ctx.closePath();
+    const col=COLS[bar.grp];
+    ctx.fillStyle=col; ctx.globalAlpha=0.13; ctx.fill();
+    ctx.globalAlpha=0.5; ctx.lineWidth=0.8; ctx.strokeStyle=col; ctx.stroke();
+    ctx.globalAlpha=1;
+  });
+  if(mnToggle.total){
+    ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2.4;
+    ctx.beginPath();
+    for(let i=0;i<env.xs.length;i++){const px=tX(env.xs[i]),py=tY(env.phiMnNeg[i]); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+    ctx.stroke();
+    ctx.strokeStyle='#a8ff78'; ctx.lineWidth=2.4;
+    ctx.beginPath();
+    for(let i=0;i<env.xs.length;i++){const px=tX(env.xs[i]),py=tY(-env.phiMnPos[i]); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+    ctx.stroke();
+  }
+  if(mnToggle.demand && dem.xs.length>0){
+    ctx.strokeStyle='#ff4d6d'; ctx.lineWidth=2; ctx.setLineDash([6,3]);
+    ctx.beginPath();
+    for(let i=0;i<dem.xs.length;i++){const px=tX(dem.xs[i]),py=tY(-dem.Mu[i]); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+  if(mnToggle.total && mnToggle.demand && dem.xs.length>0){
+    const failMask=new Array(dem.xs.length).fill(false);
+    let nF=0, maxGap=0;
+    for(let i=0;i<dem.xs.length;i++){
+      const x=dem.xs[i], mu=dem.Mu[i];
+      const pmnN=interpAt(env.xs,env.phiMnNeg,x), pmnP=interpAt(env.xs,env.phiMnPos,x);  // φMn
+      let f=false,g=0;
+      if(mu>0 && mu>pmnP){f=true; g=mu-pmnP;}        // +M: Mu > φMn⁺
+      else if(mu<0 && -mu>pmnN){f=true; g=-mu-pmnN;} // −M: |Mu| > φMn⁻
+      if(f){failMask[i]=true; nF++; if(g>maxGap)maxGap=g;}
+    }
+    if(nF>0){
+      ctx.strokeStyle='#ff4d6d'; ctx.lineWidth=4; ctx.lineCap='round';
+      let inF=false;
+      for(let i=0;i<dem.xs.length;i++){
+        if(failMask[i]){
+          if(!inF){ctx.beginPath(); ctx.moveTo(tX(dem.xs[i]),tY(-dem.Mu[i])); inF=true;}
+          else ctx.lineTo(tX(dem.xs[i]),tY(-dem.Mu[i]));
+        } else if(inF){ctx.stroke(); inF=false;}
+      }
+      if(inF) ctx.stroke();
+      ctx.lineCap='butt';
+      ctx.font='bold 11px "Space Mono",monospace'; ctx.fillStyle='#ff4d6d'; ctx.textAlign='left';
+      ctx.fillText('⚠ FAIL: φMn < Mu (gap max = '+maxGap.toFixed(0)+' kg·m)', ml+8, mt+18);
+    } else {
+      ctx.font='bold 11px "Space Mono",monospace'; ctx.fillStyle='#4ade80'; ctx.textAlign='left';
+      ctx.fillText('✓ PASS: φMn ≥ Mu ตลอดความยาว', ml+8, mt+18);
+    }
+    // เตือนหน้าตัดเหล็กแน่นเกิน (ACI 9.3.3.1: εt ≥ 0.004 สำหรับคาน)
+    if(isFinite(env.minEt) && env.minEt < 0.004){
+      ctx.font='bold 10px "Space Mono",monospace'; ctx.fillStyle='#fb923c'; ctx.textAlign='left';
+      ctx.fillText('⚠ εt,min='+env.minEt.toFixed(4)+' < 0.004 — เหล็กแน่นเกิน (ACI 9.3.3.1) เพิ่มขนาดหน้าตัด', ml+8, mt+34);
+    }
+  }
+  ctx.font='10px "Space Mono",monospace';
+  ctx.fillStyle='#38bdf8'; ctx.textAlign='left'; ctx.fillText('−φMn ↑',ml+4,mt+12);
+  ctx.fillStyle='#a8ff78'; ctx.fillText('+φMn ↓',ml+4,mt+ph-4);
+}
+function niceStepMn(range,maxTicks){
+  const rough=range/maxTicks, mag=Math.pow(10,Math.floor(Math.log10(rough)||0)), n=rough/mag;
+  let s; if(n<=1.5)s=1; else if(n<=3)s=2; else if(n<=7)s=5; else s=10;
+  return s*mag;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Shear Capacity Envelope vs Demand
+   ───────────────────────────────────────────────────────────── */
+const vToggle = {phiVnBot:false, phiVnTop:false, phiVnGov:true, demand:true, dShift:true};
+
+// d (cm) for shear: weighted centroid of tension steel at zone
+// side='bot' (sagging zones, +M) — d = depth from top
+// side='top' (hogging zones, −M) — d = depth from bottom = H − y_centroid
+// zone: 'colL'(support spanIdx) · 'colR'(support spanIdx+1) · 'mid'(span spanIdx)
+function computeDForZone(spanIdx, zone, side){
+  const B = data.beam, maxD = 2.5;
+  const yTopL = i => B.cover + B.sDia + maxD/2 + i*(maxD + B.sl);
+  const yBotL = i => B.H - B.cover - B.sDia - maxD/2 - i*(maxD + B.sl);
+  const bars = [];
+  const sp = data.spans[spanIdx];
+  let su=null;
+  if(zone==='colL') su=data.supports[spanIdx];
+  else if(zone==='colR') su=data.supports[spanIdx+1];
+  if(side === 'bot'){
+    data.main.bot.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({n:m.n,d:m.d,y:yBotL(i)}); });
+    if(sp && zone==='mid') sp.midBot.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({n:m.n,d:m.d,y:yBotL(i)}); });
+    if(su) su.bot.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({n:m.n,d:m.d,y:yBotL(i)}); });
+  } else {
+    data.main.top.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({n:m.n,d:m.d,y:yTopL(i)}); });
+    if(su) su.top.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({n:m.n,d:m.d,y:yTopL(i)}); });
+    if(sp && zone==='mid') sp.midTop.forEach((m,i)=>{ if(m.n>0&&m.d>0) bars.push({n:m.n,d:m.d,y:yTopL(i)}); });
+  }
+  if(bars.length === 0) return 0.85 * B.H;
+  let sumAsY=0, sumAs=0;
+  bars.forEach(b=>{
+    const As = b.n * Math.PI * (b.d/10) * (b.d/10) / 4;
+    sumAsY += As * b.y; sumAs += As;
+  });
+  const yC = sumAsY / sumAs;
+  return side==='bot' ? yC : (B.H - yC);
+}
+
+// φVn step segments for a side ('bot' or 'top'). Returns [{x0,x1,phiVn,d}, ...]
+function computeShearEnvelope(side){
+  const B = data.beam, Fys = MAT.Fys, fc = MAT.fc, phiV = 0.75;
+  const segs = [];
+  let xL = 0;
+  data.spans.forEach((sp, idx)=>{
+    const L = B.L[idx], third = L/3;
+    const suL = data.supports[idx]||{stir:{d:9,sp:10}}, suR = data.supports[idx+1]||{stir:{d:9,sp:10}};
+    const colSL = suL.stir || {d:9,sp:10}, colSR = suR.stir || {d:9,sp:10};
+    const midS = sp.midStir || {d:9, sp:15};
+    const dColL = computeDForZone(idx, 'colL', side);
+    const dColR = computeDForZone(idx, 'colR', side);
+    const dMid  = computeDForZone(idx, 'mid', side);
+    function phiVn(d, st){
+      const Vc = 0.53 * Math.sqrt(fc) * B.W * d;
+      const dStirCm = (st.d||9)/10;
+      const Av = 2 * Math.PI * dStirCm * dStirCm / 4;  // 2 legs
+      const sSp = st.sp||10;
+      const Vs = Av * Fys * d / sSp;
+      return phiV * (Vc + Vs);
+    }
+    segs.push({x0:xL,            x1:xL+third,    phiVn:phiVn(dColL,colSL), d:dColL});
+    segs.push({x0:xL+third,      x1:xL+2*third,  phiVn:phiVn(dMid,midS),   d:dMid});
+    segs.push({x0:xL+2*third,    x1:xL+L,        phiVn:phiVn(dColR,colSR), d:dColR});
+    xL += L;
+  });
+  return segs;
+}
+
+// Governing envelope: pick bot or top based on local Mu sign
+function computeShearGoverning(envBot, envTop){
+  const A = window.ANALYSIS;
+  if(!A || !A.res) return envBot.map(s=>({...s}));
+  const Ltot_cm = data.beam.L.reduce((a,b)=>a+b,0);
+  const scale = Ltot_cm / A.L;
+  const muXs = A.res.xs.map(x=>x*scale), muVals = A.res.Marr;
+  return envBot.map((sBot, i)=>{
+    const sTop = envTop[i];
+    let muSum=0, cnt=0;
+    for(let j=0;j<muXs.length;j++){
+      if(muXs[j]>=sBot.x0 && muXs[j]<=sBot.x1){ muSum += muVals[j]; cnt++; }
+    }
+    const muAvg = cnt>0 ? muSum/cnt : 0;
+    return muAvg >= 0 ? sBot : sTop;
+  });
+}
+
+// Vu(x) from analysis (kg) in cm coordinate
+function getRealShearDemand(){
+  const A = window.ANALYSIS;
+  if(!A || !A.res) return {xs:[], Vu:[]};
+  const Ltot_cm = data.beam.L.reduce((a,b)=>a+b,0);
+  const scale = Ltot_cm / A.L;
+  return {xs:A.res.xs.map(x=>x*scale), Vu:A.res.Varr.slice()};
+}
+
+// ACI 318: clip Vu in [supX, supX+d] to Vu(supX+d), and [supX−d, supX] to Vu(supX−d)
+function applyDFromSupport(xs, Vu, govSegs){
+  function dAt(x){
+    for(const s of govSegs) if(x>=s.x0-1e-6 && x<=s.x1+1e-6) return s.d;
+    return 0.85 * data.beam.H;
+  }
+  const supXs = [0];
+  let cum=0;
+  data.beam.L.forEach(L=>{ cum += L; supXs.push(cum); });
+  const Vu2 = Vu.slice();
+  const dMarks = [];
+  supXs.forEach(supX=>{
+    const d = dAt(supX);
+    const xRight = supX + d, xLeft = supX - d;
+    if(xRight > 0 && xRight < xs[xs.length-1]) dMarks.push(xRight);
+    if(xLeft > 0 && xLeft < xs[xs.length-1]) dMarks.push(xLeft);
+    if(xRight <= xs[xs.length-1] && xRight > supX){
+      const vAt = interpAt(xs, Vu, xRight);
+      for(let i=0;i<xs.length;i++) if(xs[i]>=supX-1e-6 && xs[i]<=xRight+1e-6) Vu2[i] = vAt;
+    }
+    if(xLeft >= 0 && xLeft < supX){
+      const vAt = interpAt(xs, Vu, xLeft);
+      for(let i=0;i<xs.length;i++) if(xs[i]>=xLeft-1e-6 && xs[i]<=supX+1e-6) Vu2[i] = vAt;
+    }
+  });
+  return {Vu_clipped: Vu2, dMarks};
+}
+
+function drawShearEnvelope(){
+  const cv=document.getElementById('cv_v_env'); if(!cv) return;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const cw=cv.clientWidth||900, ch=340;
+  cv.width=cw*dpr; cv.height=ch*dpr; cv.style.height=ch+'px';
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.fillStyle='#0f1117'; ctx.fillRect(0,0,cw,ch);
+  const Ltot=data.beam.L.reduce((a,b)=>a+b,0);
+  if(Ltot<=0) return;
+
+  const envBot = computeShearEnvelope('bot');
+  const envTop = computeShearEnvelope('top');
+  const envGov = computeShearGoverning(envBot, envTop);
+  const dem = getRealShearDemand();
+  const dShifted = applyDFromSupport(dem.xs, dem.Vu, envGov);
+
+  const allPhiVn = [...envBot.map(s=>s.phiVn), ...envTop.map(s=>s.phiVn)];
+  const maxPhiVn = Math.max(...allPhiVn, ...dem.Vu.map(Math.abs))*1.15 || 10000;
+  const yMax = maxPhiVn, yMin = -maxPhiVn;
+  const ml=70,mr=30,mt=20,mb=30, pw=cw-ml-mr, ph=ch-mt-mb;
+  const tX=x=>ml+x/Ltot*pw, tY=y=>mt+(yMax-y)/(yMax-yMin)*ph;
+
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=.5;
+  ctx.font='10px "Space Mono",monospace'; ctx.fillStyle='rgba(255,255,255,.4)'; ctx.textAlign='right';
+  const yStep=niceStepMn(2*maxPhiVn,6);
+  for(let yv=Math.ceil(yMin/yStep)*yStep; yv<=yMax; yv+=yStep){
+    const py=tY(yv);
+    ctx.beginPath();ctx.moveTo(ml,py);ctx.lineTo(ml+pw,py);ctx.stroke();
+    ctx.fillText(Math.round(yv).toLocaleString(),ml-6,py+3);
+  }
+  ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(ml,tY(0));ctx.lineTo(ml+pw,tY(0));ctx.stroke();
+  ctx.textAlign='center';
+  const xStep=niceStepMn(Ltot/100,8)*100;
+  for(let xv=0;xv<=Ltot+0.1;xv+=xStep){const px=tX(xv);ctx.fillText((xv/100).toFixed(1),px,mt+ph+14);}
+  ctx.fillText('Length (m)', ml+pw/2, ch-2);
+
+  // Support vertical lines
+  let xCur=0;
+  for(let i=0;i<=data.beam.L.length;i++){
+    const px=tX(xCur);
+    ctx.strokeStyle='rgba(255,214,10,.5)'; ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(px,mt);ctx.lineTo(px,mt+ph);ctx.stroke();
+    if(i<data.beam.L.length) xCur+=data.beam.L[i];
+  }
+  ctx.setLineDash([]);
+
+  // d-from-support markers
+  if(vToggle.dShift){
+    ctx.strokeStyle='rgba(255,214,10,.35)'; ctx.setLineDash([2,2]); ctx.lineWidth=1;
+    dShifted.dMarks.forEach(xm=>{
+      const px=tX(xm);
+      ctx.beginPath();ctx.moveTo(px,mt+ph*0.15);ctx.lineTo(px,mt+ph*0.85);ctx.stroke();
+    });
+    ctx.setLineDash([]);
+  }
+
+  // Step envelopes (symmetric ±)
+  function drawStep(segs, color, w){
+    ctx.strokeStyle=color; ctx.lineWidth=w;
+    [+1,-1].forEach(sign=>{
+      ctx.beginPath();
+      segs.forEach((s,i)=>{
+        const py = tY(sign*s.phiVn);
+        if(i===0) ctx.moveTo(tX(s.x0),py); else ctx.lineTo(tX(s.x0),py);
+        ctx.lineTo(tX(s.x1),py);
+      });
+      ctx.stroke();
+    });
+  }
+  if(vToggle.phiVnBot) drawStep(envBot, '#a8ff78', 1.5);
+  if(vToggle.phiVnTop) drawStep(envTop, '#38bdf8', 1.5);
+  if(vToggle.phiVnGov) drawStep(envGov, '#ffffff', 2.5);
+
+  // Vu raw (dashed)
+  if(vToggle.demand && dem.xs.length>0){
+    ctx.strokeStyle='#ff4d6d'; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+    ctx.beginPath();
+    for(let i=0;i<dem.xs.length;i++){const px=tX(dem.xs[i]),py=tY(dem.Vu[i]); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  // Vu clipped (d-from-support) — solid yellow thin
+  if(vToggle.dShift && dShifted.Vu_clipped && dem.xs.length>0){
+    ctx.strokeStyle='#ffd60a'; ctx.lineWidth=1.5;
+    ctx.beginPath();
+    for(let i=0;i<dem.xs.length;i++){const px=tX(dem.xs[i]),py=tY(dShifted.Vu_clipped[i]); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+    ctx.stroke();
+  }
+
+  // FAIL: |Vu_used| > φVn_gov
+  if(vToggle.phiVnGov && vToggle.demand && dem.xs.length>0){
+    const vCheck = vToggle.dShift ? dShifted.Vu_clipped : dem.Vu;
+    function govAt(x){ for(const s of envGov) if(x>=s.x0-1e-6 && x<=s.x1+1e-6) return s.phiVn; return 0; }
+    const failMask = new Array(dem.xs.length).fill(false);
+    let maxGap=0, nFail=0;
+    for(let i=0;i<dem.xs.length;i++){
+      const vu = Math.abs(vCheck[i]), phiVn = govAt(dem.xs[i]);
+      if(vu > phiVn){ failMask[i]=true; nFail++; if(vu-phiVn>maxGap) maxGap=vu-phiVn; }
+    }
+    if(nFail>0){
+      ctx.strokeStyle='#ff4d6d'; ctx.lineWidth=4; ctx.lineCap='round';
+      let inF=false;
+      for(let i=0;i<dem.xs.length;i++){
+        if(failMask[i]){
+          if(!inF){ctx.beginPath(); ctx.moveTo(tX(dem.xs[i]),tY(vCheck[i])); inF=true;}
+          else ctx.lineTo(tX(dem.xs[i]),tY(vCheck[i]));
+        } else if(inF){ctx.stroke(); inF=false;}
+      }
+      if(inF) ctx.stroke();
+      ctx.lineCap='butt';
+      ctx.font='bold 11px "Space Mono",monospace'; ctx.fillStyle='#ff4d6d'; ctx.textAlign='left';
+      ctx.fillText('⚠ FAIL: |Vu| > φVn (gap max = '+maxGap.toFixed(0)+' kg)', ml+8, mt+18);
+    } else {
+      ctx.font='bold 11px "Space Mono",monospace'; ctx.fillStyle='#4ade80'; ctx.textAlign='left';
+      ctx.fillText('✓ PASS: |Vu| ≤ φVn ตลอดความยาว', ml+8, mt+18);
+    }
+  }
+
+  // Axis labels
+  ctx.font='10px "Space Mono",monospace';
+  ctx.fillStyle='rgba(255,255,255,.7)'; ctx.textAlign='left';
+  ctx.fillText('+Vu / +φVn ↑',ml+4,mt+12);
+  ctx.fillText('−Vu / −φVn ↓',ml+4,mt+ph-4);
+}
+
+// Initial: if analysis already done, render
+if(window.ANALYSIS) window.syncDesignFromAnalysis();
+</script>
+</body>
+</html>
