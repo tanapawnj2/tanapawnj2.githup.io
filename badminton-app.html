@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>แบดก๊วนเรา 🏸</title>
+<meta name="theme-color" content="#0f172a">
+<!-- ทำให้เพิ่มลงหน้าจอโฮมแล้วเปิดแบบเต็มจอเหมือนแอป -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="แบดก๊วนเรา">
+<!-- ไอคอนแอป (รูปไม้แบดวาดด้วย SVG ฝังในไฟล์ ไม่ต้องโหลดเน็ต) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f172a'/%3E%3Ctext x='50' y='68' font-size='56' text-anchor='middle'%3E%F0%9F%8F%B8%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f172a'/%3E%3Ctext x='50' y='68' font-size='56' text-anchor='middle'%3E%F0%9F%8F%B8%3C/text%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #0f172a; --card: #1e293b; --line: #334155;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #22d3ee;
+    --left: #2563eb; --left2: #1d4ed8; --right: #dc2626; --right2: #b91c1c;
+    --nav: 64px;
+  }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Segoe UI', 'Sarabun', Tahoma, sans-serif;
+    background: var(--bg); color: var(--text);
+    user-select: none; overflow: hidden;
+    /* เผื่อพื้นที่ขอบจอ (notch) ของ iPhone */
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* ===== พื้นที่หน้าจอแต่ละแท็บ ===== */
+  .page { display: none; height: calc(100vh - var(--nav) - env(safe-area-inset-top)); }
+  .page.active { display: flex; flex-direction: column; }
+
+  /* ====== แท็บนับแต้ม ====== */
+  #score-page { background: var(--bg); }
+  .bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 8px; background: #1e293b; flex: 0 0 auto;
+    flex-wrap: wrap;
+  }
+  .bar button {
+    background: #334155; color: #e2e8f0; border: none; border-radius: 8px;
+    padding: 8px 12px; font-size: .85rem; font-weight: 600; cursor: pointer;
+  }
+  .bar button:active { background: #475569; }
+  .court { flex: 1 1 auto; display: flex; min-height: 0; }
+  .side {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; position: relative; cursor: pointer; overflow: hidden;
+  }
+  .side.left  { background: linear-gradient(160deg, var(--left), var(--left2)); }
+  .side.right { background: linear-gradient(160deg, var(--right), var(--right2)); }
+  .side:active { filter: brightness(1.12); }
+  .side.win { animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{filter:brightness(1);} 50%{filter:brightness(1.3);} }
+  .name {
+    font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; background: transparent;
+    border: none; color: #fff; text-align: center; width: 90%; outline: none;
+    border-bottom: 2px dashed rgba(255,255,255,.3); padding: 2px 0;
+  }
+  .name:focus { border-bottom-color: #fff; }
+  .score { font-size: 24vh; font-weight: 900; line-height: .95; text-shadow: 0 4px 16px rgba(0,0,0,.3); }
+  .games { font-size: 1rem; opacity: .85; margin-top: 2px; height: 1.4em; }
+  .tap-hint { position: absolute; bottom: 78px; font-size: .75rem; opacity: .5; }
+  .minus {
+    position: absolute; bottom: 16px; background: rgba(0,0,0,.28);
+    border: 2px solid rgba(255,255,255,.45); color: #fff; width: 54px; height: 54px;
+    border-radius: 50%; font-size: 1.8rem; line-height: 1; cursor: pointer;
+  }
+  .minus:active { background: rgba(0,0,0,.5); }
+  .divider { width: 4px; background: rgba(255,255,255,.25); }
+  .servedot {
+    position: absolute; top: 12px; width: 14px; height: 14px; border-radius: 50%;
+    background: #fde047; box-shadow: 0 0 10px #fde047; display: none;
+  }
+  .side.serve .servedot { display: block; }
+  .toast {
+    position: fixed; top: 45%; left: 50%; transform: translate(-50%,-50%);
+    background: rgba(0,0,0,.85); padding: 16px 24px; border-radius: 14px;
+    font-size: 1.2rem; font-weight: 700; display: none; z-index: 50; text-align: center;
+    white-space: pre-line;
+  }
+
+  /* ====== แท็บหารเงิน ====== */
+  #money-page { overflow-y: auto; padding: 16px; background: linear-gradient(160deg, #0f172a, #1e1b4b); }
+  .mh { text-align: center; font-size: 1.4rem; margin-bottom: 2px; }
+  .msub { text-align: center; color: var(--muted); font-size: .85rem; margin-bottom: 18px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 16px; margin-bottom: 14px;
+  }
+  .card h2 { font-size: 1rem; margin-bottom: 12px; }
+  .row { display: flex; gap: 10px; margin-bottom: 0; }
+  .field { flex: 1; }
+  label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
+  input[type="number"] {
+    width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+    color: var(--text); padding: 11px 12px; font-size: 1.05rem; outline: none;
+  }
+  input[type="number"]:focus { border-color: var(--accent); }
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .subtotal { text-align: right; color: var(--accent); font-size: .88rem; margin-top: 10px; font-weight: 600; }
+  .result { background: linear-gradient(135deg, #155e75, #166534); border: none; text-align: center; }
+  .perlabel { color: #d1fae5; font-size: .9rem; margin-bottom: 4px; }
+  .perhead { font-size: 2.4rem; font-weight: 800; color: #fff; line-height: 1.1; }
+  .perhead small { font-size: 1rem; font-weight: 500; opacity: .85; }
+  .breakdown {
+    display: flex; justify-content: space-around; margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.2); font-size: .82rem; color: #e0f2fe;
+  }
+  .breakdown b { display: block; font-size: 1.05rem; color: #fff; margin-top: 2px; }
+  .note { font-size: .78rem; color: var(--muted); text-align: center; margin-top: 4px; }
+  .copybtn {
+    width: 100%; margin-top: 4px; background: #334155; color: #e2e8f0; border: none;
+    border-radius: 12px; padding: 13px; font-size: .95rem; font-weight: 600; cursor: pointer;
+  }
+  .copybtn:active { background: #475569; }
+
+  /* ====== แถบเมนูล่าง ====== */
+  nav {
+    height: calc(var(--nav) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    flex: 0 0 auto; display: flex; background: #111827; border-top: 1px solid var(--line);
+  }
+  nav button {
+    flex: 1; background: none; border: none; color: var(--muted); font-size: .8rem;
+    font-weight: 600; cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 3px;
+  }
+  nav button .ic { font-size: 1.4rem; }
+  nav button.active { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ================= แท็บ: นับแต้ม ================= -->
+<div class="page active" id="score-page">
+  <div class="bar">
+    <button id="serveBtn">🏸 เสิร์ฟ: ซ้าย</button>
+    <button id="swapBtn">⇄ สลับฝั่ง</button>
+    <button id="gameBtn">✅ จบเกม</button>
+    <button id="resetBtn">↺ รีเซ็ต</button>
+  </div>
+  <div class="court">
+    <div class="side left serve" id="sideL">
+      <span class="servedot"></span>
+      <input class="name" id="nameL" value="ทีมน้ำเงิน" maxlength="14">
+      <div class="score" id="scoreL">0</div>
+      <div class="games" id="gamesL"></div>
+      <div class="tap-hint">แตะเพื่อ +1</div>
+      <button class="minus" data-side="L">−</button>
+    </div>
+    <div class="divider"></div>
+    <div class="side right" id="sideR">
+      <span class="servedot"></span>
+      <input class="name" id="nameR" value="ทีมแดง" maxlength="14">
+      <div class="score" id="scoreR">0</div>
+      <div class="games" id="gamesR"></div>
+      <div class="tap-hint">แตะเพื่อ +1</div>
+      <button class="minus" data-side="R">−</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= แท็บ: หารเงิน ================= -->
+<div class="page" id="money-page">
+  <h1 class="mh">🏸 หารค่าแบด</h1>
+  <p class="msub">หารค่าสนาม + ค่าลูกแบด เท่ากันทุกคน</p>
+
+  <div class="card">
+    <h2>🏟️ ค่าสนาม</h2>
+    <div class="row">
+      <div class="field">
+        <label>จำนวนชั่วโมง</label>
+        <input type="number" id="courtHours" min="0" step="0.5" value="2" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label>ราคา / ชั่วโมง</label>
+        <input type="number" id="courtRate" min="0" step="10" value="120" inputmode="decimal">
+      </div>
+    </div>
+    <div class="subtotal" id="courtSub">รวม 240 บาท</div>
+  </div>
+
+  <div class="card">
+    <h2>🪶 ค่าลูกแบด</h2>
+    <div class="row">
+      <div class="field">
+        <label>จำนวนลูกที่ใช้</label>
+        <input type="number" id="shuttleQty" min="0" step="1" value="6" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>ราคา / ลูก</label>
+        <input type="number" id="shuttleRate" min="0" step="1" value="20" inputmode="decimal">
+      </div>
+    </div>
+    <div class="subtotal" id="shuttleSub">รวม 120 บาท</div>
+  </div>
+
+  <div class="card">
+    <h2>👥 จำนวนคน</h2>
+    <div class="row">
+      <div class="field">
+        <label>คนเล่นทั้งหมด</label>
+        <input type="number" id="people" min="1" step="1" value="4" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <div class="card result">
+    <div class="perlabel">คนละ</div>
+    <div class="perhead"><span id="perHead">90</span> <small>บาท</small></div>
+    <div class="breakdown">
+      <div>ค่าสนาม<b id="bCourt">240</b></div>
+      <div>ค่าลูก<b id="bShuttle">120</b></div>
+      <div>รวม<b id="bTotal">360</b></div>
+    </div>
+  </div>
+  <button class="copybtn" id="copyBtn">📋 ก๊อปสรุปส่งเข้าไลน์กลุ่ม</button>
+  <p class="note">* ปัดเศษขึ้นให้ลงตัวต่อคน เก็บจริงตามนี้ได้เลย</p>
+</div>
+
+<!-- ================= เมนูล่าง ================= -->
+<nav>
+  <button class="active" data-tab="score-page"><span class="ic">🏸</span>นับแต้ม</button>
+  <button data-tab="money-page"><span class="ic">💰</span>หารเงิน</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  /* ---------- สลับแท็บ ---------- */
+  document.querySelectorAll('nav button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('nav button').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      $(b.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ---------- นับแต้ม ---------- */
+  let score = { L: 0, R: 0 };
+  let games = { L: 0, R: 0 };
+  let serve = 'L';
+  const TARGET = 21, CAP = 30;
+  let locked = false;
+
+  function renderScore() {
+    $('scoreL').textContent = score.L;
+    $('scoreR').textContent = score.R;
+    $('gamesL').textContent = games.L ? '🏆'.repeat(games.L) : '';
+    $('gamesR').textContent = games.R ? '🏆'.repeat(games.R) : '';
+    $('sideL').classList.toggle('serve', serve === 'L');
+    $('sideR').classList.toggle('serve', serve === 'R');
+    const sName = serve === 'L' ? $('nameL').value : $('nameR').value;
+    $('serveBtn').textContent = '🏸 เสิร์ฟ: ' + sName;
+  }
+  function checkWin() {
+    const a = score.L, b = score.R, lead = Math.abs(a - b), top = Math.max(a, b);
+    if ((top >= TARGET && lead >= 2) || top >= CAP) {
+      const side = a > b ? 'L' : 'R';
+      const name = side === 'L' ? $('nameL').value : $('nameR').value;
+      $('sideL').classList.toggle('win', side === 'L');
+      $('sideR').classList.toggle('win', side === 'R');
+      showToast('🎉 ' + name + ' ชนะเกมนี้!\nกด “จบเกม” เพื่อบันทึก');
+      locked = true;
+    }
+  }
+  function addScore(side, delta) {
+    if (locked && delta > 0) return;
+    score[side] = Math.max(0, score[side] + delta);
+    if (delta > 0) serve = side;
+    clearWin(); renderScore();
+    if (delta > 0) checkWin();
+  }
+  function clearWin() {
+    $('sideL').classList.remove('win');
+    $('sideR').classList.remove('win');
+    $('toast').style.display = 'none';
+    locked = false;
+  }
+  function showToast(msg) { const t = $('toast'); t.textContent = msg; t.style.display = 'block'; }
+
+  $('sideL').addEventListener('click', e => {
+    if (e.target.classList.contains('minus') || e.target.classList.contains('name')) return;
+    addScore('L', 1);
+  });
+  $('sideR').addEventListener('click', e => {
+    if (e.target.classList.contains('minus') || e.target.classList.contains('name')) return;
+    addScore('R', 1);
+  });
+  document.querySelectorAll('.minus').forEach(b => {
+    b.addEventListener('click', e => { e.stopPropagation(); addScore(b.dataset.side, -1); });
+  });
+  $('serveBtn').addEventListener('click', () => { serve = serve === 'L' ? 'R' : 'L'; renderScore(); });
+  $('swapBtn').addEventListener('click', () => {
+    [score.L, score.R] = [score.R, score.L];
+    [games.L, games.R] = [games.R, games.L];
+    const nl = $('nameL').value; $('nameL').value = $('nameR').value; $('nameR').value = nl;
+    serve = serve === 'L' ? 'R' : 'L';
+    clearWin(); renderScore();
+  });
+  $('gameBtn').addEventListener('click', () => {
+    if (score.L !== score.R) games[score.L > score.R ? 'L' : 'R']++;
+    score = { L: 0, R: 0 }; clearWin(); renderScore();
+  });
+  $('resetBtn').addEventListener('click', () => {
+    if (!confirm('รีเซ็ตแต้มและเกมทั้งหมด?')) return;
+    score = { L: 0, R: 0 }; games = { L: 0, R: 0 }; serve = 'L'; clearWin(); renderScore();
+  });
+  $('nameL').addEventListener('input', renderScore);
+  $('nameR').addEventListener('input', renderScore);
+
+  /* ---------- หารเงิน ---------- */
+  const num = id => parseFloat($(id).value) || 0;
+  const fmt = n => n.toLocaleString('th-TH', { maximumFractionDigits: 2 });
+  let lastSummary = '';
+
+  function calcMoney() {
+    const court = num('courtHours') * num('courtRate');
+    const shuttle = num('shuttleQty') * num('shuttleRate');
+    const total = court + shuttle;
+    const people = Math.max(1, Math.floor(num('people')) || 1);
+    const per = Math.ceil(total / people);
+    $('courtSub').textContent = 'รวม ' + fmt(court) + ' บาท';
+    $('shuttleSub').textContent = 'รวม ' + fmt(shuttle) + ' บาท';
+    $('bCourt').textContent = fmt(court);
+    $('bShuttle').textContent = fmt(shuttle);
+    $('bTotal').textContent = fmt(total);
+    $('perHead').textContent = fmt(per);
+    lastSummary =
+      '🏸 สรุปค่าแบด\n' +
+      '🏟️ ค่าสนาม: ' + fmt(court) + ' บาท\n' +
+      '🪶 ค่าลูก: ' + fmt(shuttle) + ' บาท\n' +
+      '➕ รวม: ' + fmt(total) + ' บาท\n' +
+      '👥 หาร ' + people + ' คน\n' +
+      '👉 คนละ ' + fmt(per) + ' บาท';
+  }
+  ['courtHours','courtRate','shuttleQty','shuttleRate','people'].forEach(id =>
+    $(id).addEventListener('input', calcMoney));
+
+  $('copyBtn').addEventListener('click', () => {
+    const done = () => { const b = $('copyBtn'); b.textContent = '✅ ก๊อปแล้ว!'; setTimeout(() => b.textContent = '📋 ก๊อปสรุปส่งเข้าไลน์กลุ่ม', 1500); };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(lastSummary).then(done).catch(() => fallbackCopy());
+    } else fallbackCopy();
+    function fallbackCopy() {
+      const ta = document.createElement('textarea');
+      ta.value = lastSummary; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e) { alert(lastSummary); }
+      document.body.removeChild(ta);
+    }
+  });
+
+  renderScore();
+  calcMoney();
+</script>
+</body>
+</html>
