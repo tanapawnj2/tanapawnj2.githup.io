@@ -59,7 +59,10 @@
   .name {
     font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; background: transparent;
     border: none; color: #fff; text-align: center; width: 90%; outline: none;
-    border-bottom: 2px dashed rgba(255,255,255,.3); padding: 2px 0;
+    border-bottom: 2px dashed rgba(255,255,255,.3); padding: 4px 0;
+    /* ต้องเปิด user-select เฉพาะช่องพิมพ์ ไม่งั้น iPhone จะแก้ชื่อไม่ได้ */
+    -webkit-user-select: text; user-select: text;
+    position: relative; z-index: 3; pointer-events: auto;
   }
   .name:focus { border-bottom-color: #fff; }
   .score { font-size: 24vh; font-weight: 900; line-height: .95; text-shadow: 0 4px 16px rgba(0,0,0,.3); }
@@ -316,6 +319,11 @@
   });
   $('nameL').addEventListener('input', renderScore);
   $('nameR').addEventListener('input', renderScore);
+  // แตะที่ช่องชื่อ = แก้ชื่อเท่านั้น ไม่ให้ไปบวกแต้ม
+  ['nameL','nameR'].forEach(id => {
+    $(id).addEventListener('click', e => e.stopPropagation());
+    $(id).addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+  });
 
   /* ---------- หารเงิน ---------- */
   const num = id => parseFloat($(id).value) || 0;
