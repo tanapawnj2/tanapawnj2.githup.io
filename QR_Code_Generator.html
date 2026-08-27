@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QR Code Generator — CivilToolKit</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0e10; --surface: #18181b; --surface2: #222226;
+    --border: rgba(255,255,255,0.08); --text: #f4f4f5; --muted: #71717a;
+    --accent: #e8d5a3; --accent-dim: rgba(232,213,163,0.12);
+    --danger: #f87171; --success: #86efac; --radius: 14px;
+  }
+  body {
+    font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; align-items: flex-start; justify-content: center;
+    padding: 3rem 1.5rem; position: relative;
+  }
+  body::before {
+    content: ''; position: fixed; top: -30%; left: -10%; width: 60vw; height: 60vw;
+    background: radial-gradient(circle, rgba(232,213,163,0.06) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .wrap { width: 100%; max-width: 920px; position: relative; z-index: 1; }
+  header { margin-bottom: 1.75rem; }
+  .brand { font-family: 'Instrument Serif', serif; font-size: 2rem; color: var(--accent); }
+  .subtitle { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; }
+
+  .grid {
+    display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem;
+  }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.75rem;
+  }
+
+  .form-group { margin-bottom: 1.15rem; }
+  label { display: block; font-size: 0.75rem; font-weight: 500; color: var(--muted);
+    margin-bottom: 0.45rem; letter-spacing: 0.03em; text-transform: uppercase; }
+  input[type="text"], textarea, select {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 9px; padding: 0.7rem 0.9rem; font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; color: var(--text); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea { resize: vertical; min-height: 76px; line-height: 1.4; }
+  input:focus, textarea:focus, select:focus {
+    border-color: rgba(232,213,163,0.4); box-shadow: 0 0 0 3px rgba(232,213,163,0.08);
+  }
+  input::placeholder, textarea::placeholder { color: #3f3f46; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+
+  select { appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2371717a'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 0.9rem center; padding-right: 2rem;
+  }
+
+  .color-row { display: flex; align-items: center; gap: 0.6rem; }
+  input[type="color"] {
+    -webkit-appearance: none; appearance: none; width: 40px; height: 38px; border: 1px solid var(--border);
+    border-radius: 8px; background: var(--surface2); cursor: pointer; padding: 3px;
+  }
+  input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  input[type="color"]::-webkit-color-swatch { border-radius: 5px; border: none; }
+  .color-hex { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; line-height: 1.5; }
+  .hint b { color: var(--text); font-weight: 500; }
+
+
+  .preview-card {
+    display: flex; flex-direction: column; align-items: center; gap: 1.1rem;
+  }
+  .qr-stage {
+    width: 260px; height: 260px; background: #fff; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+  }
+  .qr-stage canvas { image-rendering: pixelated; }
+  .qr-empty { color: #9c9c9c; font-size: 0.8rem; text-align: center; padding: 1rem; }
+
+  .meta { font-size: 0.75rem; color: var(--muted); text-align: center; }
+  .meta b { color: var(--text); }
+
+  .btn-row { display: flex; gap: 0.6rem; width: 100%; }
+  .btn {
+    flex: 1; border: none; border-radius: 9px; padding: 0.7rem; font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-primary { background: var(--accent); color: #18180b; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: rgba(232,213,163,0.4); }
+
+  .error-msg {
+    font-size: 0.78rem; color: var(--danger); margin-top: 0.5rem; display: none;
+  }
+  .error-msg.show { display: block; }
+
+  footer { margin-top: 1.5rem; text-align: center; font-size: 0.72rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">QR Code Generator</div>
+    <div class="subtitle">สร้าง QR Code จากลิงก์หรือข้อความ — ประมวลผลในเบราว์เซอร์ทั้งหมด ไม่ส่งข้อมูลออกไปที่เซิร์ฟเวอร์ ใช้ฟรีไม่มีวันหมดอายุ</div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <div class="form-group">
+        <label for="dataInput">ลิงก์ / ข้อความ</label>
+        <textarea id="dataInput" placeholder="https://example.com หรือข้อความใดๆ ก็ได้">https://</textarea>
+        <div class="hint" id="lenHint">0 ตัวอักษร</div>
+      </div>
+
+      <div class="form-group">
+        <label for="sizeSelect">ขนาดไฟล์ดาวน์โหลด</label>
+        <select id="sizeSelect">
+          <option value="512">512 × 512 px</option>
+          <option value="1024" selected>1024 × 1024 px</option>
+          <option value="2048">2048 × 2048 px</option>
+        </select>
+      </div>
+
+      <div class="row2">
+        <div class="form-group">
+          <label>สีลาย</label>
+          <div class="color-row">
+            <input type="color" id="fgColor" value="#000000" />
+            <span class="color-hex" id="fgHex">#000000</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>สีพื้นหลัง</label>
+          <div class="color-row">
+            <input type="color" id="bgColor" value="#ffffff" />
+            <span class="color-hex" id="bgHex">#ffffff</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-msg" id="errMsg"></div>
+    </div>
+
+    <div class="card preview-card">
+      <div class="qr-stage" id="qrStage">
+        <div class="qr-empty">พิมพ์ลิงก์หรือข้อความทางซ้าย<br/>เพื่อสร้าง QR Code</div>
+      </div>
+      <div class="meta" id="qrMeta"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="downloadBtn" disabled>ดาวน์โหลด PNG</button>
+        <button class="btn btn-ghost" id="downloadSvgBtn" disabled>SVG</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>ทำงานแบบ client-side ด้วยไลบรารีโอเพนซอร์ส qrcode-generator (MIT License) — ไม่มีการเรียก API ภายนอก</footer>
+</div>
+
+<script>
+//---------------------------------------------------------------------
+// QR Code Generator for JavaScript — Copyright (c) 2009 Kazuhiko Arase
+// MIT License: http://www.opensource.org/licenses/mit-license.php
+// https://github.com/kazuhikoarase/qrcode-generator
+//---------------------------------------------------------------------
+var qrcode=function(){var g=function(k,n){var c=0;switch(n){case"L":c=1;break;case"M":c=0;break;case"Q":c=3;break;case"H":c=2}var d=g.stringToBytes,e=null,f=0,l=[],h={};h.addData=function(m,q){q=q||"Byte";var p=null;switch(q){case"Numeric":p=t(m);break;case"Alphanumeric":p=u(m);break;case"Byte":p=v(m);break;case"Kanji":p=w(m);break;default:throw"mode:"+q;}l.push(p);e=null};h.isDark=function(m,q){if(m<0||f<=m||q<0||f<=q)throw m+","+q;return a2[m][q]};h.getModuleCount=function(){return f};h.make=function(){if(k<1){var m=1;for(;m<40;m++){var q=x.getRSBlocks(m,c),p=y();for(var r=0;r<l.length;r++){var s=l[r];p.put(s.getMode(),4);p.put(s.getLength(p),z.getLengthInBits(s.getMode(),m));s.write(p)}var Q=0;for(r=0;r<q.length;r++)Q+=q[r].dataCount;if(p.getLengthInBits()<=Q*8)break}k=m}A(false,B())};var A=function(m,q){f=4*k+17;a2=function(Q){for(var R=Array(Q),S=0;S<Q;S++){R[S]=Array(Q);for(var T=0;T<Q;T++)R[S][T]=null}return R}(f);C(0,0);C(f-7,0);C(0,f-7);D();E();F(m,q);7<=k&&G(m);null==e&&(e=H(k,c,l));I(e,q)},C=function(m,q){for(var p=-1;7>=p;p++)if(!(m+p<=-1||f<=m+p))for(var r=-1;7>=r;r++)q+r<=-1||f<=q+r||(a2[m+p][q+r]=0<=p&&6>=p&&(0==r||6==r)||0<=r&&6>=r&&(0==p||6==p)||2<=p&&4>=p&&2<=r&&4>=r?true:false)},B=function(){for(var m=0,q=0,p=0;8>p;p++){A(true,p);var r=z.getLostPoint(h);if(0==p||m>r){m=r;q=p}}return q},E=function(){for(var m=8;m<f-8;m++)null==a2[m][6]&&(a2[m][6]=0==m%2);for(var q=8;q<f-8;q++)null==a2[6][q]&&(a2[6][q]=0==q%2)},D=function(){for(var m=z.getPatternPosition(k),q=0;q<m.length;q++)for(var p=0;p<m.length;p++){var r=m[q],s=m[p];if(null==a2[r][s])for(var Q=-2;2>=Q;Q++)for(var R=-2;2>=R;R++)a2[r+Q][s+R]=-2==Q||2==Q||-2==R||2==R||0==Q&&0==R?true:false}},G=function(m){for(var q=z.getBCHTypeNumber(k),p=0;18>p;p++){var r=!m&&1==(q>>p&1);a2[Math.floor(p/3)][p%3+f-8-3]=r}for(p=0;18>p;p++)r=!m&&1==(q>>p&1),a2[p%3+f-8-3][Math.floor(p/3)]=r},F=function(m,q){for(var p=c<<3|q,r=z.getBCHTypeInfo(p),s=0;15>s;s++){var Q=!m&&1==(r>>s&1);6>s?a2[s][8]=Q:8>s?a2[s+1][8]=Q:a2[f-15+s][8]=Q}for(s=0;15>s;s++)Q=!m&&1==(r>>s&1),8>s?a2[8][f-s-1]=Q:9>s?a2[8][15-s-1+1]=Q:a2[8][15-s-1]=Q;a2[f-8][8]=!m},I=function(m,q){for(var p=-1,r=f-1,s=7,Q=0,R=f-1;0<R;R-=2)for(6==R&&R--;;){for(var S=0;2>S;S++)if(null==a2[r][R-S]){var T=false;Q<m.length&&(T=1==(m[Q]>>>s&1));var U=z.getMaskFunction(q)(r,R-S);U&&(T=!T);a2[r][R-S]=T;-1==--s&&(Q++,s=7)}r+=p;if(0>r||f<=r){r-=p;p=-p;break}}},H=function(m,q,p){for(var r=x.getRSBlocks(m,q),s=y(),Q=0;Q<p.length;Q++){var R=p[Q];s.put(R.getMode(),4);s.put(R.getLength(s),z.getLengthInBits(R.getMode(),m));R.write(s)}var S=0;for(Q=0;Q<r.length;Q++)S+=r[Q].dataCount;if(s.getLengthInBits()>8*S)throw"code length overflow. ("+s.getLengthInBits()+">"+8*S+")";for(s.getLengthInBits()+4<=8*S&&s.put(0,4);0!=s.getLengthInBits()%8;)s.putBit(false);for(;;){if(s.getLengthInBits()>=8*S)break;s.put(236,8);if(s.getLengthInBits()>=8*S)break;s.put(17,8)}return function(T,U){for(var V=0,W=0,X=0,Y=Array(U.length),Z=Array(U.length),$=0;$<U.length;$++){var aa=U[$].dataCount,ba=U[$].totalCount-aa;W=Math.max(W,aa);X=Math.max(X,ba);Y[$]=Array(aa);for(var ca=0;ca<Y[$].length;ca++)Y[$][ca]=255&T.getBuffer()[ca+V];V+=aa;var da=z.getErrorCorrectPolynomial(ba),ea=J(Y[$],da.getLength()-1),fa=ea.mod(da);Z[$]=Array(da.getLength()-1);for(ca=0;ca<Z[$].length;ca++){var ga=ca+fa.getLength()-Z[$].length;Z[$][ca]=0<=ga?fa.getAt(ga):0}}var ha=0;for($=0;$<U.length;$++)ha+=U[$].totalCount;var ia=Array(ha),ja=0;for($=0;$<W;$++)for(var ka=0;ka<U.length;ka++)$<Y[ka].length&&(ia[ja++]=Y[ka][$]);for($=0;$<X;$++)for(ka=0;ka<U.length;ka++)$<Z[ka].length&&(ia[ja++]=Z[ka][$]);return ia}(s,r)};var a2;return h};g.stringToBytesFuncs={default:function(k){for(var n=[],a=0;a<k.length;a++){var b=k.charCodeAt(a);n.push(255&b)}return n}};g.stringToBytes=function(k){var n=[],a=0;for(;a<k.length;a++){var b=k.codePointAt(a);if(128>b)n.push(b);else if(2048>b)n.push(192|b>>6),n.push(128|63&b);else if(55296>b||57344<=b)n.push(224|b>>12),n.push(128|b>>6&63),n.push(128|63&b);else{a++;n.push(240|b>>18),n.push(128|b>>12&63),n.push(128|b>>6&63),n.push(128|63&b)}}return n};var K={MODE_NUMBER:1,MODE_ALPHA_NUM:2,MODE_8BIT_BYTE:4,MODE_KANJI:8},z=function(){var k=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],n=1335,a=7973,b=21522,c={};c.getBCHTypeInfo=function(h){for(var m=h<<10;0<=L(m)-L(n);)m^=n<<L(m)-L(n);return((h<<10|m)^b)&32767};c.getBCHTypeNumber=function(h){for(var m=h<<12;0<=L(m)-L(a);)m^=a<<L(m)-L(a);return h<<12|m};var L=function(h){for(var m=0;0!=h;)m++,h>>>=1;return m};c.getPatternPosition=function(h){return k[h-1]};c.getMaskFunction=function(h){switch(h){case 0:return function(m,q){return 0==(m+q)%2};case 1:return function(m,q){return 0==m%2};case 2:return function(m,q){return 0==q%3};case 3:return function(m,q){return 0==(m+q)%3};case 4:return function(m,q){return 0==(Math.floor(m/2)+Math.floor(q/3))%2};case 5:return function(m,q){return 0==m*q%2+m*q%3};case 6:return function(m,q){return 0==(m*q%2+m*q%3)%2};case 7:return function(m,q){return 0==(m*q%3+(m+q)%2)%2};default:throw"bad maskPattern:"+h;}};c.getErrorCorrectPolynomial=function(h){for(var m=J([1],0),q=0;q<h;q++)m=m.multiply(J([1,M.gexp(q)],0));return m};c.getLengthInBits=function(h,m){if(1<=m&&10>m)switch(h){case 1:return 10;case 2:return 9;case 4:return 8;case 8:return 8;default:throw"mode:"+h;}else if(27>m)switch(h){case 1:return 12;case 2:return 11;case 4:return 16;case 8:return 10;default:throw"mode:"+h;}else if(41>m)switch(h){case 1:return 14;case 2:return 13;case 4:return 16;case 8:return 12;default:throw"mode:"+h;}else throw"type:"+m;};c.getLostPoint=function(h){for(var m=h.getModuleCount(),q=0,p=0;p<m;p++)for(var r=0;r<m;r++){for(var s=0,Q=h.isDark(p,r),R=-1;1>=R;R++)if(!(0>p+R||m<=p+R))for(var S=-1;1>=S;S++)0>r+S||m<=r+S||0==R&&0==S||Q==h.isDark(p+R,r+S)&&s++;5<s&&(q+=3+s-5)}for(p=0;p<m-1;p++)for(r=0;r<m-1;r++){s=0;h.isDark(p,r)&&s++;h.isDark(p+1,r)&&s++;h.isDark(p,r+1)&&s++;h.isDark(p+1,r+1)&&s++;if(0==s||4==s)q+=3}for(p=0;p<m;p++)for(r=0;r<m-6;r++)h.isDark(p,r)&&!h.isDark(p,r+1)&&h.isDark(p,r+2)&&h.isDark(p,r+3)&&h.isDark(p,r+4)&&!h.isDark(p,r+5)&&h.isDark(p,r+6)&&(q+=40);for(r=0;r<m;r++)for(p=0;p<m-6;p++)h.isDark(p,r)&&!h.isDark(p+1,r)&&h.isDark(p+2,r)&&h.isDark(p+3,r)&&h.isDark(p+4,r)&&!h.isDark(p+5,r)&&h.isDark(p+6,r)&&(q+=40);var T=0;for(r=0;r<m;r++)for(p=0;p<m;p++)h.isDark(p,r)&&T++;return q+=10*(Math.abs(100*T/m/m-50)/5)};return c}(),M=function(){for(var k=Array(256),n=Array(256),a=0;8>a;a++)k[a]=1<<a;for(a=8;256>a;a++)k[a]=k[a-4]^k[a-5]^k[a-6]^k[a-8];for(a=0;255>a;a++)n[k[a]]=a;var b={};b.glog=function(c){if(1>c)throw"glog("+c+")";return n[c]};b.gexp=function(c){for(;0>c;)c+=255;for(;256<=c;)c-=255;return k[c]};return b}();function J(k,n){if("undefined"==typeof k.length)throw k.length+"/"+n;var a=function(){for(var c=0;c<k.length&&0==k[c];)c++;for(var d=Array(k.length-c+n),e=0;e<k.length-c;e++)d[e]=k[e+c];return d}(),b={};b.getAt=function(c){return a[c]};b.getLength=function(){return a.length};b.multiply=function(c){for(var d=Array(b.getLength()+c.getLength()-1),e=0;e<b.getLength();e++)for(var f=0;f<c.getLength();f++)d[e+f]^=M.gexp(M.glog(b.getAt(e))+M.glog(c.getAt(f)));return J(d,0)};b.mod=function(c){if(0>b.getLength()-c.getLength())return b;for(var d=M.glog(b.getAt(0))-M.glog(c.getAt(0)),e=Array(b.getLength()),f=0;f<b.getLength();f++)e[f]=b.getAt(f);for(f=0;f<c.getLength();f++)e[f]^=M.gexp(M.glog(c.getAt(f))+d);return J(e,0).mod(c)};return b}var x=function(){var k=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],n=function(c,d){var e={};e.totalCount=c;e.dataCount=d;return e},a={};a.getRSBlocks=function(c,d){var e=function(m,q){switch(q){case 1:return k[4*(m-1)+0];case 0:return k[4*(m-1)+1];case 3:return k[4*(m-1)+2];case 2:return k[4*(m-1)+3];default:return undefined}}(c,d);if("undefined"==typeof e)throw"bad rs block @ typeNumber:"+c+"/errorCorrectionLevel:"+d;for(var f=e.length/3,l=[],h=0;h<f;h++)for(var b2=e[3*h+0],c2=e[3*h+1],d2=e[3*h+2],e2=0;e2<b2;e2++)l.push(n(c2,d2));return l};return a}(),y=function(){var k=[],n=0,a={};a.getBuffer=function(){return k};a.getAt=function(b){var c=Math.floor(b/8);return 1==(k[c]>>>7-b%8&1)};a.put=function(b,c){for(var d=0;d<c;d++)a.putBit(1==(b>>>c-d-1&1))};a.getLengthInBits=function(){return n};a.putBit=function(b){var c=Math.floor(n/8);k.length<=c&&k.push(0);b&&(k[c]|=128>>>n%8);n++};return a};function t(k){var n=1,a=k,b={};b.getMode=function(){return n};b.getLength=function(){return a.length};b.write=function(c){var d=a,e=0;for(;e+2<d.length;)c.put(f(d.substring(e,e+3)),10),e+=3;e<d.length&&(1==d.length-e?c.put(f(d.substring(e,e+1)),4):2==d.length-e&&c.put(f(d.substring(e,e+2)),7));var f=function(l){for(var h=0,m=0;m<l.length;m++)h=10*h+function(q){if("0"<=q&&"9">=q)return q.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+q;}(l.charAt(m));return h}};return b}function u(k){var n=2,a=k,b={};b.getMode=function(){return n};b.getLength=function(){return a.length};b.write=function(c){var d=a,e=0;for(;e+1<d.length;)c.put(45*f(d.charAt(e))+f(d.charAt(e+1)),11),e+=2;e<d.length&&c.put(f(d.charAt(e)),6);function f(l){if("0"<=l&&"9">=l)return l.charCodeAt(0)-"0".charCodeAt(0);if("A"<=l&&"Z">=l)return l.charCodeAt(0)-"A".charCodeAt(0)+10;switch(l){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+l;}}};return b}function v(k){var n=4,a=k,b=g.stringToBytes(k),c={};c.getMode=function(){return n};c.getLength=function(){return b.length};c.write=function(d){for(var e=0;e<b.length;e++)d.put(b[e],8)};return c}function w(k){var n=8,a=k,b=g.stringToBytesFuncs.SJIS;if(!b)throw"sjis not supported.";var c=b(k),d={};d.getMode=function(){return n};d.getLength=function(){return~~(c.length/2)};d.write=function(e){for(var f=0;f+1<c.length;){var l=(255&c[f])<<8|255&c[f+1];if(33088<=l&&40444>=l)l-=33088;else if(57408<=l&&60351>=l)l-=49472;else throw"illegal char at "+(f+1)+"/"+l;l=(l>>>8&255)*192+(255&l);e.put(l,13);f+=2}if(f<c.length)throw"illegal char at "+(f+1)};return d}return g}();
+</script>
+
+<script>
+(function(){
+  var QUIET_ZONE = 4; // โมดูล — ค่าต่ำสุดตามมาตรฐาน ISO/IEC 18004
+
+  var dataInput = document.getElementById('dataInput');
+  var sizeSelect = document.getElementById('sizeSelect');
+  var fgColor = document.getElementById('fgColor');
+  var bgColor = document.getElementById('bgColor');
+  var fgHex = document.getElementById('fgHex');
+  var bgHex = document.getElementById('bgHex');
+  var qrStage = document.getElementById('qrStage');
+  var qrMeta = document.getElementById('qrMeta');
+  var lenHint = document.getElementById('lenHint');
+  var errMsg = document.getElementById('errMsg');
+  var downloadBtn = document.getElementById('downloadBtn');
+  var downloadSvgBtn = document.getElementById('downloadSvgBtn');
+
+  var currentQR = null;
+
+  function debounce(fn, ms) {
+    var t;
+    return function() {
+      clearTimeout(t);
+      var args = arguments;
+      t = setTimeout(function() { fn.apply(null, args); }, ms);
+    };
+  }
+
+  function buildQR(text, ecc) {
+    var qr = qrcode(0, ecc);
+    qr.addData(text);
+    qr.make();
+    return qr;
+  }
+
+  // เลือก ECC อัตโนมัติ: ข้อความสั้นมีที่ว่างเหลือเฟือจึงให้ความทนทานสูงสุด
+  // ส่วนข้อความยาวต้องลด ECC ลงเพื่อไม่ให้โมดูลถี่จนสแกนยาก
+  function pickAutoEcc(byteLen) {
+    if (byteLen <= 25) return 'H';
+    if (byteLen <= 50) return 'Q';
+    if (byteLen <= 120) return 'M';
+    return 'L';
+  }
+
+  var currentEcc = 'M';
+
+  function renderPreview() {
+    var text = dataInput.value;
+    lenHint.textContent = text.length + ' ตัวอักษร';
+    errMsg.classList.remove('show');
+    errMsg.textContent = '';
+
+    if (!text.trim()) {
+      qrStage.innerHTML = '<div class="qr-empty">พิมพ์ลิงก์หรือข้อความทางซ้าย<br/>เพื่อสร้าง QR Code</div>';
+      qrMeta.textContent = '';
+      downloadBtn.disabled = true;
+      downloadSvgBtn.disabled = true;
+      currentQR = null;
+      return;
+    }
+
+    var byteLen = qrcode.stringToBytes(text).length;
+    currentEcc = pickAutoEcc(byteLen);
+
+    try {
+      var qr = buildQR(text, currentEcc);
+      currentQR = qr;
+
+      var moduleCount = qr.getModuleCount();
+      var previewCell = Math.max(1, Math.floor(240 / moduleCount));
+      var previewSize = (moduleCount + QUIET_ZONE * 2) * previewCell;
+
+      var canvas = document.createElement('canvas');
+      canvas.width = previewSize;
+      canvas.height = previewSize;
+      drawQrToCanvas(canvas, qr, previewCell, QUIET_ZONE, fgColor.value, bgColor.value);
+
+      qrStage.innerHTML = '';
+      qrStage.appendChild(canvas);
+
+      var version = (moduleCount - 17) / 4;
+      qrMeta.innerHTML = 'Version ' + version + ' &middot; ' + moduleCount + '&times;' + moduleCount + ' modules &middot; ECC ' + currentEcc;
+      downloadBtn.disabled = false;
+      downloadSvgBtn.disabled = false;
+    } catch (e) {
+      qrStage.innerHTML = '<div class="qr-empty">ไม่สามารถสร้าง QR ได้</div>';
+      qrMeta.textContent = '';
+      downloadBtn.disabled = true;
+      downloadSvgBtn.disabled = true;
+      currentQR = null;
+      errMsg.textContent = 'ข้อความยาวเกินไป ไม่สามารถสร้าง QR Code ได้';
+      errMsg.classList.add('show');
+    }
+  }
+
+  function drawQrToCanvas(canvas, qr, cellSize, margin, fg, bg) {
+    var moduleCount = qr.getModuleCount();
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = fg;
+    for (var r = 0; r < moduleCount; r++) {
+      for (var c = 0; c < moduleCount; c++) {
+        if (qr.isDark(r, c)) {
+          ctx.fillRect((c + margin) * cellSize, (r + margin) * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+  }
+
+  function buildSvg(qr, margin, fg, bg) {
+    var moduleCount = qr.getModuleCount();
+    var size = moduleCount + margin * 2;
+    var path = '';
+    for (var r = 0; r < moduleCount; r++) {
+      for (var c = 0; c < moduleCount; c++) {
+        if (qr.isDark(r, c)) {
+          path += 'M' + (c + margin) + ',' + (r + margin) + 'h1v1h-1z';
+        }
+      }
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + ' ' + size + '" shape-rendering="crispEdges">' +
+      '<rect width="' + size + '" height="' + size + '" fill="' + bg + '"/>' +
+      '<path d="' + path + '" fill="' + fg + '"/></svg>';
+  }
+
+  function download(dataUrl, filename) {
+    var a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  downloadBtn.addEventListener('click', function() {
+    if (!currentQR) return;
+    var targetSize = parseInt(sizeSelect.value, 10);
+    var moduleCount = currentQR.getModuleCount();
+    var cellSize = Math.max(1, Math.round(targetSize / (moduleCount + QUIET_ZONE * 2)));
+
+    var canvas = document.createElement('canvas');
+    canvas.width = canvas.height = (moduleCount + QUIET_ZONE * 2) * cellSize;
+    drawQrToCanvas(canvas, currentQR, cellSize, QUIET_ZONE, fgColor.value, bgColor.value);
+
+    download(canvas.toDataURL('image/png'), 'qrcode.png');
+  });
+
+  downloadSvgBtn.addEventListener('click', function() {
+    if (!currentQR) return;
+    var svg = buildSvg(currentQR, QUIET_ZONE, fgColor.value, bgColor.value);
+    var blob = new Blob([svg], { type: 'image/svg+xml' });
+    var url = URL.createObjectURL(blob);
+    download(url, 'qrcode.svg');
+    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+  });
+
+  fgColor.addEventListener('input', function() { fgHex.textContent = fgColor.value; renderPreview(); });
+  bgColor.addEventListener('input', function() { bgHex.textContent = bgColor.value; renderPreview(); });
+  dataInput.addEventListener('input', debounce(renderPreview, 150));
+
+  renderPreview();
+})();
+</script>
+
+</body>
+</html>
