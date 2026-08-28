@@ -4,38 +4,34 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>QR Code Generator — CivilToolKit</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0e0e10; --surface: #18181b; --surface2: #222226;
-    --border: rgba(255,255,255,0.08); --text: #f4f4f5; --muted: #71717a;
-    --accent: #e8d5a3; --accent-dim: rgba(232,213,163,0.12);
-    --danger: #f87171; --success: #86efac; --radius: 14px;
+    --bg: #9dc470; --surface: #f0ede0; --surface2: #e1e8cc;
+    --border: rgba(24,37,13,0.18); --text: #182510; --muted: #4a5c37;
+    --accent: #b96a92; --accent-dim: rgba(185,106,146,0.22);
+    --danger: #a8404f; --success: #3f8a38; --radius: 16px;
   }
   body {
-    font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+    font-family: 'Mali', sans-serif; background: var(--bg); color: var(--text);
     min-height: 100vh; display: flex; align-items: flex-start; justify-content: center;
     padding: 3rem 1.5rem; position: relative;
   }
   body::before {
     content: ''; position: fixed; top: -30%; left: -10%; width: 60vw; height: 60vw;
-    background: radial-gradient(circle, rgba(232,213,163,0.06) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(185,106,146,0.25) 0%, transparent 65%);
     pointer-events: none;
   }
-  .wrap { width: 100%; max-width: 920px; position: relative; z-index: 1; }
+  .wrap { width: 100%; max-width: 520px; position: relative; z-index: 1; }
   header { margin-bottom: 1.75rem; }
-  .brand { font-family: 'Instrument Serif', serif; font-size: 2rem; color: var(--accent); }
-  .subtitle { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; }
-
-  .grid {
-    display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem;
-  }
-  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .brand { font-family: 'Mali', sans-serif; font-weight: 700; font-size: 2rem; color: var(--accent); }
+  .subtitle { font-size: 0.85rem; color: rgba(20,32,12,0.82); margin-top: 0.3rem; }
 
   .card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 1.75rem;
+    box-shadow: 0 12px 32px rgba(18,28,10,0.16);
   }
 
   .form-group { margin-bottom: 1.15rem; }
@@ -43,31 +39,20 @@
     margin-bottom: 0.45rem; letter-spacing: 0.03em; text-transform: uppercase; }
   input[type="text"], textarea, select {
     width: 100%; background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 9px; padding: 0.7rem 0.9rem; font-family: 'DM Sans', sans-serif;
+    border-radius: 9px; padding: 0.7rem 0.9rem; font-family: 'Mali', sans-serif;
     font-size: 0.9rem; color: var(--text); outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   textarea { resize: vertical; min-height: 76px; line-height: 1.4; }
   input:focus, textarea:focus, select:focus {
-    border-color: rgba(232,213,163,0.4); box-shadow: 0 0 0 3px rgba(232,213,163,0.08);
+    border-color: rgba(185,106,146,0.6); box-shadow: 0 0 0 3px rgba(185,106,146,0.18);
   }
-  input::placeholder, textarea::placeholder { color: #3f3f46; }
-
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+  input::placeholder, textarea::placeholder { color: #7c8f68; }
 
   select { appearance: none; cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2371717a'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234a5c37'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 0.9rem center; padding-right: 2rem;
   }
-
-  .color-row { display: flex; align-items: center; gap: 0.6rem; }
-  input[type="color"] {
-    -webkit-appearance: none; appearance: none; width: 40px; height: 38px; border: 1px solid var(--border);
-    border-radius: 8px; background: var(--surface2); cursor: pointer; padding: 3px;
-  }
-  input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-  input[type="color"]::-webkit-color-swatch { border-radius: 5px; border: none; }
-  .color-hex { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 
   .hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; line-height: 1.5; }
   .hint b { color: var(--text); font-weight: 500; }
@@ -75,96 +60,95 @@
 
   .preview-card {
     display: flex; flex-direction: column; align-items: center; gap: 1.1rem;
+    margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
   }
-  .qr-stage {
-    width: 260px; height: 260px; background: #fff; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center; overflow: hidden;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+  .qr3d-wrap {
+    position: relative; width: 280px; height: 280px; background: #fff; border-radius: 10px;
+    overflow: hidden; box-shadow: 0 8px 28px rgba(18,28,10,0.3);
   }
-  .qr-stage canvas { image-rendering: pixelated; }
-  .qr-empty { color: #9c9c9c; font-size: 0.8rem; text-align: center; padding: 1rem; }
-
-  .meta { font-size: 0.75rem; color: var(--muted); text-align: center; }
-  .meta b { color: var(--text); }
+  .qr3d-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .qr3d-overlay {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #7c8f68; font-size: 0.8rem; text-align: center; padding: 1.5rem; line-height: 1.6;
+    pointer-events: none;
+  }
+  .color-mode-row { display: flex; align-items: center; gap: 0.5rem; width: 100%; }
+  .color-mode-label { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+  .btn-toggle {
+    flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem 0.6rem;
+    font-family: 'Mali', sans-serif; font-size: 0.78rem; font-weight: 500; cursor: pointer;
+    background: var(--surface2); color: var(--muted); transition: all 0.15s;
+  }
+  .btn-toggle:hover { color: var(--text); border-color: rgba(185,106,146,0.5); }
+  .btn-toggle.active { background: var(--accent-dim); color: #7a3a56; border-color: rgba(185,106,146,0.65); }
 
   .btn-row { display: flex; gap: 0.6rem; width: 100%; }
   .btn {
-    flex: 1; border: none; border-radius: 9px; padding: 0.7rem; font-family: 'DM Sans', sans-serif;
+    flex: 1; border: none; border-radius: 9px; padding: 0.7rem; font-family: 'Mali', sans-serif;
     font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: opacity 0.2s, transform 0.15s;
   }
-  .btn-primary { background: var(--accent); color: #18180b; }
+  .btn-primary { background: var(--accent); color: #fdf2f7; }
   .btn-primary:hover { opacity: 0.88; }
   .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .btn-ghost:hover { border-color: rgba(232,213,163,0.4); }
+  .btn-ghost:hover { border-color: rgba(185,106,146,0.5); }
 
   .error-msg {
     font-size: 0.78rem; color: var(--danger); margin-top: 0.5rem; display: none;
   }
   .error-msg.show { display: block; }
-
-  footer { margin-top: 1.5rem; text-align: center; font-size: 0.72rem; color: var(--muted); }
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <header>
-    <div class="brand">QR Code Generator development by Tanapawn Jardrit</div>
-    <div class="subtitle">สร้าง QR Code จากลิงก์หรือข้อความ — ไม่ส่งข้อมูลออกไปที่เซิร์ฟเวอร์ ใช้ฟรีไม่มีวันหมดอายุ</div>
+    <div class="brand">QR Code Generator</div>
+    <div class="subtitle">สร้าง QR Code จากลิงก์หรือข้อความ — ประมวลผลในเบราว์เซอร์ทั้งหมด ไม่ส่งข้อมูลออกไปที่เซิร์ฟเวอร์ ใช้ฟรีไม่มีวันหมดอายุ</div>
   </header>
 
-  <div class="grid">
-    <div class="card">
-      <div class="form-group">
-        <label for="dataInput">ลิงก์ / ข้อความ</label>
-        <textarea id="dataInput" placeholder="https://example.com หรือข้อความใดๆ ก็ได้">https://</textarea>
-        <div class="hint" id="lenHint">0 ตัวอักษร</div>
-      </div>
-
-      <div class="form-group">
-        <label for="sizeSelect">ขนาดไฟล์ดาวน์โหลด</label>
-        <select id="sizeSelect">
-          <option value="512">512 × 512 px</option>
-          <option value="1024" selected>1024 × 1024 px</option>
-          <option value="2048">2048 × 2048 px</option>
-        </select>
-      </div>
-
-      <div class="row2">
-        <div class="form-group">
-          <label>สีลาย</label>
-          <div class="color-row">
-            <input type="color" id="fgColor" value="#000000" />
-            <span class="color-hex" id="fgHex">#000000</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>สีพื้นหลัง</label>
-          <div class="color-row">
-            <input type="color" id="bgColor" value="#ffffff" />
-            <span class="color-hex" id="bgHex">#ffffff</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="error-msg" id="errMsg"></div>
+  <div class="card">
+    <div class="form-group">
+      <label for="dataInput">ลิงก์ / ข้อความ</label>
+      <textarea id="dataInput" placeholder="https://example.com หรือข้อความใดๆ ก็ได้">https://</textarea>
+      <div class="hint" id="lenHint">0 ตัวอักษร</div>
     </div>
 
-    <div class="card preview-card">
-      <div class="qr-stage" id="qrStage">
-        <div class="qr-empty">พิมพ์ลิงก์หรือข้อความทางซ้าย<br/>เพื่อสร้าง QR Code</div>
+    <div class="form-group">
+      <label for="sizeSelect">ขนาดไฟล์ดาวน์โหลด</label>
+      <select id="sizeSelect">
+        <option value="512">512 × 512 px</option>
+        <option value="1024" selected>1024 × 1024 px</option>
+        <option value="2048">2048 × 2048 px</option>
+      </select>
+    </div>
+
+    <div class="error-msg" id="errMsg"></div>
+
+    <div class="preview-card">
+      <div class="qr3d-wrap">
+        <canvas id="qr3dCanvas"></canvas>
+        <div class="qr3d-overlay" id="qr3dOverlay">พิมพ์ลิงก์หรือข้อความด้านบน<br/>แล้วกดปุ่ม "Generate QR CODE" ด้านล่าง</div>
       </div>
-      <div class="meta" id="qrMeta"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="generate3dBtn" disabled>✨ Generate QR CODE</button>
+      </div>
+      <div class="btn-row" id="topViewRow" style="display:none;">
+        <button class="btn btn-ghost" id="topViewBtn">👁️ Show QR Code</button>
+        <button class="btn btn-ghost" id="backElephantBtn" style="display:none;">🧊 3D View</button>
+      </div>
+      <div class="color-mode-row" id="colorModeRow" style="display:none;">
+        <span class="color-mode-label">ดาวน์โหลดเป็นสี:</span>
+        <button class="btn-toggle" id="colorModeBw" data-mode="bw">B&amp;W</button>
+        <button class="btn-toggle active" id="colorModeColor" data-mode="colored">Colored</button>
+      </div>
       <div class="btn-row">
         <button class="btn btn-primary" id="downloadBtn" disabled>ดาวน์โหลด PNG</button>
         <button class="btn btn-ghost" id="downloadSvgBtn" disabled>SVG</button>
       </div>
     </div>
   </div>
-
-  <footer>ทำงานแบบ client-side ด้วยไลบรารีโอเพนซอร์ส qrcode-generator (MIT License) — ไม่มีการเรียก API ภายนอก</footer>
 </div>
 
 <script>
@@ -179,21 +163,28 @@ var qrcode=function(){var g=function(k,n){var c=0;switch(n){case"L":c=1;break;ca
 <script>
 (function(){
   var QUIET_ZONE = 4; // โมดูล — ค่าต่ำสุดตามมาตรฐาน ISO/IEC 18004
+  var QR_FG = '#000000';
+  var QR_BG = '#ffffff';
 
   var dataInput = document.getElementById('dataInput');
   var sizeSelect = document.getElementById('sizeSelect');
-  var fgColor = document.getElementById('fgColor');
-  var bgColor = document.getElementById('bgColor');
-  var fgHex = document.getElementById('fgHex');
-  var bgHex = document.getElementById('bgHex');
-  var qrStage = document.getElementById('qrStage');
-  var qrMeta = document.getElementById('qrMeta');
   var lenHint = document.getElementById('lenHint');
   var errMsg = document.getElementById('errMsg');
   var downloadBtn = document.getElementById('downloadBtn');
   var downloadSvgBtn = document.getElementById('downloadSvgBtn');
 
+  var qr3dCanvas = document.getElementById('qr3dCanvas');
+  var qr3dOverlay = document.getElementById('qr3dOverlay');
+  var generate3dBtn = document.getElementById('generate3dBtn');
+  var topViewRow = document.getElementById('topViewRow');
+  var topViewBtn = document.getElementById('topViewBtn');
+  var backElephantBtn = document.getElementById('backElephantBtn');
+  var colorModeRow = document.getElementById('colorModeRow');
+  var colorModeBwBtn = document.getElementById('colorModeBw');
+  var colorModeColorBtn = document.getElementById('colorModeColor');
+
   var currentQR = null;
+  var downloadColorMode = 'colored'; // 'bw' | 'colored' — ค่าเริ่มต้นเป็นแบบมีสีตาม 3D
 
   function debounce(fn, ms) {
     var t;
@@ -222,17 +213,390 @@ var qrcode=function(){var g=function(k,n){var c=0;switch(n){case"L":c=1;break;ca
 
   var currentEcc = 'M';
 
+  //=======================================================================
+  // 3D voxel engine — ไม่พึ่งไลบรารีภายนอก ใช้ canvas 2D + การฉายภาพเอง
+  //
+  // หลักการสำคัญ: "สนามหญ้า/ดอกไม้ 3D" กับ "QR Code" เป็น "วัตถุเดียวกัน" เสมอ —
+  // ทุกต้น (หญ้า/ดอกไม้) ตั้งอยู่บนตำแหน่งโมดูลสีเข้มของ QR Code จริงเท่านั้น
+  // (footprint ของต้นไม้ = ลาย QR เป๊ะๆ) โมดูลส่วนใหญ่กลายเป็นใบหญ้าสูงต่ำไม่เท่ากัน
+  // ส่วนโมดูลที่ตกอยู่ในแปลงดอกไม้ (สุ่มตามตำแหน่งแต่คงที่) จะงอกดอกสีสันขึ้นมา
+  // พอหมุนกล้องมองจากด้านบนตรงๆ ความสูง/สีสันจะมองไม่เห็น เหลือแต่ตำแหน่งต้นไม้ —
+  // ซึ่งก็คือ QR Code ตัวจริงนั่นเอง ไม่มีการสลับชุดข้อมูลใดๆ ทั้งสิ้น
+  //=======================================================================
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var CANVAS_SIZE = 280;
+  qr3dCanvas.width = CANVAS_SIZE * DPR;
+  qr3dCanvas.height = CANVAS_SIZE * DPR;
+  var ctx3d = qr3dCanvas.getContext('2d');
+  ctx3d.scale(DPR, DPR);
+
+  var BUILD_YAW = 0.62, BUILD_PITCH = 0.4;
+  var TOP_YAW = 0, TOP_PITCH = Math.PI / 2 - 0.02;
+
+  var sceneMode = 'idle'; // idle | building | built | flipping | topview | flippingBack
+  var rafId = null;
+  var camYaw = BUILD_YAW, camPitch = BUILD_PITCH;
+  var reliefModel = null;   // { pillars, scale, span, bg }
+  var growth = 0;           // 0..1 ความสูงปัจจุบันเทียบกับความสูงเป้าหมาย
+  var colorTransition = 0;  // 0..1 สถานะปัจจุบันของการไล่สี Colored -> Black&white (แอนิเมตแยกจากกล้อง)
+  var colorRafId = null;
+
+  function clearCanvas() { ctx3d.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE); }
+  function cancelAnim() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+  function cancelColorAnim() { if (colorRafId) { cancelAnimationFrame(colorRafId); colorRafId = null; } }
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+  // ไล่สี colorTransition อย่างนุ่มนวลไปยัง target (0=Colored, 1=Black&white) แยกอิสระจากแอนิเมชันกล้อง
+  function animateColorTransition(target) {
+    cancelColorAnim();
+    var from = colorTransition;
+    if (from === target) { render(); return; }
+    var duration = 450;
+    var start = null;
+    function frame(ts) {
+      if (!start) start = ts;
+      var p = Math.min(1, (ts - start) / duration);
+      colorTransition = from + (target - from) * easeInOutCubic(p);
+      render();
+      if (p < 1) {
+        colorRafId = requestAnimationFrame(frame);
+      } else {
+        colorRafId = null;
+        colorTransition = target;
+        render();
+      }
+    }
+    colorRafId = requestAnimationFrame(frame);
+  }
+
+  function project(gx, gy, gz, yaw, pitch, scale, cx, cy) {
+    var cosY = Math.cos(yaw), sinY = Math.sin(yaw);
+    var x1 = gx * cosY + gz * sinY;
+    var z1 = -gx * sinY + gz * cosY;
+    var cosP = Math.cos(pitch), sinP = Math.sin(pitch);
+    var y2 = gy * cosP - z1 * sinP;
+    return { x: cx + x1 * scale, y: cy - y2 * scale };
+  }
+
+  function shade(hex, factor) {
+    if (!/^#[0-9a-fA-F]{6}$/.test(hex)) hex = '#808080';
+    var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+    r = Math.max(0, Math.min(255, Math.round(r * factor)));
+    g = Math.max(0, Math.min(255, Math.round(g * factor)));
+    b = Math.max(0, Math.min(255, Math.round(b * factor)));
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+
+  function paintFace(pts, fill) {
+    ctx3d.beginPath();
+    ctx3d.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) ctx3d.lineTo(pts[i].x, pts[i].y);
+    ctx3d.closePath();
+    ctx3d.fillStyle = fill;
+    ctx3d.fill();
+  }
+
+  // กล่องสี่เหลี่ยม 1 ชิ้น ตั้งอยู่บนพื้นที่ (gx,gz) จากความสูง yBase ถึง yTop
+  // flatten (0..1): ยิ่งเข้าใกล้ 1 (มุมมองบนสุด) ยิ่งลดการไล่แสงเงาแต่ละด้าน ให้ทุกโมดูลของ QR
+  // มีสีเดียวกันเป๊ะๆ ไม่ว่าจะมองจากด้านบน/ขวา/หน้า — สำคัญมากเมื่อผู้ใช้เลือกสี QR เอง (ไม่ใช่สีดำ)
+  function drawBox(gx, gz, yBase, yTop, color, halfXZ, yaw, pitch, scale, cx, cy, flatten) {
+    var s = halfXZ;
+    var fTop = 1.15 + (1 - 1.15) * flatten;
+    var fRight = 0.7 + (1 - 0.7) * flatten;
+    var fFront = 0.88 + (1 - 0.88) * flatten;
+    function P(dx, dy, dz) { return project(gx + dx, dy, gz + dz, yaw, pitch, scale, cx, cy); }
+    paintFace([P(-s, yTop, -s), P(s, yTop, -s), P(s, yTop, s), P(-s, yTop, s)], shade(color, fTop));   // top
+    paintFace([P(s, yBase, -s), P(s, yTop, -s), P(s, yTop, s), P(s, yBase, s)], shade(color, fRight)); // right
+    paintFace([P(-s, yBase, s), P(s, yBase, s), P(s, yTop, s), P(-s, yTop, s)], shade(color, fFront)); // front
+  }
+
+  // hash จำนวนเต็มแบบ deterministic (ไม่ใช้ Math.random เพื่อให้ผลลัพธ์ขึ้นกับตำแหน่งโมดูล QR เท่านั้น)
+  function hash01(a, b) {
+    var h = (a * 374761393 + b * 668265263) ^ (a * 2654435761);
+    h = (h ^ (h >>> 13)) * 1274126177;
+    h = h ^ (h >>> 16);
+    return ((h >>> 0) % 100000) / 100000;
+  }
+
+  var GRASS_GREENS = ['#5aa84c', '#6cbf5a', '#4f9c46', '#7fcf6a'];
+  var FIELD_GROUND = '#dcefd0';
+  var FLOWER_PATCHES = [
+    { cx: 0.18, cy: 0.22, r: 0.13, color: '#ff6fa3' },
+    { cx: 0.55, cy: 0.14, r: 0.11, color: '#ffd93d' },
+    { cx: 0.84, cy: 0.30, r: 0.12, color: '#ff9f43' },
+    { cx: 0.30, cy: 0.55, r: 0.14, color: '#b388ff' },
+    { cx: 0.70, cy: 0.62, r: 0.13, color: '#ff6fa3' },
+    { cx: 0.14, cy: 0.80, r: 0.12, color: '#ffd93d' },
+    { cx: 0.47, cy: 0.86, r: 0.13, color: '#4fc3f7' },
+    { cx: 0.82, cy: 0.82, r: 0.11, color: '#ff6fa3' },
+    { cx: 0.58, cy: 0.40, r: 0.10, color: '#ffffff' }
+  ];
+
+  // -------- จำแนกโมดูล QR แต่ละจุด: หญ้าธรรมดา หรือ ดอกไม้ (พิกัด normalized 0..1) --------
+  function fieldFeatureAt(nx, ny, gx, gz) {
+    for (var i = 0; i < FLOWER_PATCHES.length; i++) {
+      var f = FLOWER_PATCHES[i];
+      var dx = (nx - f.cx) / f.r, dy = (ny - f.cy) / f.r, d2 = dx * dx + dy * dy;
+      if (d2 <= 1) {
+        var density = 0.6 * (1 - Math.sqrt(d2)) + 0.12;
+        if (hash01(gx * 3 + 1, gz * 5 + 7) < density) return { flower: true, color: f.color };
+      }
+    }
+    return { flower: false };
+  }
+
+  // สีของโมดูลนี้ตามฉาก 3D (ใช้ทั้งตอนวาดฉาก 3D และตอนดาวน์โหลดแบบ "สีตาม 3D")
+  function moduleColorFor(qr, r, c) {
+    var moduleCount = qr.getModuleCount();
+    var nx = (c + 0.5) / moduleCount, ny = (r + 0.5) / moduleCount;
+    var feature = fieldFeatureAt(nx, ny, c, r);
+    if (feature.flower) return feature.color;
+    return GRASS_GREENS[Math.floor(hash01(c, r) * GRASS_GREENS.length)];
+  }
+
+  // -------- ปั้นเสาจากโมดูลสีเข้มของ QR จริง — footprint คือ QR เป๊ะๆ --------
+  function buildReliefModel(qr) {
+    var moduleCount = qr.getModuleCount();
+    var span = moduleCount + QUIET_ZONE * 2;
+    var pillars = [];
+    for (var r = 0; r < moduleCount; r++) {
+      for (var c = 0; c < moduleCount; c++) {
+        if (!qr.isDark(r, c)) continue;
+        var nx = (c + 0.5) / moduleCount, ny = (r + 0.5) / moduleCount;
+        var gx = (c + QUIET_ZONE) - span / 2;
+        var gz = (r + QUIET_ZONE) - span / 2;
+        var feature = fieldFeatureAt(nx, ny, c, r);
+        var jitter = hash01(c, r);
+        var stemColor = GRASS_GREENS[Math.floor(jitter * GRASS_GREENS.length)];
+        if (feature.flower) {
+          pillars.push({
+            gx: gx, gz: gz, sortKey: gx + gz, isFlower: true,
+            stemH: 5.5 + jitter * 2.2, bloomH: 2.8 + jitter * 1.6,
+            stemColor: stemColor, bloomColor: feature.color
+          });
+        } else {
+          // ยกกำลังกับ jitter เพื่อให้หญ้าส่วนใหญ่เตี้ย มีเพียงบางต้นที่สูงแซมสร้างพื้นผิวเป็นธรรมชาติ
+          pillars.push({
+            gx: gx, gz: gz, sortKey: gx + gz, isFlower: false,
+            stemH: 0.8 + Math.pow(jitter, 1.7) * 4.2, stemColor: stemColor
+          });
+        }
+      }
+    }
+    pillars.sort(function(a, b) { return a.sortKey - b.sortKey; });
+    return { pillars: pillars, scale: 210 / span, span: span };
+  }
+
+  // ผสมสี A กับสี B ตามสัดส่วน t (0=สี A ล้วน, 1=สี B ล้วน)
+  function mixColor(hexA, hexB, t) {
+    if (!/^#[0-9a-fA-F]{6}$/.test(hexA)) hexA = '#4f9c46';
+    if (!/^#[0-9a-fA-F]{6}$/.test(hexB)) hexB = '#000000';
+    var ra = parseInt(hexA.slice(1, 3), 16), ga = parseInt(hexA.slice(3, 5), 16), ba = parseInt(hexA.slice(5, 7), 16);
+    var rb = parseInt(hexB.slice(1, 3), 16), gb = parseInt(hexB.slice(3, 5), 16), bb = parseInt(hexB.slice(5, 7), 16);
+    var r = Math.round(ra + (rb - ra) * t), g = Math.round(ga + (gb - ga) * t), b = Math.round(ba + (bb - ba) * t);
+    function h2(n) { var s = n.toString(16); return s.length < 2 ? '0' + s : s; }
+    return '#' + h2(r) + h2(g) + h2(b);
+  }
+
+  function render() {
+    clearCanvas();
+    if (!reliefModel) return;
+    var cx = CANVAS_SIZE / 2, cy = CANVAS_SIZE / 2 + 30;
+    var m = reliefModel;
+
+    // ยิ่งกล้องใกล้มุมมองบนสุด ยิ่งลดการไล่แสงเงาแต่ละด้าน ให้ทุกโมดูลสีเดียวกันเป๊ะๆ
+    var topness = Math.max(0, Math.min(1, (camPitch - BUILD_PITCH) / (TOP_PITCH - BUILD_PITCH)));
+    // โหมด "B&W" ทำให้ทั้งฉาก 3D (สนามหญ้า/ดอกไม้) และมุมมอง QR เป็นขาวดำ ไม่ใช่แค่ตอนมองจากบนสุด
+    // colorTransition ไล่ค่าอย่างนุ่มนวลเมื่อผู้ใช้สลับปุ่ม (ไม่ใช่การสลับทันที)
+    var bwBlend = colorTransition;
+    var fg = QR_FG, bg = QR_BG;
+
+    var half = m.span / 2;
+    var g0 = project(-half, 0, -half, camYaw, camPitch, m.scale, cx, cy);
+    var g1 = project(half, 0, -half, camYaw, camPitch, m.scale, cx, cy);
+    var g2 = project(half, 0, half, camYaw, camPitch, m.scale, cx, cy);
+    var g3 = project(-half, 0, half, camYaw, camPitch, m.scale, cx, cy);
+    paintFace([g0, g1, g2, g3], mixColor(FIELD_GROUND, bg, bwBlend));
+
+    // เสาหญ้าบางกว่าโมดูลเต็มช่อง (ดูเป็นใบหญ้า) แต่ต้องกว้างเต็มช่องพอดีตอนมองจากบนสุด
+    // ไม่งั้นแต่ละจุดของ QR จะทึบไม่เท่ากัน (ดอกไม้เต็มช่อง หญ้าเว้นขอบขาว) ทำให้ดูสีไม่สม่ำเสมอ
+    var stemHalf = 0.34 + 0.16 * topness;
+
+    for (var i = 0; i < m.pillars.length; i++) {
+      var p = m.pillars[i];
+      var stemTop = p.stemH * growth;
+      var stemColor = mixColor(p.stemColor, fg, bwBlend);
+      drawBox(p.gx, p.gz, 0, stemTop, stemColor, stemHalf, camYaw, camPitch, m.scale, cx, cy, topness);
+      if (p.isFlower) {
+        var bloomTop = stemTop + p.bloomH * growth;
+        var bloomColor = mixColor(p.bloomColor, fg, bwBlend);
+        drawBox(p.gx, p.gz, stemTop, bloomTop, bloomColor, 0.5, camYaw, camPitch, m.scale, cx, cy, topness);
+      }
+    }
+  }
+
+  function startIdleSpin() {
+    if (sceneMode !== 'built') return;
+    var spinStart = performance.now();
+    function frame(ts) {
+      if (sceneMode !== 'built') { rafId = null; return; }
+      camYaw = BUILD_YAW + Math.sin((ts - spinStart) / 1600 + 1) * 0.12;
+      render();
+      rafId = requestAnimationFrame(frame);
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function startBuildAnimation() {
+    cancelAnim();
+    sceneMode = 'building';
+    qr3dOverlay.style.display = 'none';
+    topViewRow.style.display = 'none';
+    backElephantBtn.style.display = 'none';
+    reliefModel = buildReliefModel(currentQR);
+    growth = 0;
+    camYaw = BUILD_YAW; camPitch = BUILD_PITCH;
+    generate3dBtn.disabled = true;
+
+    var duration = 1800;
+    var start = null;
+    function frame(ts) {
+      if (!start) start = ts;
+      var p = Math.min(1, (ts - start) / duration);
+      growth = easeOutCubic(p);
+      camYaw = BUILD_YAW + Math.sin(ts / 900) * 0.08;
+      render();
+      if (p < 1) {
+        rafId = requestAnimationFrame(frame);
+      } else {
+        growth = 1;
+        rafId = null;
+        generate3dBtn.disabled = false;
+        generate3dBtn.textContent = '🔄 Re-Generate QR CODE';
+        sceneMode = 'built';
+        topViewRow.style.display = 'flex';
+        startIdleSpin();
+      }
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function startFlipToTop() {
+    cancelAnim();
+    sceneMode = 'flipping';
+    topViewBtn.disabled = true;
+
+    var duration = 1100;
+    var start = null;
+    var fromYaw = camYaw, fromPitch = camPitch;
+    function frame(ts) {
+      if (!start) start = ts;
+      var p = Math.min(1, (ts - start) / duration);
+      var e = easeInOutCubic(p);
+      camYaw = fromYaw + (TOP_YAW - fromYaw) * e;
+      camPitch = fromPitch + (TOP_PITCH - fromPitch) * e;
+      render();
+      if (p < 1) {
+        rafId = requestAnimationFrame(frame);
+      } else {
+        rafId = null;
+        sceneMode = 'topview';
+        topViewBtn.disabled = false;
+        topViewBtn.style.display = 'none';
+        backElephantBtn.style.display = 'inline-block';
+      }
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function startFlipToElephant() {
+    cancelAnim();
+    sceneMode = 'flippingBack';
+    backElephantBtn.disabled = true;
+
+    var duration = 1100;
+    var start = null;
+    var fromYaw = camYaw, fromPitch = camPitch;
+    function frame(ts) {
+      if (!start) start = ts;
+      var p = Math.min(1, (ts - start) / duration);
+      var e = easeInOutCubic(p);
+      camYaw = fromYaw + (BUILD_YAW - fromYaw) * e;
+      camPitch = fromPitch + (BUILD_PITCH - fromPitch) * e;
+      render();
+      if (p < 1) {
+        rafId = requestAnimationFrame(frame);
+      } else {
+        rafId = null;
+        sceneMode = 'built';
+        backElephantBtn.disabled = false;
+        backElephantBtn.style.display = 'none';
+        topViewBtn.style.display = 'inline-block';
+        startIdleSpin();
+      }
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function resetScene() {
+    cancelAnim();
+    cancelColorAnim();
+    sceneMode = 'idle';
+    reliefModel = null;
+    growth = 0;
+    colorTransition = (downloadColorMode === 'bw') ? 1 : 0;
+    camYaw = BUILD_YAW; camPitch = BUILD_PITCH;
+    qr3dOverlay.style.display = 'flex';
+    qr3dOverlay.innerHTML = 'พิมพ์ลิงก์หรือข้อความด้านบน<br/>แล้วกดปุ่ม "Generate QR CODE" ด้านล่าง';
+    topViewRow.style.display = 'none';
+    topViewBtn.style.display = 'inline-block';
+    topViewBtn.disabled = false;
+    backElephantBtn.style.display = 'none';
+    backElephantBtn.disabled = false;
+    generate3dBtn.textContent = '✨ Generate QR CODE';
+    clearCanvas();
+  }
+
+  generate3dBtn.addEventListener('click', function() {
+    if (!currentQR) return;
+    startBuildAnimation();
+  });
+  topViewBtn.addEventListener('click', function() {
+    if (!currentQR) return;
+    startFlipToTop();
+  });
+  backElephantBtn.addEventListener('click', function() {
+    startFlipToElephant();
+  });
+
+  colorModeBwBtn.addEventListener('click', function() {
+    downloadColorMode = 'bw';
+    colorModeBwBtn.classList.add('active');
+    colorModeColorBtn.classList.remove('active');
+    if (reliefModel) animateColorTransition(1);
+  });
+  colorModeColorBtn.addEventListener('click', function() {
+    downloadColorMode = 'colored';
+    colorModeColorBtn.classList.add('active');
+    colorModeBwBtn.classList.remove('active');
+    if (reliefModel) animateColorTransition(0);
+  });
+
+  //=======================================================================
+
   function renderPreview() {
     var text = dataInput.value;
     lenHint.textContent = text.length + ' ตัวอักษร';
     errMsg.classList.remove('show');
     errMsg.textContent = '';
+    resetScene();
 
     if (!text.trim()) {
-      qrStage.innerHTML = '<div class="qr-empty">พิมพ์ลิงก์หรือข้อความทางซ้าย<br/>เพื่อสร้าง QR Code</div>';
-      qrMeta.textContent = '';
       downloadBtn.disabled = true;
       downloadSvgBtn.disabled = true;
+      generate3dBtn.disabled = true;
+      colorModeRow.style.display = 'none';
       currentQR = null;
       return;
     }
@@ -243,28 +607,15 @@ var qrcode=function(){var g=function(k,n){var c=0;switch(n){case"L":c=1;break;ca
     try {
       var qr = buildQR(text, currentEcc);
       currentQR = qr;
-
-      var moduleCount = qr.getModuleCount();
-      var previewCell = Math.max(1, Math.floor(240 / moduleCount));
-      var previewSize = (moduleCount + QUIET_ZONE * 2) * previewCell;
-
-      var canvas = document.createElement('canvas');
-      canvas.width = previewSize;
-      canvas.height = previewSize;
-      drawQrToCanvas(canvas, qr, previewCell, QUIET_ZONE, fgColor.value, bgColor.value);
-
-      qrStage.innerHTML = '';
-      qrStage.appendChild(canvas);
-
-      var version = (moduleCount - 17) / 4;
-      qrMeta.innerHTML = 'Version ' + version + ' &middot; ' + moduleCount + '&times;' + moduleCount + ' modules &middot; ECC ' + currentEcc;
       downloadBtn.disabled = false;
       downloadSvgBtn.disabled = false;
+      generate3dBtn.disabled = false;
+      colorModeRow.style.display = 'flex';
     } catch (e) {
-      qrStage.innerHTML = '<div class="qr-empty">ไม่สามารถสร้าง QR ได้</div>';
-      qrMeta.textContent = '';
       downloadBtn.disabled = true;
       downloadSvgBtn.disabled = true;
+      generate3dBtn.disabled = true;
+      colorModeRow.style.display = 'none';
       currentQR = null;
       errMsg.textContent = 'ข้อความยาวเกินไป ไม่สามารถสร้าง QR Code ได้';
       errMsg.classList.add('show');
@@ -280,6 +631,22 @@ var qrcode=function(){var g=function(k,n){var c=0;switch(n){case"L":c=1;break;ca
     for (var r = 0; r < moduleCount; r++) {
       for (var c = 0; c < moduleCount; c++) {
         if (qr.isDark(r, c)) {
+          ctx.fillRect((c + margin) * cellSize, (r + margin) * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+  }
+
+  // ดาวน์โหลดแบบ "สีตาม 3D" — แต่ละโมดูลใช้สีเดียวกับที่ปรากฏในฉาก 3D (เขียวหญ้า/สีดอกไม้)
+  function drawQrToCanvasColored(canvas, qr, cellSize, margin, bg) {
+    var moduleCount = qr.getModuleCount();
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (var r = 0; r < moduleCount; r++) {
+      for (var c = 0; c < moduleCount; c++) {
+        if (qr.isDark(r, c)) {
+          ctx.fillStyle = moduleColorFor(qr, r, c);
           ctx.fillRect((c + margin) * cellSize, (r + margin) * cellSize, cellSize, cellSize);
         }
       }
@@ -302,6 +669,22 @@ var qrcode=function(){var g=function(k,n){var c=0;switch(n){case"L":c=1;break;ca
       '<path d="' + path + '" fill="' + fg + '"/></svg>';
   }
 
+  // ดาวน์โหลดแบบ "สีตาม 3D" — SVG ที่แต่ละโมดูลใช้สีเดียวกับที่ปรากฏในฉาก 3D
+  function buildSvgColored(qr, margin, bg) {
+    var moduleCount = qr.getModuleCount();
+    var size = moduleCount + margin * 2;
+    var rects = '';
+    for (var r = 0; r < moduleCount; r++) {
+      for (var c = 0; c < moduleCount; c++) {
+        if (qr.isDark(r, c)) {
+          rects += '<rect x="' + (c + margin) + '" y="' + (r + margin) + '" width="1" height="1" fill="' + moduleColorFor(qr, r, c) + '"/>';
+        }
+      }
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + ' ' + size + '" shape-rendering="crispEdges">' +
+      '<rect width="' + size + '" height="' + size + '" fill="' + bg + '"/>' + rects + '</svg>';
+  }
+
   function download(dataUrl, filename) {
     var a = document.createElement('a');
     a.href = dataUrl;
@@ -319,22 +702,26 @@ var qrcode=function(){var g=function(k,n){var c=0;switch(n){case"L":c=1;break;ca
 
     var canvas = document.createElement('canvas');
     canvas.width = canvas.height = (moduleCount + QUIET_ZONE * 2) * cellSize;
-    drawQrToCanvas(canvas, currentQR, cellSize, QUIET_ZONE, fgColor.value, bgColor.value);
+    if (downloadColorMode === 'colored') {
+      drawQrToCanvasColored(canvas, currentQR, cellSize, QUIET_ZONE, QR_BG);
+    } else {
+      drawQrToCanvas(canvas, currentQR, cellSize, QUIET_ZONE, QR_FG, QR_BG);
+    }
 
     download(canvas.toDataURL('image/png'), 'qrcode.png');
   });
 
   downloadSvgBtn.addEventListener('click', function() {
     if (!currentQR) return;
-    var svg = buildSvg(currentQR, QUIET_ZONE, fgColor.value, bgColor.value);
+    var svg = downloadColorMode === 'colored'
+      ? buildSvgColored(currentQR, QUIET_ZONE, QR_BG)
+      : buildSvg(currentQR, QUIET_ZONE, QR_FG, QR_BG);
     var blob = new Blob([svg], { type: 'image/svg+xml' });
     var url = URL.createObjectURL(blob);
     download(url, 'qrcode.svg');
     setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
   });
 
-  fgColor.addEventListener('input', function() { fgHex.textContent = fgColor.value; renderPreview(); });
-  bgColor.addEventListener('input', function() { bgHex.textContent = bgColor.value; renderPreview(); });
   dataInput.addEventListener('input', debounce(renderPreview, 150));
 
   renderPreview();
