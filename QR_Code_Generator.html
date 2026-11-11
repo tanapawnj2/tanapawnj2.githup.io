@@ -98,6 +98,31 @@
     font-size: 0.78rem; color: var(--danger); margin-top: 0.5rem; display: none;
   }
   .error-msg.show { display: block; }
+
+  /* ---------- ส่วนสแกน QR จากหน้าจอ ---------- */
+  .scan-card { margin-top: 1.25rem; transition: box-shadow 0.15s, border-color 0.15s; }
+  .scan-card.dragover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim), 0 12px 32px rgba(18,28,10,0.16); }
+  .section-title { font-weight: 600; font-size: 1.05rem; color: var(--accent); margin-bottom: 0.4rem; }
+  .scan-status { font-size: 0.78rem; color: var(--muted); line-height: 1.55; margin-top: 0.8rem; }
+  .scan-status.error { color: var(--danger); }
+  .scan-status.ok { color: var(--success); }
+  .scan-status:empty { margin-top: 0; }
+  .scan-preview {
+    margin-top: 0.9rem; border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; background: #fff; line-height: 0;
+  }
+  .scan-preview canvas { display: block; width: 100%; height: auto; }
+  .scan-result {
+    margin-top: 0.9rem; padding: 0.95rem; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+  }
+  .scan-meta { font-size: 0.7rem; color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 400; }
+  .scan-result-text {
+    font-size: 0.88rem; line-height: 1.55; word-break: break-all; user-select: text;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 0.6rem 0.7rem; margin: 0.15rem 0 0.8rem; max-height: 9.5rem; overflow-y: auto;
+  }
+  .scan-warn { font-size: 0.74rem; color: var(--danger); margin-bottom: 0.6rem; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -149,6 +174,41 @@
       </div>
     </div>
   </div>
+
+  <div class="card scan-card" id="scanCard">
+    <div class="section-title">📷 สแกน QR Code จากหน้าจอ</div>
+    <div class="hint">
+      กด <b>แคปหน้าจอแล้วสแกน</b> แล้วเลือกหน้าต่าง/หน้าจอที่มี QR Code อยู่ — ระบบจะอ่านค่าและเปิดลิงก์ให้<br/>
+      หรือจะกด <b>Win+Shift+S</b> แคปเองแล้ว <b>Ctrl+V</b> วางตรงนี้ / ลากไฟล์รูปมาวางก็ได้ (ถอดรหัสในเครื่องทั้งหมด ไม่มีการอัปโหลด)
+    </div>
+    <div class="btn-row" style="margin-top: 1rem;">
+      <button class="btn btn-primary" id="captureBtn">📸 แคปหน้าจอแล้วสแกน</button>
+    </div>
+    <div class="btn-row" style="margin-top: 0.6rem;">
+      <button class="btn btn-ghost" id="pickFileBtn">🖼️ เลือกไฟล์รูป</button>
+      <button class="btn btn-ghost" id="pasteBtn">📋 วางจากคลิปบอร์ด</button>
+    </div>
+    <input type="file" id="scanFileInput" accept="image/*" style="display:none;" />
+
+    <div class="scan-status" id="scanStatus"></div>
+
+    <div class="scan-preview" id="scanPreview" style="display:none;">
+      <canvas id="scanCanvas"></canvas>
+    </div>
+
+    <div class="scan-result" id="scanResult" style="display:none;">
+      <label>ผลการสแกน <span class="scan-meta" id="scanMeta"></span></label>
+      <div class="scan-result-text" id="scanText"></div>
+      <div class="scan-warn" id="scanWarn" style="display:none;"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="openLinkBtn">🔗 เปิดลิงก์</button>
+        <button class="btn btn-ghost" id="copyScanBtn">📋 คัดลอก</button>
+      </div>
+      <div class="btn-row" style="margin-top: 0.6rem;">
+        <button class="btn btn-ghost" id="useScanBtn">↑ ใช้ข้อความนี้สร้าง QR ใหม่</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -158,6 +218,1092 @@
 // https://github.com/kazuhikoarase/qrcode-generator
 //---------------------------------------------------------------------
 var qrcode=function(){var g=function(k,n){var c=0;switch(n){case"L":c=1;break;case"M":c=0;break;case"Q":c=3;break;case"H":c=2}var d=g.stringToBytes,e=null,f=0,l=[],h={};h.addData=function(m,q){q=q||"Byte";var p=null;switch(q){case"Numeric":p=t(m);break;case"Alphanumeric":p=u(m);break;case"Byte":p=v(m);break;case"Kanji":p=w(m);break;default:throw"mode:"+q;}l.push(p);e=null};h.isDark=function(m,q){if(m<0||f<=m||q<0||f<=q)throw m+","+q;return a2[m][q]};h.getModuleCount=function(){return f};h.make=function(){if(k<1){var m=1;for(;m<40;m++){var q=x.getRSBlocks(m,c),p=y();for(var r=0;r<l.length;r++){var s=l[r];p.put(s.getMode(),4);p.put(s.getLength(p),z.getLengthInBits(s.getMode(),m));s.write(p)}var Q=0;for(r=0;r<q.length;r++)Q+=q[r].dataCount;if(p.getLengthInBits()<=Q*8)break}k=m}A(false,B())};var A=function(m,q){f=4*k+17;a2=function(Q){for(var R=Array(Q),S=0;S<Q;S++){R[S]=Array(Q);for(var T=0;T<Q;T++)R[S][T]=null}return R}(f);C(0,0);C(f-7,0);C(0,f-7);D();E();F(m,q);7<=k&&G(m);null==e&&(e=H(k,c,l));I(e,q)},C=function(m,q){for(var p=-1;7>=p;p++)if(!(m+p<=-1||f<=m+p))for(var r=-1;7>=r;r++)q+r<=-1||f<=q+r||(a2[m+p][q+r]=0<=p&&6>=p&&(0==r||6==r)||0<=r&&6>=r&&(0==p||6==p)||2<=p&&4>=p&&2<=r&&4>=r?true:false)},B=function(){for(var m=0,q=0,p=0;8>p;p++){A(true,p);var r=z.getLostPoint(h);if(0==p||m>r){m=r;q=p}}return q},E=function(){for(var m=8;m<f-8;m++)null==a2[m][6]&&(a2[m][6]=0==m%2);for(var q=8;q<f-8;q++)null==a2[6][q]&&(a2[6][q]=0==q%2)},D=function(){for(var m=z.getPatternPosition(k),q=0;q<m.length;q++)for(var p=0;p<m.length;p++){var r=m[q],s=m[p];if(null==a2[r][s])for(var Q=-2;2>=Q;Q++)for(var R=-2;2>=R;R++)a2[r+Q][s+R]=-2==Q||2==Q||-2==R||2==R||0==Q&&0==R?true:false}},G=function(m){for(var q=z.getBCHTypeNumber(k),p=0;18>p;p++){var r=!m&&1==(q>>p&1);a2[Math.floor(p/3)][p%3+f-8-3]=r}for(p=0;18>p;p++)r=!m&&1==(q>>p&1),a2[p%3+f-8-3][Math.floor(p/3)]=r},F=function(m,q){for(var p=c<<3|q,r=z.getBCHTypeInfo(p),s=0;15>s;s++){var Q=!m&&1==(r>>s&1);6>s?a2[s][8]=Q:8>s?a2[s+1][8]=Q:a2[f-15+s][8]=Q}for(s=0;15>s;s++)Q=!m&&1==(r>>s&1),8>s?a2[8][f-s-1]=Q:9>s?a2[8][15-s-1+1]=Q:a2[8][15-s-1]=Q;a2[f-8][8]=!m},I=function(m,q){for(var p=-1,r=f-1,s=7,Q=0,R=f-1;0<R;R-=2)for(6==R&&R--;;){for(var S=0;2>S;S++)if(null==a2[r][R-S]){var T=false;Q<m.length&&(T=1==(m[Q]>>>s&1));var U=z.getMaskFunction(q)(r,R-S);U&&(T=!T);a2[r][R-S]=T;-1==--s&&(Q++,s=7)}r+=p;if(0>r||f<=r){r-=p;p=-p;break}}},H=function(m,q,p){for(var r=x.getRSBlocks(m,q),s=y(),Q=0;Q<p.length;Q++){var R=p[Q];s.put(R.getMode(),4);s.put(R.getLength(s),z.getLengthInBits(R.getMode(),m));R.write(s)}var S=0;for(Q=0;Q<r.length;Q++)S+=r[Q].dataCount;if(s.getLengthInBits()>8*S)throw"code length overflow. ("+s.getLengthInBits()+">"+8*S+")";for(s.getLengthInBits()+4<=8*S&&s.put(0,4);0!=s.getLengthInBits()%8;)s.putBit(false);for(;;){if(s.getLengthInBits()>=8*S)break;s.put(236,8);if(s.getLengthInBits()>=8*S)break;s.put(17,8)}return function(T,U){for(var V=0,W=0,X=0,Y=Array(U.length),Z=Array(U.length),$=0;$<U.length;$++){var aa=U[$].dataCount,ba=U[$].totalCount-aa;W=Math.max(W,aa);X=Math.max(X,ba);Y[$]=Array(aa);for(var ca=0;ca<Y[$].length;ca++)Y[$][ca]=255&T.getBuffer()[ca+V];V+=aa;var da=z.getErrorCorrectPolynomial(ba),ea=J(Y[$],da.getLength()-1),fa=ea.mod(da);Z[$]=Array(da.getLength()-1);for(ca=0;ca<Z[$].length;ca++){var ga=ca+fa.getLength()-Z[$].length;Z[$][ca]=0<=ga?fa.getAt(ga):0}}var ha=0;for($=0;$<U.length;$++)ha+=U[$].totalCount;var ia=Array(ha),ja=0;for($=0;$<W;$++)for(var ka=0;ka<U.length;ka++)$<Y[ka].length&&(ia[ja++]=Y[ka][$]);for($=0;$<X;$++)for(ka=0;ka<U.length;ka++)$<Z[ka].length&&(ia[ja++]=Z[ka][$]);return ia}(s,r)};var a2;return h};g.stringToBytesFuncs={default:function(k){for(var n=[],a=0;a<k.length;a++){var b=k.charCodeAt(a);n.push(255&b)}return n}};g.stringToBytes=function(k){var n=[],a=0;for(;a<k.length;a++){var b=k.codePointAt(a);if(128>b)n.push(b);else if(2048>b)n.push(192|b>>6),n.push(128|63&b);else if(55296>b||57344<=b)n.push(224|b>>12),n.push(128|b>>6&63),n.push(128|63&b);else{a++;n.push(240|b>>18),n.push(128|b>>12&63),n.push(128|b>>6&63),n.push(128|63&b)}}return n};var K={MODE_NUMBER:1,MODE_ALPHA_NUM:2,MODE_8BIT_BYTE:4,MODE_KANJI:8},z=function(){var k=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],n=1335,a=7973,b=21522,c={};c.getBCHTypeInfo=function(h){for(var m=h<<10;0<=L(m)-L(n);)m^=n<<L(m)-L(n);return((h<<10|m)^b)&32767};c.getBCHTypeNumber=function(h){for(var m=h<<12;0<=L(m)-L(a);)m^=a<<L(m)-L(a);return h<<12|m};var L=function(h){for(var m=0;0!=h;)m++,h>>>=1;return m};c.getPatternPosition=function(h){return k[h-1]};c.getMaskFunction=function(h){switch(h){case 0:return function(m,q){return 0==(m+q)%2};case 1:return function(m,q){return 0==m%2};case 2:return function(m,q){return 0==q%3};case 3:return function(m,q){return 0==(m+q)%3};case 4:return function(m,q){return 0==(Math.floor(m/2)+Math.floor(q/3))%2};case 5:return function(m,q){return 0==m*q%2+m*q%3};case 6:return function(m,q){return 0==(m*q%2+m*q%3)%2};case 7:return function(m,q){return 0==(m*q%3+(m+q)%2)%2};default:throw"bad maskPattern:"+h;}};c.getErrorCorrectPolynomial=function(h){for(var m=J([1],0),q=0;q<h;q++)m=m.multiply(J([1,M.gexp(q)],0));return m};c.getLengthInBits=function(h,m){if(1<=m&&10>m)switch(h){case 1:return 10;case 2:return 9;case 4:return 8;case 8:return 8;default:throw"mode:"+h;}else if(27>m)switch(h){case 1:return 12;case 2:return 11;case 4:return 16;case 8:return 10;default:throw"mode:"+h;}else if(41>m)switch(h){case 1:return 14;case 2:return 13;case 4:return 16;case 8:return 12;default:throw"mode:"+h;}else throw"type:"+m;};c.getLostPoint=function(h){for(var m=h.getModuleCount(),q=0,p=0;p<m;p++)for(var r=0;r<m;r++){for(var s=0,Q=h.isDark(p,r),R=-1;1>=R;R++)if(!(0>p+R||m<=p+R))for(var S=-1;1>=S;S++)0>r+S||m<=r+S||0==R&&0==S||Q==h.isDark(p+R,r+S)&&s++;5<s&&(q+=3+s-5)}for(p=0;p<m-1;p++)for(r=0;r<m-1;r++){s=0;h.isDark(p,r)&&s++;h.isDark(p+1,r)&&s++;h.isDark(p,r+1)&&s++;h.isDark(p+1,r+1)&&s++;if(0==s||4==s)q+=3}for(p=0;p<m;p++)for(r=0;r<m-6;r++)h.isDark(p,r)&&!h.isDark(p,r+1)&&h.isDark(p,r+2)&&h.isDark(p,r+3)&&h.isDark(p,r+4)&&!h.isDark(p,r+5)&&h.isDark(p,r+6)&&(q+=40);for(r=0;r<m;r++)for(p=0;p<m-6;p++)h.isDark(p,r)&&!h.isDark(p+1,r)&&h.isDark(p+2,r)&&h.isDark(p+3,r)&&h.isDark(p+4,r)&&!h.isDark(p+5,r)&&h.isDark(p+6,r)&&(q+=40);var T=0;for(r=0;r<m;r++)for(p=0;p<m;p++)h.isDark(p,r)&&T++;return q+=10*(Math.abs(100*T/m/m-50)/5)};return c}(),M=function(){for(var k=Array(256),n=Array(256),a=0;8>a;a++)k[a]=1<<a;for(a=8;256>a;a++)k[a]=k[a-4]^k[a-5]^k[a-6]^k[a-8];for(a=0;255>a;a++)n[k[a]]=a;var b={};b.glog=function(c){if(1>c)throw"glog("+c+")";return n[c]};b.gexp=function(c){for(;0>c;)c+=255;for(;256<=c;)c-=255;return k[c]};return b}();function J(k,n){if("undefined"==typeof k.length)throw k.length+"/"+n;var a=function(){for(var c=0;c<k.length&&0==k[c];)c++;for(var d=Array(k.length-c+n),e=0;e<k.length-c;e++)d[e]=k[e+c];return d}(),b={};b.getAt=function(c){return a[c]};b.getLength=function(){return a.length};b.multiply=function(c){for(var d=Array(b.getLength()+c.getLength()-1),e=0;e<b.getLength();e++)for(var f=0;f<c.getLength();f++)d[e+f]^=M.gexp(M.glog(b.getAt(e))+M.glog(c.getAt(f)));return J(d,0)};b.mod=function(c){if(0>b.getLength()-c.getLength())return b;for(var d=M.glog(b.getAt(0))-M.glog(c.getAt(0)),e=Array(b.getLength()),f=0;f<b.getLength();f++)e[f]=b.getAt(f);for(f=0;f<c.getLength();f++)e[f]^=M.gexp(M.glog(c.getAt(f))+d);return J(e,0).mod(c)};return b}var x=function(){var k=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],n=function(c,d){var e={};e.totalCount=c;e.dataCount=d;return e},a={};a.getRSBlocks=function(c,d){var e=function(m,q){switch(q){case 1:return k[4*(m-1)+0];case 0:return k[4*(m-1)+1];case 3:return k[4*(m-1)+2];case 2:return k[4*(m-1)+3];default:return undefined}}(c,d);if("undefined"==typeof e)throw"bad rs block @ typeNumber:"+c+"/errorCorrectionLevel:"+d;for(var f=e.length/3,l=[],h=0;h<f;h++)for(var b2=e[3*h+0],c2=e[3*h+1],d2=e[3*h+2],e2=0;e2<b2;e2++)l.push(n(c2,d2));return l};return a}(),y=function(){var k=[],n=0,a={};a.getBuffer=function(){return k};a.getAt=function(b){var c=Math.floor(b/8);return 1==(k[c]>>>7-b%8&1)};a.put=function(b,c){for(var d=0;d<c;d++)a.putBit(1==(b>>>c-d-1&1))};a.getLengthInBits=function(){return n};a.putBit=function(b){var c=Math.floor(n/8);k.length<=c&&k.push(0);b&&(k[c]|=128>>>n%8);n++};return a};function t(k){var n=1,a=k,b={};b.getMode=function(){return n};b.getLength=function(){return a.length};b.write=function(c){var d=a,e=0;for(;e+2<d.length;)c.put(f(d.substring(e,e+3)),10),e+=3;e<d.length&&(1==d.length-e?c.put(f(d.substring(e,e+1)),4):2==d.length-e&&c.put(f(d.substring(e,e+2)),7));var f=function(l){for(var h=0,m=0;m<l.length;m++)h=10*h+function(q){if("0"<=q&&"9">=q)return q.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+q;}(l.charAt(m));return h}};return b}function u(k){var n=2,a=k,b={};b.getMode=function(){return n};b.getLength=function(){return a.length};b.write=function(c){var d=a,e=0;for(;e+1<d.length;)c.put(45*f(d.charAt(e))+f(d.charAt(e+1)),11),e+=2;e<d.length&&c.put(f(d.charAt(e)),6);function f(l){if("0"<=l&&"9">=l)return l.charCodeAt(0)-"0".charCodeAt(0);if("A"<=l&&"Z">=l)return l.charCodeAt(0)-"A".charCodeAt(0)+10;switch(l){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+l;}}};return b}function v(k){var n=4,a=k,b=g.stringToBytes(k),c={};c.getMode=function(){return n};c.getLength=function(){return b.length};c.write=function(d){for(var e=0;e<b.length;e++)d.put(b[e],8)};return c}function w(k){var n=8,a=k,b=g.stringToBytesFuncs.SJIS;if(!b)throw"sjis not supported.";var c=b(k),d={};d.getMode=function(){return n};d.getLength=function(){return~~(c.length/2)};d.write=function(e){for(var f=0;f+1<c.length;){var l=(255&c[f])<<8|255&c[f+1];if(33088<=l&&40444>=l)l-=33088;else if(57408<=l&&60351>=l)l-=49472;else throw"illegal char at "+(f+1)+"/"+l;l=(l>>>8&255)*192+(255&l);e.put(l,13);f+=2}if(f<c.length)throw"illegal char at "+(f+1)};return d}return g}();
+</script>
+
+<script>
+//---------------------------------------------------------------------
+// QR Code DECODER — เขียนขึ้นเองตามมาตรฐาน ISO/IEC 18004
+// (ใช้อัลกอริทึมแนวเดียวกับ ZXing: hybrid binarizer, finder pattern finder,
+//  perspective grid sampler, Reed–Solomon แบบ Euclidean algorithm)
+// ไม่มี dependency ภายนอก — ทำงานออฟไลน์ในเบราว์เซอร์ทั้งหมด
+//
+// ลำดับการทำงาน:
+//   ImageData → grayscale → binarize → หา finder pattern 3 มุม → หา alignment
+//   → perspective transform + sample เป็นตาราง n×n → อ่าน format/version
+//   → ถอด mask → อ่าน codeword แบบซิกแซก → แยกบล็อก → แก้ error ด้วย RS
+//   → ถอด bitstream (Numeric / Alphanumeric / Byte / Kanji / ECI)
+//---------------------------------------------------------------------
+window.QRDecoder = (function(){
+'use strict';
+
+/* ================= Galois Field GF(256), primitive 0x11D ================= */
+var EXP = new Int32Array(256), LOG = new Int32Array(256);
+(function(){
+  var x = 1;
+  for (var i = 0; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 0x100) x ^= 0x11D; }
+  EXP[255] = 1; // alpha^255 = 1
+})();
+function gmul(a, b) { return (a === 0 || b === 0) ? 0 : EXP[(LOG[a] + LOG[b]) % 255]; }
+function ginv(a) { if (a === 0) throw new Error('GF: inverse of 0'); return EXP[255 - LOG[a]]; }
+
+/* ---- พหุนามบน GF(256): index 0 = สัมประสิทธิ์ดีกรีสูงสุด (แบบเดียวกับ ZXing) ---- */
+function pNorm(c) { var i = 0; while (i < c.length - 1 && c[i] === 0) i++; return i === 0 ? c : c.slice(i); }
+function pZero() { return [0]; }
+function pIsZero(c) { return c[0] === 0; }
+function pDeg(c) { return c.length - 1; }
+function pCoef(c, degree) { return c[c.length - 1 - degree]; }
+function pEval(c, x) {
+  if (x === 0) return pCoef(c, 0);
+  var r = c[0];
+  for (var i = 1; i < c.length; i++) r = gmul(r, x) ^ c[i];
+  return r;
+}
+function pAdd(a, b) {
+  if (pIsZero(a)) return b;
+  if (pIsZero(b)) return a;
+  var s = a, l = b;
+  if (s.length > l.length) { s = b; l = a; }
+  var out = new Array(l.length), d = l.length - s.length, i;
+  for (i = 0; i < d; i++) out[i] = l[i];
+  for (i = d; i < l.length; i++) out[i] = s[i - d] ^ l[i];
+  return pNorm(out);
+}
+function pMul(a, b) {
+  if (pIsZero(a) || pIsZero(b)) return pZero();
+  var out = new Array(a.length + b.length - 1), i, j;
+  for (i = 0; i < out.length; i++) out[i] = 0;
+  for (i = 0; i < a.length; i++) {
+    var av = a[i];
+    if (!av) continue;
+    for (j = 0; j < b.length; j++) out[i + j] ^= gmul(av, b[j]);
+  }
+  return pNorm(out);
+}
+function pScale(a, s) {
+  if (s === 0) return pZero();
+  if (s === 1) return a;
+  var out = new Array(a.length);
+  for (var i = 0; i < a.length; i++) out[i] = gmul(a[i], s);
+  return pNorm(out);
+}
+function pMonomial(degree, coeff) {
+  if (coeff === 0) return pZero();
+  var out = new Array(degree + 1);
+  for (var i = 0; i <= degree; i++) out[i] = 0;
+  out[0] = coeff;
+  return out;
+}
+function pMulMonomial(a, degree, coeff) {
+  if (coeff === 0) return pZero();
+  var out = new Array(a.length + degree), i;
+  for (i = 0; i < out.length; i++) out[i] = 0;
+  for (i = 0; i < a.length; i++) out[i] = gmul(a[i], coeff);
+  return pNorm(out);
+}
+
+/* ---- Reed–Solomon decode (generator base 0) ---- */
+function rsEuclid(a, b, R) {
+  if (pDeg(a) < pDeg(b)) { var t = a; a = b; b = t; }
+  var rLast = a, r = b, tLast = pZero(), tCur = [1];
+  var halfR = R >> 1; // ต้องปัดลง (จำนวน EC codeword เป็นเลขคี่ได้ เช่น เวอร์ชัน 1 ระดับ L มี 7)
+  while (pDeg(r) >= halfR) {
+    var rLastLast = rLast, tLastLast = tLast;
+    rLast = r; tLast = tCur;
+    if (pIsZero(rLast)) throw new Error('RS: r_{i-1} was zero');
+    r = rLastLast;
+    var q = pZero();
+    var dlt = pCoef(rLast, pDeg(rLast));
+    var dltInv = ginv(dlt);
+    var guard = 0;
+    while (pDeg(r) >= pDeg(rLast) && !pIsZero(r)) {
+      if (++guard > 300) throw new Error('RS: division loop');
+      var degreeDiff = pDeg(r) - pDeg(rLast);
+      var scale = gmul(pCoef(r, pDeg(r)), dltInv);
+      q = pAdd(q, pMonomial(degreeDiff, scale));
+      r = pAdd(r, pMulMonomial(rLast, degreeDiff, scale));
+    }
+    tCur = pAdd(pMul(q, tLast), tLastLast);
+    if (pDeg(r) >= pDeg(rLast)) throw new Error('RS: division algorithm failed');
+  }
+  var sigmaTildeAtZero = pCoef(tCur, 0);
+  if (sigmaTildeAtZero === 0) throw new Error('RS: sigmaTilde(0) = 0');
+  var inv = ginv(sigmaTildeAtZero);
+  return [pScale(tCur, inv), pScale(r, inv)];
+}
+function rsFindErrorLocations(errorLocator) {
+  var numErrors = pDeg(errorLocator);
+  if (numErrors === 1) return [pCoef(errorLocator, 1)];
+  var result = new Array(numErrors), e = 0;
+  for (var i = 1; i < 256 && e < numErrors; i++) {
+    if (pEval(errorLocator, i) === 0) { result[e++] = ginv(i); }
+  }
+  if (e !== numErrors) throw new Error('RS: error locator degree mismatch');
+  return result;
+}
+function rsFindErrorMagnitudes(errorEvaluator, errorLocations) {
+  var s = errorLocations.length, result = new Array(s), i, j;
+  for (i = 0; i < s; i++) {
+    var xiInverse = ginv(errorLocations[i]);
+    var denominator = 1;
+    for (j = 0; j < s; j++) {
+      if (i === j) continue;
+      var term = gmul(errorLocations[j], xiInverse);
+      var termPlus1 = (term & 1) === 0 ? (term | 1) : (term & ~1);
+      denominator = gmul(denominator, termPlus1);
+    }
+    result[i] = gmul(pEval(errorEvaluator, xiInverse), ginv(denominator));
+  }
+  return result;
+}
+// received = อาร์เรย์ codeword (data + ec), twoS = จำนวน EC codeword — แก้ไขในตัว
+function rsDecode(received, twoS) {
+  var i, syndrome = new Array(twoS), noError = true;
+  for (i = 0; i < twoS; i++) {
+    var ev = pEval(received, EXP[i]);
+    syndrome[twoS - 1 - i] = ev;
+    if (ev !== 0) noError = false;
+  }
+  if (noError) return 0;
+  var so = rsEuclid(pMonomial(twoS, 1), pNorm(syndrome), twoS);
+  var locations = rsFindErrorLocations(so[0]);
+  var magnitudes = rsFindErrorMagnitudes(so[1], locations);
+  for (i = 0; i < locations.length; i++) {
+    var position = received.length - 1 - LOG[locations[i]];
+    if (position < 0) throw new Error('RS: bad error location');
+    received[position] ^= magnitudes[i];
+  }
+  return locations.length;
+}
+
+/* ================= ตารางมาตรฐาน QR ================= */
+// ตำแหน่งกึ่งกลาง alignment pattern ของแต่ละเวอร์ชัน (index 0 = เวอร์ชัน 1)
+var ALIGNMENT_POS = [[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],
+[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],
+[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],
+[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],
+[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],
+[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]];
+
+// โครงสร้างบล็อก RS: RS_BLOCKS[4*(version-1) + eccIndex] โดย eccIndex 0=L 1=M 2=Q 3=H
+// แต่ละรายการเป็นชุดของ (จำนวนบล็อก, codeword ทั้งหมด/บล็อก, data codeword/บล็อก)
+var RS_BLOCKS = [
+[1,26,19],[1,26,16],[1,26,13],[1,26,9],
+[1,44,34],[1,44,28],[1,44,22],[1,44,16],
+[1,70,55],[1,70,44],[2,35,17],[2,35,13],
+[1,100,80],[2,50,32],[2,50,24],[4,25,9],
+[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],
+[2,86,68],[4,43,27],[4,43,19],[4,43,15],
+[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],
+[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],
+[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],
+[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],
+[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],
+[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],
+[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],
+[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],
+[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],
+[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],
+[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],
+[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],
+[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],
+[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],
+[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],
+[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],
+[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],
+[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],
+[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],
+[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],
+[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],
+[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],
+[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],
+[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],
+[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],
+[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],
+[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],
+[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],
+[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],
+[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],
+[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],
+[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],
+[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],
+[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]];
+
+// format information: [รูปแบบ 15 บิตหลัง mask, ค่าจริง 5 บิต]
+var FORMAT_LOOKUP = [
+[0x5412,0x00],[0x5125,0x01],[0x5E7C,0x02],[0x5B4B,0x03],[0x45F9,0x04],[0x40CE,0x05],[0x4F97,0x06],[0x4AA0,0x07],
+[0x77C4,0x08],[0x72F3,0x09],[0x7DAA,0x0A],[0x789D,0x0B],[0x662F,0x0C],[0x6318,0x0D],[0x6C41,0x0E],[0x6976,0x0F],
+[0x1689,0x10],[0x13BE,0x11],[0x1CE7,0x12],[0x19D0,0x13],[0x0762,0x14],[0x0255,0x15],[0x0D0C,0x16],[0x083B,0x17],
+[0x355F,0x18],[0x3068,0x19],[0x3F31,0x1A],[0x3A06,0x1B],[0x24B4,0x1C],[0x2183,0x1D],[0x2EDA,0x1E],[0x2BED,0x1F]];
+
+// version information 18 บิต สำหรับเวอร์ชัน 7–40
+var VERSION_DECODE = [
+0x07C94,0x085BC,0x09A99,0x0A4D3,0x0BBF6,0x0C762,0x0D847,0x0E60D,0x0F928,0x10B78,
+0x1145D,0x12A17,0x13532,0x149A6,0x15683,0x168C9,0x177EC,0x18EC4,0x191E1,0x1AFAB,
+0x1B08E,0x1CC1A,0x1D33F,0x1ED75,0x1F250,0x209D5,0x216F0,0x228BA,0x2379F,0x24B0B,
+0x2542E,0x26A64,0x27541,0x28C69];
+
+// บิต 2 ตัวใน format info → ระดับ ECC (00=M 01=L 10=H 11=Q)
+var ECC_NAMES = ['M','L','H','Q'];
+var ECC_TABLE_INDEX = [1,0,3,2]; // → index ใน RS_BLOCKS (0=L 1=M 2=Q 3=H)
+
+var DATA_MASKS = [
+  function(i,j){ return ((i + j) & 1) === 0; },
+  function(i,j){ return (i & 1) === 0; },
+  function(i,j){ return j % 3 === 0; },
+  function(i,j){ return (i + j) % 3 === 0; },
+  function(i,j){ return ((((i / 2) | 0) + ((j / 3) | 0)) & 1) === 0; },
+  function(i,j){ var t = i * j; return (t & 1) + (t % 3) === 0; },
+  function(i,j){ var t = i * j; return (((t & 1) + (t % 3)) & 1) === 0; },
+  function(i,j){ return (((((i + j) & 1)) + ((i * j) % 3)) & 1) === 0; }
+];
+
+function bitCount(n) { var c = 0; while (n) { n &= n - 1; c++; } return c; }
+
+/* ================= ภาพขาวดำ (true = จุดดำ) ================= */
+function BitImage(w, h, bits) { this.w = w; this.h = h; this.bits = bits || new Uint8Array(w * h); }
+BitImage.prototype.get = function(x, y) { return this.bits[y * this.w + x] === 1; };
+BitImage.prototype.invert = function() {
+  var out = new Uint8Array(this.bits.length);
+  for (var i = 0; i < out.length; i++) out[i] = this.bits[i] ? 0 : 1;
+  return new BitImage(this.w, this.h, out);
+};
+
+function grayLuma(data, w, h) {
+  var g = new Uint8Array(w * h);
+  for (var i = 0, p = 0; i < g.length; i++, p += 4) {
+    g[i] = (306 * data[p] + 601 * data[p + 1] + 117 * data[p + 2]) >> 10;
+  }
+  return g;
+}
+// "ความสว่างต่ำสุดของสามช่อง" — ช่วยกรณี QR สีสด (เช่นเหลือง/ฟ้า) บนพื้นขาว
+// ซึ่ง luminance ของสีเหลืองใกล้เคียงสีขาวจนแยกไม่ออก
+function grayMinChannel(data, w, h) {
+  var g = new Uint8Array(w * h);
+  for (var i = 0, p = 0; i < g.length; i++, p += 4) {
+    var r = data[p], gg = data[p + 1], b = data[p + 2];
+    var m = r < gg ? r : gg;
+    g[i] = m < b ? m : b;
+  }
+  return g;
+}
+
+// Otsu global threshold
+function otsuBinarize(gray, w, h) {
+  var hist = new Int32Array(256), i;
+  for (i = 0; i < gray.length; i++) hist[gray[i]]++;
+  var total = gray.length, sum = 0;
+  for (i = 0; i < 256; i++) sum += i * hist[i];
+  var sumB = 0, wB = 0, best = 0, thr = 128;
+  for (i = 0; i < 256; i++) {
+    wB += hist[i];
+    if (wB === 0) continue;
+    var wF = total - wB;
+    if (wF === 0) break;
+    sumB += i * hist[i];
+    var mB = sumB / wB, mF = (sum - sumB) / wF;
+    var between = wB * wF * (mB - mF) * (mB - mF);
+    if (between > best) { best = between; thr = i; }
+  }
+  var bits = new Uint8Array(gray.length);
+  for (i = 0; i < gray.length; i++) bits[i] = gray[i] <= thr ? 1 : 0;
+  return new BitImage(w, h, bits);
+}
+
+// Hybrid binarizer แบบ ZXing: threshold เฉพาะที่ ทนต่อแสงไม่สม่ำเสมอ/พื้นหลังไล่สี
+function hybridBinarize(gray, w, h) {
+  if (w < 40 || h < 40) return otsuBinarize(gray, w, h);
+  var subW = w >> 3; if ((w & 7) !== 0) subW++;
+  var subH = h >> 3; if ((h & 7) !== 0) subH++;
+  var blackPoints = new Int32Array(subW * subH);
+  var bx, by, xx, yy, off;
+  for (by = 0; by < subH; by++) {
+    var yoffset = by << 3; if (yoffset > h - 8) yoffset = h - 8;
+    for (bx = 0; bx < subW; bx++) {
+      var xoffset = bx << 3; if (xoffset > w - 8) xoffset = w - 8;
+      var sum = 0, min = 255, max = 0;
+      for (yy = 0, off = yoffset * w + xoffset; yy < 8; yy++, off += w) {
+        for (xx = 0; xx < 8; xx++) {
+          var pv = gray[off + xx];
+          sum += pv;
+          if (pv < min) min = pv;
+          if (pv > max) max = pv;
+        }
+      }
+      var average;
+      if (max - min > 24) {
+        average = sum >> 6;
+      } else {
+        average = max >> 1;
+        if (by > 0 && bx > 0) {
+          var nb = (blackPoints[(by - 1) * subW + bx] + 2 * blackPoints[by * subW + bx - 1] +
+                    blackPoints[(by - 1) * subW + bx - 1]) >> 2;
+          if (min < nb) average = nb;
+        }
+      }
+      blackPoints[by * subW + bx] = average;
+    }
+  }
+  var bits = new Uint8Array(w * h);
+  for (by = 0; by < subH; by++) {
+    var yo = by << 3; if (yo > h - 8) yo = h - 8;
+    var top = by < 2 ? 2 : (by > subH - 3 ? subH - 3 : by);
+    for (bx = 0; bx < subW; bx++) {
+      var xo = bx << 3; if (xo > w - 8) xo = w - 8;
+      var left = bx < 2 ? 2 : (bx > subW - 3 ? subW - 3 : bx);
+      var s = 0;
+      for (var dz = -2; dz <= 2; dz++) {
+        var row = (top + dz) * subW;
+        s += blackPoints[row + left - 2] + blackPoints[row + left - 1] + blackPoints[row + left] +
+             blackPoints[row + left + 1] + blackPoints[row + left + 2];
+      }
+      var avg = s / 25;
+      for (yy = 0, off = yo * w + xo; yy < 8; yy++, off += w) {
+        for (xx = 0; xx < 8; xx++) bits[off + xx] = gray[off + xx] <= avg ? 1 : 0;
+      }
+    }
+  }
+  return new BitImage(w, h, bits);
+}
+
+/* ================= ค้นหา finder pattern (สี่เหลี่ยม 3 มุม) ================= */
+function foundPatternCross(sc) {
+  var total = sc[0] + sc[1] + sc[2] + sc[3] + sc[4];
+  if (total < 7) return false;
+  var moduleSize = total / 7, maxVariance = moduleSize / 2;
+  return Math.abs(moduleSize - sc[0]) < maxVariance &&
+         Math.abs(moduleSize - sc[1]) < maxVariance &&
+         Math.abs(3 * moduleSize - sc[2]) < 3 * maxVariance &&
+         Math.abs(moduleSize - sc[3]) < maxVariance &&
+         Math.abs(moduleSize - sc[4]) < maxVariance;
+}
+function centerFromEnd(sc, end) { return (end - sc[4] - sc[3]) - sc[2] / 2; }
+
+function crossCheckVertical(img, startI, centerJ, maxCount, originalTotal) {
+  var maxI = img.h, sc = [0, 0, 0, 0, 0], i = startI;
+  while (i >= 0 && img.get(centerJ, i)) { sc[2]++; i--; }
+  if (i < 0) return NaN;
+  while (i >= 0 && !img.get(centerJ, i) && sc[1] <= maxCount) { sc[1]++; i--; }
+  if (i < 0 || sc[1] > maxCount) return NaN;
+  while (i >= 0 && img.get(centerJ, i) && sc[0] <= maxCount) { sc[0]++; i--; }
+  if (sc[0] > maxCount) return NaN;
+  i = startI + 1;
+  while (i < maxI && img.get(centerJ, i)) { sc[2]++; i++; }
+  if (i === maxI) return NaN;
+  while (i < maxI && !img.get(centerJ, i) && sc[3] < maxCount) { sc[3]++; i++; }
+  if (i === maxI || sc[3] >= maxCount) return NaN;
+  while (i < maxI && img.get(centerJ, i) && sc[4] < maxCount) { sc[4]++; i++; }
+  if (sc[4] >= maxCount) return NaN;
+  var total = sc[0] + sc[1] + sc[2] + sc[3] + sc[4];
+  if (5 * Math.abs(total - originalTotal) >= 2 * originalTotal) return NaN;
+  return foundPatternCross(sc) ? centerFromEnd(sc, i) : NaN;
+}
+function crossCheckHorizontal(img, startJ, centerI, maxCount, originalTotal) {
+  var maxJ = img.w, sc = [0, 0, 0, 0, 0], j = startJ;
+  while (j >= 0 && img.get(j, centerI)) { sc[2]++; j--; }
+  if (j < 0) return NaN;
+  while (j >= 0 && !img.get(j, centerI) && sc[1] <= maxCount) { sc[1]++; j--; }
+  if (j < 0 || sc[1] > maxCount) return NaN;
+  while (j >= 0 && img.get(j, centerI) && sc[0] <= maxCount) { sc[0]++; j--; }
+  if (sc[0] > maxCount) return NaN;
+  j = startJ + 1;
+  while (j < maxJ && img.get(j, centerI)) { sc[2]++; j++; }
+  if (j === maxJ) return NaN;
+  while (j < maxJ && !img.get(j, centerI) && sc[3] < maxCount) { sc[3]++; j++; }
+  if (j === maxJ || sc[3] >= maxCount) return NaN;
+  while (j < maxJ && img.get(j, centerI) && sc[4] < maxCount) { sc[4]++; j++; }
+  if (sc[4] >= maxCount) return NaN;
+  var total = sc[0] + sc[1] + sc[2] + sc[3] + sc[4];
+  if (5 * Math.abs(total - originalTotal) >= 2 * originalTotal) return NaN;
+  return foundPatternCross(sc) ? centerFromEnd(sc, j) : NaN;
+}
+
+function findFinderCandidates(img) {
+  var centers = [], sc = [0, 0, 0, 0, 0], w = img.w, h = img.h;
+  for (var i = 0; i < h; i++) {
+    sc[0] = sc[1] = sc[2] = sc[3] = sc[4] = 0;
+    var currentState = 0;
+    for (var j = 0; j < w; j++) {
+      if (img.get(j, i)) {
+        if ((currentState & 1) === 1) currentState++;
+        sc[currentState]++;
+      } else {
+        if ((currentState & 1) === 0) {
+          if (currentState === 4) {
+            if (foundPatternCross(sc)) handlePossibleCenter(img, centers, sc, i, j);
+            sc[0] = sc[2]; sc[1] = sc[3]; sc[2] = sc[4]; sc[3] = 1; sc[4] = 0;
+            currentState = 3;
+          } else {
+            sc[++currentState]++;
+          }
+        } else {
+          sc[currentState]++;
+        }
+      }
+    }
+    if (currentState === 4 && foundPatternCross(sc)) handlePossibleCenter(img, centers, sc, i, w);
+  }
+  return centers;
+}
+
+function handlePossibleCenter(img, centers, sc, i, j) {
+  var total = sc[0] + sc[1] + sc[2] + sc[3] + sc[4];
+  var centerJ = centerFromEnd(sc, j);
+  var centerI = crossCheckVertical(img, i, Math.floor(centerJ), sc[2], total);
+  if (isNaN(centerI)) return false;
+  centerJ = crossCheckHorizontal(img, Math.floor(centerJ), Math.floor(centerI), sc[2], total);
+  if (isNaN(centerJ)) return false;
+  var estimatedModuleSize = total / 7;
+  for (var k = 0; k < centers.length; k++) {
+    var c = centers[k];
+    if (Math.abs(centerI - c.y) <= c.size && Math.abs(centerJ - c.x) <= c.size) {
+      var diff = Math.abs(estimatedModuleSize - c.size);
+      if (diff <= 1 || diff <= c.size) {
+        var n = c.count + 1;
+        c.x = (c.count * c.x + centerJ) / n;
+        c.y = (c.count * c.y + centerI) / n;
+        c.size = (c.count * c.size + estimatedModuleSize) / n;
+        c.count = n;
+        return true;
+      }
+    }
+  }
+  centers.push({ x: centerJ, y: centerI, size: estimatedModuleSize, count: 1 });
+  return true;
+}
+
+function dist(a, b) { var dx = a.x - b.x, dy = a.y - b.y; return Math.sqrt(dx * dx + dy * dy); }
+
+// จัดอันดับชุด finder 3 จุดที่ "เข้าท่า" ที่สุด (สามเหลี่ยมมุมฉากหน้าจั่ว + ขนาดโมดูลใกล้เคียงกัน)
+function rankTriples(centers) {
+  var pool = centers.slice().sort(function(a, b) { return b.count - a.count; }).slice(0, 16);
+  var out = [];
+  for (var a = 0; a < pool.length - 2; a++) {
+    for (var b = a + 1; b < pool.length - 1; b++) {
+      for (var c = b + 1; c < pool.length; c++) {
+        var p = [pool[a], pool[b], pool[c]];
+        var sizes = [p[0].size, p[1].size, p[2].size];
+        var mn = Math.min(sizes[0], sizes[1], sizes[2]), mx = Math.max(sizes[0], sizes[1], sizes[2]);
+        var avgSize = (sizes[0] + sizes[1] + sizes[2]) / 3;
+        var sizeSpread = (mx - mn) / avgSize;
+        if (sizeSpread > 0.6) continue;
+        var d01 = dist(p[0], p[1]), d12 = dist(p[1], p[2]), d02 = dist(p[0], p[2]);
+        var hyp = Math.max(d01, d12, d02);
+        var legs = [d01, d12, d02].filter(function(d) { return d !== hyp; });
+        if (legs.length < 2) legs = [d01, d12];
+        var legA = legs[0], legB = legs[1];
+        if (legA <= 0 || legB <= 0) continue;
+        var legAvg = (legA + legB) / 2;
+        if (legAvg / avgSize < 9 || legAvg / avgSize > 190) continue; // นอกช่วงเวอร์ชัน 1–40
+        var legDiff = Math.abs(legA - legB) / legAvg;
+        if (legDiff > 0.35) continue;
+        var hypErr = Math.abs(hyp / (Math.SQRT2 * legAvg) - 1);
+        if (hypErr > 0.3) continue;
+        out.push({ pts: p, score: legDiff + hypErr * 1.5 + sizeSpread * 0.5 });
+      }
+    }
+  }
+  out.sort(function(x, y) { return x.score - y.score; });
+  return out;
+}
+
+// เรียงเป็น bottomLeft / topLeft / topRight (อัลกอริทึมเดียวกับ ZXing)
+function orderPatterns(p) {
+  var d01 = dist(p[0], p[1]), d12 = dist(p[1], p[2]), d02 = dist(p[0], p[2]);
+  var pointA, pointB, pointC;
+  if (d12 >= d01 && d12 >= d02) { pointB = p[0]; pointA = p[1]; pointC = p[2]; }
+  else if (d02 >= d12 && d02 >= d01) { pointB = p[1]; pointA = p[0]; pointC = p[2]; }
+  else { pointB = p[2]; pointA = p[0]; pointC = p[1]; }
+  var cross = (pointC.x - pointB.x) * (pointA.y - pointB.y) - (pointC.y - pointB.y) * (pointA.x - pointB.x);
+  if (cross < 0) { var t = pointA; pointA = pointC; pointC = t; }
+  return { bottomLeft: pointA, topLeft: pointB, topRight: pointC };
+}
+
+/* ---- วัดขนาดโมดูลจากความยาวช่วงดำ-ขาว-ดำ ระหว่างจุดกึ่งกลาง finder ---- */
+function sizeOfBlackWhiteBlackRun(img, fromX, fromY, toX, toY) {
+  var steep = Math.abs(toY - fromY) > Math.abs(toX - fromX), t;
+  if (steep) { t = fromX; fromX = fromY; fromY = t; t = toX; toX = toY; toY = t; }
+  var dx = Math.abs(toX - fromX), dy = Math.abs(toY - fromY);
+  var error = -dx >> 1;
+  var xstep = fromX < toX ? 1 : -1, ystep = fromY < toY ? 1 : -1;
+  var state = 0, xLimit = toX + xstep;
+  for (var x = fromX, y = fromY; x !== xLimit; x += xstep) {
+    var realX = steep ? y : x, realY = steep ? x : y;
+    if (realX < 0 || realY < 0 || realX >= img.w || realY >= img.h) break;
+    if ((state === 1) === img.get(realX, realY)) {
+      if (state === 2) return Math.sqrt((x - fromX) * (x - fromX) + (y - fromY) * (y - fromY));
+      state++;
+    }
+    error += dy;
+    if (error > 0) {
+      if (y === toY) break;
+      y += ystep;
+      error -= dx;
+    }
+  }
+  if (state === 2) {
+    var ex = toX + xstep - fromX, ey = toY - fromY;
+    return Math.sqrt(ex * ex + ey * ey);
+  }
+  return NaN;
+}
+function sizeOfBlackWhiteBlackRunBothWays(img, fromX, fromY, toX, toY) {
+  var result = sizeOfBlackWhiteBlackRun(img, fromX, fromY, toX, toY);
+  var scale = 1, otherToX = fromX - (toX - fromX);
+  if (otherToX < 0) { scale = fromX / (fromX - otherToX); otherToX = 0; }
+  else if (otherToX >= img.w) { scale = (img.w - 1 - fromX) / (otherToX - fromX); otherToX = img.w - 1; }
+  var otherToY = Math.round(fromY - (toY - fromY) * scale);
+  scale = 1;
+  if (otherToY < 0) { scale = fromY / (fromY - otherToY); otherToY = 0; }
+  else if (otherToY >= img.h) { scale = (img.h - 1 - fromY) / (otherToY - fromY); otherToY = img.h - 1; }
+  otherToX = Math.round(fromX + (otherToX - fromX) * scale);
+  result += sizeOfBlackWhiteBlackRun(img, fromX, fromY, otherToX, otherToY);
+  return result - 1;
+}
+function calculateModuleSizeOneWay(img, a, b) {
+  var s1 = sizeOfBlackWhiteBlackRunBothWays(img, Math.round(a.x), Math.round(a.y), Math.round(b.x), Math.round(b.y));
+  var s2 = sizeOfBlackWhiteBlackRunBothWays(img, Math.round(b.x), Math.round(b.y), Math.round(a.x), Math.round(a.y));
+  if (isNaN(s1)) return s2 / 7;
+  if (isNaN(s2)) return s1 / 7;
+  return (s1 + s2) / 14;
+}
+
+/* ---- ค้นหา alignment pattern ในบริเวณที่คาดไว้ ---- */
+function findAlignmentInRegion(img, overallEstModuleSize, estX, estY, allowanceFactor) {
+  var allowance = (allowanceFactor * overallEstModuleSize) | 0;
+  var startX = Math.max(0, estX - allowance), endX = Math.min(img.w - 1, estX + allowance);
+  if (endX - startX < overallEstModuleSize * 3) return null;
+  var startY = Math.max(0, estY - allowance), endY = Math.min(img.h - 1, estY + allowance);
+  if (endY - startY < overallEstModuleSize * 3) return null;
+  var width = endX - startX, height = endY - startY;
+  var found = [];
+  var maxCount = (width * 5) | 0;
+  var sc = [0, 0, 0];
+  for (var iGen = 0; iGen < height; iGen++) {
+    // สลับสแกนขึ้น/ลงจากกลางบริเวณออกไป
+    var i = ((iGen & 1) === 0) ? (height >> 1) + ((iGen + 1) >> 1) : (height >> 1) - ((iGen + 1) >> 1);
+    if (i < 0 || i >= height) continue;
+    var y = startY + i;
+    sc[0] = sc[1] = sc[2] = 0;
+    var j = startX;
+    while (j < endX && !img.get(j, y)) j++;
+    var currentState = 0;
+    while (j < endX) {
+      if (img.get(j, y)) {
+        if (currentState === 1) sc[1]++;
+        else {
+          if (currentState === 2) {
+            if (alignFoundCross(sc)) {
+              var c = handleAlignmentCenter(img, found, sc, y, j, maxCount);
+              if (c) return c;
+            }
+            sc[0] = sc[2]; sc[1] = 1; sc[2] = 0; currentState = 1;
+          } else {
+            sc[++currentState]++;
+          }
+        }
+      } else {
+        if (currentState === 1) currentState++;
+        sc[currentState]++;
+      }
+      j++;
+    }
+    if (alignFoundCross(sc)) {
+      var c2 = handleAlignmentCenter(img, found, sc, y, endX, maxCount);
+      if (c2) return c2;
+    }
+  }
+  if (found.length > 0) return found[0];
+  return null;
+}
+function alignFoundCross(sc) {
+  var moduleSize = (sc[0] + sc[1] + sc[2]) / 3;
+  if (moduleSize < 1) return false;
+  var maxVariance = moduleSize / 2;
+  return Math.abs(moduleSize - sc[0]) < maxVariance &&
+         Math.abs(moduleSize - sc[1]) < maxVariance &&
+         Math.abs(moduleSize - sc[2]) < maxVariance;
+}
+function alignCrossCheckVertical(img, startI, centerJ, maxCount, originalTotal) {
+  var maxI = img.h, sc = [0, 0, 0], i = startI;
+  while (i >= 0 && img.get(centerJ, i) && sc[1] <= maxCount) { sc[1]++; i--; }
+  if (i < 0 || sc[1] > maxCount) return NaN;
+  while (i >= 0 && !img.get(centerJ, i) && sc[0] <= maxCount) { sc[0]++; i--; }
+  if (sc[0] > maxCount) return NaN;
+  i = startI + 1;
+  while (i < maxI && img.get(centerJ, i) && sc[1] <= maxCount) { sc[1]++; i++; }
+  if (i === maxI || sc[1] > maxCount) return NaN;
+  while (i < maxI && !img.get(centerJ, i) && sc[2] <= maxCount) { sc[2]++; i++; }
+  if (sc[2] > maxCount) return NaN;
+  var total = sc[0] + sc[1] + sc[2];
+  if (5 * Math.abs(total - originalTotal) >= 2 * originalTotal) return NaN;
+  return alignFoundCross(sc) ? (i - sc[2] - sc[1] / 2) : NaN;
+}
+function handleAlignmentCenter(img, found, sc, i, j, maxCount) {
+  var total = sc[0] + sc[1] + sc[2];
+  var centerJ = (j - sc[2]) - sc[1] / 2;
+  var centerI = alignCrossCheckVertical(img, i, Math.floor(centerJ), 2 * sc[1], total);
+  if (isNaN(centerI)) return null;
+  var estimatedModuleSize = total / 3;
+  for (var k = 0; k < found.length; k++) {
+    var p = found[k];
+    if (Math.abs(centerI - p.y) <= p.size && Math.abs(centerJ - p.x) <= p.size) {
+      return { x: (p.x + centerJ) / 2, y: (p.y + centerI) / 2, size: (p.size + estimatedModuleSize) / 2 };
+    }
+  }
+  found.push({ x: centerJ, y: centerI, size: estimatedModuleSize });
+  return null;
+}
+
+/* ================= Perspective transform + grid sampling ================= */
+function ptSquareToQuad(x0, y0, x1, y1, x2, y2, x3, y3) {
+  var dx3 = x0 - x1 + x2 - x3, dy3 = y0 - y1 + y2 - y3;
+  if (dx3 === 0 && dy3 === 0) {
+    return [x1 - x0, x2 - x1, x0, y1 - y0, y2 - y1, y0, 0, 0, 1];
+  }
+  var dx1 = x1 - x2, dx2 = x3 - x2, dy1 = y1 - y2, dy2 = y3 - y2;
+  var denominator = dx1 * dy2 - dx2 * dy1;
+  var a13 = (dx3 * dy2 - dx2 * dy3) / denominator;
+  var a23 = (dx1 * dy3 - dx3 * dy1) / denominator;
+  return [x1 - x0 + a13 * x1, x3 - x0 + a23 * x3, x0,
+          y1 - y0 + a13 * y1, y3 - y0 + a23 * y3, y0,
+          a13, a23, 1];
+}
+function ptAdjoint(m) {
+  return [m[4] * m[8] - m[7] * m[5], m[7] * m[2] - m[1] * m[8], m[1] * m[5] - m[4] * m[2],
+          m[6] * m[5] - m[3] * m[8], m[0] * m[8] - m[6] * m[2], m[3] * m[2] - m[0] * m[5],
+          m[3] * m[7] - m[6] * m[4], m[6] * m[1] - m[0] * m[7], m[0] * m[4] - m[3] * m[1]];
+}
+// หมายเหตุ: ลำดับสมาชิกในอาร์เรย์คือ [a11,a21,a31, a12,a22,a32, a13,a23,a33]
+// (ตามลำดับพารามิเตอร์ constructor ของ ZXing ซึ่งไม่ใช่การไล่แบบแถวต่อแถว)
+function ptTimes(a, b) { // a·b โดย a = this, b = other
+  return [a[0]*b[0]+a[1]*b[3]+a[2]*b[6], a[0]*b[1]+a[1]*b[4]+a[2]*b[7], a[0]*b[2]+a[1]*b[5]+a[2]*b[8],
+          a[3]*b[0]+a[4]*b[3]+a[5]*b[6], a[3]*b[1]+a[4]*b[4]+a[5]*b[7], a[3]*b[2]+a[4]*b[5]+a[5]*b[8],
+          a[6]*b[0]+a[7]*b[3]+a[8]*b[6], a[6]*b[1]+a[7]*b[4]+a[8]*b[7], a[6]*b[2]+a[7]*b[5]+a[8]*b[8]];
+}
+function ptQuadToQuad(x0,y0,x1,y1,x2,y2,x3,y3, x0p,y0p,x1p,y1p,x2p,y2p,x3p,y3p) {
+  var qToS = ptAdjoint(ptSquareToQuad(x0, y0, x1, y1, x2, y2, x3, y3));
+  var sToQ = ptSquareToQuad(x0p, y0p, x1p, y1p, x2p, y2p, x3p, y3p);
+  return ptTimes(sToQ, qToS);
+}
+function ptApply(m, x, y) {
+  var denom = m[6] * x + m[7] * y + m[8];
+  return { x: (m[0] * x + m[1] * y + m[2]) / denom, y: (m[3] * x + m[4] * y + m[5]) / denom };
+}
+
+function sampleGrid(img, transform, dimension) {
+  var bits = new Uint8Array(dimension * dimension);
+  for (var y = 0; y < dimension; y++) {
+    for (var x = 0; x < dimension; x++) {
+      var p = ptApply(transform, x + 0.5, y + 0.5);
+      var px = Math.round(p.x), py = Math.round(p.y);
+      if (px < 0) px = 0; else if (px >= img.w) px = img.w - 1;
+      if (py < 0) py = 0; else if (py >= img.h) py = img.h - 1;
+      if (img.get(px, py)) bits[y * dimension + x] = 1;
+    }
+  }
+  return bits;
+}
+
+function computeDimension(topLeft, topRight, bottomLeft, moduleSize) {
+  var tltr = Math.round(dist(topLeft, topRight) / moduleSize);
+  var tlbl = Math.round(dist(topLeft, bottomLeft) / moduleSize);
+  var dimension = (((tltr + tlbl) / 2) | 0) + 7;
+  switch (dimension & 0x03) {
+    case 0: dimension++; break;
+    case 2: dimension--; break;
+    case 3: return -1;
+  }
+  return dimension;
+}
+
+// ตรวจจับจาก finder 3 จุด → คืนตารางบิต n×n + มุมทั้งสี่ในพิกัดภาพต้นฉบับ
+function detectFromTriple(img, triple) {
+  var o = orderPatterns(triple);
+  var topLeft = o.topLeft, topRight = o.topRight, bottomLeft = o.bottomLeft;
+  var ms1 = calculateModuleSizeOneWay(img, topLeft, topRight);
+  var ms2 = calculateModuleSizeOneWay(img, topLeft, bottomLeft);
+  var moduleSize = (ms1 + ms2) / 2;
+  if (!isFinite(moduleSize) || moduleSize < 1) {
+    moduleSize = (topLeft.size + topRight.size + bottomLeft.size) / 3;
+  }
+  if (!isFinite(moduleSize) || moduleSize < 1) return null;
+  var dimension = computeDimension(topLeft, topRight, bottomLeft, moduleSize);
+  if (dimension < 21 || dimension > 177) return null;
+  var provisionalVersion = (dimension - 17) >> 2;
+  if (provisionalVersion < 1 || provisionalVersion > 40) return null;
+
+  var alignmentPattern = null;
+  if (ALIGNMENT_POS[provisionalVersion - 1].length > 0) {
+    var bottomRightX = topRight.x - topLeft.x + bottomLeft.x;
+    var bottomRightY = topRight.y - topLeft.y + bottomLeft.y;
+    var correction = 1 - 3 / (dimension - 7);
+    var estAlignmentX = Math.round(topLeft.x + correction * (bottomRightX - topLeft.x));
+    var estAlignmentY = Math.round(topLeft.y + correction * (bottomRightY - topLeft.y));
+    for (var f = 4; f <= 16; f <<= 1) {
+      try {
+        alignmentPattern = findAlignmentInRegion(img, moduleSize, estAlignmentX, estAlignmentY, f);
+        if (alignmentPattern) break;
+      } catch (e) { /* ลองรัศมีถัดไป */ }
+    }
+  }
+
+  var dimMinusThree = dimension - 3.5;
+  var brX, brY, srcBRX, srcBRY;
+  if (alignmentPattern) {
+    brX = alignmentPattern.x; brY = alignmentPattern.y;
+    srcBRX = dimMinusThree - 3; srcBRY = srcBRX;
+  } else {
+    brX = topRight.x - topLeft.x + bottomLeft.x;
+    brY = topRight.y - topLeft.y + bottomLeft.y;
+    srcBRX = dimMinusThree; srcBRY = dimMinusThree;
+  }
+  var transform = ptQuadToQuad(
+    3.5, 3.5, dimMinusThree, 3.5, srcBRX, srcBRY, 3.5, dimMinusThree,
+    topLeft.x, topLeft.y, topRight.x, topRight.y, brX, brY, bottomLeft.x, bottomLeft.y);
+
+  var bits = sampleGrid(img, transform, dimension);
+  var corners = [ptApply(transform, 0, 0), ptApply(transform, dimension, 0),
+                 ptApply(transform, dimension, dimension), ptApply(transform, 0, dimension)];
+  return { bits: bits, dimension: dimension, corners: corners, moduleSize: moduleSize };
+}
+
+/* ================= อ่านข้อมูลจากตารางบิต ================= */
+function mGet(bits, dim, x, y) { return bits[y * dim + x] === 1; }
+
+function readFormatInformation(bits, dim) {
+  // copyBit(i, j): i = คอลัมน์, j = แถว (ลำดับเดียวกับ BitMatrixParser ของ ZXing)
+  function copyBit(i, j, acc) { return mGet(bits, dim, i, j) ? ((acc << 1) | 1) : (acc << 1); }
+  var f1 = 0, i, j;
+  for (i = 0; i < 6; i++) f1 = copyBit(i, 8, f1);
+  f1 = copyBit(7, 8, f1);
+  f1 = copyBit(8, 8, f1);
+  f1 = copyBit(8, 7, f1);
+  for (j = 5; j >= 0; j--) f1 = copyBit(8, j, f1);
+  var f2 = 0;
+  for (j = dim - 1; j >= dim - 7; j--) f2 = copyBit(8, j, f2);
+  for (i = dim - 8; i < dim; i++) f2 = copyBit(i, 8, f2);
+  var best = null, bestDiff = 32;
+  for (var k = 0; k < FORMAT_LOOKUP.length; k++) {
+    var target = FORMAT_LOOKUP[k][0];
+    if (target === f1 || target === f2) { return FORMAT_LOOKUP[k][1]; }
+    var d1 = bitCount(f1 ^ target);
+    if (d1 < bestDiff) { best = FORMAT_LOOKUP[k][1]; bestDiff = d1; }
+    if (f1 !== f2) {
+      var d2 = bitCount(f2 ^ target);
+      if (d2 < bestDiff) { best = FORMAT_LOOKUP[k][1]; bestDiff = d2; }
+    }
+  }
+  return bestDiff <= 3 ? best : -1;
+}
+
+function readVersion(bits, dim) {
+  var provisional = (dim - 17) >> 2;
+  if (provisional <= 6) return provisional;
+  function copyBit(i, j, acc) { return mGet(bits, dim, i, j) ? ((acc << 1) | 1) : (acc << 1); }
+  var i, j, versionBits = 0;
+  for (j = 5; j >= 0; j--) for (i = dim - 9; i >= dim - 11; i--) versionBits = copyBit(i, j, versionBits);
+  var v = decodeVersionBits(versionBits);
+  if (v > 0 && v * 4 + 17 === dim) return v;
+  versionBits = 0;
+  for (i = 5; i >= 0; i--) for (j = dim - 9; j >= dim - 11; j--) versionBits = copyBit(i, j, versionBits);
+  v = decodeVersionBits(versionBits);
+  if (v > 0 && v * 4 + 17 === dim) return v;
+  return provisional;
+}
+function decodeVersionBits(versionBits) {
+  var bestDiff = 32, best = 0;
+  for (var i = 0; i < VERSION_DECODE.length; i++) {
+    var target = VERSION_DECODE[i];
+    if (target === versionBits) return i + 7;
+    var d = bitCount(versionBits ^ target);
+    if (d < bestDiff) { bestDiff = d; best = i + 7; }
+  }
+  return bestDiff <= 3 ? best : 0;
+}
+
+function buildFunctionPatternMask(version, dim) {
+  var mask = new Uint8Array(dim * dim);
+  function setRegion(left, top, width, height) {
+    for (var y = top; y < top + height; y++)
+      for (var x = left; x < left + width; x++) mask[y * dim + x] = 1;
+  }
+  setRegion(0, 0, 9, 9);
+  setRegion(dim - 8, 0, 8, 9);
+  setRegion(0, dim - 8, 9, 8);
+  var centers = ALIGNMENT_POS[version - 1], max = centers.length;
+  for (var x = 0; x < max; x++) {
+    var i = centers[x] - 2;
+    for (var y = 0; y < max; y++) {
+      if ((x !== 0 || (y !== 0 && y !== max - 1)) && (x !== max - 1 || y !== 0)) {
+        setRegion(centers[y] - 2, i, 5, 5);
+      }
+    }
+  }
+  setRegion(6, 9, 1, dim - 17);
+  setRegion(9, 6, dim - 17, 1);
+  if (version > 6) {
+    setRegion(dim - 11, 0, 3, 6);
+    setRegion(0, dim - 11, 6, 3);
+  }
+  return mask;
+}
+
+function totalCodewordsFor(version, eccIdx) {
+  var spec = RS_BLOCKS[4 * (version - 1) + eccIdx], total = 0;
+  for (var i = 0; i < spec.length; i += 3) total += spec[i] * spec[i + 1];
+  return total;
+}
+
+function readCodewords(bits, dim, funcMask, maskFn, totalCodewords) {
+  var result = new Array(totalCodewords), resultOffset = 0;
+  var currentByte = 0, bitsRead = 0, readingUp = true;
+  for (var j = dim - 1; j > 0; j -= 2) {
+    if (j === 6) j--;
+    for (var count = 0; count < dim; count++) {
+      var i = readingUp ? dim - 1 - count : count;
+      for (var col = 0; col < 2; col++) {
+        var jj = j - col;
+        if (funcMask[i * dim + jj]) continue;
+        bitsRead++;
+        var bit = mGet(bits, dim, jj, i);
+        if (maskFn(i, jj)) bit = !bit;
+        currentByte = (currentByte << 1) | (bit ? 1 : 0);
+        if (bitsRead === 8) {
+          if (resultOffset < totalCodewords) result[resultOffset++] = currentByte;
+          bitsRead = 0;
+          currentByte = 0;
+        }
+      }
+    }
+    readingUp = !readingUp;
+  }
+  if (resultOffset !== totalCodewords) throw new Error('codeword count mismatch');
+  return result;
+}
+
+function getDataBlocks(rawCodewords, version, eccIdx) {
+  var spec = RS_BLOCKS[4 * (version - 1) + eccIdx];
+  var blocks = [], i, j;
+  for (i = 0; i < spec.length; i += 3) {
+    var count = spec[i], total = spec[i + 1], dataCount = spec[i + 2];
+    for (j = 0; j < count; j++) blocks.push({ total: total, numData: dataCount, codewords: new Array(total) });
+  }
+  var ecPerBlock = blocks[0].total - blocks[0].numData;
+  var shorterTotal = blocks[0].total;
+  var longerStart = blocks.length - 1;
+  while (longerStart >= 0 && blocks[longerStart].total !== shorterTotal) longerStart--;
+  longerStart++;
+  var shorterNumData = shorterTotal - ecPerBlock;
+  var off = 0;
+  for (i = 0; i < shorterNumData; i++)
+    for (j = 0; j < blocks.length; j++) blocks[j].codewords[i] = rawCodewords[off++];
+  for (j = longerStart; j < blocks.length; j++) blocks[j].codewords[shorterNumData] = rawCodewords[off++];
+  var maxLen = blocks[0].codewords.length;
+  for (i = shorterNumData; i < maxLen; i++) {
+    for (j = 0; j < blocks.length; j++) {
+      var iOffset = j < longerStart ? i : i + 1;
+      blocks[j].codewords[iOffset] = rawCodewords[off++];
+    }
+  }
+  return blocks;
+}
+
+/* ================= ถอด bitstream เป็นข้อความ ================= */
+var ALPHANUM = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
+function BitReader(bytes) { this.bytes = bytes; this.bitPos = 0; }
+BitReader.prototype.available = function() { return this.bytes.length * 8 - this.bitPos; };
+BitReader.prototype.read = function(n) {
+  if (n < 0 || n > 32 || n > this.available()) throw new Error('bitstream ended');
+  var result = 0;
+  var bitOffset = this.bitPos & 7, byteOffset = this.bitPos >> 3;
+  if (bitOffset > 0) {
+    var bitsLeft = 8 - bitOffset;
+    var toRead = n < bitsLeft ? n : bitsLeft;
+    var bitsToNotRead = bitsLeft - toRead;
+    var mask = (0xFF >> (8 - toRead)) << bitsToNotRead;
+    result = (this.bytes[byteOffset] & mask) >> bitsToNotRead;
+    n -= toRead; this.bitPos += toRead;
+    if (bitsToNotRead === 0) byteOffset++;
+  }
+  if (n > 0) {
+    while (n >= 8) {
+      result = (result << 8) | (this.bytes[byteOffset] & 0xFF);
+      byteOffset++; this.bitPos += 8; n -= 8;
+    }
+    if (n > 0) {
+      var bitsToNotRead2 = 8 - n;
+      var mask2 = (0xFF >> bitsToNotRead2) << bitsToNotRead2;
+      result = (result << n) | ((this.bytes[byteOffset] & mask2) >> bitsToNotRead2);
+      this.bitPos += n;
+    }
+  }
+  return result;
+};
+function charCountBits(mode, version) {
+  var i = version <= 9 ? 0 : (version <= 26 ? 1 : 2);
+  if (mode === 1) return [10, 12, 14][i];
+  if (mode === 2) return [9, 11, 13][i];
+  if (mode === 4) return [8, 16, 16][i];
+  if (mode === 8) return [8, 10, 12][i];
+  throw new Error('mode ไม่รองรับ: ' + mode);
+}
+function decodeBytesWith(bytes, encoding) {
+  var arr = new Uint8Array(bytes);
+  if (typeof TextDecoder === 'function') {
+    if (!encoding) {
+      try { return new TextDecoder('utf-8', { fatal: true }).decode(arr); }
+      catch (e) { return new TextDecoder('windows-1252').decode(arr); }
+    }
+    try { return new TextDecoder(encoding).decode(arr); }
+    catch (e2) { /* ตกไปใช้วิธีสำรอง */ }
+  }
+  var s = '';
+  for (var i = 0; i < arr.length; i++) s += String.fromCharCode(arr[i]);
+  try { return decodeURIComponent(escape(s)); } catch (e3) { return s; }
+}
+var ECI_ENCODINGS = { 0: 'windows-1252', 1: 'windows-1252', 2: 'windows-1252', 3: 'iso-8859-1',
+  4: 'iso-8859-2', 5: 'iso-8859-3', 6: 'iso-8859-4', 7: 'iso-8859-5', 8: 'iso-8859-6', 9: 'iso-8859-7',
+  10: 'iso-8859-8', 11: 'iso-8859-9', 12: 'iso-8859-10', 13: 'iso-8859-11', 15: 'iso-8859-13',
+  16: 'iso-8859-14', 17: 'iso-8859-15', 18: 'iso-8859-16', 20: 'shift_jis', 21: 'windows-1250',
+  22: 'windows-1251', 23: 'windows-1252', 24: 'windows-1256', 25: 'utf-16be', 26: 'utf-8',
+  27: 'ascii', 28: 'big5', 29: 'gb18030', 30: 'euc-kr' };
+
+function decodeBitStream(dataBytes, version) {
+  var br = new BitReader(dataBytes), out = '', encoding = null;
+  var guard = 0;
+  while (true) {
+    if (++guard > 4096) break;
+    var mode;
+    if (br.available() < 4) break;
+    mode = br.read(4);
+    if (mode === 0) break;                      // terminator
+    if (mode === 5 || mode === 9) continue;     // FNC1
+    if (mode === 3) { br.read(16); continue; }  // structured append
+    if (mode === 7) {                           // ECI
+      var first = br.read(8), eci;
+      if ((first & 0x80) === 0) eci = first & 0x7F;
+      else if ((first & 0xC0) === 0x80) eci = ((first & 0x3F) << 8) | br.read(8);
+      else eci = ((first & 0x1F) << 16) | br.read(16);
+      encoding = ECI_ENCODINGS[eci] || null;
+      continue;
+    }
+    var count = br.read(charCountBits(mode, version)), i;
+    if (mode === 1) {                           // ตัวเลข
+      while (count >= 3) { var d3 = br.read(10); if (d3 >= 1000) throw new Error('numeric'); out += pad(d3, 3); count -= 3; }
+      if (count === 2) { var d2 = br.read(7); if (d2 >= 100) throw new Error('numeric'); out += pad(d2, 2); }
+      else if (count === 1) { var d1 = br.read(4); if (d1 >= 10) throw new Error('numeric'); out += String(d1); }
+    } else if (mode === 2) {                    // ตัวอักษร-ตัวเลข
+      while (count > 1) { var v = br.read(11); out += ALPHANUM.charAt((v / 45) | 0) + ALPHANUM.charAt(v % 45); count -= 2; }
+      if (count === 1) out += ALPHANUM.charAt(br.read(6));
+    } else if (mode === 4) {                    // ไบต์
+      var bytes = new Array(count);
+      for (i = 0; i < count; i++) bytes[i] = br.read(8);
+      out += decodeBytesWith(bytes, encoding);
+    } else if (mode === 8) {                    // คันจิ (Shift-JIS)
+      var kb = [];
+      for (i = 0; i < count; i++) {
+        var twoBytes = br.read(13);
+        var assembled = (((twoBytes / 0xC0) | 0) << 8) | (twoBytes % 0xC0);
+        assembled += (assembled < 0x01F00) ? 0x08140 : 0x0C140;
+        kb.push((assembled >> 8) & 0xFF, assembled & 0xFF);
+      }
+      out += decodeBytesWith(kb, 'shift_jis');
+    } else {
+      throw new Error('mode ไม่รองรับ: ' + mode);
+    }
+  }
+  return out;
+}
+function pad(n, len) { var s = String(n); while (s.length < len) s = '0' + s; return s; }
+
+/* ---- ถอดรหัสจากตารางบิต n×n (ลองทั้งแบบปกติและแบบกระจกเงา) ---- */
+function decodeBits(bits, dim) {
+  var attempts = [bits, mirrorBits(bits, dim)];
+  var lastErr = null;
+  for (var a = 0; a < attempts.length; a++) {
+    try {
+      var r = decodeBitsOnce(attempts[a], dim);
+      if (r) { r.mirrored = (a === 1); return r; }
+    } catch (e) { lastErr = e; }
+  }
+  return null;
+}
+function mirrorBits(bits, dim) {
+  var out = new Uint8Array(dim * dim);
+  for (var y = 0; y < dim; y++) for (var x = 0; x < dim; x++) out[x * dim + y] = bits[y * dim + x];
+  return out;
+}
+function decodeBitsOnce(bits, dim) {
+  var formatInfo = readFormatInformation(bits, dim);
+  if (formatInfo < 0) return null;
+  var eccBits = (formatInfo >> 3) & 0x03;
+  var maskId = formatInfo & 0x07;
+  var eccIdx = ECC_TABLE_INDEX[eccBits];
+  var version = readVersion(bits, dim);
+  if (version < 1 || version > 40) return null;
+  var funcMask = buildFunctionPatternMask(version, dim);
+  var totalCodewords = totalCodewordsFor(version, eccIdx);
+  var raw = readCodewords(bits, dim, funcMask, DATA_MASKS[maskId], totalCodewords);
+  var blocks = getDataBlocks(raw, version, eccIdx);
+  var dataBytes = [], errorsCorrected = 0;
+  for (var b = 0; b < blocks.length; b++) {
+    var blk = blocks[b];
+    var ecCount = blk.total - blk.numData;
+    errorsCorrected += rsDecode(blk.codewords, ecCount);
+    for (var i = 0; i < blk.numData; i++) dataBytes.push(blk.codewords[i] & 0xFF);
+  }
+  var text = decodeBitStream(dataBytes, version);
+  return { text: text, version: version, ecLevel: ECC_NAMES[eccBits], mask: maskId, errorsCorrected: errorsCorrected };
+}
+
+/* ================= จุดเข้าใช้งานหลัก ================= */
+function decodeBinaryImage(img) {
+  var centers = findFinderCandidates(img);
+  if (centers.length < 3) return null;
+  var triples = rankTriples(centers);
+  var limit = Math.min(triples.length, 10);
+  for (var t = 0; t < limit; t++) {
+    var det = null;
+    try { det = detectFromTriple(img, triples[t].pts); } catch (e) { det = null; }
+    if (!det) continue;
+    var res = null;
+    try { res = decodeBits(det.bits, det.dimension); } catch (e2) { res = null; }
+    if (res && res.text !== null && res.text !== undefined) {
+      res.points = det.corners;
+      res.moduleSize = det.moduleSize;
+      return res;
+    }
+  }
+  return null;
+}
+
+function decodeImageData(imgData) {
+  var w = imgData.width, h = imgData.height, data = imgData.data;
+  if (w < 21 || h < 21) return null;
+  var lum = grayLuma(data, w, h);
+  var binLum = hybridBinarize(lum, w, h);
+  var res = decodeBinaryImage(binLum);
+  if (res) return res;
+  res = decodeBinaryImage(binLum.invert());          // QR สีขาวบนพื้นเข้ม
+  if (res) return res;
+  res = decodeBinaryImage(otsuBinarize(lum, w, h));  // threshold รวมทั้งภาพ
+  if (res) return res;
+  var minc = grayMinChannel(data, w, h);             // QR สีสด (เหลือง/ฟ้า) บนพื้นขาว
+  var binMin = hybridBinarize(minc, w, h);
+  res = decodeBinaryImage(binMin);
+  if (res) return res;
+  res = decodeBinaryImage(otsuBinarize(minc, w, h));
+  if (res) return res;
+  return null;
+}
+
+function decodeCanvas(canvas) {
+  var ctx = canvas.getContext('2d', { willReadFrequently: true });
+  return decodeImageData(ctx.getImageData(0, 0, canvas.width, canvas.height));
+}
+
+return { decodeImageData: decodeImageData, decodeCanvas: decodeCanvas };
+})();
 </script>
 
 <script>
@@ -723,6 +1869,293 @@ var qrcode=function(){var g=function(k,n){var c=0;switch(n){case"L":c=1;break;ca
   });
 
   dataInput.addEventListener('input', debounce(renderPreview, 150));
+
+  //=======================================================================
+  // สแกน QR Code — แคปหน้าจอ / วางจากคลิปบอร์ด / เลือกไฟล์ / ลากมาวาง
+  // ทุกอย่างถอดรหัสด้วย window.QRDecoder ในเครื่อง ไม่มีการส่งรูปออกไปไหน
+  //=======================================================================
+  var scanCard = document.getElementById('scanCard');
+  var captureBtn = document.getElementById('captureBtn');
+  var pickFileBtn = document.getElementById('pickFileBtn');
+  var pasteBtn = document.getElementById('pasteBtn');
+  var scanFileInput = document.getElementById('scanFileInput');
+  var scanStatus = document.getElementById('scanStatus');
+  var scanPreview = document.getElementById('scanPreview');
+  var scanCanvas = document.getElementById('scanCanvas');
+  var scanResult = document.getElementById('scanResult');
+  var scanMeta = document.getElementById('scanMeta');
+  var scanText = document.getElementById('scanText');
+  var scanWarn = document.getElementById('scanWarn');
+  var openLinkBtn = document.getElementById('openLinkBtn');
+  var copyScanBtn = document.getElementById('copyScanBtn');
+  var useScanBtn = document.getElementById('useScanBtn');
+
+  var lastScanText = '';
+  var lastScanUrl = null;
+
+  function setScanStatus(msg, kind) {
+    scanStatus.textContent = msg || '';
+    scanStatus.className = 'scan-status' + (kind ? ' ' + kind : '');
+  }
+
+  // วาดรูปที่แคปมาลง canvas ขนาดจริง (ย่อเฉพาะกรณีใหญ่เกิน ~16 ล้านพิกเซล เพื่อไม่ให้กินหน่วยความจำ)
+  function canvasFromSource(src, sw, sh) {
+    var maxPixels = 16e6;
+    var scale = (sw * sh > maxPixels) ? Math.sqrt(maxPixels / (sw * sh)) : 1;
+    var c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(sw * scale));
+    c.height = Math.max(1, Math.round(sh * scale));
+    var ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(src, 0, 0, c.width, c.height);
+    return c;
+  }
+
+  function showScanPreview(src, points) {
+    scanPreview.style.display = 'block';
+    var maxW = scanPreview.clientWidth || 460;
+    var scale = Math.min(1, maxW / src.width);
+    scanCanvas.width = Math.max(1, Math.round(src.width * scale));
+    scanCanvas.height = Math.max(1, Math.round(src.height * scale));
+    var ctx = scanCanvas.getContext('2d');
+    ctx.drawImage(src, 0, 0, scanCanvas.width, scanCanvas.height);
+    if (points && points.length === 4) {
+      ctx.beginPath();
+      ctx.moveTo(points[0].x * scale, points[0].y * scale);
+      for (var i = 1; i < 4; i++) ctx.lineTo(points[i].x * scale, points[i].y * scale);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(185,106,146,0.22)';
+      ctx.fill();
+      ctx.lineWidth = Math.max(2, Math.round(scanCanvas.width / 200));
+      ctx.strokeStyle = '#b96a92';
+      ctx.stroke();
+    }
+  }
+
+  // ตัดสินว่าเปิดในเบราว์เซอร์ได้ไหม — ไม่เปิดอัตโนมัติ ผู้ใช้ต้องเห็น URL แล้วกดเอง
+  function resolveUrl(text) {
+    var t = (text || '').trim();
+    if (!t || /\s/.test(t)) return null; // มีช่องว่าง = ไม่ใช่ URL เดี่ยวๆ
+    if (/^https?:\/\/\S+$/i.test(t)) return { url: t, guessed: false };
+    if (/^(mailto|tel):\S+$/i.test(t)) return { url: t, guessed: false };
+    if (/^[a-z0-9][a-z0-9-]*(\.[a-z0-9-]+)+(:\d+)?([\/?#]\S*)?$/i.test(t)) {
+      return { url: 'https://' + t, guessed: true };
+    }
+    return null;
+  }
+
+  function showScanResult(res) {
+    lastScanText = res.text;
+    scanText.textContent = res.text;
+    var meta = 'เวอร์ชัน ' + res.version + ' · ECC ' + res.ecLevel + ' · ' + res.text.length + ' ตัวอักษร';
+    if (res.errorsCorrected) meta += ' · แก้ error ' + res.errorsCorrected + ' ไบต์';
+    scanMeta.textContent = '(' + meta + ')';
+
+    var resolved = resolveUrl(res.text);
+    lastScanUrl = resolved ? resolved.url : null;
+    scanWarn.style.display = 'none';
+    scanWarn.textContent = '';
+    if (resolved) {
+      openLinkBtn.style.display = '';
+      openLinkBtn.textContent = '🔗 เปิดลิงก์';
+      if (resolved.guessed) {
+        scanWarn.style.display = 'block';
+        scanWarn.style.color = 'var(--muted)';
+        scanWarn.textContent = 'ข้อความไม่มี https:// นำหน้า — ถ้ากดเปิดจะเปิดเป็น ' + resolved.url;
+      }
+    } else {
+      openLinkBtn.style.display = 'none';
+      var scheme = /^([a-z][a-z0-9+.-]*):/i.exec(res.text.trim());
+      if (scheme) {
+        scanWarn.style.display = 'block';
+        scanWarn.style.color = 'var(--danger)';
+        scanWarn.textContent = 'ข้อความนี้ขึ้นต้นด้วย "' + scheme[1] + ':" ซึ่งไม่ใช่ลิงก์เว็บ จึงไม่เปิดให้ — คัดลอกไปใช้เองได้';
+      }
+    }
+    scanResult.style.display = 'block';
+  }
+
+  function hideScanResult() {
+    scanResult.style.display = 'none';
+    lastScanText = '';
+    lastScanUrl = null;
+  }
+
+  function scanCanvasSource(canvas, sourceLabel) {
+    hideScanResult();
+    showScanPreview(canvas, null);
+    setScanStatus('กำลังสแกน... (' + canvas.width + '×' + canvas.height + ' px)', '');
+    // หน่วง 1 เฟรมเพื่อให้เบราว์เซอร์วาดสถานะ "กำลังสแกน" ก่อนเริ่มคำนวณหนักๆ
+    setTimeout(function() {
+      var res = null, err = null;
+      var t0 = performance.now();
+      try { res = window.QRDecoder.decodeCanvas(canvas); }
+      catch (e) { err = e; }
+      var ms = Math.round(performance.now() - t0);
+      if (res) {
+        showScanPreview(canvas, res.points);
+        showScanResult(res);
+        setScanStatus('✅ พบ QR Code แล้ว (' + sourceLabel + ' · ' + ms + ' ms)', 'ok');
+      } else {
+        showScanPreview(canvas, null);
+        setScanStatus('ไม่พบ QR Code ในรูปนี้' + (err ? ' (' + err.message + ')' : '') +
+          ' — ลองแคปใหม่ให้ QR อยู่เต็มกรอบและชัดขึ้น หรือครอบเฉพาะบริเวณ QR', 'error');
+      }
+    }, 30);
+  }
+
+  function scanFromBlobOrFile(blob, sourceLabel) {
+    if (!blob) return;
+    if (blob.type && blob.type.indexOf('image/') !== 0) {
+      setScanStatus('ไฟล์นี้ไม่ใช่รูปภาพ', 'error');
+      return;
+    }
+    var url = URL.createObjectURL(blob);
+    var img = new Image();
+    img.onload = function() {
+      var canvas = canvasFromSource(img, img.naturalWidth, img.naturalHeight);
+      URL.revokeObjectURL(url);
+      scanCanvasSource(canvas, sourceLabel);
+    };
+    img.onerror = function() {
+      URL.revokeObjectURL(url);
+      setScanStatus('เปิดไฟล์รูปไม่สำเร็จ', 'error');
+    };
+    img.src = url;
+  }
+
+  // ---------- แคปหน้าจอด้วย getDisplayMedia ----------
+  captureBtn.addEventListener('click', function() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+      setScanStatus('เบราว์เซอร์นี้ไม่รองรับการแคปหน้าจอ — ใช้ Win+Shift+S แล้วกด Ctrl+V วางรูป หรือกด "เลือกไฟล์รูป" แทนได้', 'error');
+      return;
+    }
+    setScanStatus('เลือกหน้าจอ/หน้าต่างที่มี QR Code แล้วกด "แชร์"...', '');
+    captureBtn.disabled = true;
+    navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 5 }, audio: false }).then(function(stream) {
+      var video = document.createElement('video');
+      video.muted = true;
+      video.playsInline = true;
+      video.srcObject = stream;
+      video.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;';
+      document.body.appendChild(video);
+      var done = false;
+      function finish(canvas, errMsg) {
+        if (done) return;
+        done = true;
+        stream.getTracks().forEach(function(t) { t.stop(); });
+        if (video.parentNode) video.parentNode.removeChild(video);
+        captureBtn.disabled = false;
+        if (canvas) scanCanvasSource(canvas, 'แคปหน้าจอ');
+        else setScanStatus(errMsg || 'จับภาพหน้าจอไม่สำเร็จ', 'error');
+      }
+      function grab() {
+        if (!video.videoWidth || !video.videoHeight) { finish(null, 'ยังไม่ได้ภาพจากหน้าจอ ลองอีกครั้ง'); return; }
+        finish(canvasFromSource(video, video.videoWidth, video.videoHeight), null);
+      }
+      video.onloadedmetadata = function() {
+        var p = video.play();
+        if (p && p['catch']) p['catch'](function() {});
+        if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(function() { grab(); });
+        else setTimeout(grab, 350);
+      };
+      setTimeout(function() { if (!done) grab(); }, 4000); // กันกรณี event ไม่มา
+    })['catch'](function(err) {
+      captureBtn.disabled = false;
+      var name = err && err.name ? err.name : '';
+      if (name === 'NotAllowedError') setScanStatus('ยกเลิกการแชร์หน้าจอแล้ว', '');
+      else setScanStatus('แคปหน้าจอไม่สำเร็จ (' + (name || err) + ') — ลองใช้ Win+Shift+S แล้ว Ctrl+V วางรูป หรือกด "เลือกไฟล์รูป" แทน', 'error');
+    });
+  });
+
+  // ---------- เลือกไฟล์ ----------
+  pickFileBtn.addEventListener('click', function() { scanFileInput.click(); });
+  scanFileInput.addEventListener('change', function() {
+    if (scanFileInput.files && scanFileInput.files[0]) scanFromBlobOrFile(scanFileInput.files[0], 'ไฟล์รูป');
+    scanFileInput.value = '';
+  });
+
+  // ---------- วางจากคลิปบอร์ด ----------
+  pasteBtn.addEventListener('click', function() {
+    if (!navigator.clipboard || !navigator.clipboard.read) {
+      setScanStatus('เบราว์เซอร์นี้อ่านคลิปบอร์ดโดยตรงไม่ได้ — คลิกที่หน้าเว็บแล้วกด Ctrl+V เพื่อวางรูปแทน', 'error');
+      return;
+    }
+    setScanStatus('กำลังอ่านคลิปบอร์ด...', '');
+    navigator.clipboard.read().then(function(items) {
+      for (var i = 0; i < items.length; i++) {
+        var types = items[i].types;
+        for (var j = 0; j < types.length; j++) {
+          if (types[j].indexOf('image/') === 0) {
+            items[i].getType(types[j]).then(function(blob) { scanFromBlobOrFile(blob, 'คลิปบอร์ด'); });
+            return;
+          }
+        }
+      }
+      setScanStatus('ไม่มีรูปในคลิปบอร์ด — ลองกด Win+Shift+S แคปหน้าจอก่อน แล้วค่อยกดปุ่มนี้อีกครั้ง', 'error');
+    })['catch'](function() {
+      setScanStatus('อ่านคลิปบอร์ดไม่สำเร็จ (เบราว์เซอร์ไม่อนุญาต) — คลิกที่หน้าเว็บแล้วกด Ctrl+V แทน', 'error');
+    });
+  });
+
+  document.addEventListener('paste', function(e) {
+    var cd = e.clipboardData;
+    if (!cd) return;
+    var items = cd.items || [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].kind === 'file' && items[i].type.indexOf('image/') === 0) {
+        var blob = items[i].getAsFile();
+        if (blob) {
+          e.preventDefault();
+          scanFromBlobOrFile(blob, 'Ctrl+V');
+          scanCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        return;
+      }
+    }
+  });
+
+  // ---------- ลากไฟล์มาวาง ----------
+  ['dragenter', 'dragover'].forEach(function(ev) {
+    scanCard.addEventListener(ev, function(e) { e.preventDefault(); scanCard.classList.add('dragover'); });
+  });
+  ['dragleave', 'dragend'].forEach(function(ev) {
+    scanCard.addEventListener(ev, function() { scanCard.classList.remove('dragover'); });
+  });
+  scanCard.addEventListener('drop', function(e) {
+    e.preventDefault();
+    scanCard.classList.remove('dragover');
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+      scanFromBlobOrFile(e.dataTransfer.files[0], 'ลากมาวาง');
+    }
+  });
+
+  // ---------- ปุ่มจัดการผลลัพธ์ ----------
+  openLinkBtn.addEventListener('click', function() {
+    if (!lastScanUrl) return;
+    window.open(lastScanUrl, '_blank', 'noopener,noreferrer');
+  });
+  copyScanBtn.addEventListener('click', function() {
+    if (!lastScanText) return;
+    function ok() { copyScanBtn.textContent = '✅ คัดลอกแล้ว'; setTimeout(function() { copyScanBtn.textContent = '📋 คัดลอก'; }, 1500); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(lastScanText).then(ok)['catch'](fallbackCopy);
+    } else fallbackCopy();
+    function fallbackCopy() {
+      var ta = document.createElement('textarea');
+      ta.value = lastScanText;
+      ta.style.cssText = 'position:fixed;left:-9999px;';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); ok(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  });
+  useScanBtn.addEventListener('click', function() {
+    if (!lastScanText) return;
+    dataInput.value = lastScanText;
+    renderPreview();
+    dataInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
 
   renderPreview();
 })();

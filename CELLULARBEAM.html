@@ -28,8 +28,11 @@ sub{bottom:-.3em}sup{top:-.4em}
 .hdr-title{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text);letter-spacing:.04em}
 .hdr-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
 .layout{display:flex;min-width:1372px}
+/* ── Beam load/support editor inputs (โหมดตำแหน่ง) ── */
+.bin{background:var(--bg3);color:#fff;border:1px solid var(--border2);border-radius:3px;font-size:11px;padding:3px 4px;font-family:var(--mono)}
+.bin:focus{outline:none;border-color:var(--cyan)}
 .sidebar{width:360px;min-width:360px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
-  position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column}
+  position:sticky;top:93px;height:calc(100vh - 93px);overflow-y:auto;display:flex;flex-direction:column}
 .sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
 
 /* TAB BAR */
@@ -214,9 +217,10 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   /* Canvas */
   #sectionCanvas{width:auto!important;height:auto!important;max-width:100%!important;max-height:260px!important;aspect-ratio:1/1!important;background:#fff!important}
   #elevCanvas{width:100%!important;height:auto!important;max-height:260px!important;background:#fff!important}
+  #cutCanvas{width:100%!important;height:auto!important;max-height:280px!important;background:#fff!important}
   /* Container ของ canvas ให้เป็นสีขาว */
   [style*="background:var(--bg)"]{background:#fff!important}
-  div:has(#sectionCanvas),div:has(#elevCanvas){background:#fff!important}
+  div:has(#sectionCanvas),div:has(#elevCanvas),div:has(#cutCanvas){background:#fff!important}
 
   /* Table */
   .sum-tbl td{border-color:#bbb!important}
@@ -315,7 +319,20 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 @media screen{
   .print-header,.print-header-repeat,.print-footer,.print-input-summary,.print-break-before{display:none!important}
 }
+/* 3D view controls */
+.btn-3d{background:var(--bg3);color:rgba(255,255,255,.75);border:1px solid var(--border2);border-radius:4px;padding:4px 11px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.05em;cursor:pointer}
+.btn-3d:hover{background:var(--cyan);color:#000;border-color:var(--cyan)}
+.d3tg.off{opacity:.4}
+@media print{ #d3wrap,#d3ctrl{display:none!important} .sec-block:has(#d3wrap){display:none!important} #material_waste{display:none!important} #hole_fill_ui{display:none!important} }
 </style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -372,18 +389,42 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
   <!-- TAB 1: GEOMETRY & MATERIAL -->
   <div id="panel_geo" class="tab-panel">
+    <div class="sg" style="background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.3)">
+      <div class="sg-title" style="color:var(--cyan)">โหมดกำหนด Geometry หน้าตัด</div>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button id="btn_geo_parent" onclick="setGeomMode('parent')" style="flex:1;background:var(--cyan);color:#000;border:none;border-radius:4px;padding:9px 6px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.04em;cursor:pointer;line-height:1.4">① จาก I-Beam เดิม<br>+ รูเจาะ a₀</button>
+        <button id="btn_geo_direct" onclick="setGeomMode('direct')" style="flex:1;background:var(--bg3);color:rgba(255,255,255,.6);border:1px solid var(--border2);border-radius:4px;padding:9px 6px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.04em;cursor:pointer;line-height:1.4">② กำหนด H<sub>cb</sub>, a₀, S<br>โดยตรง</button>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:8px;line-height:1.6">
+        <b style="color:var(--cyan)">①</b> กรอก H ของเหล็กตั้งต้น + a₀ → โปรแกรมคำนวณ S, H<sub>cb</sub> ให้<br>
+        <b style="color:var(--cyan)">②</b> กรอก H<sub>cb</sub>, a₀, S เอง → ย้อนหา H ของเหล็กตั้งต้น (parent) ให้
+      </div>
+    </div>
     <div class="sg">
       <div class="sg-title">เหล็กรูปพรรณต้นกำเนิด (I-Beam)</div>
       <div class="inp-row"><span class="lbl">H</span><span class="sym">=</span><input id="inp_H" type="text" value="400"><span class="unit">mm</span></div>
       <div class="inp-row"><span class="lbl">B</span><span class="sym">=</span><input id="inp_B" type="text" value="200"><span class="unit">mm</span></div>
       <div class="inp-row"><span class="lbl">t<sub>w</sub></span><span class="sym">=</span><input id="inp_tw" type="text" value="8"><span class="unit">mm</span></div>
       <div class="inp-row"><span class="lbl">t<sub>f</sub></span><span class="sym">=</span><input id="inp_tf" type="text" value="13"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">L</span><span class="sym">=</span><input id="inp_L" type="text" value="6000" title="ความยาวเหล็กรูปพรรณตั้งต้น (parent stock) ก่อนตัด-ประกอบ"><span class="unit">mm</span></div>
     </div>
     <div class="sg">
       <div class="sg-title">รูปทรง Cellular Beam</div>
-      <div class="inp-row"><span class="lbl">H<sub>cb</sub></span><span class="sym">=</span><input id="inp_Hcb" type="text" value="560"><span class="unit">mm</span></div>
-      <div class="inp-row"><span class="lbl">a<sub>0</sub></span><span class="sym">=</span><input id="inp_a0" type="text" value="400"><span class="unit">mm</span></div>
-      <div class="inp-row"><span class="lbl">S</span><span class="sym">=</span><input id="inp_S" type="text" value="600"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">a<sub>0</sub> (Dia.)</span><span class="sym">=</span><input id="inp_a0" type="text" value="400" title="เส้นผ่านศูนย์กลางรูเจาะ (opening diameter, D₀) — ไม่ใช่รัศมี · รัศมีรู = a₀/2"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">S</span><span class="sym">=</span><input id="inp_S" type="text" value="600" readonly title="ระยะห่างศูนย์กลางรูถึงรู (center-to-center spacing) · โหมด① คำนวณอัตโนมัติ S = 2L/hp" style="background:var(--bg3);color:var(--cyan);font-weight:700;cursor:not-allowed"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">H<sub>cb</sub></span><span class="sym">=</span><input id="inp_Hcb" type="text" value="573" readonly title="คำนวณจาก a₀ และ S (รอยตัดสัมผัสกันพอดี — เศษน้อยสุด)" style="background:var(--bg3);color:var(--green);font-weight:700;cursor:not-allowed"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">L<sub>final</sub></span><span class="sym">=</span><input id="inp_Lfin" type="text" value="5314" readonly title="ความยาวคาน Cellular จริง หลังตัด-เลื่อนประกอบ S/2-trim ปลายให้ web post เต็ม (สั้นกว่า L ของ parent) — เป็นความยาวคานที่ใช้คำนวณจริง" style="background:var(--bg3);color:var(--orange);font-weight:700;cursor:not-allowed"><span class="unit">mm</span></div>
+      <div id="geo_help_parent" style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        <b style="color:var(--cyan)">S = 2L/hp</b> (hp = ครึ่ง-pitch เลขคี่) — เลือกอัตโนมัติให้ S/a<sub>0</sub>≈1.5 · ปลายซ้าย-ขวาเป็น <b>mirror บน-ล่าง</b> (เลื่อน tee ครึ่ง pitch แบบ Westok)<br>
+        <b style="color:var(--green)">H<sub>cb</sub> = H + √[(S/2)(a<sub>0</sub>−S/2)]</b> — ตาม CB Properties.xlsx (รอยตัด 2 เส้น<b>ไขว้กัน</b>, a<sub>0</sub>/H<sub>cb</sub>≈0.8)<br>
+        กำหนด <b>ขนาดรู a<sub>0</sub></b> (Cellular) + <b>ความยาว L</b> เหล็กตั้งต้น (อยู่กลุ่ม I-Beam) → S, H<sub>cb</sub>, <b style="color:var(--orange)">L<sub>final</sub></b>, จำนวนรู ตามมาเอง
+      </div>
+      <div id="geo_help_direct" style="display:none;font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.6">
+        กรอก <b style="color:var(--green)">H<sub>cb</sub></b> (ความสูงคาน Cellular), <b>ขนาดรู a<sub>0</sub></b> และ <b style="color:var(--cyan)">S</b> (ระยะห่างระหว่างศูนย์กลางรู) โดยตรง<br>
+        <b style="color:var(--purple)">H<sub>parent</sub> = H<sub>cb</sub> − √[(S/2)(a<sub>0</sub>−S/2)]</b> — ย้อนหาความสูงเหล็กตั้งต้นให้อัตโนมัติ (ช่อง H)<br>
+        เงื่อนไขตัดได้จริง: <b>a<sub>0</sub> &lt; S &lt; 2a<sub>0</sub></b> · <b style="color:var(--orange)">L<sub>final</sub></b> และจำนวนรูคำนวณจาก L ของเหล็กตั้งต้น
+      </div>
+      <div id="cb_limits" style="font-size:10px;margin-top:8px;padding:7px 9px;background:rgba(34,211,238,.07);border-left:3px solid var(--cyan);border-radius:0 4px 4px 0;line-height:1.8;color:rgba(255,255,255,.75)">—</div>
     </div>
     <div class="sg">
       <div class="sg-title">วัสดุ (สำหรับน้ำหนัก)</div>
@@ -396,7 +437,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     </div>
     <div class="sg">
       <div class="sg-title" style="color:var(--orange)">Unbraced Length &amp; Cb</div>
-      <div class="inp-row"><span class="lbl">L<sub>b</sub></span><span class="sym">=</span><input id="inp_Lb" type="text" value="3000"><span class="unit">mm</span></div>
+      <div class="inp-row"><span class="lbl">L<sub>b</sub></span><span class="sym">=</span><input id="inp_Lb" type="text" value="5314" title="ค่าเริ่มต้น = L_final (ทั้งคานไม่มีค้ำยันด้านข้าง) — ติดตาม L_final อัตโนมัติ จนกว่าจะแก้เป็นระยะค้ำยันจริงเอง"><span class="unit">mm</span></div>
       <div class="inp-row"><span class="lbl">C<sub>b</sub></span><span class="sym">=</span><input id="inp_Cb" type="text" value="1.0"><span class="unit"></span></div>
     </div>
     <div class="sg">
@@ -423,6 +464,43 @@ canvas{display:block;border-radius:4px;background:#0f1117}
         <span id="method_hint">
 
         </span>
+      </div>
+    </div>
+
+    <div class="sg" style="background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.3)">
+      <div class="sg-title" style="color:var(--cyan)">โหมดวิเคราะห์ตามตำแหน่ง (Matrix Stiffness)</div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:6px 0;font-size:12px;color:#fff">
+        <input type="checkbox" id="inp_posMode" onchange="setPosMode(this.checked)" style="accent-color:#22d3ee;width:15px;height:15px">
+        เปิดวิเคราะห์ตามตำแหน่งรู
+      </label>
+      <div id="beam_editor" style="display:none">
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin:4px 0 2px" id="beam_span_info">span = L_final · EI จาก geometry</div>
+        <div style="font-size:9.5px;color:rgba(255,255,255,.6);margin:4px 0 2px;padding:5px 7px;background:rgba(34,211,238,.06);border-radius:4px;line-height:1.6">
+          📐 <b style="color:var(--cyan)">x</b> = ระยะจากปลายซ้ายของคาน (m) · <b style="color:var(--cyan)">P</b> แรงจุด (kg) · <b style="color:var(--cyan)">w</b> โหลดแผ่ (kg/m) · <b style="color:var(--cyan)">M</b> โมเมนต์ (kg·m)<br>
+          ช่อง <b style="color:var(--cyan)">x=</b> คือ<b>ตำแหน่ง</b> · ช่อง <b style="color:var(--cyan)">P=/w=/M=</b> คือ<b>ขนาดแรง</b>
+        </div>
+        <!-- SUPPORTS -->
+        <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em">จุดรองรับ / ค้ำข้าง</span>
+          <span style="flex:1"></span>
+          <button class="btn-3d" onclick="addSupport()" style="border-color:#4ade80;color:#4ade80;padding:2px 7px">+ รองรับ</button>
+          <button class="btn-3d" onclick="addLateral()" style="border-color:#f9a8d4;color:#f9a8d4;padding:2px 7px" title="Lateral brace — ค้ำการโก่งด้านข้าง (ใช้คำนวณ Cb)">+ ค้ำข้าง</button>
+        </div>
+        <div id="sup_rows" style="margin-top:5px"></div>
+        <!-- LOADS -->
+        <div style="display:flex;align-items:center;gap:4px;margin-top:12px;flex-wrap:wrap">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.06em">แรงกระทำ (LOADS)</span>
+          <span style="flex:1"></span>
+          <button class="btn-3d" onclick="addLoad('point')" style="border-color:#f0883e;color:#f0883e;padding:2px 6px" title="แรงเป็นจุด (kg)">+ จุด P</button>
+          <button class="btn-3d" onclick="addLoad('udl')" style="border-color:#f0883e;color:#f0883e;padding:2px 6px" title="โหลดแผ่สม่ำเสมอ (kg/m)">+ UDL</button>
+          <button class="btn-3d" onclick="addLoad('trap')" style="border-color:#f0883e;color:#f0883e;padding:2px 6px" title="โหลดแผ่สามเหลี่ยม/คางหมู">+ Trap</button>
+          <button class="btn-3d" onclick="addLoad('moment')" style="border-color:#f0883e;color:#f0883e;padding:2px 6px" title="โมเมนต์เป็นจุด (kg·m)">+ M</button>
+        </div>
+        <div id="load_rows" style="margin-top:5px"></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:8px;line-height:1.6">
+        วิเคราะห์ Matrix Stiffness → M(x), V(x) ที่ทุกรู (เฉพาะ<b>รูที่เปิด</b>) → ใช้ envelope สูงสุดป้อนเข้า design check (M<sub>r</sub>, V<sub>r</sub> คำนวณให้)<br>
+        <span id="pos_info" style="color:var(--cyan)">—</span>
       </div>
     </div>
 
@@ -487,6 +565,53 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
 
 
+<!-- PARENT SECTION CUTTING PATTERN (moved to top) — ซ่อนไว้ก่อน (ยังคง canvas ใน DOM ให้ drawParentCut ทำงานได้) -->
+<div class="sec-block" style="display:none;page-break-inside:avoid;break-inside:avoid">
+  <div class="sec-hdr"><span class="sec-tag tag-orange">Cutting</span><span class="sec-title">เส้นตัดบน Web ของหน้าตัดเดิม (Parent)</span><span class="sec-ref">Fabrication Feasibility</span></div>
+  <div style="padding:0;display:flex;justify-content:center;background:var(--bg)">
+    <canvas id="cutCanvas" width="940" height="300" style="width:940px;height:300px;display:block"></canvas>
+  </div>
+</div>
+
+<!-- 3D VIEW (real length, interactive WebGL) -->
+<div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
+  <div class="sec-hdr"><span class="sec-tag tag-cyan">3D View</span><span class="sec-title">มุมมอง 3 มิติ — ความยาวจริง (หมุน/ซูมได้)</span><span class="sec-ref" id="d3_ref">—</span></div>
+  <div style="padding:10px 12px;background:var(--bg)">
+    <div id="d3ctrl" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;font-family:var(--mono);font-size:11px">
+      <label class="d3tg" data-key="parent" style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;padding:3px 8px;border:1px solid var(--border2);border-radius:4px"><input type="checkbox" checked style="accent-color:#f0883e"><span style="display:inline-block;width:12px;height:3px;background:#f0883e;border-radius:2px"></span>① เส้นตัด (Parent)</label>
+      <label class="d3tg" data-key="tees" style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;padding:3px 8px;border:1px solid var(--border2);border-radius:4px"><input type="checkbox" checked style="accent-color:#9fc4f0"><span style="display:inline-block;width:12px;height:3px;background:#9fc4f0;border-radius:2px"></span>② ตัด 2 ชิ้น (Tee)</label>
+      <label class="d3tg" data-key="asm" style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;padding:3px 8px;border:1px solid var(--border2);border-radius:4px"><input type="checkbox" checked style="accent-color:#a78bfa"><span style="display:inline-block;width:12px;height:3px;background:#a78bfa;border-radius:2px"></span>③ ประกอบ (ก่อน trim)</label>
+      <label class="d3tg" data-key="cell" style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;padding:3px 8px;border:1px solid var(--border2);border-radius:4px"><input type="checkbox" checked style="accent-color:#4ade80"><span style="display:inline-block;width:12px;height:3px;background:#4ade80;border-radius:2px"></span>④ เจาะรูแล้ว (final)</label>
+      <span style="flex:1"></span>
+      <button class="btn-3d" id="d3-iso">ISO</button>
+      <button class="btn-3d" id="d3-side">Side</button>
+      <button class="btn-3d" id="d3-top">Top</button>
+      <button class="btn-3d" id="d3-end">End</button>
+      <button class="btn-3d" id="d3-dae" title="Export COLLADA .dae (เปิดใน SketchUp ได้เลย · ขนาดจริง)" style="border-color:#22d3ee;color:#22d3ee">⭳ DAE</button>
+    </div>
+    <div id="d3wrap" style="position:relative;width:100%;height:460px;border-radius:6px;overflow:hidden;background:#0f1117">
+      <div id="d3msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-family:var(--mono);font-size:12px">กำลังโหลด 3D…</div>
+    </div>
+  </div>
+</div>
+
+<!-- MATERIAL EFFICIENCY / เนื้อเหล็กที่เสียไป (screen-only, ไม่แสดงตอน print) -->
+<div class="sec-block" id="material_waste" style="page-break-inside:avoid;break-inside:avoid">
+  <div class="sec-hdr"><span class="sec-tag tag-teal">Material</span><span class="sec-title">เนื้อเหล็กที่เสียไป (Steel Waste vs Parent Stock)</span><span class="sec-ref">รูเจาะ + เศษตัดปลาย · ไม่รวมในการพิมพ์</span></div>
+  <div class="rep-col-full">
+    <table class="sum-tbl">
+      <tr><td style="width:42%">รายการ</td><td style="width:18%">Symbol</td><td style="width:22%">Value</td><td style="width:18%">หมายเหตุ</td></tr>
+      <tr><td>เหล็กตั้งต้น (Parent stock)</td><td>V<sub>parent</sub> = A<sub>parent</sub>·L</td><td class="val" id="m_Vpar">—</td><td>kg</td></tr>
+      <tr><td>คาน Cellular จริง (Final)</td><td>V<sub>cell</sub> = A<sub>avg</sub>·L<sub>final</sub></td><td class="val" id="m_Vcell">—</td><td>kg</td></tr>
+      <tr><td>เนื้อเหล็กที่เสียไป</td><td>V<sub>parent</sub> − V<sub>cell</sub></td><td class="val" id="m_Vlost">—</td><td>kg</td></tr>
+    </table>
+    <div class="gov" id="m_box" style="margin-top:12px">
+      <div class="gov-lbl"><span class="gov-tag" style="background:#0d7a6e">WASTE</span>% เนื้อเหล็กที่เสียไป (เทียบ Parent)</div>
+      <div class="gov-val"><span id="m_pct">—</span><span class="gov-unit">%</span> <span style="font-size:11px;color:rgba(255,255,255,.6);margin-left:8px" id="m_break">—</span></div>
+    </div>
+  </div>
+</div>
+
 <!-- CROSS-SECTION CANVAS -->
 <div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
   <div class="sec-hdr"><span class="sec-tag tag-blue">Cross-Section</span><span class="sec-title">Cross Section</span></div>
@@ -500,6 +625,35 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   <div class="sec-hdr"><span class="sec-tag tag-purple">Elevation</span><span class="sec-title">Side View</span></div>
   <div style="padding:0;display:flex;justify-content:center;background:var(--bg)">
     <canvas id="elevCanvas" width="940" height="280" style="width:940px;height:280px;display:block"></canvas>
+  </div>
+  <div id="hole_fill_ui" style="padding:10px 12px;background:var(--bg);border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.05em">ปิดรู (INFILL)</span>
+      <span style="font-size:10px;color:rgba(255,255,255,.5)" id="hole_count">—</span>
+      <span style="flex:1"></span>
+      <button class="btn-3d" onclick="clearAllHoles()" style="border-color:#4ade80;color:#4ade80">เปิดทั้งหมด</button>
+      <button class="btn-3d" onclick="fillAllHoles()" style="border-color:#f0883e;color:#f0883e">ปิดทั้งหมด</button>
+    </div>
+    <div id="hole_chips" style="display:flex;flex-wrap:wrap;gap:5px">—</div>
+    <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:7px;line-height:1.5">
+      คลิกหมายเลขรูเพื่อสลับ <b style="color:var(--orange)">ปิด</b>/<b style="color:#4ade80">เปิด</b> · รูที่ปิดจะถูกอุดด้วยแผ่นเหล็ก → เพิ่มน้ำหนัก, ตัด local check ที่ตำแหน่งนั้น (มีผลต่อ design check เมื่อเปิดโหมด "วิเคราะห์ตามตำแหน่ง")
+    </div>
+  </div>
+</div>
+
+<!-- BEAM ANALYSIS DIAGRAMS (โหมดตำแหน่ง · Matrix Stiffness) -->
+<div class="sec-block" id="beam_diagrams" style="display:none;page-break-inside:avoid;break-inside:avoid">
+  <div class="sec-hdr"><span class="sec-tag tag-cyan">Beam</span><span class="sec-title">Beam Analysis — Diagrams (Matrix Stiffness)</span><span class="sec-ref" id="beam_dia_ref">span = L<sub>final</sub> · EI ตาม geometry</span></div>
+  <div style="padding:10px 12px;background:var(--bg)">
+    <div style="font-family:var(--mono);font-size:9.5px;color:rgba(255,255,255,.4);margin-bottom:6px">※ Beam Element Diagram (แรงกระทำ) แสดงทาบบน <b style="color:var(--purple)">Side View</b> ด้านบน</div>
+    <div style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.5);margin:0 0 4px">Free Body Diagram — Reactions</div>
+    <canvas id="bd_fbd" width="920" height="150" style="width:100%;display:block;background:#0f1117;border-radius:5px"></canvas>
+    <div style="font-family:var(--mono);font-size:10px;color:#ef4444;margin:10px 0 4px">Shear Force Diagram — V(x) [kg]</div>
+    <canvas id="bd_sfd" width="920" height="170" style="width:100%;display:block;background:#0f1117;border-radius:5px"></canvas>
+    <div style="font-family:var(--mono);font-size:10px;color:#f5c842;margin:10px 0 4px">Bending Moment Diagram — M(x) [kg·m]</div>
+    <canvas id="bd_bmd" width="920" height="170" style="width:100%;display:block;background:#0f1117;border-radius:5px"></canvas>
+    <div style="font-family:var(--mono);font-size:10px;color:#22d3ee;margin:10px 0 4px">Deflection — δ(x) [mm]</div>
+    <canvas id="bd_def" width="920" height="170" style="width:100%;display:block;background:#0f1117;border-radius:5px"></canvas>
   </div>
 </div>
 
@@ -734,7 +888,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <table class="sum-tbl">
       <tr><td>Property</td><td>Symbol</td><td>Value</td><td>Unit</td><td>หมายเหตุ</td></tr>
       <tr><td>Cross-sectional Area</td><td>A</td><td class="val" id="s_A">—</td><td>cm²</td><td>2 × A<sub>tee</sub></td></tr>
-      <tr><td>Weight per meter</td><td>w</td><td class="val" id="s_wt">—</td><td>kg/m</td><td>A × ρ</td></tr>
+      <tr><td>Weight per meter</td><td>w</td><td class="val" id="s_wt">—</td><td>kg/m</td><td>A<sub>avg</sub>·ρ (เฉลี่ยตลอด pitch · A<sub>avg</sub>=<span id="s_Aavg">—</span> cm²)</td></tr>
       <tr><td>Second Moment of Area (X)</td><td>I<sub>x</sub></td><td class="val" id="s_Ix">—</td><td>cm⁴</td><td>Parallel Axis Theorem</td></tr>
       <tr><td>Second Moment of Area (Y)</td><td>I<sub>y</sub></td><td class="val" id="s_Iy">—</td><td>cm⁴</td><td>2 flanges + 2 web stubs</td></tr>
       <tr><td>Plastic Section Modulus (X)</td><td>Z<sub>x</sub></td><td class="val" id="s_Zx">—</td><td>cm³</td><td>2 × A<sub>tee</sub> × d</td></tr>
@@ -903,13 +1057,13 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 
 <!-- GOVERNING DESIGN MOMENT -->
 <div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
-  <div class="sec-hdr"><span class="sec-tag tag-red">Governing</span><span class="sec-title">Governing Nominal Moment M<sub>n</sub> = min(F2.1, F2.2, DG 31 Section 3.3)</span></div>
+  <div class="sec-hdr"><span class="sec-tag tag-red">Governing</span><span class="sec-title">Governing Nominal Moment M<sub>n</sub> = min(F2.1, F2.2)</span></div>
   <div class="rep-col-full">
     <table class="sum-tbl">
       <tr><td style="width:50%">Limit State</td><td style="width:25%">M<sub>n</sub> (kg·m)</td><td style="width:25%">Status</td></tr>
       <tr><td>1. Yielding (F2.1) — M<sub>p</sub></td><td class="val" id="gov_y">—</td><td id="gov_y_st">—</td></tr>
       <tr><td>2. Lateral-Torsional Buckling (F2.2)</td><td class="val" id="gov_l">—</td><td id="gov_l_st">—</td></tr>
-      <tr><td>3. Vierendeel at Opening (AISC DG 31 Section 3.3)</td><td class="val" id="gov_v">—</td><td id="gov_v_st">—</td></tr>
+      <tr><td>3. Vierendeel at Opening (AISC DG 31 Section 3.3) <span style="font-size:10px;color:rgba(255,255,255,.5)">— ตรวจแยกด้วย H1-1 interaction</span></td><td class="val" id="gov_v">—</td><td id="gov_v_st">—</td></tr>
     </table>
     <div class="gov" style="margin-top:14px">
       <div class="gov-lbl"><span class="gov-tag">CONTROLS</span>Governing M<sub>n</sub></div>
@@ -1181,7 +1335,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
         <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Pn">—</span><span class="calc-unit">kg</span></span></div>
       </div>
       <div class="gov">
-        <div class="gov-lbl"><span class="gov-tag">LRFD</span>φP<sub>n</sub> (φ=0.90)</div>
+        <div class="gov-lbl" id="vd_Pc_lbl"><span class="gov-tag">LRFD</span>φP<sub>n</sub> (φ=0.90)</div>
         <div class="gov-val"><span id="vd_phiPn">—</span><span class="gov-unit">kg</span></div>
       </div>
     </div>
@@ -1200,7 +1354,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
         <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="vd_Mntee">—</span><span class="calc-unit">kg·m</span></span></div>
       </div>
       <div class="gov">
-        <div class="gov-lbl"><span class="gov-tag">LRFD</span>φM<sub>n,tee</sub> (φ=0.90)</div>
+        <div class="gov-lbl" id="vd_Mc_lbl"><span class="gov-tag">LRFD</span>φM<sub>n,tee</sub> (φ=0.90)</div>
         <div class="gov-val"><span id="vd_phiMntee">—</span><span class="gov-unit">kg·m</span></div>
       </div>
     </div>
@@ -1412,6 +1566,79 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- WEB POST BUCKLING — DETAILED CHECK (DG 31 Section 3.5.2)    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
+  <div class="sec-hdr"><span class="sec-tag tag-red">DG 31 Section 3.5</span><span class="sec-title">Web Post Buckling (Lateral-Torsional Buckling of Web Post)</span><span class="sec-ref">AISC Design Guide 31 Eq. 3-19 → 3-21</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv">Geometry Ratios</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">S/D<sub>o</sub> = S / a<sub>0</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="wp_SD">—</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">D<sub>o</sub>/t<sub>w</sub> = a<sub>0</sub> / t<sub>w</sub></span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="wp_Dt">—</span></span></div>
+      </div>
+      <div class="sdiv" style="margin-top:12px">Elastic Buckling Ratio (Eq. 3-21)</div>
+      <div style="font-size:11px;line-height:1.7;padding:6px 10px;background:rgba(239,68,68,.06);border-radius:4px;font-family:var(--mono);color:rgba(255,255,255,.6)">
+        <div>M<sub>e</sub>/M<sub>p</sub> = C<sub>1</sub>(S/D<sub>o</sub>) − C<sub>2</sub>(S/D<sub>o</sub>)² − C<sub>3</sub></div>
+        <div style="margin-top:4px;font-size:10px">C<sub>1</sub>,C<sub>2</sub>,C<sub>3</sub> = พหุนามของ D<sub>o</sub>/t<sub>w</sub></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="wp_ratio_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="wp_ratio">—</span> <span style="color:rgba(255,255,255,.5);font-size:10px">(cap ≤ 1.0)</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Web Post Plastic Moment</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">s<sub>o</sub> = e + D<sub>o</sub>·(1−cos θ<sub>cr</sub>), θ<sub>cr</sub>=25°</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="wp_so_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="wp_so">—</span><span class="calc-unit">mm</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>p,wp</sub> = F<sub>y</sub>·t<sub>w</sub>·s<sub>o</sub>²/4</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="wp_Mpwp_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="wp_Mpwp">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>allow</sub> = (M<sub>e</sub>/M<sub>p</sub>)·M<sub>p,wp</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="wp_Mallow_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="wp_Mallow">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="gov">
+        <div class="gov-lbl" id="wp_Mc_lbl"><span class="gov-tag">LRFD</span>φM<sub>allow</sub> (φ=0.90)</div>
+        <div class="gov-val"><span id="wp_phiM">—</span><span class="gov-unit">kg·m</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="rep-grid" style="margin-top:6px">
+    <div class="rep-col">
+      <div class="sdiv">Demand (from Horizontal Shear)</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>r,wp</sub> = V<sub>rh</sub>·h<sub>w</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="wp_Mr_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="wp_Mr">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv">Demand / Capacity</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">D/C = M<sub>r,wp</sub> / φM<sub>allow</sub></span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="wp_dc_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="wp_dc">—</span></span></div>
+      </div>
+      <div id="wp_status_box" class="gov">
+        <div class="gov-lbl"><span class="gov-tag">DG 31</span>Web Post Buckling</div>
+        <div class="gov-val"><span id="wp_status">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div style="margin:24px 0 14px;padding:12px 16px;background:linear-gradient(90deg,rgba(74,222,128,.18),transparent);border-left:4px solid var(--green);border-radius:0 6px 6px 0">
   <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--green)">COMPLETE DESIGN SUMMARY — Design Guide 31</div>
 </div>
@@ -1559,9 +1786,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
 </div>
 
-<!-- COMBINED LOADING INTERACTION — NEW PAGE -->
-</div>
-
+<!-- COMBINED LOADING INTERACTION -->
 <div class="sec-block" style="page-break-inside:avoid;break-inside:avoid">
   <div class="sec-hdr"><span class="sec-tag tag-orange">AISC H</span><span class="sec-title">Combined Loading Interaction — AISC Chapter H</span></div>
   <div class="rep-col-full">
@@ -1644,9 +1869,342 @@ const cap = (Rn, phi, omega) => {
   return phi * Rn;
 };
 
+// ─────────────────────────────────────────────────────────────
+// BEAM SHEAR/MOMENT EVALUATORS — ported from Beamelement.html
+//   evalV/evalM ใช้ math เดียวกับ Beamelement (loads[] + rxns[])
+//   ในที่นี้ใช้สำหรับโหมด "วิเคราะห์ตามตำแหน่ง" : simply-supported + UDL
+// ─────────────────────────────────────────────────────────────
+function evalV(x, loads, rxns){
+  let V = 0;
+  for(const r of rxns){ if(r.x <= x + 1e-9) V += r.Fy; }
+  for(const ld of loads){
+    if(ld.type==='point' && ld.x <= x+1e-9) V -= ld.P;
+    if(ld.type==='udl'){ const a=Math.max(ld.x1,0), b=Math.min(ld.x2,x); if(b>a) V -= ld.w*(b-a); }
+    if(ld.type==='trap'){ const a=Math.max(ld.x1,0), b=Math.min(ld.x2,x); if(b>a){ const Ls=ld.x2-ld.x1; const wa=ld.w1+(a-ld.x1)/Ls*(ld.w2-ld.w1), wb=ld.w1+(b-ld.x1)/Ls*(ld.w2-ld.w1); V -= (wa+wb)/2*(b-a); } }
+  }
+  return V;
+}
+function evalM(x, loads, rxns){
+  let M = 0;
+  for(const r of rxns){ if(r.x <= x+1e-9){ M += r.Fy*(x-r.x); if(Math.abs(r.Mz)>1e-9) M -= r.Mz; } }
+  for(const ld of loads){
+    if(ld.type==='point' && ld.x <= x+1e-9) M -= ld.P*(x-ld.x);
+    if(ld.type==='moment' && ld.x <= x+1e-9) M -= ld.M;
+    if(ld.type==='udl'){ const a=Math.max(ld.x1,0), b=Math.min(ld.x2,x); if(b>a) M -= ld.w*(b-a)*(x-(a+b)/2); }
+    if(ld.type==='trap'){ const a=Math.max(ld.x1,0), b=Math.min(ld.x2,x); if(b>a){ const Ls=ld.x2-ld.x1; const wa=ld.w1+(a-ld.x1)/Ls*(ld.w2-ld.w1), wb=ld.w1+(b-ld.x1)/Ls*(ld.w2-ld.w1); const rect=wa*(b-a), tri=0.5*(wb-wa)*(b-a); M -= rect*(x-(a+b)/2) + tri*(x-(a+2/3*(b-a))); } }
+  }
+  return M;
+}
+// ═════════════════════════════════════════════════════════════════════
+// BEAM MATRIX-STIFFNESS ENGINE — ported from Beamelement.html
+//   ใช้คำนวณ reactions ของคาน (รองรับ pin/roller/fixed/spring · indeterminate)
+//   span = L_final · EI จาก geometry (E·I ของหน้าตัด cellular)
+// ═════════════════════════════════════════════════════════════════════
+function gaussSolve(Ain,bin){
+  var n=Ain.length, A=Ain.map(function(r){return r.slice();}), b=bin.slice();
+  for(var col=0;col<n;col++){
+    var maxR=col;
+    for(var r2=col+1;r2<n;r2++) if(Math.abs(A[r2][col])>Math.abs(A[maxR][col])) maxR=r2;
+    var tmp=A[col];A[col]=A[maxR];A[maxR]=tmp; var tb=b[col];b[col]=b[maxR];b[maxR]=tb;
+    var piv=A[col][col]; if(Math.abs(piv)<1e-14) throw new Error('Singular at col '+col);
+    for(var r3=0;r3<n;r3++){ if(r3===col) continue; var f=A[r3][col]/piv; for(var c=col;c<n;c++) A[r3][c]-=f*A[col][c]; b[r3]-=f*b[col]; }
+  }
+  return A.map(function(r,i){return b[i]/r[i];});
+}
+function elemK(EI,L){
+  var a=EI/(L*L*L);
+  return [[12*a,6*L*a,-12*a,6*L*a],[6*L*a,4*L*L*a,-6*L*a,2*L*L*a],[-12*a,-6*L*a,12*a,-6*L*a],[6*L*a,2*L*L*a,-6*L*a,4*L*L*a]];
+}
+function fefElement(loads,xL,Le){
+  var fef=[0,0,0,0]; var L=Le;
+  for(var i=0;i<loads.length;i++){
+    var ld=loads[i];
+    if(ld.type==='point'){
+      var a=ld.x-xL; if(a<-1e-9||a>L+1e-9) continue;
+      var ac=Math.min(Math.max(a,0),L),b=L-ac,P=ld.P; if(ac<1e-9||b<1e-9) continue;
+      fef[0]+=P*b*b*(3*ac+b)/(L*L*L); fef[1]+=P*ac*b*b/(L*L); fef[2]+=P*ac*ac*(ac+3*b)/(L*L*L); fef[3]+=-P*ac*ac*b/(L*L);
+    } else if(ld.type==='udl'){
+      var gA=Math.max(ld.x1,xL),gB=Math.min(ld.x2,xL+L); if(gA>=gB) continue;
+      var w=ld.w,a0=gA-xL,a1=gB-xL;
+      function Fi(t){return t-t*t*t/(L*L)+t*t*t*t/(2*L*L*L);}
+      function Mi(t){return t*t/2-2*t*t*t/(3*L)+t*t*t*t/(4*L*L);}
+      function Fj(t){return t*t*t/(L*L)-t*t*t*t/(2*L*L*L);}
+      function Mj(t){return -t*t*t/(3*L)+t*t*t*t/(4*L*L);}
+      fef[0]+=w*(Fi(a1)-Fi(a0)); fef[1]+=w*(Mi(a1)-Mi(a0)); fef[2]+=w*(Fj(a1)-Fj(a0)); fef[3]+=w*(Mj(a1)-Mj(a0));
+    } else if(ld.type==='trap'){
+      var gA2=Math.max(ld.x1,xL),gB2=Math.min(ld.x2,xL+L);
+      if(gA2<gB2){
+        var Lseg=ld.x2-ld.x1, a0t=gA2-xL, a1t=gB2-xL;
+        var w1t=ld.w1+(gA2-ld.x1)/Lseg*(ld.w2-ld.w1), w2t=ld.w1+(gB2-ld.x1)/Lseg*(ld.w2-ld.w1);
+        var segL2=a1t-a0t, nq=40;
+        for(var ki=0;ki<=nq;ki++){
+          var s=a0t+segL2*ki/nq, wq=w1t+(w2t-w1t)*ki/nq, wf=(ki===0||ki===nq)?wq/2:wq;
+          var xi3=s/L, Ni2=1-3*xi3*xi3+2*xi3*xi3*xi3, Nj2=3*xi3*xi3-2*xi3*xi3*xi3, Nmi2=s*(1-xi3)*(1-xi3), Nmj2=s*s/L*(xi3-1), ds2=segL2/nq;
+          fef[0]+=wf*ds2*Ni2; fef[1]+=wf*ds2*Nmi2; fef[2]+=wf*ds2*Nj2; fef[3]+=wf*ds2*Nmj2;
+        }
+      }
+    }
+  }
+  return fef;
+}
+// คาน cellular = หน้าตัดสม่ำเสมอ → 1 segment · EI = E[ksc]·I[cm⁴] (ค่าคงที่ → ไม่กระทบ M/V แต่ตั้งตาม geometry)
+function beamSolve(L, EI, supList, loads){
+  var nodeArr=[0,L];
+  for(var i=0;i<supList.length;i++) nodeArr.push(supList[i].x);
+  for(var i=0;i<loads.length;i++){ var ld=loads[i];
+    if(ld.type==='point'||ld.type==='moment'){ if(ld.x>=0&&ld.x<=L)nodeArr.push(ld.x); }
+    else { if(ld.x1>=0&&ld.x1<=L)nodeArr.push(ld.x1); if(ld.x2>=0&&ld.x2<=L)nodeArr.push(ld.x2); }
+  }
+  var seen={}; var nodes=nodeArr.filter(function(x){var k=x.toFixed(9);if(seen[k])return false;seen[k]=true;return true;}).sort(function(a,b){return a-b;});
+  var nN=nodes.length,nE=nN-1,nDOF=nN*2;
+  function findNode(x){for(var i=0;i<nodes.length;i++)if(Math.abs(nodes[i]-x)<1e-9)return i;return -1;}
+  var Kg=[];for(var i=0;i<nDOF;i++){Kg.push([]);for(var j=0;j<nDOF;j++)Kg[i].push(0);}
+  var F_ext=new Array(nDOF).fill(0);
+  for(var e=0;e<nE;e++){
+    var xLn=nodes[e],xR=nodes[e+1],Le=xR-xLn;
+    var ke=elemK(EI,Le), fef=fefElement(loads,xLn,Le), gd=[2*e,2*e+1,2*e+2,2*e+3];
+    for(var ii=0;ii<4;ii++){F_ext[gd[ii]]-=fef[ii];for(var jj=0;jj<4;jj++)Kg[gd[ii]][gd[jj]]+=ke[ii][jj];}
+  }
+  for(var i=0;i<loads.length;i++){ var ld=loads[i];
+    if(ld.type==='point'){var ni=findNode(ld.x);if(ni>=0)F_ext[2*ni]-=ld.P;}
+    else if(ld.type==='moment'){var ni=findNode(ld.x);if(ni>=0)F_ext[2*ni+1]+=ld.M;}
+  }
+  var constrained=new Set();
+  for(var i=0;i<supList.length;i++){ var s=supList[i]; var ni=findNode(s.x); if(ni<0) return {err:'support node not found'};
+    if(s.type==='pin'||s.type==='roller') constrained.add(2*ni);
+    else if(s.type==='fixed'){constrained.add(2*ni);constrained.add(2*ni+1);}
+  }
+  if(constrained.size<1) return {err:'ต้องมี support อย่างน้อย 1'};
+  var freeDOFs=[]; for(var i=0;i<nDOF;i++) if(!constrained.has(i)) freeDOFs.push(i);
+  var nF=freeDOFs.length, d=new Array(nDOF).fill(0);
+  if(nF>0){
+    var Kff=freeDOFs.map(function(fi){return freeDOFs.map(function(fj){return Kg[fi][fj];});});
+    var Ff=freeDOFs.map(function(fi){return F_ext[fi];});
+    var df; try{df=gaussSolve(Kff,Ff);}catch(ex){return {err:'ระบบไม่เสถียร (singular) — ตรวจ support'};}
+    for(var i=0;i<nF;i++) d[freeDOFs[i]]=df[i];
+  }
+  var R=new Array(nDOF).fill(0);
+  constrained.forEach(function(ci){ var s=0;for(var j=0;j<nDOF;j++)s+=Kg[ci][j]*d[j]; R[ci]=s-F_ext[ci]; });
+  var rxns=supList.map(function(s){ var ni=findNode(s.x);
+    return {type:s.type, x:s.x, Fy:(constrained.has(2*ni)?R[2*ni]:0), Mz:(constrained.has(2*ni+1)?R[2*ni+1]:0)};
+  });
+  // ── SFD/BMD: สร้าง grid + จุด discontinuity (support/load) เพื่อจับ jump ──
+  var EPS=1e-9, nBase=400, xSet={};
+  for(var k=0;k<=nBase;k++){ var xg=L*k/nBase; xSet[xg.toFixed(9)]=xg; }
+  function addX(x){ if(x>=-EPS&&x<=L+EPS) xSet[x.toFixed(9)]=x; }
+  addX(0); addX(L);
+  rxns.forEach(function(r){ addX(r.x-1e-8); addX(r.x); addX(r.x+1e-8); });
+  loads.forEach(function(ld){ if(ld.type==='point'||ld.type==='moment'){ addX(ld.x-1e-8); addX(ld.x); addX(ld.x+1e-8); } else { addX(ld.x1); addX(ld.x2); } });
+  var XS=Object.values(xSet).filter(function(x){return x>=-EPS&&x<=L+EPS;}).sort(function(a,b){return a-b;});
+  var VS=XS.map(function(x){return evalV(x,loads,rxns);});
+  var MS=XS.map(function(x){return evalM(x,loads,rxns);});
+  var maxV=Math.max.apply(null,VS.map(Math.abs));
+  var maxMp=Math.max.apply(null,MS), minMp=Math.min.apply(null,MS);
+  var maxM=Math.max(Math.abs(maxMp),Math.abs(minMp));
+  // ── Deflection: double integration ของ M/EI (EI คงที่) ──
+  var nD=XS.length-1, tRaw=new Array(nD+1).fill(0), vRaw=new Array(nD+1).fill(0);
+  for(var i=1;i<=nD;i++){ var dxi=XS[i]-XS[i-1]; tRaw[i]=tRaw[i-1]+(MS[i-1]+MS[i])/2*dxi/EI; }
+  for(var i=1;i<=nD;i++){ var dxi2=XS[i]-XS[i-1]; vRaw[i]=vRaw[i-1]+(tRaw[i-1]+tRaw[i])/2*dxi2; }
+  function findIdx(x){ var best=0,bd=1e18; for(var ii=0;ii<XS.length;ii++){ var dd=Math.abs(XS[ii]-x); if(dd<bd){bd=dd;best=ii;} } return best; }
+  var dispEqs=[], thetaEqs=[];
+  rxns.forEach(function(s){ var idx=findIdx(s.x);
+    if(s.type==='pin'||s.type==='roller'||s.type==='fixed') dispEqs.push({x:s.x,vr:vRaw[idx]});
+    if(s.type==='fixed') thetaEqs.push({x:s.x,tr:tRaw[idx]});
+  });
+  var theta0=0,v0=0;
+  if(dispEqs.length>=2){ var e0=dispEqs[0],e1=dispEqs[dispEqs.length-1],detM=e0.x-e1.x; if(Math.abs(detM)>1e-12){theta0=(-e0.vr+e1.vr)/detM;v0=-e0.vr-theta0*e0.x;} }
+  else if(dispEqs.length===1){ var e0b=dispEqs[0]; if(thetaEqs.length>=1){ theta0=-thetaEqs[0].tr; } v0=-e0b.vr-theta0*e0b.x; }
+  var DEF=XS.map(function(x,i){return (vRaw[i]+theta0*x+v0)*1000;});  // mm
+  var minDef=Math.min.apply(null,DEF), maxPosDef=Math.max.apply(null,DEF), maxDefAbs=Math.max.apply(null,DEF.map(Math.abs));
+  var xMaxDef=XS[DEF.indexOf(minDef)];
+  return {ok:true, rxns:rxns, xs:XS, Varr:VS, Marr:MS, DEF:DEF, maxV:maxV, maxM:maxM, maxMp:maxMp, minMp:minMp, minDef:minDef, maxPosDef:maxPosDef, maxDefAbs:maxDefAbs, xMaxDef:xMaxDef, EI:EI};
+}
+
+// ── Cb สำหรับช่วงไม่ค้ำยัน [x1,x2] (AISC F1-1) — ported from Beamelement ──
+// Cb = 12.5·Mmax / (2.5·Mmax + 3·MA + 4·MB + 3·MC) ≤ 3.0
+function calcCbForSpan(xs, Marr, x1, x2){
+  const pts=[]; for(let i=0;i<xs.length;i++){ if(xs[i]>=x1-1e-9 && xs[i]<=x2+1e-9) pts.push({x:xs[i],M:Marr[i]}); }
+  if(pts.length<2) return null;
+  let Mmax=0; for(const p of pts) if(Math.abs(p.M)>Mmax) Mmax=Math.abs(p.M);
+  if(Mmax<1e-9) return {Cb:1.0, Mmax:0};
+  const Lb=x2-x1;
+  const interp=xq=>{ for(let i=0;i<pts.length-1;i++){ if(pts[i].x<=xq+1e-9 && xq<=pts[i+1].x+1e-9){ const t=(xq-pts[i].x)/((pts[i+1].x-pts[i].x)||1); return Math.abs(pts[i].M+t*(pts[i+1].M-pts[i].M)); } } return Math.abs(pts[pts.length-1].M); };
+  const MA=interp(x1+Lb*0.25), MB=interp(x1+Lb*0.50), MC=interp(x1+Lb*0.75);
+  const denom=2.5*Mmax+3*MA+4*MB+3*MC;
+  let Cb = denom<1e-12 ? 1.0 : 12.5*Mmax/denom;
+  if(Cb>3.0) Cb=3.0;            // AISC จำกัด Cb ≤ 3.0
+  return {Cb:Cb, Mmax:Mmax, MA:MA, MB:MB, MC:MC, Lb:Lb};
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// BEAM DIAGRAMS — วาด 5 รูป (Beam / FBD / SFD / BMD / Deflection)
+// ═════════════════════════════════════════════════════════════════════
+function _bdSupport(ctx,x,y,type){
+  if(type==='lateral'){
+    // ค้ำข้าง (lateral brace) — สัญลักษณ์ชมพู ⊠ ที่ปีกบน-ล่าง (ไม่ใช่ support แนวดิ่ง)
+    ctx.strokeStyle='#f9a8d4'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(x-7,y-7); ctx.lineTo(x+7,y+7); ctx.moveTo(x+7,y-7); ctx.lineTo(x-7,y+7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x,y,8,0,6.3); ctx.stroke();
+    return;
+  }
+  ctx.strokeStyle='#9fb4d8'; ctx.fillStyle='#9fb4d8'; ctx.lineWidth=1.5;
+  if(type==='fixed'){
+    ctx.beginPath(); ctx.moveTo(x,y-18); ctx.lineTo(x,y+18); ctx.stroke();
+    ctx.lineWidth=1; for(let i=-18;i<=14;i+=6){ ctx.beginPath(); ctx.moveTo(x,y+i); ctx.lineTo(x-8,y+i+6); ctx.stroke(); }
+  } else {
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-9,y+15); ctx.lineTo(x+9,y+15); ctx.closePath(); ctx.stroke();
+    if(type==='roller'){ ctx.beginPath(); ctx.moveTo(x-11,y+19); ctx.lineTo(x+11,y+19); ctx.stroke(); }
+    else { ctx.fillRect(x-11,y+18,22,2); for(let i=-9;i<11;i+=5){ ctx.beginPath(); ctx.moveTo(x+i,y+20); ctx.lineTo(x+i-4,y+25); ctx.stroke(); } }
+  }
+}
+function _arrow(ctx,x,y0,y1,col){ ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,y1); ctx.stroke();
+  const dir=(y1>y0)?1:-1; ctx.beginPath(); ctx.moveTo(x,y1); ctx.lineTo(x-3.5,y1-dir*6); ctx.lineTo(x+3.5,y1-dir*6); ctx.closePath(); ctx.fill();
+}
+// ── ทาบ "แรงกระทำ + จุดรองรับ" ลงบน Side View (โหมดตำแหน่ง) ──
+// beamLeft,scL,beamY,Hp = พิกัด/มาตราส่วนของคานใน drawElevation · Lmm = ความยาวคาน (mm)
+function overlayBeamLoads(ctx, beamLeft, scL, beamY, Hp, Lmm){
+  if(!window.posMode) return;
+  if(window.ensureBeamDefaults) window.ensureBeamDefaults();   // ให้ supports/loads มีค่า + ตาม L_final
+  if(!window.beamLoads || !window.beamLoads.length) return;
+  const Xm = xm => beamLeft + Math.min(Math.max(xm*1000,0),Lmm)*scL;   // x(เมตร) → px
+  const topY=beamY, botY=beamY+Hp;
+  ctx.save(); ctx.font='9px IBM Plex Mono, monospace'; ctx.textAlign='center';
+  (window.beamSupports||[]).forEach(s=> _bdSupport(ctx, Xm(s.x), botY, s.type));
+  window.beamLoads.forEach(ld=>{
+    if(ld.type==='point'){ const x=Xm(ld.x); _arrow(ctx,x,topY-34,topY-3,'#f0883e'); ctx.fillStyle='#f0883e'; ctx.fillText('P='+Math.round(ld.P), x, topY-38); }
+    else if(ld.type==='moment'){ const x=Xm(ld.x); ctx.strokeStyle='#a78bfa'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x,topY-12,10,0.3,5.1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x+9,topY-18); ctx.lineTo(x+13,topY-13); ctx.lineTo(x+6,topY-11); ctx.closePath(); ctx.fillStyle='#a78bfa'; ctx.fill(); ctx.fillText('M='+Math.round(ld.M), x, topY-26); }
+    else { const xa=Xm(ld.x1), xb=Xm(ld.x2); ctx.strokeStyle='#4ade80'; ctx.lineWidth=1;
+      const mw=Math.max(Math.abs(ld.w1!=null?ld.w1:ld.w),Math.abs(ld.w2!=null?ld.w2:ld.w),1);
+      const h1=(ld.type==='trap')?(8+Math.abs(ld.w1)/mw*20):22, h2=(ld.type==='trap')?(8+Math.abs(ld.w2)/mw*20):22;
+      ctx.beginPath(); ctx.moveTo(xa,topY-3-h1); ctx.lineTo(xb,topY-3-h2); ctx.stroke();
+      const step=Math.max(15,(xb-xa)/12);
+      for(let xx=xa;xx<=xb+0.1;xx+=step){ const fr=(xb>xa)?(xx-xa)/(xb-xa):0; _arrow(ctx,xx,topY-3-(h1+(h2-h1)*fr),topY-3,'#4ade80'); }
+      const lab=(ld.type==='trap')?('w '+Math.round(ld.w1)+'→'+Math.round(ld.w2)):('w='+Math.round(ld.w));
+      ctx.fillStyle='#4ade80'; ctx.fillText(lab,(xa+xb)/2, topY-6-Math.max(h1,h2)); }
+  });
+  ctx.restore();
+}
+function drawBeamDiagrams(res, supList, loads, L){
+  const X0=50, padR=50;
+  const Xof=(c)=>{ const W=c.width; return x=> X0 + (L>0? x/L:0)*(W-X0-padR); };
+  // ── Beam schematic (loads) / FBD (reactions) ──
+  const schem=(cid,withRx)=>{
+    const c=document.getElementById(cid); if(!c) return; const ctx=c.getContext('2d');
+    const W=c.width,H=c.height; ctx.clearRect(0,0,W,H); ctx.fillStyle='#0f1117'; ctx.fillRect(0,0,W,H);
+    const Xf=Xof(c), yB=Math.round(H*0.52);
+    ctx.strokeStyle='#6aa9e0'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(X0,yB); ctx.lineTo(W-padR,yB); ctx.stroke();
+    ctx.font='9px IBM Plex Mono, monospace'; ctx.textAlign='center';
+    supList.forEach(s=> _bdSupport(ctx,Xf(s.x),yB,s.type));
+    if(!withRx){
+      loads.forEach(ld=>{
+        if(ld.type==='point'){ const x=Xf(ld.x); _arrow(ctx,x,yB-38,yB-2,'#f0883e'); ctx.fillStyle='#f0883e'; ctx.fillText('P='+Math.round(ld.P), x, yB-42); }
+        else if(ld.type==='moment'){ const x=Xf(ld.x); ctx.strokeStyle='#a78bfa'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x,yB-2,11,0.4,5.0); ctx.stroke(); ctx.fillStyle='#a78bfa'; ctx.fillText('M='+Math.round(ld.M), x, yB-22); }
+        else { const xa=Xf(ld.x1), xb=Xf(ld.x2); ctx.strokeStyle='#4ade80'; ctx.fillStyle='#4ade80'; ctx.lineWidth=1;
+          const h1=(ld.type==='trap')?Math.max(8,Math.min(34,Math.abs(ld.w1)/Math.max(Math.abs(ld.w1),Math.abs(ld.w2),1)*30+8)):26;
+          const h2=(ld.type==='trap')?Math.max(8,Math.min(34,Math.abs(ld.w2)/Math.max(Math.abs(ld.w1),Math.abs(ld.w2),1)*30+8)):26;
+          ctx.beginPath(); ctx.moveTo(xa,yB-h1); ctx.lineTo(xb,yB-h2); ctx.stroke();
+          for(let xx=xa; xx<=xb+0.1; xx+=Math.max(14,(xb-xa)/10)){ const fr=(xb>xa)?(xx-xa)/(xb-xa):0; _arrow(ctx,xx,yB-(h1+(h2-h1)*fr),yB-2,'#4ade80'); }
+          const lab=(ld.type==='trap')?('w '+Math.round(ld.w1)+'→'+Math.round(ld.w2)):('w='+Math.round(ld.w)); ctx.fillStyle='#4ade80'; ctx.fillText(lab,(xa+xb)/2,yB-h1-6); }
+      });
+    } else {
+      res.rxns.forEach(r=>{ const x=Xf(r.x); if(Math.abs(r.Fy)>1e-6){ _arrow(ctx,x,yB+40,yB+4,'#4ade80'); ctx.fillStyle='#4ade80'; ctx.fillText('R='+Math.round(r.Fy), x, yB+52); }
+        if(Math.abs(r.Mz)>1e-6){ ctx.fillStyle='#a78bfa'; ctx.fillText('M='+Math.round(-r.Mz), x, yB-22); } });
+    }
+  };
+  schem('bd_fbd',true);   // Beam Element Diagram (โหลด) ย้ายไปทาบบน Side View แล้ว
+  // ── plot V / M / Deflection ──
+  const plot=(cid,ys,col,unit,markMax,flip)=>{
+    const c=document.getElementById(cid); if(!c) return; const ctx=c.getContext('2d');
+    const W=c.width,H=c.height; ctx.clearRect(0,0,W,H); ctx.fillStyle='#0f1117'; ctx.fillRect(0,0,W,H);
+    const Xf=Xof(c), padT=22,padB=20, y0=padT+(H-padT-padB)/2, hsc=(H-padT-padB)/2;
+    let amax=0; for(const v of ys) amax=Math.max(amax,Math.abs(v)); if(amax<1e-9)amax=1;
+    const sgn=flip?-1:1; const Y=(v)=> y0 - sgn*v/amax*hsc*0.92;
+    // zero axis
+    ctx.strokeStyle='rgba(255,255,255,.25)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(X0,y0); ctx.lineTo(W-padR,y0); ctx.stroke();
+    // area + line
+    ctx.beginPath(); ctx.moveTo(X0,y0);
+    for(let i=0;i<res.xs.length;i++) ctx.lineTo(Xf(res.xs[i]), Y(ys[i]));
+    ctx.lineTo(Xf(res.xs[res.xs.length-1]), y0); ctx.closePath();
+    ctx.fillStyle=col+'22'; ctx.fill();
+    ctx.beginPath(); for(let i=0;i<res.xs.length;i++){ const px=Xf(res.xs[i]),py=Y(ys[i]); i?ctx.lineTo(px,py):ctx.moveTo(px,py); } ctx.strokeStyle=col; ctx.lineWidth=1.6; ctx.stroke();
+    // max marker
+    let im=0,am=0; for(let i=0;i<ys.length;i++) if(Math.abs(ys[i])>am){am=Math.abs(ys[i]);im=i;}
+    const mx=Xf(res.xs[im]),my=Y(ys[im]); ctx.fillStyle=col; ctx.beginPath(); ctx.arc(mx,my,3,0,6.3); ctx.fill();
+    ctx.font='9px IBM Plex Mono, monospace'; ctx.textAlign=(mx>W-120)?'right':'left';
+    ctx.fillText(`${markMax}=${fmtNum(ys[im],ys[im]>1000||ys[im]<-1000?0:2)} ${unit} @x=${fmtNum(res.xs[im],2)}m`, Math.min(Math.max(mx+5,X0),W-padR), my<y0?my-5:my+12);
+  };
+  plot('bd_sfd', res.Varr, '#ef4444','kg','V',false);
+  plot('bd_bmd', res.Marr, '#f5c842','kg·m','M',true);   // flip → sagging วาดใต้แกน · label = ค่า M จริง
+  plot('bd_def', res.DEF, '#22d3ee','mm','δ',false);
+
+  // ── ทาบตำแหน่ง a=รูเจาะ / b=web post ลงบน SFD → เทียบ V ที่ใช้ check กับกราฟได้ ──
+  (function(){
+    const m=window._beamMarks; const c=document.getElementById('bd_sfd'); if(!m||!c) return;
+    const ctx=c.getContext('2d'); const W=c.width,H=c.height, padT=22,padB=20;
+    const y0=padT+(H-padT-padB)/2, hsc=(H-padT-padB)/2, Xf=Xof(c);
+    let amax=0; for(const v of res.Varr) amax=Math.max(amax,Math.abs(v)); if(amax<1e-9)amax=1;
+    const Y=v=> y0 - v/amax*hsc*0.92;
+    // web posts (b) — เขียว
+    (m.wps||[]).forEach(p=>{ const x=Xf(p.x),y=Y(p.V), gov=(p.k===m.iWp);
+      ctx.strokeStyle=gov?'#4ade80':'rgba(74,222,128,.3)'; ctx.setLineDash([2,2]); ctx.lineWidth=gov?1.4:0.8;
+      ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,y); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle=gov?'#4ade80':'rgba(74,222,128,.55)'; ctx.beginPath(); ctx.arc(x,y,gov?3.5:2,0,6.3); ctx.fill(); });
+    // holes (a) — ส้ม
+    (m.holes||[]).forEach(p=>{ const x=Xf(p.x),y=Y(p.V), gov=(p.i===m.iVo);
+      ctx.fillStyle=gov?'#f0883e':'rgba(240,136,62,.6)'; ctx.beginPath(); ctx.arc(x,y,gov?3.5:2,0,6.3); ctx.fill();
+      if(gov){ ctx.strokeStyle='#f0883e'; ctx.setLineDash([2,2]); ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,y); ctx.stroke(); ctx.setLineDash([]); } });
+    // labels governing + legend
+    ctx.font='9px IBM Plex Mono, monospace';
+    const gh=(m.holes||[]).find(p=>p.i===m.iVo);
+    if(gh){ const x=Xf(gh.x),y=Y(gh.V); ctx.fillStyle='#f0883e'; ctx.textAlign=x>W-150?'right':'left'; ctx.fillText('a รูที่'+(gh.i+1)+' V='+Math.round(gh.V), Math.min(Math.max(x+6,X0),W-60), y<y0?y-6:y+12); }
+    const gw=(m.wps||[]).find(p=>p.k===m.iWp);
+    if(gw){ const x=Xf(gw.x),y=Y(gw.V); ctx.fillStyle='#4ade80'; ctx.textAlign=x>W-150?'right':'left'; ctx.fillText('b webpost'+(gw.k+1)+' V='+Math.round(gw.V), Math.min(Math.max(x+6,X0),W-60), y<y0?y-16:y+22); }
+    ctx.textAlign='right'; ctx.fillStyle='#f0883e'; ctx.fillText('● a=รูเจาะ', W-58, 12); ctx.fillStyle='#4ade80'; ctx.fillText('● b=web post', W-58, 22);
+  })();
+}
+
+// ── สถานะการปิดรู (infill) + นิยามคาน (supports/loads) สำหรับโหมดตำแหน่ง ──
+window.posMode = false;             // โหมดวิเคราะห์ตามตำแหน่ง
+window.filledHoles = new Set();     // รูที่ถูกปิด
+window.beamSupports = null;         // [{x,type}] · null = ใช้ default SS ที่ปลายคาน
+window.beamLoads = null;            // [{type,...}] · null = ใช้ default UDL
+window.beamLast = null;             // ผลลัพธ์ล่าสุด {rxns,maxV,maxM,L,EI}
+
 function fmtNum(v, d=1){
   if(v==null||isNaN(v)) return '—';
   return v.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+}
+
+// ─────────────────────────────────────────────────────────────
+// CELLULAR-CUT FEASIBILITY (minimal-scrap, รอยตัดสัมผัสกันพอดี)
+//   เงื่อนไขที่ตัดได้จริง:
+//     (1) tangency       : S < 2·a0          (g = √[(S/2)(a0−S/2)] เป็นจำนวนจริง)
+//     (2) min web post   : e = S−a0 ≥ 0.10·a0  → S ≥ 1.10·a0
+//     (3) arc fit in web : ρ = (a0−g)/2 ≤ H/2 − tf
+// ─────────────────────────────────────────────────────────────
+function cbFeasible(a0, S, H, tf){
+  if(!(a0>0 && S>0 && H>0)) return false;
+  const webHalf = H/2 - tf;
+  if(webHalf <= 0) return false;
+  if(!(S < 2*a0)) return false;             // (1)
+  if((S - a0) < 0.10*a0) return false;      // (2)  (ครอบ S>a0 ด้วย)
+  const g = Math.sqrt((S/2)*(a0 - S/2));    // corner-tangent (เส้นไขว้ ตาม CB Properties.xlsx)
+  const rho = (a0 - g)/2;
+  if(rho > webHalf) return false;           // (3)
+  return true;
+}
+// คืนค่าช่วงที่ใช้งานได้ (mm) ของ S (สำหรับ a0 ปัจจุบัน) และ a0 (สำหรับ S ปัจจุบัน)
+function cbLimits(a0, S, H, tf){
+  let Smin=NaN, Smax=NaN, a0min=NaN, a0max=NaN;
+  if(a0>0 && H>0){
+    for(let s=Math.ceil(a0)+1; s<2*a0; s++){ if(cbFeasible(a0,s,H,tf)){ if(isNaN(Smin))Smin=s; Smax=s; } }
+  }
+  if(S>0 && H>0){
+    for(let A=Math.floor(S/2)+1; A<=Math.ceil(S); A++){ if(cbFeasible(A,S,H,tf)){ if(isNaN(a0min))a0min=A; a0max=A; } }
+  }
+  return {Smin, Smax, a0min, a0max};
 }
 
 window.switchTab = function(tabId){
@@ -1685,15 +2243,220 @@ window.setMethod = function(method){
   if (typeof calculate === 'function') calculate();
 };
 
+// ── Geometry input mode: 'parent' (จาก I-Beam เดิม + a₀) | 'direct' (กำหนด Hcb,a₀,S) ──
+window.geomMode = 'parent';
+window.setGeomMode = function(mode){
+  window.geomMode = mode;
+  const bP = document.getElementById('btn_geo_parent');
+  const bD = document.getElementById('btn_geo_direct');
+  const on  = b => { if(b){ b.style.background='var(--cyan)'; b.style.color='#000'; b.style.border='none'; } };
+  const off = b => { if(b){ b.style.background='var(--bg3)'; b.style.color='rgba(255,255,255,.6)'; b.style.border='1px solid var(--border2)'; } };
+  if(mode==='direct'){ on(bD); off(bP); } else { on(bP); off(bD); }
+
+  // toggle อินพุต: readonly = ช่องที่ "คำนวณให้" · editable = ช่องที่ "ผู้ใช้กรอก"
+  const setRO = (id, ro, color) => {
+    const el = document.getElementById(id); if(!el) return;
+    el.readOnly = ro;
+    if(ro){ el.style.background='var(--bg3)'; el.style.color=color||'var(--cyan)'; el.style.fontWeight='700'; el.style.cursor='not-allowed'; }
+    else  { el.style.background=''; el.style.color=''; el.style.fontWeight=''; el.style.cursor=''; }
+  };
+  if(mode==='direct'){
+    setRO('inp_H',   true,  'var(--purple)');  // H = ย้อนหา (derived)
+    setRO('inp_S',   false);                   // S = กรอกเอง
+    setRO('inp_Hcb', false);                   // Hcb = กรอกเอง
+  } else {
+    setRO('inp_H',   false);                   // H = กรอกเอง
+    setRO('inp_S',   true,  'var(--cyan)');    // S = คำนวณ
+    setRO('inp_Hcb', true,  'var(--green)');   // Hcb = คำนวณ
+  }
+  // toggle ข้อความช่วยอธิบายตามโหมด
+  const hP = document.getElementById('geo_help_parent');
+  const hD = document.getElementById('geo_help_direct');
+  if(hP) hP.style.display = (mode==='direct') ? 'none' : 'block';
+  if(hD) hD.style.display = (mode==='direct') ? 'block' : 'none';
+
+  if (typeof calculate === 'function') calculate();
+};
+
+// ── โหมดวิเคราะห์ตามตำแหน่ง (SS+UDL) : เปิด/ปิด ──
+window.setPosMode = function(on){
+  window.posMode = !!on;
+  // เมื่อเปิด: M_r, V_r ถูกคำนวณให้ (readonly) · เมื่อปิด: กรอกเอง
+  ['inp_Mr','inp_Vr'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.readOnly = window.posMode;
+    if(window.posMode){ el.style.background='var(--bg3)'; el.style.color='var(--cyan)'; el.style.fontWeight='700'; el.style.cursor='not-allowed'; }
+    else { el.style.background=''; el.style.color=''; el.style.fontWeight=''; el.style.cursor=''; }
+  });
+  const ed=document.getElementById('beam_editor'); if(ed) ed.style.display = window.posMode ? 'block' : 'none';
+  if(window.posMode && window.renderBeamEditor) window.renderBeamEditor();
+  if (typeof calculate === 'function') calculate();
+};
+
+// ══ Beam load/support editor (inline) — ป้อนคานสำหรับโหมดตำแหน่ง ══
+window._beamAuto = true;             // true = supports/loads ตาม L_final อัตโนมัติ จนกว่าผู้ใช้จะแก้
+function _defLm(){ return (window._Lfin ? window._Lfin/1000 : 6); }
+window.ensureBeamDefaults = function(Lm){
+  Lm = Lm || _defLm();
+  if(window._beamAuto || !window.beamSupports) window.beamSupports = [{x:0,type:'pin'},{x:+Lm.toFixed(4),type:'roller'}];
+  if(window._beamAuto || !window.beamLoads)    window.beamLoads = [{type:'udl',x1:0,x2:+Lm.toFixed(4),w:2500}];
+};
+window.renderBeamEditor = function(){
+  window.ensureBeamDefaults();
+  const Lm=_defLm();
+  const si=document.getElementById('beam_span_info'); if(si) si.innerHTML = `span = L<sub>final</sub> = <b style="color:var(--orange)">${fmtNum(Lm,3)} m</b> · EI ตาม geometry` + (window._beamAuto?' · <span style="color:var(--green)">(supports/loads อัตโนมัติ)</span>':' · <span style="color:var(--yellow)">(แก้เอง)</span>');
+  const sb=document.getElementById('sup_rows'), lb=document.getElementById('load_rows');
+  // mini field พร้อม label + หน่วย
+  const fld=(lbl,f,onCh,val,unit,w,col)=>`<span style="font-family:var(--mono);font-size:9px;color:${col||'rgba(255,255,255,.55)'};margin:0 1px 0 4px">${lbl}</span><input class="bin" type="text" value="${val}" onchange="${onCh}" style="width:${w}px"><span style="font-size:8px;color:rgba(255,255,255,.4);margin-left:1px">${unit}</span>`;
+  if(sb){ sb.innerHTML = window.beamSupports.map((s,i)=>`<div style="display:flex;gap:2px;align-items:center;margin-bottom:5px;flex-wrap:wrap">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--green);width:18px;flex-shrink:0">#${i+1}</span>
+      ${fld('x=','x',`updateSup(${i},'x',this.value)`,s.x,'m',46,'var(--cyan)')}
+      <select class="bin" onchange="updateSup(${i},'type',this.value)" style="flex:1;min-width:78px;margin-left:4px">
+        <option value="pin"${s.type==='pin'?' selected':''}>Pin (หมุด)</option>
+        <option value="roller"${s.type==='roller'?' selected':''}>Roller (ลูกกลิ้ง)</option>
+        <option value="fixed"${s.type==='fixed'?' selected':''}>Fixed (ยึดแน่น)</option>
+        <option value="lateral"${s.type==='lateral'?' selected':''}>Lateral brace (ค้ำข้าง)</option>
+      </select>
+      <button class="btn-3d" onclick="removeSupport(${i})" style="border-color:#e05252;color:#e05252;padding:2px 7px" title="ลบ support">×</button>
+    </div>`).join(''); }
+  if(lb){ lb.innerHTML = window.beamLoads.map((ld,i)=>{
+      const tag={point:'จุด P',udl:'UDL',trap:'Trapezoid',moment:'โมเมนต์'}[ld.type];
+      const F=(lbl,f,unit,w)=>fld(lbl,f,`updateLoad(${i},'${f}',this.value)`,ld[f],unit,w,'var(--cyan)');
+      let fields;
+      if(ld.type==='point') fields=F('x=','x','m',50)+F('P=','P','kg',60);
+      else if(ld.type==='udl') fields=F('x₁=','x1','m',46)+F('x₂=','x2','m',46)+F('w=','w','kg/m',58);
+      else if(ld.type==='trap') fields=`<div style="display:flex;gap:3px;align-items:center;margin-bottom:3px">${F('x₁=','x1','m',46)+F('x₂=','x2','m',46)}</div><div style="display:flex;gap:3px;align-items:center">${F('w₁=','w1','kg/m',50)+F('w₂=','w2','kg/m',50)}</div>`;
+      else fields=F('x=','x','m',50)+F('M=','M','kg·m',60);
+      return `<div style="margin-bottom:6px;padding:5px 7px;background:rgba(240,136,62,.05);border:1px solid rgba(240,136,62,.18);border-radius:5px">
+        <div style="display:flex;align-items:center;margin-bottom:4px">
+          <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:var(--orange);letter-spacing:.05em">${tag}</span>
+          <span style="flex:1"></span>
+          <button class="btn-3d" onclick="removeLoad(${i})" style="border-color:#e05252;color:#e05252;padding:1px 8px" title="ลบโหลด">×</button>
+        </div>
+        <div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap">${fields}</div>
+      </div>`;
+    }).join(''); }
+};
+window.addSupport = function(){ window.ensureBeamDefaults(); window._beamAuto=false; window.beamSupports.push({x:+(_defLm()/2).toFixed(3),type:'roller'}); renderBeamEditor(); calculate(); };
+window.addLateral = function(){ window.ensureBeamDefaults(); window._beamAuto=false; window.beamSupports.push({x:+(_defLm()/2).toFixed(3),type:'lateral'}); renderBeamEditor(); calculate(); };
+window.removeSupport = function(i){ window._beamAuto=false; window.beamSupports.splice(i,1); renderBeamEditor(); calculate(); };
+window.updateSup = function(i,f,v){ window._beamAuto=false; if(f==='x') window.beamSupports[i].x=parseFloat(v)||0; else window.beamSupports[i].type=v; renderBeamEditor(); calculate(); };
+window.addLoad = function(type){ window.ensureBeamDefaults(); window._beamAuto=false; const Lm=_defLm(); let ld;
+  if(type==='point') ld={type:'point',x:+(Lm/2).toFixed(3),P:5000};
+  else if(type==='udl') ld={type:'udl',x1:0,x2:+Lm.toFixed(3),w:2000};
+  else if(type==='trap') ld={type:'trap',x1:0,x2:+Lm.toFixed(3),w1:1000,w2:3000};
+  else ld={type:'moment',x:+(Lm/2).toFixed(3),M:1000};
+  window.beamLoads.push(ld); renderBeamEditor(); calculate(); };
+window.removeLoad = function(i){ window._beamAuto=false; window.beamLoads.splice(i,1); renderBeamEditor(); calculate(); };
+window.updateLoad = function(i,f,v){ window._beamAuto=false; let n=parseFloat(v); if(isNaN(n))n=0; window.beamLoads[i][f]=n; calculate(); };
+
+// ── สร้างปุ่ม toggle เลือกปิดรู (chips) ตามจำนวนรู ──
+window.renderHoleChips = function(n){
+  const box = document.getElementById('hole_chips'); if(!box) return;
+  // ลบ index ที่เกินจำนวนรูปัจจุบันออกจาก set
+  [...window.filledHoles].forEach(i=>{ if(i>=n) window.filledHoles.delete(i); });
+  if(n<=0){ box.innerHTML = '<span style="color:rgba(255,255,255,.4);font-size:11px">— ไม่มีรู —</span>'; return; }
+  let html = '';
+  for(let i=0;i<n;i++){
+    const filled = window.filledHoles.has(i);
+    const bg = filled ? 'var(--orange)' : 'var(--bg3)';
+    const col = filled ? '#000' : 'rgba(255,255,255,.7)';
+    const bd = filled ? 'none' : '1px solid var(--border2)';
+    const lab = filled ? '✕ '+(i+1) : (i+1);
+    html += `<button onclick="toggleHole(${i})" title="${filled?'รูที่ '+(i+1)+' = ปิด (คลิกเพื่อเปิด)':'รูที่ '+(i+1)+' = เปิด (คลิกเพื่อปิด)'}" style="background:${bg};color:${col};border:${bd};border-radius:4px;min-width:30px;padding:5px 7px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer">${lab}</button>`;
+  }
+  box.innerHTML = html;
+};
+window.toggleHole = function(i){
+  if(window.filledHoles.has(i)) window.filledHoles.delete(i); else window.filledHoles.add(i);
+  if (typeof calculate === 'function') calculate();
+};
+window.fillAllHoles = function(){ const n=window._nCells||0; window.filledHoles=new Set(); for(let i=0;i<n;i++) window.filledHoles.add(i); calculate(); };
+window.clearAllHoles = function(){ window.filledHoles=new Set(); calculate(); };
+
 function calculate(){
-  const H = pi('inp_H'), B = pi('inp_B'), tw = pi('inp_tw'), tf = pi('inp_tf');
-  const Hcb = pi('inp_Hcb'), a0 = pi('inp_a0'), S = pi('inp_S');
+  const B = pi('inp_B'), tw = pi('inp_tw'), tf = pi('inp_tf');
+  const a0 = pi('inp_a0'), Lbeam = pi('inp_L') || 6000;
+  const _gMode = window.geomMode || 'parent';
+  let H, S = 0, Hcb = 0, nCells = 0, g_tan = 0;
+
+  if (_gMode === 'direct') {
+    // ════ โหมด ② : กำหนด H_cb, a₀, S โดยตรง ════
+    //   S, H_cb มาจากผู้ใช้ · ย้อนหา H (parent) จาก g = √[(S/2)(a₀−S/2)] → H = H_cb − g
+    S   = pi('inp_S');
+    Hcb = pi('inp_Hcb');
+    const _halfS = S/2;
+    g_tan = (S>0 && a0>_halfS) ? Math.sqrt(_halfS*(a0-_halfS)) : 0;
+    H = Math.max(0, Math.round(Hcb - g_tan));
+    const _hEl = document.getElementById('inp_H');
+    if(_hEl) _hEl.value = (H>0 ? H : '—');
+  } else {
+    // ════ โหมด ① : กำหนดจาก I-Beam เดิม + รูเจาะ a₀ ════
+    //   S คำนวณอัตโนมัติ: S = 2L/hp (hp = ครึ่ง-pitch เลขคี่) ให้ปลายซ้าย-ขวา mirror บน-ล่าง
+    //   H_cb = H + g · g = √[(S/2)(a₀−S/2)] (รอยตัด 2 เส้นไขว้กันตามรูปแบบ xlsx)
+    H = pi('inp_H');
+    if(a0 > 0 && Lbeam > a0){
+      let hp = Math.round(2*Lbeam/(1.5*a0));          // จำนวนครึ่ง-pitch เป้าหมาย
+      if(hp < 1) hp = 1;
+      if(hp % 2 === 0) hp += 1;                       // ต้องเป็นเลขคี่
+      while(2*Lbeam/hp >= 2*a0) hp += 2;              // S ≥ 2a0 → เพิ่ม (คงคี่)
+      while(hp > 1 && 2*Lbeam/hp <= a0) hp -= 2;       // S ≤ a0 → ลด (คงคี่)
+      const Stry = 2*Lbeam/hp;
+      if(Stry > a0 && Stry < 2*a0){ S = Stry; }
+    }
+    const _sEl = document.getElementById('inp_S');
+    if(_sEl) _sEl.value = (S>0 ? (Math.round(S*100)/100) : '—');
+    const _halfS = S/2;
+    g_tan = (S>0 && a0>_halfS) ? Math.sqrt(_halfS*(a0-_halfS)) : 0;
+    Hcb = Math.round(H + g_tan);
+    const _hcbEl = document.getElementById('inp_Hcb');
+    if (_hcbEl) _hcbEl.value = Hcb;
+  }
+
+  // ── L_final: ความยาวคาน Cellular จริง (parent L → ตัด 2 tee → เลื่อนประกอบ S/2 → trim ปลาย) ──
+  //   N = จำนวนรูในคาน final · L_final = (N+1)·S − a0 · ใช้เป็นความยาวคานจริงในการคำนวณ (เหมือนกันทั้งสองโหมด)
+  let Lfin = 0;
+  if(S>0 && a0>0 && Lbeam>0){
+    nCells = Math.floor((Lbeam - S/2 + a0)/S) - 1; if(nCells < 1) nCells = 1;
+    Lfin = Math.min(Lbeam, Math.round((nCells+1)*S - a0));
+  } else { nCells = 0; }
+  const _lfEl = document.getElementById('inp_Lfin');
+  if(_lfEl) _lfEl.value = (Lfin>0 ? Lfin : '—');
+  // L_b เริ่มต้น = L_final (ทั้งคานไม่ค้ำยันด้านข้าง) — ติดตาม L_final จนกว่าผู้ใช้จะแก้ L_b เอง
+  if(_lbAuto && Lfin>0){ const _lbEl=document.getElementById('inp_Lb'); if(_lbEl) _lbEl.value = Lfin; }
+
+  // ── สรุปค่าที่คำนวณได้ + a0 สูงสุด ──
+  const _lim = cbLimits(a0, S, H, tf);
+  const _lel = document.getElementById('cb_limits');
+  if(_lel){
+    const C=v=>v?'var(--green)':'var(--red)';
+    const f=(v,dn)=>isNaN(v)?'—':(dn?Math.floor(v/5)*5:Math.ceil(v/5)*5);
+    if(S>0){
+      const a0OK = !isNaN(_lim.a0max) && a0 <= _lim.a0max + 0.5;
+      const _hdr = (_gMode==='direct')
+        ? '<b style="color:var(--cyan)">② กำหนด H<sub>cb</sub>, a₀, S โดยตรง</b> (H<sub>parent</sub> ย้อนหา = <b style="color:var(--purple)">'+fmtNum(H,0)+'</b> mm, t<sub>f</sub>='+fmtNum(tf,0)+')'
+        : '<b style="color:var(--cyan)">① คำนวณจาก a₀ และ L</b> (H='+fmtNum(H,0)+', t<sub>f</sub>='+fmtNum(tf,0)+')';
+      _lel.innerHTML =
+        _hdr+'<br>'+
+        '• จำนวนรู n = <b style="color:#fff">'+nCells+'</b> · S = <b style="color:var(--cyan)">'+fmtNum(S,1)+'</b> mm (S/a₀='+fmtNum(S/a0,2)+')<br>'+
+        '• H<sub>cb</sub> = <b style="color:var(--green)">'+Hcb+'</b> mm · a<sub>0,max</sub> ≈ <b style="color:'+C(a0OK)+'">'+f(_lim.a0max,true)+'</b> mm<br>'+
+        '• L<sub>final</sub> = <b style="color:var(--orange)">'+Lfin+'</b> mm (parent L = '+fmtNum(Lbeam,0)+' · เศษตัดทิ้ง '+(Lbeam-Lfin)+' mm)';
+    } else {
+      _lel.innerHTML = '<span style="color:var(--red)">⚠ S ไม่ถูกต้อง — โหมด ① ต้อง L &gt; a₀ · โหมด ② ต้องกรอก S (a₀ &lt; S &lt; 2a₀)</span>';
+    }
+  }
+
   const rho = pi('inp_rho') || 7850;
 
   if(!H||!B||!tw||!tf||!Hcb||!a0||!S) return;
 
+  // ── ปิดรูทั้งหมด → คานหน้าตัดตัน (solid) : 2 tee ชนกันกลาง (เสมือน a₀=0) ──
+  const _nFillNow = window.filledHoles ? [...window.filledHoles].filter(i=>i<nCells).length : 0;
+  const solidMode = (window.posMode && nCells>0 && _nFillNow>=nCells);
+
   // ── Geometry ──
-  const hs = (Hcb - a0) / 2;
+  //   solid: hs=Hcb/2, hw=(Hcb−2tf)/2 (เอวเต็ม) → A_total, Ix, Zx ฯลฯ กลายเป็นหน้าตัดตันอัตโนมัติ
+  const hs = solidMode ? (Hcb/2) : ((Hcb - a0) / 2);
   const hw = Math.max(0, hs - tf);
   const e  = S - a0;
 
@@ -1735,7 +2498,35 @@ function calculate(){
   const Sy_cm3 = Sy_mm3 / 1e3;
   const Zy_cm3 = Zy_mm3 / 1e3;
   const A_cm2  = A_total / 100;
-  const wt     = A_total * 1e-6 * rho;           // kg/m  (mm² × m × kg/m³ = kg/m, with A in m²)
+  // ── Self-weight: ใช้พื้นที่ "เฉลี่ยตลอด 1 pitch" (หน้าตัดตัน − หักรูวงกลม Ø a₀) ──
+  //   ไม่ใช้ net section ที่รู เพราะจะไม่นับเนื้อ web post (ส่วนตันระหว่างรู) → ประเมินน้ำหนักต่ำไป
+  //   A_avg = 2·B·tf + tw·(Hcb−2tf) − tw·π·a₀²/(4S) · clamp ≥ A_net (ขอบเขตล่างทางกายภาพ)
+  //   รูที่ "ปิด" (infill) ไม่หักออก → คูณด้วยสัดส่วนรูที่เปิด (openFrac)
+  const _nFilled  = window.filledHoles ? [...window.filledHoles].filter(i=>i<nCells).length : 0;
+  const _nOpen    = Math.max(0, nCells - _nFilled);
+  const _openFrac = nCells>0 ? _nOpen/nCells : 1;
+  const A_solid_mm2 = 2*B*tf + tw*Math.max(0, Hcb - 2*tf);          // หน้าตัดตันที่ web post
+  const A_hole_mm2  = (S > 0) ? tw * Math.PI * a0*a0 / (4*S) * _openFrac : 0;  // หักเฉพาะรูที่เปิด
+  const A_avg_mm2   = Math.max(A_total, A_solid_mm2 - A_hole_mm2);
+  const A_avg_cm2   = A_avg_mm2 / 100;
+  const wt     = A_avg_mm2 * 1e-6 * rho;         // kg/m  (พื้นที่เฉลี่ย × ρ)
+
+  // ── เนื้อเหล็กที่เสียไป (waste) = (Parent stock − คาน Cellular จริง) / Parent · รวมรูเจาะ + เศษตัดปลาย ──
+  const A_parent_mm2 = 2*B*tf + tw*Math.max(0, H - 2*tf);          // หน้าตัด I-beam ตั้งต้น
+  const V_parent_kg  = A_parent_mm2 * 1e-6 * (Lbeam/1000) * rho;   // เหล็กตั้งต้นทั้งท่อน (kg)
+  const V_cell_kg    = A_avg_mm2   * 1e-6 * (Lfin /1000) * rho;    // คาน Cellular จริง (kg)
+  const V_lost_kg    = Math.max(0, V_parent_kg - V_cell_kg);
+  const lostPct      = V_parent_kg > 0 ? V_lost_kg / V_parent_kg * 100 : 0;
+  sv('m_Vpar',  V_parent_kg, 1);
+  sv('m_Vcell', V_cell_kg, 1);
+  sv('m_Vlost', V_lost_kg, 1);
+  sv('m_pct',   lostPct, 1);
+  sh('m_break', `(Parent ${fmtNum(A_parent_mm2*1e-6*rho,1)} → Cellular ${fmtNum(wt,1)} kg/m · L ${fmtNum(Lbeam,0)}→${fmtNum(Lfin,0)} mm` + (_nFilled>0 ? ` · ปิดรู ${_nFilled}/${nCells}` : '') + `)`);
+  // เก็บจำนวนรู + ความยาวจริง + สร้างปุ่มเลือกปิดรู
+  window._nCells = nCells;
+  window._Lfin = Lfin;
+  if (window.renderHoleChips) window.renderHoleChips(nCells);
+  { const pe=document.getElementById('hole_count'); if(pe) pe.textContent = nCells + ' รู · ปิด ' + _nFilled + ' · เปิด ' + _nOpen; }
   const rx     = Math.sqrt(Ix_mm4/A_total) / 10; // cm
   const ry     = Math.sqrt(Iy_mm4/A_total) / 10; // cm
   const sf     = Sx_cm3 > 0 ? Zx_cm3/Sx_cm3 : 0;
@@ -1798,6 +2589,7 @@ function calculate(){
   // Summary table
   sv('s_A', A_cm2, 2);
   sv('s_wt', wt, 2);
+  sv('s_Aavg', A_avg_cm2, 2);
   sv('s_Ix', Ix_cm4, 1);
   sv('s_Iy', Iy_cm4, 2);
   sv('s_Zx', Zx_cm3, 1);
@@ -1817,6 +2609,20 @@ function calculate(){
   if(hw <= 0) warns.push(`h<sub>w</sub> ≤ 0 — รูปทรงไม่ถูกต้อง: h<sub>s</sub> ต้อง &gt; t<sub>f</sub>`);
   if(Hcb < a0) warns.push(`H<sub>cb</sub> &lt; a<sub>0</sub> — ความสูงต้องมากกว่า opening`);
 
+  // ── ตรวจความเป็นไปได้ของการตัดแบบ minimal-scrap (รอยตัด 2 เส้นสัมผัสกันพอดี) ──
+  //   g = √[(S/2)(a0−S/2)] (จาก calculate ด้านบน) ; ρ = (a0−g)/2 = ยอดส่วนโค้งวัดจากกึ่งกลางเอว
+  //   ต้อง a0 < S < 2a0 (มี web post + สัมผัสได้) และ ρ ≤ H/2−tf (โค้งอยู่ในเอว)
+  const rhoCut  = (a0 - g_tan) / 2;
+  const webHalfP = H/2 - tf;
+  if (!(S > a0)) {
+    warns.push(`S = ${fmtNum(S,0)} mm ≤ a<sub>0</sub> = ${fmtNum(a0,0)} mm — รูชนกัน ไม่มี web post (ต้อง S &gt; a<sub>0</sub>)`);
+  } else if (!(S < 2*a0)) {
+    warns.push(`S = ${fmtNum(S,0)} mm ≥ 2·a<sub>0</sub> = ${fmtNum(2*a0,0)} mm — รอยตัดสองเส้นไม่สัมผัสกัน (ต้อง S &lt; 2·a<sub>0</sub>) · H<sub>cb</sub> คำนวณไม่ได้`);
+  } else if (rhoCut > webHalfP) {
+    const Hneed = Math.ceil((2*(rhoCut+tf))/5)*5;
+    warns.push(`<b>หน้าตัดเดิมตื้นเกินไป</b> · ส่วนโค้งรอยตัด ρ = ${fmtNum(rhoCut,1)} mm &gt; H/2−t<sub>f</sub> = ${fmtNum(webHalfP,0)} mm (โค้งล้นออกนอกเอว) · ต้องใช้หน้าตัดเดิมลึก ≥ ${Hneed} mm หรือลด a<sub>0</sub>`);
+  }
+
   const wb = document.getElementById('warn-block');
   if(warns.length){
     wb.style.display = 'block';
@@ -1830,6 +2636,8 @@ function calculate(){
   // Draw both views
   drawSection(B, tw, tf, Hcb, a0);
   drawElevation(B, tw, tf, Hcb, a0, S);
+  drawParentCut(B, tw, tf, H, Hcb, a0, S, false);
+  if (window.rebuild3D) window.rebuild3D();
 
   // ═══════════════════════════════════════════════════════════
   // FLEXURAL DESIGN — AISC 360-22 + AISC Design Guide 31
@@ -1838,15 +2646,123 @@ function calculate(){
   const Fy = pi('inp_Fy');               // ksc (kgf/cm²)
   const E  = pi('inp_E');                 // ksc
   const Lb_mm = pi('inp_Lb');             // mm
-  const Cb = pi('inp_Cb') || 1.0;
-  const Mu = pi('inp_Mr');                // kg·m  (strong axis - same as Mr at opening for combined check)
-  const Ma = pi('inp_Mr');                // kg·m  (same applied force, factor handled by user)
-  const Mr = pi('inp_Mr');                // kg·m  (Vierendeel global moment at opening)
-  const Vr = pi('inp_Vr');                // kg    (Vierendeel global shear at opening)
+  let Cb = pi('inp_Cb') || 1.0;
+  let _CbAuto = null, _LbAuto = null;     // คำนวณจาก lateral bracing (โหมดตำแหน่ง)
 
-  if (!Fy || !E || !Lb_mm) return;
+  // ── M_r, V_r : โหมดตามตำแหน่ง (Matrix Stiffness) จากรูที่เปิด · ปกติอ่านจาก input ──
+  //   Vr_wp = แรงเฉือนที่ "ตำแหน่ง web post จริง" (ระหว่างรู) สำหรับ horizontal shear + web post buckling
+  let Mr, Vr, Vr_wp = null, _iWp = -1;
+  if (window.posMode && S>0 && nCells>0) {
+    const Lspan = Lfin/1000;                           // m (= L_final)
+    window.ensureBeamDefaults(Lspan);
+    if(window.renderBeamEditor) window.renderBeamEditor();
+    const EI = (E>0 && Ix_cm4>0) ? E*Ix_cm4 : 1;       // E[ksc]·I[cm⁴] (ค่าคงที่ · ไม่กระทบ M/V)
+    // clamp ตำแหน่ง support/load ให้อยู่ในช่วง [0, Lspan]
+    const cl = v => Math.min(Math.max(v,0),Lspan);
+    const supC  = window.beamSupports.map(s=>({x:cl(s.x), type:s.type}));
+    const loadC = window.beamLoads.map(ld=>{ const c=Object.assign({},ld);
+      if(c.x!=null)c.x=cl(c.x); if(c.x1!=null)c.x1=cl(c.x1); if(c.x2!=null)c.x2=cl(c.x2); return c; });
+    const supStruct = supC.filter(s=>s.type!=='lateral');   // lateral = ค้ำข้างเท่านั้น ไม่ใช่ support โครงสร้าง
+    const res = beamSolve(Lspan, EI, supStruct, loadC);
+    const _bd = document.getElementById('beam_diagrams');
+    if(res.err){
+      sh('pos_info', `<span style="color:var(--red)">✗ ${res.err}</span> — ใช้ M_r, V_r ที่กรอกไว้แทน`);
+      Mr = pi('inp_Mr'); Vr = pi('inp_Vr');
+      if(_bd) _bd.style.display='none';
+    } else {
+      window.beamLast = {rxns:res.rxns, maxV:res.maxV, maxM:res.maxM, L:Lspan};
+      // ── Cb + Lb : จาก lateral bracing + จุดรองรับ (แบ่งช่วงไม่ค้ำยัน → เลือกช่วงที่ Mn,LTB ต่ำสุด) ──
+      {
+        const braceSet = new Set([0, Lspan]);
+        supC.forEach(s=>{ if(['pin','roller','fixed','lateral'].includes(s.type)) braceSet.add(+cl(s.x).toFixed(5)); });
+        const bp = [...braceSet].sort((p,q)=>p-q);
+        const _sqEFy = Math.sqrt(E/Fy), _Lp = 1.76*ry*_sqEFy, _Lr = Math.PI*ry*Math.sqrt(E/(0.7*Fy)), _Mp = Fy*Zx_cm3/100;
+        const mnLTB = (LbCm,cbS)=>{ if(LbCm<=_Lp) return _Mp;
+          if(LbCm<=_Lr){ const red=(_Mp-0.7*Fy*Sx_cm3/100)*(LbCm-_Lp)/((_Lr-_Lp)||1); return Math.min(cbS*(_Mp-red),_Mp); }
+          const Fcr=cbS*Math.PI*Math.PI*E/Math.pow(LbCm/ry,2); return Math.min(Fcr*Sx_cm3/100,_Mp); };
+        let bestMn=Infinity, segs=[];
+        for(let s=0;s<bp.length-1;s++){
+          const x1=bp[s], x2=bp[s+1]; if(x2-x1<1e-6) continue;
+          const cbr = calcCbForSpan(res.xs, res.Marr, x1, x2);
+          const cbv = cbr? cbr.Cb : 1.0;
+          const LbCm = (x2-x1)*100;                       // m → cm
+          const mn = mnLTB(LbCm, cbv);
+          segs.push({x1,x2,Lb:(x2-x1),Cb:cbv,Mn:mn});
+          if(mn<bestMn){ bestMn=mn; _CbAuto=cbv; _LbAuto=(x2-x1)*1000; }   // mm
+        }
+        window._cbSegs = segs;
+        const _nLat = supC.filter(s=>s.type==='lateral').length;
+        window._braceTxt = `<b style="color:var(--purple)">LTB:</b> C<sub>b</sub>=${_CbAuto!=null?_CbAuto.toFixed(2):'—'} · L<sub>b</sub>=${_LbAuto!=null?fmtNum(_LbAuto/1000,2):'—'} m (ค้ำข้าง ${_nLat} จุด · ${segs.length} ช่วงไม่ค้ำยัน · เลือกช่วงวิกฤต)`;
+      }
+      const _holeMarks=[], _wpMarks=[];
+      let Mmax=0, Vmax=0, iMo=-1, iVo=-1;
+      for(let i=0;i<nCells;i++){
+        if(window.filledHoles && window.filledHoles.has(i)) continue;   // ข้ามรูที่ปิด
+        const xi = ((S - a0/2) + i*S)/1000;            // ตำแหน่งศูนย์กลางรู (m) · ตรงกับ 3D (end web post = e)
+        const Mi = Math.abs(evalM(xi, loadC, res.rxns));
+        const Vi = Math.abs(evalV(xi, loadC, res.rxns));
+        const Vs = evalV(xi, loadC, res.rxns);
+        const Ms = evalM(xi, loadC, res.rxns);
+        _holeMarks.push({x:xi, V:Vs, M:Ms, i:i});
+        if(Mi>Mmax){ Mmax=Mi; iMo=i; }
+        if(Vi>Vmax){ Vmax=Vi; iVo=i; }
+      }
+      Mr = Mmax; Vr = Vmax;
+      // ── web post: ระหว่างรู k กับ k+1 (ศูนย์กลางที่ x=(k+1)·S) · เอาเฉพาะ web post ที่มีรูเปิดอย่างน้อยข้างหนึ่ง ──
+      let Vwp=0;
+      for(let k=0;k<nCells-1;k++){
+        const lOpen = !(window.filledHoles && window.filledHoles.has(k));
+        const rOpen = !(window.filledHoles && window.filledHoles.has(k+1));
+        if(!lOpen && !rOpen) continue;                  // รูสองข้างปิด → web post ตัน ข้าม
+        const xwp = ((S - a0/2) + k*S + S/2)/1000;       // ตำแหน่ง web post (m) = กึ่งกลางระหว่างรู k, k+1
+        const Vk = Math.abs(evalV(xwp, loadC, res.rxns));
+        _wpMarks.push({x:xwp, V:evalV(xwp, loadC, res.rxns), k:k});
+        if(Vk>Vwp){ Vwp=Vk; _iWp=k; }
+      }
+      Vr_wp = (_iWp>=0) ? Vwp : Vmax;                    // ไม่มี web post (รูเดียว) → ใช้ Vr
+      // เก็บ marks ไว้ทาบบน SFD (เทียบตำแหน่ง a=รูเจาะ / b=web post กับกราฟ)
+      window._beamMarks = { holes:_holeMarks, wps:_wpMarks, iVo:iVo, iWp:_iWp };
+      const _me=document.getElementById('inp_Mr'); const _ve=document.getElementById('inp_Vr');
+      if(_nOpen===0){
+        // ── ปิดรูหมด → คานตัน: ใช้แรงสูงสุดทั้งคาน (ไม่ใช่ที่รู) · ปิด opening checks ──
+        Mr = res.maxM; Vr = res.maxV; Vr_wp = res.maxV;
+        if(_me) _me.value = Math.round(Mr); if(_ve) _ve.value = Math.round(Vr);
+        sh('pos_info', `<b style="color:var(--yellow)">⬛ ปิดรูทั้งหมด → คานหน้าตัดตัน (solid)</b> · span=${fmtNum(Lspan,2)} m<br>`+
+          `ใช้แรงสูงสุดทั้งคาน: M<sub>r</sub>=${fmtNum(Mr,0)} kg·m · V<sub>r</sub>=${fmtNum(Vr,0)} kg · ตรวจหน้าตัดตัน (ไม่มี Vierendeel/web post)<br>`+(window._braceTxt||''));
+      } else {
+        Mr = Mmax; Vr = Vmax;
+        if(_me) _me.value = Math.round(Mmax);
+        if(_ve) _ve.value = Math.round(Vmax);
+        sh('pos_info', `span=${fmtNum(Lspan,2)} m · V<sub>max,beam</sub>=${fmtNum(res.maxV,0)} · M<sub>max,beam</sub>=${fmtNum(res.maxM,0)} · เปิด ${_nOpen}/${nCells} รู<br>`+
+          `<b style="color:var(--cyan)">ที่รูเจาะ:</b> M<sub>r</sub>=${fmtNum(Mmax,0)} kg·m (รูที่ ${iMo+1}) · V<sub>r</sub>=${fmtNum(Vmax,0)} kg (รูที่ ${iVo+1})<br>`+
+          `<b style="color:var(--green)">ที่ web post:</b> V<sub>wp</sub>=${fmtNum(Vr_wp,0)} kg`+(_iWp>=0?` (web post ${_iWp+1}, ระหว่างรู ${_iWp+1}-${_iWp+2})`:'')+` → ใช้กับ horizontal shear & web post buckling<br>`+(window._braceTxt||''));
+      }
+      // วาด diagram 5 รูป
+      if(_bd) _bd.style.display='block';
+      sh('beam_dia_ref', `span=${fmtNum(Lspan,2)} m · EI=${fmtNum(EI,0)} · ${supC.length} supports · ${loadC.length} loads`);
+      try { drawBeamDiagrams(res, supC, loadC, Lspan); } catch(e){ console.warn('diagram',e); }
+    }
+  } else {
+    Mr = pi('inp_Mr');
+    Vr = pi('inp_Vr');
+    sh('pos_info', '— (ปิดอยู่ · ใช้ M_r, V_r ที่กรอกเอง)');
+    const _bd = document.getElementById('beam_diagrams'); if(_bd) _bd.style.display='none';
+  }
+  const Mu = Mr;                          // strong axis (same as Mr at opening for combined check)
+  const Ma = Mr;                          // same applied force, factor handled by user
 
-  const Lb_cm = Lb_mm / 10;
+  if (!Fy || !E) return;
+
+  // ── โหมดตำแหน่ง: ใช้ Cb, Lb ที่คำนวณจาก lateral bracing (ช่วงไม่ค้ำยันที่วิกฤต) ──
+  if(_CbAuto != null) Cb = _CbAuto;
+  if(window.posMode && _LbAuto != null){
+    const _le=document.getElementById('inp_Lb'); if(_le){ _le.value=Math.round(_LbAuto); _le.readOnly=true; _le.style.background='var(--bg3)'; _le.style.color='var(--cyan)'; _le.style.fontWeight='700'; _le.style.cursor='not-allowed'; }
+    const _ce=document.getElementById('inp_Cb'); if(_ce){ _ce.value=_CbAuto.toFixed(3); _ce.readOnly=true; _ce.style.background='var(--bg3)'; _ce.style.color='var(--cyan)'; _ce.style.fontWeight='700'; _ce.style.cursor='not-allowed'; }
+  } else {
+    ['inp_Lb','inp_Cb'].forEach(id=>{ const el=document.getElementById(id); if(el&&!window.posMode){ el.readOnly=false; el.style.background=''; el.style.color=''; el.style.fontWeight=''; el.style.cursor=''; } });
+  }
+  const Lb_cm = (_LbAuto != null ? _LbAuto : Lb_mm) / 10;
+  if(!Lb_cm) return;
   // Unit conversion:
   // M [kgf·cm] = Fy [ksc=kgf/cm²] × Z [cm³]
   // 1 kg·m = 100 kgf·cm  →  M [kg·m] = Fy·Z / 100
@@ -1925,7 +2841,7 @@ function calculate(){
   sh('ltb_Lp_sub', `1.76 × ${fmtNum(ry,2)} × √(${E}/${Fy})`);
   sv('ltb_Lp', Lp_m, 3);
   sv('ltb_Lr', Lr_m, 3);
-  sv('ltb_Lb', Lb_mm/1000, 3);
+  sv('ltb_Lb', Lb_cm/100, 3);   // ใช้ Lb ที่ใช้จริง (auto จาก bracing เมื่อโหมดตำแหน่ง)
   sh('ltb_region', region);
   sh('ltb_eq', ltbEqHTML);
   sv('ltb_Mn_calc', Mn_LTB_kgm, 2);
@@ -1997,10 +2913,12 @@ function calculate(){
   sv('vd_MnV', MnV_kgm, 2);
 
   // ── (E) GOVERNING ──
+  // กำลังดัดแกนหลัก (global) = min(Yielding, LTB) เท่านั้น
+  // Vierendeel เป็นกลไกเฉพาะที่ช่องเปิด → ตรวจแยกด้วย interaction H1-1 (3-step) ด้านล่าง
+  // (ไม่นำ MnV มารวมใน min เพราะเป็นคนละ limit state และทำให้นับซ้ำ)
   const candidates = [
     { name: 'Yielding (F2.1)',     M: Mp_kgm,     key: 'y' },
-    { name: 'LTB (F2.2)',          M: Mn_LTB_kgm, key: 'l' },
-    { name: 'Vierendeel (AISC DG 31 Section 3.3)',   M: MnV_kgm,    key: 'v' }
+    { name: 'LTB (F2.2)',          M: Mn_LTB_kgm, key: 'l' }
   ];
   candidates.sort((a,b) => a.M - b.M);
   const Mn_gov = candidates[0].M;
@@ -2018,6 +2936,7 @@ function calculate(){
   sv('gov_y', Mp_kgm, 2);
   sv('gov_l', Mn_LTB_kgm, 2);
   sv('gov_v', MnV_kgm, 2);
+  sh('gov_v_st', '<span style="color:rgba(255,255,255,.5)">ตรวจแยก (H1-1)</span>');
   sv('gov_Mn', Mn_gov, 2);
   sh('gov_by', Mn_gov_name);
 
@@ -2220,9 +3139,9 @@ function calculate(){
   // ═══════════════════════════════════════════════════════════
   // ── Step 1: DEMAND ──
   const deff_m = deff_mm / 1000;
-  const Pr_kg  = Mr / deff_m;                   // P_r = M_r / d_eff [kg]
+  let Pr_kg  = Mr / deff_m;                     // P_r = M_r / d_eff [kg]
   const Anet_cm2 = 2 * Atee_cm2;                // 2 Tees
-  const Mvr_kgm  = Vr * (Atee_cm2 / Anet_cm2) * (a0/1000) / 4;  // = Vr·(1/2)·(a0/4) for symmetric
+  let Mvr_kgm  = Vr * (Atee_cm2 / Anet_cm2) * (a0/1000) / 4;  // = Vr·(1/2)·(a0/4) for symmetric
 
   sh('vd_Pr_sub', `${fmtNum(Mr,0)} / ${fmtNum(deff_m,3)}`);
   sv('vd_Pr', Pr_kg, 0);
@@ -2242,25 +3161,51 @@ function calculate(){
     Fcr_E3 = 0.877 * Fe;                         // E3-3
   }
   const Pn_kg = Fcr_E3 * Atee_cm2;              // ksc × cm² = kg
-  const phiPn = 0.90 * Pn_kg;
+  // capacity ตามวิธีออกแบบ: LRFD → φPn (φ=0.90) · ASD → Pn/Ω (Ω=1.67)
+  const Pc_tee = cap(Pn_kg, 0.90, 1.67);
   sv('vd_Fe', Fe, 0);
   sv('vd_Fcr', Fcr_E3, 0);
   sv('vd_Pn', Pn_kg, 0);
-  sv('vd_phiPn', phiPn, 0);
+  sv('vd_phiPn', Pc_tee, 0);
 
   // Flexural Tee Capacity (F9.1, stem in tension is critical)
   const Mptee_kgm = Fy * Ztee_cm3 / KGFCM_PER_KGM;
   const Mytee_kgm = Fy * Stee_cm3 / KGFCM_PER_KGM;
   const Mntee_kgm = Math.min(Mptee_kgm, 1.6 * Mytee_kgm);
-  const phiMntee = 0.90 * Mntee_kgm;
+  const Mc_tee = cap(Mntee_kgm, 0.90, 1.67);   // LRFD → φMn · ASD → Mn/Ω
   sv('vd_Mptee2', Mptee_kgm, 3);
   sv('vd_Mytee', Mytee_kgm, 3);
   sv('vd_Mntee', Mntee_kgm, 3);
-  sv('vd_phiMntee', phiMntee, 3);
+  sv('vd_phiMntee', Mc_tee, 3);
+
+  // label ของกำลัง (สลับตามวิธี LRFD/ASD)
+  const _asd = (window.designMethod === 'ASD');
+  sh('vd_Pc_lbl',  _asd ? '<span class="gov-tag">ASD</span>P<sub>n</sub>/Ω (Ω=1.67)'    : '<span class="gov-tag">LRFD</span>φP<sub>n</sub> (φ=0.90)');
+  sh('vd_Mc_lbl',  _asd ? '<span class="gov-tag">ASD</span>M<sub>n,tee</sub>/Ω (Ω=1.67)' : '<span class="gov-tag">LRFD</span>φM<sub>n,tee</sub> (φ=0.90)');
+
+  // ── โหมดตำแหน่ง: หา "รูที่ critical ที่สุด" จาก H1-1 (ใช้ M และ V ของรูเดียวกัน ไม่ใช่ envelope ต่างจุด) ──
+  window._vdCritI = -1; window._vdCritX = null;
+  if (window.posMode && window._beamMarks && window._beamMarks.holes && window._beamMarks.holes.length) {
+    let best=-1, bI=-1, bPr=0, bMvr=0, bX=0;
+    window._beamMarks.holes.forEach(h=>{
+      const Pr_i = Math.abs(h.M)/deff_m;
+      const Mvr_i = Math.abs(h.V) * (Atee_cm2/Anet_cm2) * (a0/1000)/4;
+      const pp = Pc_tee>0? Pr_i/Pc_tee:0, mm = Mc_tee>0? Mvr_i/Mc_tee:0;
+      const h1i = (pp>=0.2)? pp+(8/9)*mm : pp/2+mm;
+      if(h1i>best){ best=h1i; bI=h.i; bPr=Pr_i; bMvr=Mvr_i; bX=h.x; }
+    });
+    if(bI>=0){
+      Pr_kg = bPr; Mvr_kgm = bMvr; window._vdCritI = bI; window._vdCritX = bX;
+      sh('vd_Pr_sub', `M(รูที่ ${bI+1}) / d_eff = ${fmtNum(bPr*deff_m,0)} / ${fmtNum(deff_m,3)}`);
+      sv('vd_Pr', Pr_kg, 0);
+      sh('vd_Mvr_sub', `V(รูที่ ${bI+1}) × (${fmtNum(Atee_cm2,2)}/${fmtNum(Anet_cm2,2)}) × ${fmtNum(a0/1000,3)}/4`);
+      sv('vd_Mvr', Mvr_kgm, 2);
+    }
+  }
 
   // ── Step 3: INTERACTION (Eq. H1-1) ──
-  const PrPc = phiPn > 0 ? Pr_kg / phiPn : 0;
-  const MrMc = phiMntee > 0 ? Mvr_kgm / phiMntee : 0;
+  const PrPc = Pc_tee > 0 ? Pr_kg / Pc_tee : 0;
+  const MrMc = Mc_tee > 0 ? Mvr_kgm / Mc_tee : 0;
   sv('vd_PrPc', PrPc, 3);
   sv('vd_MrMc', MrMc, 3);
 
@@ -2294,8 +3239,10 @@ function calculate(){
   // HORIZONTAL SHEAR AT WEB POST (DG 31 Sec 3.4)
   // ═══════════════════════════════════════════════════════════
   const S_mm  = S;
-  const Vrh_kg = Vr * (S_mm / deff_mm);          // Horizontal shear at web post
-  sh('hs_Vrh_sub', `${fmtNum(Vr,0)} × (${S}/${fmtNum(deff_mm,1)})`);
+  // โหมดตำแหน่ง: ใช้ V ที่ "ตำแหน่ง web post จริง" (Vr_wp) · ปกติใช้ Vr
+  const V_for_wp = (Vr_wp != null) ? Vr_wp : Vr;
+  const Vrh_kg = V_for_wp * (S_mm / deff_mm);    // Horizontal shear at web post = V_wp·S/d_eff
+  sh('hs_Vrh_sub', `${fmtNum(V_for_wp,0)} × (${S}/${fmtNum(deff_mm,1)})` + (Vr_wp!=null?` <span style="color:rgba(255,255,255,.5);font-size:10px">(V ที่ web post)</span>`:''));
   sv('hs_Vrh', Vrh_kg, 0);
 
   // Capacity: Vn,h = 0.6·Fy·e·tw  (e = web post width = S - a0)
@@ -2499,18 +3446,14 @@ function calculate(){
   sv('wp_SD', SD, 3);
   sv('wp_Dt', Dt, 1);
 
-  // Approximate constants for Cellular (DG 31 Table 3-1, simplified)
-  // For Do/tw between 10 and 50:
-  let C1, C2, C3;
-  if (Dt <= 20) {
-    C1 = 5.097; C2 = 0.1464; C3 = 0.00174;
-  } else if (Dt <= 30) {
-    C1 = 11.441; C2 = 0.2903; C3 = 0.00528;
-  } else if (Dt <= 40) {
-    C1 = 15.842; C2 = 0.4079; C3 = 0.0072;
-  } else {
-    C1 = 18.985; C2 = 0.4828; C3 = 0.00917;
-  }
+  // Constants for Cellular web-post buckling (DG 31 Eq. 3-19/3-20/3-21)
+  // C1, C2, C3 are polynomials in (Do/tw) — valid Do/tw ≈ 10–50:
+  //   C1 = 5.097 + 0.1464·(Do/tw) − 0.00174·(Do/tw)²
+  //   C2 = 1.441 + 0.0625·(Do/tw) − 0.000683·(Do/tw)²
+  //   C3 = 3.645 + 0.0853·(Do/tw) − 0.00108·(Do/tw)²
+  const C1 = 5.097 + 0.1464*Dt - 0.00174*Dt*Dt;
+  const C2 = 1.441 + 0.0625*Dt - 0.000683*Dt*Dt;
+  const C3 = 3.645 + 0.0853*Dt - 0.00108*Dt*Dt;
 
   // Note: Eq. 3-21 uses (S/Do) ratio; valid range typically 1.08 ≤ S/Do ≤ 1.5
   let MeMp = C1*SD - C2*SD*SD - C3;
@@ -2546,19 +3489,26 @@ function calculate(){
   // Convert to kg·m: Fy [ksc] × tw [cm] × so² [cm²] / 4 = kgf·cm / 4 → /100 to get kg·m
   const Mpwp_kgm = (Fy * tw_cm * so_cm * so_cm / 4) / 100;
   const Mallow_kgm = MeMp * Mpwp_kgm;
-  const phiMallow  = 0.90 * Mallow_kgm;
 
-  sh('wp_Mpwp_sub', `${Fy} × ${fmtNum(tw_cm,2)} × ${fmtNum(so_cm,2)}²/4 / 100  (s<sub>o</sub> at θ=25°)`);
+  sv('wp_so', so_mm, 1);
+  sh('wp_so_sub', `${fmtNum(e,0)} + ${a0}·(1−cos25°)`);
+  sh('wp_Mpwp_sub', `${Fy} × ${fmtNum(tw_cm,2)} × ${fmtNum(so_cm,2)}²/4 / 100`);
   sv('wp_Mpwp', Mpwp_kgm, 3);
+  sh('wp_Mallow_sub', `${fmtNum(MeMp,3)} × ${fmtNum(Mpwp_kgm,2)}`);
   sv('wp_Mallow', Mallow_kgm, 3);
-  sv('wp_phiM', phiMallow, 3);
+
+  const designCap_wp = cap(Mallow_kgm, 0.90, 1.67);
+  sv('wp_phiM', designCap_wp, 3);
+  const _asdWp = (window.designMethod === 'ASD');
+  sh('wp_Mc_lbl', _asdWp ? '<span class="gov-tag">ASD</span>M<sub>allow</sub>/Ω (Ω=1.67)' : '<span class="gov-tag">LRFD</span>φM<sub>allow</sub> (φ=0.90)');
 
   // Demand: M_r,wp = Vrh × hw  (web post moment from horizontal shear)
   const Mrwp_kgm = Vrh_kg * (hw / 1000);  // hw in m
+  sh('wp_Mr_sub', `${fmtNum(Vrh_kg,0)} × ${fmtNum(hw/1000,3)}`);
   sv('wp_Mr', Mrwp_kgm, 3);
 
-  const designCap_wp = cap(Mallow_kgm, 0.90, 1.67);
   const wp_dc = designCap_wp > 0 ? Mrwp_kgm / designCap_wp : 999;
+  sh('wp_dc_sub', `${fmtNum(Mrwp_kgm,2)} / ${fmtNum(designCap_wp,2)}`);
   sv('wp_dc', wp_dc, 3);
 
   const wp_pass = wp_dc <= 1.0;
@@ -2745,7 +3695,7 @@ function calculate(){
 
   // Vierendeel - Tee Flexural
   sv('cap_Mntee',   Mntee_kgm, 2);
-  sv('cap_phiMntee', phiMntee, 2);
+  sv('cap_phiMntee', 0.90 * Mntee_kgm, 2);
   sv('cap_MnOtee',  Mntee_kgm/omega, 2);
 
   // Vertical Shear (Net)
@@ -2765,12 +3715,12 @@ function calculate(){
 
   // Web Post Buckling Moment
   sv('cap_Mnwp',    Mallow_kgm, 2);
-  sv('cap_phiMnwp', phiMallow, 2);
+  sv('cap_phiMnwp', 0.90 * Mallow_kgm, 2);
   sv('cap_MnOwp',   Mallow_kgm/omega, 2);
 
   // Compression - Tee
   sv('cap_Pn',      Pn_kg, 0);
-  sv('cap_phiPn',   phiPn, 0);
+  sv('cap_phiPn',   0.90 * Pn_kg, 0);
   sv('cap_PnO',     Pn_kg/omega, 0);
 
   // Axial Tension (D2)
@@ -2843,52 +3793,55 @@ function calculate(){
   const vshear_pass = vshear_dc <= 1.0;
   sv('all_vshear_dc', vshear_dc, 3);
 
-  // Vierendeel + Axial at Opening (already computed as h1_value)
-  sv('all_vd_dc', h1_value, 3);
-  const vd_pass_combined = h1_value <= 1.0;
+  // Vierendeel + Axial at Opening (already computed as h1_value) · ปิดรูหมด = N/A
+  if(solidMode){ sh('all_vd_dc','<span style="color:rgba(255,255,255,.45)">N/A (คานตัน)</span>'); }
+  else { sv('all_vd_dc', h1_value, 3); }
+  const vd_pass_combined = solidMode || h1_value <= 1.0;
 
   // ═══════════════════════════════════════════════════════════
   // COMPLETE SUMMARY — All Limit States
   // ═══════════════════════════════════════════════════════════
+  // โหมดคานตัน (ปิดรูหมด): opening checks (Vierendeel/horizontal shear/web post/tee stem) = N/A
+  const _na = solidMode;
+  const g_v = _na?0:h1_value, g_h=_na?0:hs_dc, g_wp=_na?0:wp_dc, g_ts=_na?0:ts_dc;
+  const naHTML = '<span style="color:rgba(255,255,255,.45)">N/A (คานตัน)</span>';
   const allChecks = [
     { name: 'Strong Axis Flexure',  dc: lrfd_dc,  passKey: lrfd_pass },
     { name: 'Weak Axis Flexure',    dc: lrfdY_dc, passKey: lrfdY_pass },
-    { name: 'Vierendeel Interaction', dc: h1_value, passKey: vd_pass },
-    { name: 'Horizontal Shear',     dc: hs_dc,    passKey: hs_pass },
+    { name: 'Vierendeel Interaction', dc: g_v, passKey: (_na||vd_pass) },
+    { name: 'Horizontal Shear',     dc: g_h,    passKey: (_na||hs_pass) },
     { name: 'Vertical Shear',       dc: vs_dc,    passKey: vs_pass },
     { name: 'Weak-Axis Shear',      dc: vsy_dc,   passKey: vsy_pass },
-    { name: 'Web Post Buckling',    dc: wp_dc,    passKey: wp_pass },
-    { name: 'Tee Stem Local Buckling', dc: ts_dc, passKey: ts_pass },
+    { name: 'Web Post Buckling',    dc: g_wp,    passKey: (_na||wp_pass) },
+    { name: 'Tee Stem Local Buckling', dc: g_ts, passKey: (_na||ts_pass) },
     { name: 'Web Local Yielding',   dc: wy_dc,    passKey: wy_pass },
     { name: 'Web Local Crippling',  dc: wc_dc,    passKey: wc_pass },
     { name: 'Axial (Tension/Compression)', dc: ax_dc, passKey: ax_pass },
     { name: 'H1-1 Combined Axial+Biaxial Flexure', dc: h1_dc, passKey: h1_pass },
     { name: 'Biaxial Flexure (No Axial)', dc: biax_dc, passKey: biax_pass },
     { name: 'Combined Shear (X+Y)', dc: vshear_dc, passKey: vshear_pass }
-  ];
+  ].filter(c => !(_na && ['Vierendeel Interaction','Horizontal Shear','Web Post Buckling','Tee Stem Local Buckling'].includes(c.name)));
 
   sv('all_x_dc',  lrfd_dc, 3);
   sv('all_y_dc',  lrfdY_dc, 3);
-  sv('all_v_dc',  h1_value, 3);
-  sv('all_h_dc',  hs_dc, 3);
   sv('all_vs_dc', vs_dc, 3);
   sv('all_vsy_dc', vsy_dc, 3);
-  sv('all_wp_dc', wp_dc, 3);
-  sv('all_ts_dc', ts_dc, 3);
   sv('all_wy_dc', wy_dc, 3);
   sv('all_wc_dc', wc_dc, 3);
   sv('all_ax_dc', ax_dc, 3);
+  if(_na){ sh('all_v_dc',naHTML); sh('all_h_dc',naHTML); sh('all_wp_dc',naHTML); sh('all_ts_dc',naHTML); }
+  else { sv('all_v_dc',h1_value,3); sv('all_h_dc',hs_dc,3); sv('all_wp_dc',wp_dc,3); sv('all_ts_dc',ts_dc,3); }
 
   const passHTML = '<span style="color:var(--green);font-weight:700">✓ OK</span>';
   const failHTML = '<span style="color:var(--red);font-weight:700">✗ FAIL</span>';
   sh('all_x_st',  lrfd_pass  ? passHTML : failHTML);
   sh('all_y_st',  lrfdY_pass ? passHTML : failHTML);
-  sh('all_v_st',  vd_pass    ? passHTML : failHTML);
-  sh('all_h_st',  hs_pass    ? passHTML : failHTML);
+  sh('all_v_st',  _na?naHTML:(vd_pass    ? passHTML : failHTML));
+  sh('all_h_st',  _na?naHTML:(hs_pass    ? passHTML : failHTML));
   sh('all_vs_st', vs_pass    ? passHTML : failHTML);
   sh('all_vsy_st', vsy_pass  ? passHTML : failHTML);
-  sh('all_wp_st', wp_pass    ? passHTML : failHTML);
-  sh('all_ts_st', ts_pass    ? passHTML : failHTML);
+  sh('all_wp_st', _na?naHTML:(wp_pass    ? passHTML : failHTML));
+  sh('all_ts_st', _na?naHTML:(ts_pass    ? passHTML : failHTML));
   sh('all_wy_st', wy_pass    ? passHTML : failHTML);
   sh('all_wc_st', wc_pass    ? passHTML : failHTML);
   sh('all_ax_st', ax_pass    ? passHTML : failHTML);
@@ -2897,7 +3850,7 @@ function calculate(){
   sh('all_h1_st',     h1_pass         ? passHTML : failHTML);
   sh('all_biax_st',   biax_pass       ? passHTML : failHTML);
   sh('all_vshear_st', vshear_pass     ? passHTML : failHTML);
-  sh('all_vd_st',     vd_pass_combined ? passHTML : failHTML);
+  sh('all_vd_st',     _na?naHTML:(vd_pass_combined ? passHTML : failHTML));
 
   // ═══════════════════════════════════════════════════════════
   // INLINE SUBSTITUTIONS — Individual Limit States
@@ -2960,17 +3913,30 @@ function calculate(){
 
   // Vierendeel substitution (using existing Vierendeel variables)
   // h1_value uses PrPc (Tee) and MrMc - both computed earlier
-  sh('cmb_vd_sub',
-    (typeof PrPc !== 'undefined' && typeof MrMc !== 'undefined')
-      ? (PrPc >= 0.2
+  const _vdLoc = (window.posMode && window._vdCritI!=null && window._vdCritI>=0) ? ` <span style="color:var(--orange)">@ รูที่ ${window._vdCritI+1}${window._vdCritX!=null?' (x='+fmtNum(window._vdCritX,2)+'m)':''}</span>` : '';
+  sh('cmb_vd_sub', solidMode ? 'N/A — คานตัน (ไม่มีรู)' :
+    ((typeof PrPc !== 'undefined' && typeof MrMc !== 'undefined')
+      ? ((PrPc >= 0.2
           ? `${fmtNum(PrPc,4)} + (8/9)·(${fmtNum(MrMc,4)}) = ${fmtNum(h1_value,3)}`
-          : `${fmtNum(PrPc,4)}/2 + ${fmtNum(MrMc,4)} = ${fmtNum(h1_value,3)}`)
-      : '—');
+          : `${fmtNum(PrPc,4)}/2 + ${fmtNum(MrMc,4)} = ${fmtNum(h1_value,3)}`) + _vdLoc)
+      : '—'));
 
   // Find critical (highest D/C)
   const sorted = [...allChecks].sort((a,b) => b.dc - a.dc);
   const critical = sorted[0];
-  sh('all_critical', `<b style="color:${critical.passKey ? 'var(--green)' : 'var(--red)'}">${critical.name}</b> (D/C = ${fmtNum(critical.dc,3)})`);
+  // โหมดตำแหน่ง: ระบุ"ตำแหน่งวิกฤต" ที่ใช้อ้างอิง (รูเจาะ/web post จาก SFD จุดที่ critical)
+  let _posTxt = '';
+  if (solidMode) {
+    _posTxt = `<br><span style="color:var(--yellow);font-weight:400">⬛ ปิดรูทั้งหมด → ตรวจเป็น<b>คานหน้าตัดตัน</b> ที่ M/V สูงสุดทั้งคาน (ตัด Vierendeel/web post/horizontal shear/tee stem)</span>`;
+  } else if (window.posMode && window._beamMarks) {
+    const m = window._beamMarks;
+    const vdI = (window._vdCritI!=null && window._vdCritI>=0) ? window._vdCritI : m.iVo;
+    const parts = [];
+    if(vdI>=0) parts.push(`Vierendeel/flexure ที่ <b style="color:var(--orange)">รูที่ ${vdI+1}</b>`);
+    if(m.iWp>=0) parts.push(`web post ที่ <b style="color:var(--green)">web post ${m.iWp+1}</b>`);
+    if(parts.length) _posTxt = `<br><span style="color:rgba(255,255,255,.6);font-weight:400">📍 ตำแหน่งวิกฤตอ้างอิง: ${parts.join(' · ')} (เทียบกับ SFD ได้)</span>`;
+  }
+  sh('all_critical', `<b style="color:${critical.passKey ? 'var(--green)' : 'var(--red)'}">${critical.name}</b> (D/C = ${fmtNum(critical.dc,3)})${_posTxt}`);
 }
 
 // ──────────────────────────────────────────────────
@@ -3203,26 +4169,25 @@ function drawElevation(B, tw, tf, Hcb, a0, S){
   ctx.textAlign = 'center';
   ctx.fillText('Side Elevation — Beam with Cellular Openings', W/2, 22);
 
-  // We want to show ~4-5 openings in the available width
+  // แสดง "เต็มความยาวคาน" L_final — scale แนวนอนแยกจากแนวตั้ง (รูจะเป็นวงรี)
   const padL = 60, padR = 60, padT = 60, padB = 80;
   const drawW = W - padL - padR;
   const drawH = H - padT - padB;
 
-  // Decide scale: fit beam height comfortably, then show as many openings as fit
-  const scH = drawH / Hcb;             // pixel per mm vertically
-  const scL = scH;                     // use same horizontal scale (real proportions)
-  const beamLengthPx = drawW;
-  const beamLengthMm = beamLengthPx / scL;
+  const Lfin = window._Lfin || 0;       // ความยาวคานจริง (mm)
+  const nC   = window._nCells || 0;     // จำนวนรู
+  // scale เดียว (สัดส่วนจริง) — fit เต็มความยาวในกรอบ · รูเป็นวงกลมจริง
+  const sc = (Lfin > 0) ? Math.min(drawW / Lfin, drawH / Hcb) : (drawH / Hcb);
+  const scH = sc, scL = sc;
+  const beamLengthPx = (Lfin > 0) ? Lfin * sc : drawW;
 
-  const Sp = S * scL;                   // spacing in pixels
-  const a0p = a0 * scL;                 // opening diameter px
-  const r = a0p / 2;
-  const tfp = Math.max(3, tf * scH);
-  const Hp = Hcb * scH;
+  const rx = a0 * sc / 2, ry = rx;      // รัศมีรู (วงกลม)
+  const tfp = Math.max(2, tf * sc);
+  const Hp = Hcb * sc;
 
   const beamY = padT + (drawH - Hp) / 2;
-  const beamLeft = padL;
-  const beamRight = padL + beamLengthPx;
+  const beamLeft = padL + (drawW - beamLengthPx) / 2;   // จัดกลางแนวนอน
+  const beamRight = beamLeft + beamLengthPx;
   const cy = beamY + Hp / 2;
 
   // ── DRAW BEAM (rectangle with flanges drawn as solid lines) ──
@@ -3235,21 +4200,24 @@ function drawElevation(B, tw, tf, Hcb, a0, S){
   ctx.fillStyle = '#1d3a66';
   ctx.fillRect(beamLeft, beamY + tfp, beamLengthPx, Hp - 2*tfp);
 
-  // ── DRAW OPENINGS ──
-  // Place first opening at S/2 from left edge, then every S
-  let xPos = beamLeft + Sp / 2;
+  // ── DRAW OPENINGS — ทุกรูตามตำแหน่งจริง x_i = S/2 + i·S (เต็มความยาว) ──
   const openings = [];
-  while (xPos + r <= beamRight) {
-    openings.push(xPos);
-    xPos += Sp;
+  if (nC > 0 && Lfin > 0) {
+    for (let i = 0; i < nC; i++) openings.push(beamLeft + ((S - a0/2) + i*S) * scL);  // ตรงกับ 3D: end web post = e
+  } else {
+    // fallback: เรียงตาม spacing เท่าที่พอดีกรอบ
+    let xPos = beamLeft + (S*scL) / 2;
+    while (xPos + rx <= beamRight) { openings.push(xPos); xPos += S*scL; }
   }
 
-  // Cut openings (dest-out)
+  // Cut openings (dest-out) — เฉพาะรูที่ "เปิด" (รูที่ปิด/อุด จะปล่อยให้เป็นเนื้อตัน)
+  const _filledSet = window.filledHoles || new Set();
   ctx.save();
   ctx.globalCompositeOperation = 'destination-out';
-  openings.forEach(x => {
+  openings.forEach((x,i) => {
+    if (_filledSet.has(i)) return;        // รูที่ปิด → ไม่เจาะ
     ctx.beginPath();
-    ctx.arc(x, cy, r, 0, 2*Math.PI);
+    ctx.ellipse(x, cy, rx, ry, 0, 0, 2*Math.PI);
     ctx.fill();
   });
   ctx.restore();
@@ -3266,16 +4234,27 @@ function drawElevation(B, tw, tf, Hcb, a0, S){
   ctx.lineTo(beamRight, beamY + Hp - tfp);
   ctx.stroke();
 
-  // Outline openings
-  ctx.strokeStyle = '#f0883e';
-  ctx.lineWidth = 1.5;
-  openings.forEach(x => {
-    ctx.beginPath();
-    ctx.arc(x, cy, r, 0, 2*Math.PI);
-    ctx.stroke();
+  // Outline openings · รูที่เปิด = วงส้ม · รูที่ปิด = วงเขียวประ + hatch (แผ่นอุด)
+  openings.forEach((x,i) => {
+    if (_filledSet.has(i)) {
+      // รูที่ปิด = แผ่นเหล็กกลมอุด (infill plate) + รอยเชื่อมรอบขอบ (weld seam)
+      ctx.save();
+      ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, 0, 0, 2*Math.PI); ctx.fillStyle = '#36507a'; ctx.fill();   // แผ่นอุด
+      ctx.setLineDash([]); ctx.lineWidth = 2; ctx.strokeStyle = '#f5c842';                                    // รอยเชื่อม (เหลือง)
+      ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, 0, 0, 2*Math.PI); ctx.stroke();
+      ctx.lineWidth = 1.1;
+      for (let a=0; a<2*Math.PI; a+=Math.PI/10){ ctx.beginPath(); ctx.moveTo(x+Math.cos(a)*rx, cy+Math.sin(a)*ry); ctx.lineTo(x+Math.cos(a)*(rx+3.5), cy+Math.sin(a)*(ry+3.5)); ctx.stroke(); }  // ขีดรอยเชื่อม
+      ctx.restore();
+    } else {
+      ctx.strokeStyle = '#f0883e';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([]);
+      ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, 0, 0, 2*Math.PI); ctx.stroke();
+    }
   });
+  ctx.setLineDash([]);
 
-  // Centerline of openings
+  // Centerline of openings (อ้างอิง)
   ctx.strokeStyle = '#22d3ee';
   ctx.setLineDash([4,3]);
   ctx.lineWidth = 1;
@@ -3284,6 +4263,20 @@ function drawElevation(B, tw, tf, Hcb, a0, S){
   ctx.lineTo(beamRight + 20, cy);
   ctx.stroke();
   ctx.setLineDash([]);
+
+  // ── รอยเชื่อมต่อ Top–Bottom Tee ตามแนวกึ่งกลาง (ที่ web post · เว้นช่วงรูเปิด) ──
+  {
+    const openSpans = openings.filter((x,i)=>!_filledSet.has(i)).map(x=>[x-rx,x+rx]).sort((a,b)=>a[0]-b[0]);
+    const segs=[]; let cur=beamLeft;
+    openSpans.forEach(sp=>{ if(sp[0]>cur) segs.push([cur,sp[0]]); cur=Math.max(cur,sp[1]); });
+    if(cur<beamRight) segs.push([cur,beamRight]);
+    ctx.strokeStyle='#f5c842'; ctx.setLineDash([]); ctx.lineWidth=1.8;
+    segs.forEach(s=>{ ctx.beginPath(); ctx.moveTo(s[0],cy); ctx.lineTo(s[1],cy); ctx.stroke();
+      // ขีดรอยเชื่อมเล็ก (zigzag ticks) ตามแนว
+      ctx.lineWidth=0.8; for(let xx=s[0]+4; xx<s[1]-2; xx+=7){ ctx.beginPath(); ctx.moveTo(xx,cy-2.5); ctx.lineTo(xx+3.5,cy+2.5); ctx.stroke(); }
+      ctx.lineWidth=1.8;
+    });
+  }
 
   // ── DIMENSIONS ──
   ctx.font = '10px IBM Plex Mono, monospace';
@@ -3320,8 +4313,8 @@ function drawElevation(B, tw, tf, Hcb, a0, S){
 
   // e (web post) — between openings
   if (openings.length >= 2) {
-    const x1Edge = openings[0] + r;
-    const x2Edge = openings[1] - r;
+    const x1Edge = openings[0] + rx;
+    const x2Edge = openings[1] - rx;
     const eY = beamY - 14;
     ctx.strokeStyle = '#4ade80';
     ctx.lineWidth = 1;
@@ -3364,7 +4357,157 @@ function drawElevation(B, tw, tf, Hcb, a0, S){
   ctx.font = '9px IBM Plex Mono, monospace';
   ctx.textAlign = 'left';
   ctx.fillText('CL of openings', beamRight + 25, cy + 3);
+
+  // ── ทาบแรงกระทำ + จุดรองรับ ลงบน Side View (โหมดตำแหน่ง) ──
+  overlayBeamLoads(ctx, beamLeft, scL, beamY, Hp, (Lfin>0?Lfin:beamLengthPx/scL));
 }
+
+// ═════════════════════════════════════════════════════════════════════
+// DRAW PARENT-SECTION CUTTING LINE — ตรวจว่าตัดได้จริงไหม
+// เส้นตัดบน web ของหน้าตัดเดิม (depth H): ส่วนโค้งรัศมี ρ = (a0 + H − Hcb)/2
+//   ตัดหน้าตัดเดิมเป็น 2 Tee แล้วดึงแยก g = Hcb − H → รูสุดท้าย 2ρ + g = a0
+//   ρ ≤ 0  → Tee รวมลึกเกินหน้าตัดเดิม (ตัดไม่ได้) ; ρ > web → ส่วนโค้งทะลุปีก
+// ═════════════════════════════════════════════════════════════════════
+function drawParentCut(B, tw, tf, H, Hcb, a0, S, forPrint){
+  const c = document.getElementById('cutCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, Hc = c.height;
+  const P = forPrint
+    ? {bg:'#ffffff',fl:'#c9d6e8',web:'#eef4fb',out:'#33425e',cut:'#c2410c',cl:'#0e7490',txt:'#1a2230',sub:'#5a6678',ok:'#15803d',bad:'#b91c1c',hatch:'rgba(185,28,28,.10)'}
+    : {bg:'#0f1117',fl:'#2c4a7a',web:'#1d3a66',out:'#6aa9e0',cut:'#f0883e',cl:'#22d3ee',txt:'#e6ebf5',sub:'rgba(255,255,255,.55)',ok:'#4ade80',bad:'#ff6b6b',hatch:'rgba(255,107,107,.12)'};
+
+  ctx.clearRect(0,0,W,Hc);
+  ctx.fillStyle = P.bg; ctx.fillRect(0,0,W,Hc);
+  if(!forPrint){ ctx.fillStyle='#1a2235'; for(let x=20;x<W;x+=20) for(let y=20;y<Hc;y+=20) ctx.fillRect(x-0.5,y-0.5,1,1); }
+
+  ctx.fillStyle = P.cut; ctx.font='bold 12px IBM Plex Mono, monospace'; ctx.textAlign='center';
+  ctx.fillText('Cutting Line on Parent Web — Fabrication Feasibility', W/2, 22);
+
+  // ── fabrication geometry (minimal-scrap: รอยตัด 2 เส้นสัมผัสกันพอดี) ──
+  const halfS = S/2;
+  const g    = (S>0 && a0>halfS) ? Math.sqrt(halfS*(a0-halfS)) : 0;  // สูตรแอพ (เส้นไขว้ตามรูปแบบ xlsx)
+  const rho  = (a0 - g) / 2;         // ยอดส่วนโค้งวัดจากกึ่งกลางเอว (arc peak from mid)
+  const webHalf = H/2 - tf;          // half clear web (mm)
+  const eWeb = S - a0;               // web post width
+  const okSpace = (S > a0) && (S < 2*a0);          // มี web post + g จริง
+  const okFit   = (g > 0) && (rho <= webHalf) && (g/2 <= webHalf);  // โค้ง+flat อยู่ในเอว
+  const feasible = okSpace && okFit;
+
+  // ── layout (true proportion) ──
+  const padL=60, padR=60, padT=44, padB=72;
+  const drawW=W-padL-padR, drawH=Hc-padT-padB;
+  const sc = Math.min(drawH/Math.max(H,1), drawW/Math.max(3.4*S, a0*1.2));
+  const Hp=H*sc, tfp=Math.max(2.5, tf*sc);
+  const beamY=padT+(drawH-Hp)/2, beamLeft=padL, beamLen=drawW, beamRight=beamLeft+beamLen;
+  const midY=beamY+Hp/2;
+
+  // ── parent I-beam ──
+  ctx.fillStyle=P.fl; ctx.fillRect(beamLeft,beamY,beamLen,tfp); ctx.fillRect(beamLeft,beamY+Hp-tfp,beamLen,tfp);
+  ctx.fillStyle=P.web; ctx.fillRect(beamLeft,beamY+tfp,beamLen,Hp-2*tfp);
+  ctx.strokeStyle=P.out; ctx.lineWidth=1.5; ctx.strokeRect(beamLeft,beamY,beamLen,Hp);
+  ctx.beginPath(); ctx.moveTo(beamLeft,beamY+tfp); ctx.lineTo(beamRight,beamY+tfp);
+  ctx.moveTo(beamLeft,beamY+Hp-tfp); ctx.lineTo(beamRight,beamY+Hp-tfp); ctx.stroke();
+
+  // cut centerline (mid-depth)
+  ctx.strokeStyle=P.cl; ctx.setLineDash([5,4]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(beamLeft-15,midY); ctx.lineTo(beamRight+15,midY); ctx.stroke(); ctx.setLineDash([]);
+
+  // H dimension (left)
+  ctx.strokeStyle=P.sub; ctx.lineWidth=1; ctx.beginPath();
+  ctx.moveTo(beamLeft-26,beamY); ctx.lineTo(beamLeft-26,beamY+Hp);
+  ctx.moveTo(beamLeft-30,beamY); ctx.lineTo(beamLeft-22,beamY);
+  ctx.moveTo(beamLeft-30,beamY+Hp); ctx.lineTo(beamLeft-22,beamY+Hp); ctx.stroke();
+  ctx.save(); ctx.translate(beamLeft-34,midY); ctx.rotate(-Math.PI/2); ctx.fillStyle=P.sub;
+  ctx.font='10px IBM Plex Mono, monospace'; ctx.textAlign='center'; ctx.fillText('H = '+H, 0, 0); ctx.restore();
+
+  if(feasible){
+    // ── construction (per CB Properties.xlsx) ──
+    //   yf = (Hcb − H)/2 = g/2  : ระยะ flat ของรอยตัดจากกึ่งกลางเอว (เลื่อนแยกข้างละ g/2)
+    //   R  = a0/2              : รัศมีส่วนโค้ง = ครึ่งหนึ่งของ Ø รู
+    //   รอยตัด 1 (ส้ม): flat ที่ y=+yf ใต้ศูนย์กลาง, โค้งครึ่งวงกลม "นูนขึ้น" ที่ตำแหน่งรู (pitch S)
+    //   รอยตัด 2 (เขียว): flat ที่ y=−yf เหนือศูนย์กลาง, โค้งครึ่งวงกลม "นูนลง", เลื่อน S/2
+    //   เศษเหล็ก = พื้นที่ระหว่างรอยตัด 1 กับ 2 (รวมตัวเป็นรู Ø a0 หลังประกอบ)
+    const Sp=S*sc, Rp=(a0/2)*sc, yfp=(g/2)*sc;
+    const webTop=beamY+tfp, webBot=beamY+Hp-tfp;
+    const cut2 = forPrint?'#15803d':'#34d36b';            // green (cut 2)
+    const blue = forPrint?'#1f5fa8':'#4a90d9';
+
+    // เส้นฟ้า: ขอบบน-ล่างของแผ่นเอว (clear web)
+    ctx.strokeStyle=blue; ctx.lineWidth=2.5; ctx.beginPath();
+    ctx.moveTo(beamLeft,webTop); ctx.lineTo(beamRight,webTop);
+    ctx.moveTo(beamLeft,webBot); ctx.lineTo(beamRight,webBot); ctx.stroke();
+
+    // hole x-positions — ขยายเลยขอบทั้งสองข้างเพื่อให้เส้นวนเป็นครึ่งวงกลมต่อเนื่อง (ไม่มี flat ยาวที่ปลาย)
+    const xs1=[]; { let x=beamRight; while(x>beamLeft-Sp) x-=Sp; for(; x<beamRight+Sp; x+=Sp) xs1.push(x); }  // cut1 ยึดขอบขวา → quarter 90-180° ที่ปลายขวา
+    const xs2=xs1.map(x=>x-Sp/2);                                                                              // cut2 offset S/2
+
+    // polyline: flats at yFlat + semicircles (radius Rp) at each hole, bulge=-1 up / +1 down
+    const build=(holes,yFlat,bulge)=>{ const a=[]; const N=26;
+      holes.forEach(hx=>{ a.push([hx-Rp,yFlat]);
+        for(let k=0;k<=N;k++){ const t=Math.PI*k/N; a.push([hx-Rp*Math.cos(t), yFlat+bulge*Rp*Math.sin(t)]); }
+        a.push([hx+Rp,yFlat]); });
+      return a; };
+    const trace=a=>{ ctx.moveTo(a[0][0],a[0][1]); for(let i=1;i<a.length;i++) ctx.lineTo(a[i][0],a[i][1]); };
+
+    const yfO=midY+yfp, yfG=midY-yfp;                     // ส้ม flat ใต้ศูนย์ / เขียว flat เหนือศูนย์
+    const A1=build(xs1, yfO, -1);                         // cut1 orange, bulge up
+    const A2=build(xs2, yfG, +1);                         // cut2 green,  bulge down
+
+    // clip ทุกอย่างให้อยู่ในแผ่นเอว (เส้นที่เลยขอบจะถูกตัดเรียบ)
+    ctx.save();
+    ctx.beginPath(); ctx.rect(beamLeft, webTop, beamRight-beamLeft, webBot-webTop); ctx.clip();
+
+    // เศษเหล็ก = แถบระหว่างรอยตัด 1 กับ 2 (รวมตัวเป็นรู Ø a₀ หลังประกอบ) — บีบเป็นศูนย์ที่จุดสัมผัส
+    ctx.beginPath(); trace(A1); for(let i=A2.length-1;i>=0;i--) ctx.lineTo(A2[i][0],A2[i][1]); ctx.closePath();
+    ctx.fillStyle = forPrint?'rgba(120,140,160,.20)':'rgba(150,175,210,.16)'; ctx.fill();
+
+    // วาดเส้นรอยตัด (A1=โดมขึ้น=ส้ม, A2=หุบลง=เขียว)
+    ctx.lineWidth=2.3; ctx.strokeStyle=P.cut;  ctx.beginPath(); trace(A1); ctx.stroke();
+    ctx.lineWidth=2.3; ctx.strokeStyle=cut2;   ctx.beginPath(); trace(A2); ctx.stroke();
+    ctx.restore();
+
+    // legend + labels
+    ctx.font='9px IBM Plex Mono, monospace'; ctx.textAlign='left';
+    ctx.fillStyle=P.cut;  ctx.fillRect(beamLeft+2, beamY+tfp+4, 14, 3); ctx.fillText('รอยตัด 1 (ส้ม)', beamLeft+20, beamY+tfp+8);
+    ctx.fillStyle=cut2;   ctx.fillRect(beamLeft+2, beamY+tfp+16, 14, 3); ctx.fillText('รอยตัด 2 (เขียว)', beamLeft+20, beamY+tfp+20);
+
+    // verdict
+    ctx.fillStyle=P.ok; ctx.font='bold 11px IBM Plex Mono, monospace'; ctx.textAlign='center';
+    ctx.fillText('✓ ตัดได้ (เศษน้อยสุด) — รอยตัด 2 เส้นสัมผัสกันพอดี · ยกแยกข้างละ g/2 = '+(g/2).toFixed(1)+' mm (g = '+g.toFixed(1)+') → Hcb = '+Hcb+' mm',
+      W/2, beamY+Hp+30);
+    ctx.fillStyle=P.sub; ctx.font='9px IBM Plex Mono, monospace';
+    ctx.fillText('R = a₀/2 = '+(a0/2).toFixed(0)+' · flat offset y_f = g/2 = '+(g/2).toFixed(1)+' · pitch S = '+S+' · web post e = '+eWeb.toFixed(0)+' · ρ = '+rho.toFixed(1)+' ≤ H/2−t_f = '+webHalf.toFixed(0)+' ✓',
+      W/2, beamY+Hp+46);
+  } else {
+    // infeasible — red hatch over web + reason
+    ctx.save(); ctx.beginPath(); ctx.rect(beamLeft,beamY+tfp,beamLen,Hp-2*tfp); ctx.clip();
+    ctx.strokeStyle=P.bad; ctx.globalAlpha=0.5; ctx.lineWidth=1.5;
+    for(let x=beamLeft-Hp;x<beamRight+Hp;x+=12){ ctx.beginPath(); ctx.moveTo(x,beamY); ctx.lineTo(x+Hp,beamY+Hp); ctx.stroke(); }
+    ctx.restore();
+    ctx.strokeStyle=P.bad; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(beamLeft,midY); ctx.lineTo(beamRight,midY); ctx.stroke();
+
+    let reason, hint;
+    if(!okSpace){
+      reason = 'ระยะห่าง S = '+S+' mm ไม่อยู่ในช่วง a₀ ('+a0+') < S < 2·a₀ ('+(2*a0)+') mm';
+      hint   = 'ต้องให้ S มากกว่า a₀ (มี web post) และน้อยกว่า 2·a₀ (รอยตัดสัมผัสได้)';
+    } else {
+      reason = 'หน้าตัดเดิมตื้นเกินไป: ส่วนโค้ง/flat ของรอยตัดล้นออกนอกเอว · ρ = '+rho.toFixed(1)+' mm > H/2−t_f = '+webHalf.toFixed(0)+' mm';
+      const Hneed = Math.ceil((2*(rho+tf))/5)*5;
+      hint   = 'ต้องใช้หน้าตัดเดิมลึกขึ้น (H ≥ '+Hneed+' mm) หรือลด a₀';
+    }
+    ctx.fillStyle=P.bad; ctx.font='bold 12px IBM Plex Mono, monospace'; ctx.textAlign='center';
+    ctx.fillText('✗ ตัดจากหน้าตัดเดิมนี้ไม่ได้', W/2, beamY+Hp+30);
+    ctx.font='9px IBM Plex Mono, monospace';
+    ctx.fillText(reason, W/2, beamY+Hp+46);
+    ctx.fillStyle=P.sub;
+    ctx.fillText(hint, W/2, beamY+Hp+60);
+  }
+}
+
+// L_b ติดตาม L_final อัตโนมัติ จนกว่าผู้ใช้จะพิมพ์แก้ค่า L_b เอง (ลงทะเบียนก่อน generic เพื่อให้ตั้ง flag ทันก่อน calculate อ่าน)
+var _lbAuto = true;
+(function(){ const e=document.getElementById('inp_Lb'); if(e) e.addEventListener('input', ()=>{ _lbAuto = false; }); })();
 
 // Bind input events
 document.querySelectorAll('input').forEach(inp => {
@@ -3552,17 +4695,18 @@ function drawElevationForPrint(B, tw, tf, Hcb, a0, S){
   const padL = 60, padR = 60, padT = 60, padB = 80;
   const drawW = W - padL - padR;
   const drawH = H - padT - padB;
-  const scH = drawH / Hcb;
-  const scL = scH;
-  const beamLengthPx = drawW;
-  const Sp = S * scL;
-  const a0p = a0 * scL;
-  const r = a0p / 2;
-  const tfp = Math.max(3, tf * scH);
-  const Hp = Hcb * scH;
+  const Lfin = window._Lfin || 0;
+  const nC   = window._nCells || 0;
+  // scale เดียว (สัดส่วนจริง) — fit เต็มความยาวในกรอบ · รูวงกลมจริง
+  const sc = (Lfin > 0) ? Math.min(drawW / Lfin, drawH / Hcb) : (drawH / Hcb);
+  const scH = sc, scL = sc;
+  const beamLengthPx = (Lfin > 0) ? Lfin * sc : drawW;
+  const rx = a0 * sc / 2, ry = rx;
+  const tfp = Math.max(2, tf * sc);
+  const Hp = Hcb * sc;
   const beamY = padT + (drawH - Hp) / 2;
-  const beamLeft = padL;
-  const beamRight = padL + beamLengthPx;
+  const beamLeft = padL + (drawW - beamLengthPx) / 2;
+  const beamRight = beamLeft + beamLengthPx;
   const cy = beamY + Hp / 2;
 
   // Beam flanges (medium blue)
@@ -3573,15 +4717,21 @@ function drawElevationForPrint(B, tw, tf, Hcb, a0, S){
   ctx.fillStyle = '#d6e8fa';
   ctx.fillRect(beamLeft, beamY + tfp, beamLengthPx, Hp - 2*tfp);
 
-  // Cut openings
-  let xPos = beamLeft + Sp / 2;
+  // Cut openings — ทุกรูตามตำแหน่งจริง (เฉพาะรูที่เปิด)
   const openings = [];
-  while (xPos + r <= beamRight) { openings.push(xPos); xPos += Sp; }
+  if (nC > 0 && Lfin > 0) {
+    for (let i = 0; i < nC; i++) openings.push(beamLeft + ((S - a0/2) + i*S) * scL);  // ตรงกับ 3D: end web post = e
+  } else {
+    let xPos = beamLeft + (S*scL)/2;
+    while (xPos + rx <= beamRight) { openings.push(xPos); xPos += S*scL; }
+  }
+  const _filledSet = window.filledHoles || new Set();
 
   ctx.save();
   ctx.globalCompositeOperation = 'destination-out';
-  openings.forEach(x => {
-    ctx.beginPath(); ctx.arc(x, cy, r, 0, 2*Math.PI); ctx.fill();
+  openings.forEach((x,i) => {
+    if (_filledSet.has(i)) return;
+    ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, 0, 0, 2*Math.PI); ctx.fill();
   });
   ctx.restore();
 
@@ -3594,12 +4744,23 @@ function drawElevationForPrint(B, tw, tf, Hcb, a0, S){
   ctx.moveTo(beamLeft, beamY + Hp - tfp); ctx.lineTo(beamRight, beamY + Hp - tfp);
   ctx.stroke();
 
-  // Opening outlines (dark orange)
-  ctx.strokeStyle = '#b45309';
-  ctx.lineWidth = 1.5;
-  openings.forEach(x => {
-    ctx.beginPath(); ctx.arc(x, cy, r, 0, 2*Math.PI); ctx.stroke();
+  // Opening outlines · เปิด = ส้มเข้ม · ปิด = เขียว + hatch
+  openings.forEach((x,i) => {
+    if (_filledSet.has(i)) {
+      // แผ่นเหล็กอุด + รอยเชื่อม (print: ฟ้าอ่อน + เส้นน้ำตาลเชื่อม)
+      ctx.save();
+      ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, 0, 0, 2*Math.PI); ctx.fillStyle = '#bcd0ea'; ctx.fill();
+      ctx.setLineDash([]); ctx.lineWidth = 2; ctx.strokeStyle = '#8b6914';
+      ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, 0, 0, 2*Math.PI); ctx.stroke();
+      ctx.lineWidth = 1.1;
+      for (let a=0; a<2*Math.PI; a+=Math.PI/10){ ctx.beginPath(); ctx.moveTo(x+Math.cos(a)*rx, cy+Math.sin(a)*ry); ctx.lineTo(x+Math.cos(a)*(rx+3.5), cy+Math.sin(a)*(ry+3.5)); ctx.stroke(); }
+      ctx.restore();
+    } else {
+      ctx.strokeStyle = '#b45309'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, 0, 0, 2*Math.PI); ctx.stroke();
+    }
   });
+  ctx.setLineDash([]);
 
   // Centerline (dark cyan)
   ctx.strokeStyle = '#0e7490';
@@ -3609,6 +4770,19 @@ function drawElevationForPrint(B, tw, tf, Hcb, a0, S){
   ctx.moveTo(beamLeft - 20, cy); ctx.lineTo(beamRight + 20, cy);
   ctx.stroke();
   ctx.setLineDash([]);
+
+  // รอยเชื่อม Top–Bottom Tee ที่ web post (เว้นช่วงรูเปิด)
+  {
+    const openSpans = openings.filter((x,i)=>!_filledSet.has(i)).map(x=>[x-rx,x+rx]).sort((a,b)=>a[0]-b[0]);
+    const segs=[]; let cur=beamLeft;
+    openSpans.forEach(sp=>{ if(sp[0]>cur) segs.push([cur,sp[0]]); cur=Math.max(cur,sp[1]); });
+    if(cur<beamRight) segs.push([cur,beamRight]);
+    ctx.strokeStyle='#8b6914'; ctx.setLineDash([]); ctx.lineWidth=1.8;
+    segs.forEach(s=>{ ctx.beginPath(); ctx.moveTo(s[0],cy); ctx.lineTo(s[1],cy); ctx.stroke();
+      ctx.lineWidth=0.8; for(let xx=s[0]+4; xx<s[1]-2; xx+=7){ ctx.beginPath(); ctx.moveTo(xx,cy-2.5); ctx.lineTo(xx+3.5,cy+2.5); ctx.stroke(); }
+      ctx.lineWidth=1.8;
+    });
+  }
 
   ctx.font = '10px IBM Plex Mono, monospace';
 
@@ -3640,7 +4814,7 @@ function drawElevationForPrint(B, tw, tf, Hcb, a0, S){
 
   // e (web post)
   if (openings.length >= 2) {
-    const x1Edge = openings[0] + r, x2Edge = openings[1] - r;
+    const x1Edge = openings[0] + rx, x2Edge = openings[1] - rx;
     const eY = beamY - 14;
     ctx.strokeStyle = '#166534';
     ctx.lineWidth = 1;
@@ -3680,6 +4854,9 @@ function drawElevationForPrint(B, tw, tf, Hcb, a0, S){
   ctx.font = '9px IBM Plex Mono, monospace';
   ctx.textAlign = 'left';
   ctx.fillText('CL of openings', beamRight + 25, cy + 3);
+
+  // ── ทาบแรงกระทำ + จุดรองรับ ลงบน Side View (โหมดตำแหน่ง) ──
+  overlayBeamLoads(ctx, beamLeft, scL, beamY, Hp, (Lfin>0?Lfin:beamLengthPx/scL));
 }
 
 // ═════════════════════════════════════════════════════════════════════
@@ -3703,6 +4880,7 @@ function preparePrint(){
     Hcb: document.getElementById('inp_Hcb').value,
     a0: document.getElementById('inp_a0').value,
     S: document.getElementById('inp_S').value,
+    L: document.getElementById('inp_L').value,
     Fy: document.getElementById('inp_Fy').value,
     E: document.getElementById('inp_E').value,
     Lb: document.getElementById('inp_Lb').value,
@@ -3722,6 +4900,7 @@ function preparePrint(){
       '<div><b>Hcb=</b>'+vals.Hcb+' mm</div>'+
       '<div><b>a₀=</b>'+vals.a0+' mm</div>'+
       '<div><b>S=</b>'+vals.S+' mm</div>'+
+      '<div><b>L=</b>'+vals.L+' mm</div>'+
       '<div>|</div>'+
       '<div><b>Fy=</b>'+vals.Fy+' ksc</div>'+
       '<div><b>E=</b>'+vals.E+' ksc</div>'+
@@ -3745,8 +4924,10 @@ window.addEventListener('beforeprint', function(){
   const Hcb= parseFloat(document.getElementById('inp_Hcb').value)||560;
   const a0 = parseFloat(document.getElementById('inp_a0').value)||400;
   const S  = parseFloat(document.getElementById('inp_S').value)||600;
+  const Hpar = parseFloat(document.getElementById('inp_H').value)||400;
   drawSectionForPrint(B, tw, tf, Hcb, a0);
   drawElevationForPrint(B, tw, tf, Hcb, a0, S);
+  drawParentCut(B, tw, tf, Hpar, Hcb, a0, S, true);
 });
 
 window.addEventListener('afterprint', function(){
@@ -3757,8 +4938,10 @@ window.addEventListener('afterprint', function(){
   const Hcb= parseFloat(document.getElementById('inp_Hcb').value)||560;
   const a0 = parseFloat(document.getElementById('inp_a0').value)||400;
   const S  = parseFloat(document.getElementById('inp_S').value)||600;
+  const Hpar = parseFloat(document.getElementById('inp_H').value)||400;
   drawSection(B, tw, tf, Hcb, a0);
   drawElevation(B, tw, tf, Hcb, a0, S);
+  drawParentCut(B, tw, tf, Hpar, Hcb, a0, S, false);
 });
 
 // Override print button
@@ -3770,6 +4953,410 @@ if(origPrintBtn){
     setTimeout(function(){ window.print(); }, 100);
   });
 }
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 3D VIEW — Three.js (WebGL) · interactive · real length        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+let scene, cam, renderer, ctrls, gCell, gParent, gTees, gAsm, animId, framedOnce=false;
+const PIN = Math.PI;
+const num = id => { const e=document.getElementById(id); return e?(parseFloat(e.value)||0):0; };
+
+function makeLabel(text, hex){
+  const cv=document.createElement('canvas'); cv.width=512; cv.height=64;
+  const x=cv.getContext('2d'); x.font='bold 40px monospace'; x.textAlign='left'; x.textBaseline='middle';
+  x.strokeStyle='rgba(0,0,0,.7)'; x.lineWidth=5; x.strokeText(text,6,34); x.fillStyle=hex; x.fillText(text,6,34);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthTest:false}));
+  sp.center.set(0,0.5);
+  return sp;
+}
+function addEdges(mesh, geo, hex, op){
+  const e=new THREE.EdgesGeometry(geo, 22);
+  const l=new THREE.LineSegments(e, new THREE.LineBasicMaterial({color:hex,transparent:true,opacity:op||0.55}));
+  mesh.add(l);
+}
+function clearGroup(g){ while(g.children.length){ const c=g.children[0];
+  c.traverse(o=>{ if(o.geometry)o.geometry.dispose(); if(o.material){ if(o.material.map)o.material.map.dispose(); o.material.dispose(); } });
+  g.remove(c); } }
+
+// สร้างคาน I (กลุ่ม) — mode 'holes' = เจาะรู Ø a0 / 'cuts' = web เต็ม + เส้นตัด 2 เส้น
+function buildBeam(g, mode, P){
+  const {B,tw,tf,a0,S,L,Hb,holes,infills,yf,R,oCenters} = P;
+  const matF=new THREE.MeshStandardMaterial({color:0x5478ad, metalness:0.45, roughness:0.5});
+  const matW=new THREE.MeshStandardMaterial({color:0x6f93c8, metalness:0.4, roughness:0.55, side:THREE.DoubleSide});
+  const eHex=0x9fc4f0;
+  // flanges (boxes) — ยาวเท่าความยาวคานเอง (parent = L stock · cellular = Lfin สั้นกว่า)
+  const fGeoT=new THREE.BoxGeometry(L, tf, B), fGeoB=new THREE.BoxGeometry(L, tf, B);
+  const ft=new THREE.Mesh(fGeoT,matF); ft.position.set(L/2, Hb-tf/2, 0); addEdges(ft,fGeoT,eHex); g.add(ft);
+  const fb=new THREE.Mesh(fGeoB,matF); fb.position.set(L/2, tf/2, 0); addEdges(fb,fGeoB,eHex); g.add(fb);
+  // web
+  if(mode==='holes'){
+    const shp=new THREE.Shape();
+    shp.moveTo(0,tf); shp.lineTo(L,tf); shp.lineTo(L,Hb-tf); shp.lineTo(0,Hb-tf); shp.lineTo(0,tf);
+    holes.forEach(xh=>{ const h=new THREE.Path(); h.absarc(xh, Hb/2, a0/2, 0, PIN*2, true); shp.holes.push(h); });
+    const wGeo=new THREE.ExtrudeGeometry(shp,{depth:tw,bevelEnabled:false,steps:1}); wGeo.translate(0,0,-tw/2);
+    const web=new THREE.Mesh(wGeo,matW); addEdges(web,wGeo,eHex,0.7); g.add(web);
+    // ── รูที่ปิด (infill plate) : แผ่นเหล็กกลม + รอยเชื่อมรอบขอบทั้งสองหน้า ──
+    (infills||[]).forEach(xh=>{
+      // แผ่นเหล็กอุด (disc) สีต่างเล็กน้อย
+      const plate=new THREE.Mesh(new THREE.CylinderGeometry(a0/2, a0/2, tw, 40),
+        new THREE.MeshStandardMaterial({color:0x8aa6cf, metalness:0.5, roughness:0.45}));
+      plate.rotation.x=PIN/2; plate.position.set(xh, Hb/2, 0); g.add(plate);
+      // รอยเชื่อม (weld seam) — วงแหวนเหลืองสองหน้า web
+      [tw/2+0.6, -tw/2-0.6].forEach(z=>{
+        const curve=new THREE.EllipseCurve(0,0,a0/2,a0/2,0,2*PIN);
+        const pts=curve.getPoints(48).map(p=>new THREE.Vector3(xh+p.x, Hb/2+p.y, z));
+        const ring=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts),
+          new THREE.LineBasicMaterial({color:0xf5c842}));
+        ring.userData.weld=true; g.add(ring);    // tag → export .dae
+      });
+    });
+    // ── รอยเชื่อม Top–Bottom Tee ตามแนวกึ่งกลาง (web post) — เว้นช่วงทุกรู (เปิด+ปิด) ──
+    {
+      const spans=[...(holes||[]),...(infills||[])].map(xh=>[xh-a0/2,xh+a0/2]).sort((p,q)=>p[0]-q[0]);
+      const segs=[]; let cur=0;
+      spans.forEach(sp=>{ if(sp[0]>cur) segs.push([cur,sp[0]]); cur=Math.max(cur,sp[1]); });
+      if(cur<L) segs.push([cur,L]);
+      const wMat=new THREE.LineBasicMaterial({color:0xf5c842});
+      segs.forEach(s=>{ [tw/2+0.6,-tw/2-0.6].forEach(z=>{
+        const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(s[0],Hb/2,z), new THREE.Vector3(s[1],Hb/2,z)]);
+        const wl=new THREE.Line(geo, wMat); wl.userData.weld=true; g.add(wl);   // tag → export .dae
+      });});
+    }
+  } else {
+    const wGeo=new THREE.BoxGeometry(L, Hb-2*tf, tw);
+    const web=new THREE.Mesh(wGeo,new THREE.MeshStandardMaterial({color:0x44608c,metalness:0.4,roughness:0.6}));
+    web.position.set(L/2, Hb/2, 0); addEdges(web,wGeo,eHex,0.5); g.add(web);
+    // เส้นตัด 2 เส้น (tangent) บนผิวหน้า web — ให้ตรงกับ 2D "เส้นตัดบน Web (Parent)"
+    //   ส้ม: ศูนย์รู = holes (S/2+kS), flat ใต้กึ่งกลาง, นูนขึ้น
+    //   เขียว: เลื่อนครึ่ง pitch (−S/2), flat เหนือกึ่งกลาง, นูนลง → มุมเขียวสัมผัสส่วนโค้งส้มพอดี
+    const zf=tw/2+1.5, N=24;
+    // สร้างเส้นยื่นเลยขอบทั้งสองข้าง (flats + semicircles) — x เพิ่มขึ้นเรื่อยๆ (monotonic)
+    const seg=(centers,yFlat,bulge)=>{ const a=[];
+      centers.forEach(xc=>{ a.push(new THREE.Vector3(xc-R,yFlat,zf));
+        for(let k=0;k<=N;k++){const t=PIN*k/N; a.push(new THREE.Vector3(xc-R*Math.cos(t), yFlat+bulge*R*Math.sin(t), zf));}
+        a.push(new THREE.Vector3(xc+R,yFlat,zf)); });
+      return a; };
+    // clip เส้นให้อยู่ในช่วง x∈[0, L] (parent = เหล็ก stock เต็มความยาว)
+    const xL=0, xR=L;
+    const clip=(pts)=>{ const lp=(a,b,t)=>new THREE.Vector3(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,a.z);
+      let p=pts, r=[];
+      for(let i=0;i<p.length;i++){ const c=p[i],pr=p[i-1]; if(c.x>=xL){ if(pr&&pr.x<xL) r.push(lp(pr,c,(xL-pr.x)/(c.x-pr.x))); r.push(c); } }
+      p=r; r=[];
+      for(let i=0;i<p.length;i++){ const c=p[i],pr=p[i-1]; if(c.x<=xR){ r.push(c); } else { if(pr&&pr.x<=xR) r.push(lp(pr,c,(xR-pr.x)/(c.x-pr.x))); break; } }
+      return r; };
+    // ศูนย์ส้ม "ยึดที่ขอบขวา x=L" → ขอบขวาตัดที่ยอดส่วนโค้งส้ม = quarter 90°–180° · เขียว = ส้ม−S/2
+    //   (ปลายซ้าย green center ตรง x=0 → green quarter = mirror บน-ล่าง)
+    const oC = oCenters;                 // ศูนย์โดมส้ม (ส่งเข้ามาให้ตรงกับ grid รูของคาน final)
+    const gC = oC.map(x=>x-S/2);
+    g.userData.cutLines=[];   // เก็บเส้น polyline ไว้ให้ export เป็นเส้นจริง (ไม่ใช่ tube)
+    const mkLine=(raw,hex)=>{
+      // dedupe จุดซ้ำ/ชิดกัน (seg() มีจุดซ้ำที่หัว-ท้ายส่วนโค้ง) → กัน zero-length segment ที่ทำ Frenet frame ของ TubeGeometry เพี้ยน (tube แบนหาย)
+      const pts=[]; for(const p of raw){ if(!pts.length || p.distanceTo(pts[pts.length-1])>0.5) pts.push(p); }
+      if(pts.length<2) return;
+      g.userData.cutLines.push({pts:pts.map(p=>p.clone()), hex});
+      // tube สำหรับ "แสดงผลบนจอ" เท่านั้น (export ใช้ polyline ด้านบน)
+      const tube=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,false,'catmullrom',0), Math.max(pts.length*2,64), Math.max(tw*0.35,3), 6, false), new THREE.MeshStandardMaterial({color:'#'+hex,metalness:.3,roughness:.5,emissive:'#'+hex,emissiveIntensity:.3}));
+      tube.userData.exp='line'; g.add(tube);
+    };
+    mkLine(clip(seg(oC, Hb/2 - yf, +1)), 'f0883e');  // ส้ม = โดมขึ้น ∩ (flat ล่าง)
+    mkLine(clip(seg(gC, Hb/2 + yf, -1)), '34d36b');  // เขียว = หุบลง ∪ (flat บน)
+  }
+}
+
+// ── เส้นขอบรอยตัด 2D (flat + ครึ่งวงกลม) clip ช่วง x∈[xL,xR] → ใช้สร้างรูปทรง tee ───────────
+function clip2D(pts, xL, xR){
+  const lp=(a,b,t)=>[a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t];
+  let p=pts, r=[];
+  for(let i=0;i<p.length;i++){ const c=p[i],pr=p[i-1]; if(c[0]>=xL-1e-6){ if(pr&&pr[0]<xL-1e-6) r.push(lp(pr,c,(xL-pr[0])/(c[0]-pr[0]))); r.push(c); } }
+  p=r; r=[];
+  for(let i=0;i<p.length;i++){ const c=p[i],pr=p[i-1]; if(c[0]<=xR+1e-6){ r.push(c); } else { if(pr&&pr[0]<=xR+1e-6) r.push(lp(pr,c,(xR-pr[0])/(c[0]-pr[0]))); break; } }
+  return r;
+}
+function cutEdge2D(centers, yFlat, bulge, R, xL, xR){
+  const N=24, a=[];
+  centers.forEach(xc=>{ a.push([xc-R,yFlat]);
+    for(let k=0;k<=N;k++){ const t=PIN*k/N; a.push([xc-R*Math.cos(t), yFlat+bulge*R*Math.sin(t)]); }
+    a.push([xc+R,yFlat]); });
+  return clip2D(a, xL, xR);
+}
+// สร้าง "ครึ่งคาน" (tee) 1 ชิ้น · which='top' (ปีกบน, ขอบเอวล่าง = โดมส้ม ∩) / 'bottom' (ปีกล่าง, ขอบเอวบน = หุบเขียว ∪)
+function buildTee(g, which, P){
+  const {B,tw,tf,H,L,yf,R,oC,gC} = P;
+  const matF=new THREE.MeshStandardMaterial({color:0x5478ad, metalness:0.45, roughness:0.5});
+  const matW=new THREE.MeshStandardMaterial({color:0x6f93c8, metalness:0.4, roughness:0.55, side:THREE.DoubleSide});
+  const eHex=0x9fc4f0, fGeo=new THREE.BoxGeometry(L, tf, B);
+  const shp=new THREE.Shape();
+  if(which==='top'){
+    const ft=new THREE.Mesh(fGeo,matF); ft.position.set(L/2, H-tf/2, 0); addEdges(ft,fGeo,eHex); g.add(ft);
+    const oPts=cutEdge2D(oC, H/2-yf, +1, R, 0, L);          // ขอบล่าง = โดมส้ม ∩
+    shp.moveTo(0, H-tf); shp.lineTo(L, H-tf);
+    for(let i=oPts.length-1;i>=0;i--) shp.lineTo(oPts[i][0], oPts[i][1]);  // ไล่ขอบตัด ขวา→ซ้าย
+    shp.lineTo(0, H-tf);
+  } else {
+    const fb=new THREE.Mesh(fGeo,matF); fb.position.set(L/2, tf/2, 0); addEdges(fb,fGeo,eHex); g.add(fb);
+    const gPts=cutEdge2D(gC, H/2+yf, -1, R, 0, L);          // ขอบบน = หุบเขียว ∪
+    shp.moveTo(0, tf); shp.lineTo(0, gPts[0][1]);
+    for(let i=0;i<gPts.length;i++) shp.lineTo(gPts[i][0], gPts[i][1]);     // ไล่ขอบตัด ซ้าย→ขวา
+    shp.lineTo(L, tf); shp.lineTo(0, tf);
+  }
+  const wGeo=new THREE.ExtrudeGeometry(shp,{depth:tw,bevelEnabled:false,steps:1}); wGeo.translate(0,0,-tw/2);
+  const web=new THREE.Mesh(wGeo,matW); addEdges(web,wGeo,eHex,0.6); g.add(web);
+}
+
+function frame(dir){
+  const box=new THREE.Box3();
+  [gParent,gTees,gAsm,gCell].forEach(g=>{ if(g&&g.visible&&g.children.length) box.expandByObject(g); });
+  if(box.isEmpty()) return;
+  const c=box.getCenter(new THREE.Vector3()), sph=box.getBoundingSphere(new THREE.Sphere());
+  const r=Math.max(sph.radius,50), fov=cam.fov*Math.PI/180;
+  const dist=r/Math.sin(fov/2)*1.1;
+  ctrls.target.copy(c);
+  cam.position.copy(c).addScaledVector(dir.clone().normalize(), dist);
+  // near/far กว้างไว้ — กันรูป "หาย" ตอนหมุน/ซูม
+  cam.near=Math.max(1, r*0.02); cam.far=(dist+r)*8; cam.updateProjectionMatrix();
+  ctrls.minDistance=r*0.1; ctrls.maxDistance=(dist+r)*6; ctrls.update();
+}
+const DIRS={ iso:new THREE.Vector3(0.5,0.55,1), side:new THREE.Vector3(0,0,1), top:new THREE.Vector3(0,1,0.0001), end:new THREE.Vector3(1,0.12,0.12) };
+
+function rebuild(){
+  if(!scene||!gCell) return;
+  clearGroup(gCell); clearGroup(gParent); clearGroup(gTees); clearGroup(gAsm);
+  const H=num('inp_H'), B=num('inp_B'), tw=num('inp_tw'), tf=num('inp_tf');
+  const a0=num('inp_a0'), S=num('inp_S'), L=num('inp_L')||6000;
+  const ref=document.getElementById('d3_ref');
+  const ok=(H>0&&B>0&&tw>0&&tf>0&&a0>0&&S>0&&L>0&&S<2*a0&&(S-a0)>=0.10*a0&&S>a0);
+  if(!ok){ if(ref) ref.textContent='ค่าไม่พร้อมวาด (ต้อง a₀<S<2a₀)'; return; }
+  const g=Math.sqrt((S/2)*(a0-S/2)), Hcb=Math.round(H+g), yf=g/2, R=a0/2;
+  const e = S - a0;                                   // ความกว้าง web post
+  // ── L = ความยาวเหล็ก parent (stock) · คาน cellular final สั้นกว่า ──
+  //   ตัด parent → 2 tee → เลื่อนประกอบ S/2 (เสียความยาว ≈S/2) → trim ปลายให้ web post เต็มทั้งสองข้าง
+  //   usable = L − S/2 · คาน final = (N+1)·S − a0  (N รู, web post เต็ม e ที่ปลายทั้งสอง)
+  let N = Math.floor((L - S/2 + a0)/S) - 1;
+  if(N<1) N=1;
+  const Lfin  = Math.min(L, (N+1)*S - a0);            // ความยาว cellular final
+  const waste = Math.max(0, L - Lfin);               // เศษที่ตัดทิ้ง (รวมสองปลาย)
+  const off   = waste/2;                              // จัดคาน final ให้กึ่งกลาง parent → เศษสองปลายเท่ากัน
+  // รูคาน final (local 0..Lfin) — เจาะเฉพาะรูที่ "เปิด" · รูที่ปิด (infill) = แผ่นเหล็กอุด (เนื้อตัน + รอยเชื่อม)
+  const holesFin=[], infillsFin=[];
+  for(let k=0;k<N;k++){ const xc=e + a0/2 + k*S; if(window.filledHoles && window.filledHoles.has(k)) infillsFin.push(xc); else holesFin.push(xc); }
+  const oC=[]; { const base = off + e + a0/2; let x=base; while(x>-S) x-=S; for(; x<L+S; x+=S) oC.push(x); } // ศูนย์โดมส้มบน parent (align กับรู final, เต็ม [0,L])
+  const gC = oC.map(x=>x-S/2);                        // ศูนย์หุบเขียว = ส้ม − S/2
+  const lblY = Math.max(L*0.012, 70), lblS = [Math.max(L*0.17,800), Math.max(L*0.022,95), 1];
+  // ── เลย์เอาต์แนวตั้ง: 4 ขั้น ไหลจากบนลงล่าง (① → ④) ───────────────────────────────
+  const slot   = Math.max(Hcb, H);
+  const teeSep = g + slot*0.45;                       // ระยะแยก 2 tee (ขั้น ②)
+  const sp     = slot*0.55 + B*1.4 + lblY*2;          // ช่องว่างระหว่างขั้น (รวมที่ป้าย)
+  const yFinal  = 0;                                  // ④ ล่างสุด
+  const yAsm    = yFinal + Hcb            + sp;        // ③
+  const yTees   = yAsm   + (H + teeSep)   + sp;        // ②
+  const yParent = yTees  + H             + sp;        // ① บนสุด
+  const teeP = {B,tw,tf,H,L,yf,R,oC,gC};
+  // ① parent (เส้นตัด) — ลึก H, ยาว L (stock) — บนสุด
+  buildBeam(gParent,'cuts',{B,tw,tf,a0,S,L,Hb:H,holes:[],yf,R,oCenters:oC});
+  gParent.position.set(0, yParent, 0);
+  const lp=makeLabel('① Parent (เส้นตัด)  H='+H+'  L='+L+' mm', '#f0883e'); lp.scale.set(...lblS);
+  lp.position.set(0, H+lblY, B/2); gParent.add(lp);
+  // ② ตัด 2 ชิ้น (tee แยก) — top tee ยกขึ้น teeSep · bottom tee อยู่ล่าง · ยาว L ทั้งคู่
+  const gtTop=new THREE.Group(), gtBot=new THREE.Group();
+  buildTee(gtTop,'top',teeP);  gtTop.position.set(0, teeSep, 0);
+  buildTee(gtBot,'bottom',teeP);
+  gTees.add(gtTop); gTees.add(gtBot); gTees.position.set(0, yTees, 0);
+  const lt=makeLabel('② ตัด 2 ชิ้น (Top + Bottom Tee)', '#9fc4f0'); lt.scale.set(...lblS);
+  lt.position.set(0, H+teeSep+lblY, B/2); gTees.add(lt);
+  // ③ ประกอบ (ก่อน trim) — bottom tee เลื่อน +S/2 · top tee ยก +g → รูกลม + ปลายรุ่งริ่ง · ลึก Hcb
+  const gaTop=new THREE.Group(), gaBot=new THREE.Group();
+  buildTee(gaTop,'top',teeP);  gaTop.position.set(0, g, 0);
+  buildTee(gaBot,'bottom',teeP); gaBot.position.set(S/2, 0, 0);
+  gAsm.add(gaTop); gAsm.add(gaBot); gAsm.position.set(0, yAsm, 0);
+  const la=makeLabel('③ ประกอบ + เชื่อม web post (เลื่อน S/2 · ก่อน trim ปลาย)', '#a78bfa'); la.scale.set(...lblS);
+  la.position.set(0, Hcb+lblY, B/2); gAsm.add(la);
+  // ④ cellular (holes) — ลึก Hcb, ยาว Lfin (สั้นกว่า), จัดกึ่งกลาง — ล่างสุด
+  buildBeam(gCell,'holes',{B,tw,tf,a0,S,L:Lfin,Hb:Hcb,holes:holesFin,infills:infillsFin,yf,R});
+  gCell.position.set(off, yFinal, 0);
+  const _nFill3D = window.filledHoles ? [...window.filledHoles].filter(k=>k<N).length : 0;
+  const _holeLbl = _nFill3D>0 ? ('เปิด '+holesFin.length+'/'+N+' รู · ปิด '+_nFill3D) : (N+' รู');
+  const lc=makeLabel('④ Cellular final  d='+Hcb+'  L='+Lfin+' mm ('+_holeLbl+' · ตัดเศษ '+waste+')', '#4ade80'); lc.scale.set(...lblS);
+  lc.position.set(0, Hcb+lblY, B/2); gCell.add(lc);
+
+  if(ref) ref.textContent='';
+  if(!framedOnce){ frame(DIRS.iso); framedOnce=true; }
+}
+window.rebuild3D = rebuild;
+window.resize3DPub = ()=>resize();
+
+/* ─────────────────────────────────────────────────────────────
+   EXPORT — .dae (COLLADA → SketchUp)
+   triangulate mesh จริงทั้งหมด · mm → m (÷1000)
+   ───────────────────────────────────────────────────────────── */
+function expFilename(ext){
+  const a0=num('inp_a0'), S=num('inp_S'), L=num('inp_L')||6000;
+  return 'cellular_a'+a0+'_S'+S+'_L'+L+'.'+ext;
+}
+function dl(text, mime, name){
+  const blob=new Blob([text],{type:mime}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+}
+// คืน {pts:[[x,y,z]..], tri:[[i,i,i]..]} ในหน่วยเมตร (world) · map คือฟังก์ชันสลับแกน
+function meshGeom(mesh, map){
+  const geo=mesh.geometry, pos=geo.attributes.position; if(!pos) return {pts:[],tri:[]};
+  mesh.updateWorldMatrix(true,false); const m=mesh.matrixWorld; const v=new THREE.Vector3();
+  const pts=[]; for(let i=0;i<pos.count;i++){ v.fromBufferAttribute(pos,i).applyMatrix4(m); v.multiplyScalar(0.001); pts.push(map?map(v):[v.x,v.y,v.z]); }
+  const tri=[], idx=geo.index;
+  if(idx){ for(let i=0;i<idx.count;i+=3) tri.push([idx.getX(i),idx.getX(i+1),idx.getX(i+2)]); }
+  else { for(let i=0;i<pos.count;i+=3) tri.push([i,i+1,i+2]); }
+  return {pts,tri};
+}
+function eachMesh(fn, includeLines){
+  [gParent,gTees,gAsm,gCell].forEach(g=>{ if(!g||!g.visible) return;
+    g.traverse(o=>{ if(o.isMesh && o.geometry && o.geometry.attributes.position){ if(!includeLines && o.userData.exp==='line') return; fn(o,g); } }); });
+}
+// แปลง polyline (local) → world เมตร
+function lineWorld(group, pts){ group.updateWorldMatrix(true,false); const m=group.matrixWorld;
+  return pts.map(p=>{ const v=p.clone().applyMatrix4(m).multiplyScalar(0.001); return [v.x,v.y,v.z]; }); }
+// ── DAE (COLLADA) — solid = triangles, เส้นตัด = linestrips (เส้นจริง ไม่ใช่ท่อ) · Y-up ──
+function exportDAE(){
+  if(scene) scene.updateMatrixWorld(true);
+  const byColor={};
+  eachMesh((o)=>{ const hex=o.material&&o.material.color?o.material.color.getHexString():'8aa0c0';
+    const g=meshGeom(o,null); const bucket=byColor[hex]||(byColor[hex]={a:[]});
+    for(const t of g.tri){ for(const vi of t){ const p=g.pts[vi]; bucket.a.push(p[0],p[1],p[2]); } } }, false); // solid เท่านั้น (ไม่เอา tube)
+  let effects='',materials='',geometries='',nodes='', ix=0;
+  const mat=(hex)=>{ const r=(parseInt(hex.slice(0,2),16)/255).toFixed(4), gg=(parseInt(hex.slice(2,4),16)/255).toFixed(4), bb=(parseInt(hex.slice(4,6),16)/255).toFixed(4);
+    effects+=`<effect id="eff${ix}"><profile_COMMON><technique sid="t"><lambert><diffuse><color>${r} ${gg} ${bb} 1</color></diffuse></lambert></technique></profile_COMMON></effect>`;
+    materials+=`<material id="mat${ix}" name="C${hex}"><instance_effect url="#eff${ix}"/></material>`; };
+  // solids → triangles
+  Object.keys(byColor).forEach((hex)=>{ const arr=byColor[hex].a; if(arr.length<9) return;
+    mat(hex); const id='g'+ix, nV=arr.length/3;
+    let p=''; for(let i=0;i<nV;i++) p+=(i?' ':'')+i;
+    geometries+=`<geometry id="${id}"><mesh>`+
+      `<source id="${id}p"><float_array id="${id}a" count="${arr.length}">${arr.map(n=>+n.toFixed(5)).join(' ')}</float_array>`+
+      `<technique_common><accessor source="#${id}a" count="${nV}" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>`+
+      `<vertices id="${id}v"><input semantic="POSITION" source="#${id}p"/></vertices>`+
+      `<triangles count="${nV/3}" material="s${ix}"><input semantic="VERTEX" source="#${id}v" offset="0"/><p>${p}</p></triangles>`+
+      `</mesh></geometry>`;
+    nodes+=`<node id="n${ix}"><instance_geometry url="#${id}"><bind_material><technique_common><instance_material symbol="s${ix}" target="#mat${ix}"/></technique_common></bind_material></instance_geometry></node>`;
+    ix++;
+  });
+  // เส้นตัด → linestrips (เส้นจริง)
+  [gCell,gParent].forEach(g=>{ if(!g||!g.visible||!g.userData.cutLines) return;
+    g.userData.cutLines.forEach(cl=>{ const wp=lineWorld(g,cl.pts); const flat=[]; wp.forEach(p=>flat.push(p[0],p[1],p[2])); const nV=wp.length; if(nV<2) return;
+      mat(cl.hex); const id='ln'+ix;
+      let p=''; for(let i=0;i<nV;i++) p+=(i?' ':'')+i;
+      geometries+=`<geometry id="${id}"><mesh>`+
+        `<source id="${id}p"><float_array id="${id}a" count="${flat.length}">${flat.map(n=>+n.toFixed(5)).join(' ')}</float_array>`+
+        `<technique_common><accessor source="#${id}a" count="${nV}" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>`+
+        `<vertices id="${id}v"><input semantic="POSITION" source="#${id}p"/></vertices>`+
+        `<linestrips count="1" material="s${ix}"><input semantic="VERTEX" source="#${id}v" offset="0"/><p>${p}</p></linestrips>`+
+        `</mesh></geometry>`;
+      nodes+=`<node id="n${ix}"><instance_geometry url="#${id}"><bind_material><technique_common><instance_material symbol="s${ix}" target="#mat${ix}"/></technique_common></bind_material></instance_geometry></node>`;
+      ix++;
+    });
+  });
+  // รอยเชื่อม (weld) — Top–Bottom Tee + แผ่นอุด → linestrips
+  [gParent,gTees,gAsm,gCell].forEach(g=>{ if(!g||!g.visible) return; g.updateWorldMatrix(true,false);
+    g.traverse(o=>{ if(!(o.isLine && o.userData && o.userData.weld) || !o.geometry) return;
+      o.updateWorldMatrix(true,false); const m=o.matrixWorld, pos=o.geometry.attributes.position; if(!pos) return;
+      const flat=[], v=new THREE.Vector3();
+      for(let i=0;i<pos.count;i++){ v.fromBufferAttribute(pos,i).applyMatrix4(m).multiplyScalar(0.001); flat.push(+v.x.toFixed(5),+v.y.toFixed(5),+v.z.toFixed(5)); }
+      if(o.isLineLoop && pos.count>1){ v.fromBufferAttribute(pos,0).applyMatrix4(m).multiplyScalar(0.001); flat.push(+v.x.toFixed(5),+v.y.toFixed(5),+v.z.toFixed(5)); } // ปิด loop
+      const nV=flat.length/3; if(nV<2) return;
+      const hex=o.material&&o.material.color?o.material.color.getHexString():'f5c842';
+      mat(hex); const id='wl'+ix; let p=''; for(let i=0;i<nV;i++) p+=(i?' ':'')+i;
+      geometries+=`<geometry id="${id}"><mesh>`+
+        `<source id="${id}p"><float_array id="${id}a" count="${flat.length}">${flat.join(' ')}</float_array>`+
+        `<technique_common><accessor source="#${id}a" count="${nV}" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>`+
+        `<vertices id="${id}v"><input semantic="POSITION" source="#${id}p"/></vertices>`+
+        `<linestrips count="1" material="s${ix}"><input semantic="VERTEX" source="#${id}v" offset="0"/><p>${p}</p></linestrips>`+
+        `</mesh></geometry>`;
+      nodes+=`<node id="n${ix}"><instance_geometry url="#${id}"><bind_material><technique_common><instance_material symbol="s${ix}" target="#mat${ix}"/></technique_common></bind_material></instance_geometry></node>`;
+      ix++;
+    });
+  });
+  const now=new Date().toISOString();
+  const dae='<?xml version="1.0" encoding="utf-8"?>\n<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">'+
+    `<asset><contributor><authoring_tool>CivilToolKit CellularBeam</authoring_tool></contributor><created>${now}</created><modified>${now}</modified><unit meter="1" name="meter"/><up_axis>Y_UP</up_axis></asset>`+
+    `<library_effects>${effects}</library_effects><library_materials>${materials}</library_materials><library_geometries>${geometries}</library_geometries>`+
+    `<library_visual_scenes><visual_scene id="scene">${nodes}</visual_scene></library_visual_scenes><scene><instance_visual_scene url="#scene"/></scene></COLLADA>`;
+  dl(dae,'model/vnd.collada+xml',expFilename('dae'));
+}
+window.exportDAE3D = exportDAE;
+
+function resize(){
+  const wrap=document.getElementById('d3wrap'); if(!renderer||!wrap||!cam) return;
+  const w=wrap.clientWidth, h=wrap.clientHeight; if(w<=0||h<=0) return;
+  renderer.setSize(w,h); cam.aspect=w/Math.max(h,1); cam.updateProjectionMatrix();
+}
+
+function setup(){
+  const wrap=document.getElementById('d3wrap'); if(!wrap||scene) return;
+  if(wrap.clientWidth===0||wrap.clientHeight===0){ setTimeout(setup,150); return; }
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0x0f1117);
+  scene.add(new THREE.AmbientLight(0xffffff,0.6));
+  const d1=new THREE.DirectionalLight(0xffffff,0.85); d1.position.set(0.6,1,0.7); scene.add(d1);
+  const d2=new THREE.DirectionalLight(0xffffff,0.35); d2.position.set(-0.5,0.4,-0.6); scene.add(d2);
+  cam=new THREE.PerspectiveCamera(32, wrap.clientWidth/Math.max(wrap.clientHeight,1), 1, 200000);
+  cam.position.set(4000,3000,5000);
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  wrap.appendChild(renderer.domElement);
+  const msg=document.getElementById('d3msg'); if(msg) msg.style.display='none';
+  ctrls=new OrbitControls(cam, renderer.domElement);
+  ctrls.enableDamping=true; ctrls.dampingFactor=0.08;
+  gCell=new THREE.Group(); gParent=new THREE.Group(); gTees=new THREE.Group(); gAsm=new THREE.Group();
+  scene.add(gCell); scene.add(gParent); scene.add(gTees); scene.add(gAsm);
+  setupCursorRotate();
+  (function loop(){ ctrls.update(); renderer.render(scene,cam); animId=requestAnimationFrame(loop); })();
+  new ResizeObserver(()=>resize()).observe(wrap);
+  // view buttons
+  const bind=(id,dir)=>{ const b=document.getElementById(id); if(b) b.onclick=()=>frame(DIRS[dir]); };
+  bind('d3-iso','iso'); bind('d3-side','side'); bind('d3-top','top'); bind('d3-end','end');
+  // export buttons
+  const eDae=document.getElementById('d3-dae'); if(eDae) eDae.onclick=exportDAE;
+  // toggles
+  document.querySelectorAll('#d3ctrl .d3tg').forEach(tg=>{
+    const key=tg.getAttribute('data-key'), cb=tg.querySelector('input');
+    const apply=()=>{ const grp={cell:gCell,parent:gParent,tees:gTees,asm:gAsm}[key]; if(grp) grp.visible=cb.checked; tg.classList.toggle('off',!cb.checked); };
+    cb.addEventListener('change', apply); apply();
+  });
+  rebuild();
+  frame(DIRS.iso); framedOnce=true;
+}
+
+// หมุนรอบจุดใต้เคอร์เซอร์ (ลากซ้าย=หมุน · ขวา=pan · ล้อ=zoom)
+function setupCursorRotate(){
+  const el=renderer.domElement;
+  ctrls.mouseButtons={ LEFT:null, MIDDLE:THREE.MOUSE.DOLLY, RIGHT:THREE.MOUSE.PAN };
+  const ray=new THREE.Raycaster(), ndc=new THREE.Vector2(); let rot=null;
+  const pivot=(ev)=>{ const r=el.getBoundingClientRect();
+    ndc.x=((ev.clientX-r.left)/r.width)*2-1; ndc.y=-((ev.clientY-r.top)/r.height)*2+1;
+    ray.setFromCamera(ndc,cam); const hits=ray.intersectObjects([gParent,gTees,gAsm,gCell],true);
+    return hits.length?hits[0].point.clone():ctrls.target.clone(); };
+  el.addEventListener('pointerdown',ev=>{ if(ev.button!==0||ev.pointerType==='touch')return;
+    rot={p:pivot(ev),lx:ev.clientX,ly:ev.clientY}; try{el.setPointerCapture(ev.pointerId);}catch(e){} });
+  el.addEventListener('pointermove',ev=>{ if(!rot)return; const dx=ev.clientX-rot.lx,dy=ev.clientY-rot.ly; rot.lx=ev.clientX; rot.ly=ev.clientY;
+    if(!dx&&!dy)return; const sp=2*Math.PI/Math.max(el.clientHeight,1), P=rot.p;
+    const right=new THREE.Vector3(1,0,0).applyQuaternion(cam.quaternion);
+    const qY=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),-dx*sp);
+    const qP=new THREE.Quaternion().setFromAxisAngle(right,-dy*sp);
+    let R=qY.clone().multiply(qP);
+    const fwdN=new THREE.Vector3(0,0,-1).applyQuaternion(cam.quaternion).applyQuaternion(R);
+    const ang=fwdN.angleTo(new THREE.Vector3(0,1,0)); if(ang<0.04||ang>Math.PI-0.04) R=qY.clone();
+    cam.position.sub(P).applyQuaternion(R).add(P); cam.quaternion.premultiply(R);
+    const fwd=new THREE.Vector3(0,0,-1).applyQuaternion(cam.quaternion);
+    ctrls.target.copy(cam.position).addScaledVector(fwd, cam.position.distanceTo(P)); });
+  const end=ev=>{ if(rot){rot=null; try{el.releasePointerCapture(ev.pointerId);}catch(e){}} };
+  el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', setup);
+else setup();
 </script>
 </body>
 </html>
