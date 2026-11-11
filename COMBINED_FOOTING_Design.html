@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Combined Footing — Multi-Column (ACI 318 Strength Design)</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161b25;--bg3:#1c2333;--bg4:#222c3c;
+  --border:#2a3650;--border2:#334166;
+  --text:#ffffff;--muted:#ffffff;--dim:#ffffff;
+  --blue:#4a90d9;--blue2:#2563a8;
+  --orange:#f0883e;--red:#e05252;--green:#4ade80;
+  --yellow:#f5c842;--purple:#a78bfa;--cyan:#22d3ee;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+sub,sup{font-size:.72em;font-weight:600;line-height:0;position:relative;vertical-align:baseline}
+sub{bottom:-.3em}sup{top:-.4em}
+.hdr{background:linear-gradient(135deg,#0d1520,#1a2540);border-bottom:1px solid var(--border2);
+  padding:0 24px;display:flex;align-items:center;gap:14px;height:52px;position:sticky;top:0;z-index:100}
+.hdr-logo{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue);
+  letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--blue2);padding:3px 9px;border-radius:3px}
+.hdr-title{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text);letter-spacing:.04em}
+.hdr-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.btn-print{background:#2563a8;color:#fff;border:1px solid #4a90d9;border-radius:4px;font-family:var(--mono);
+  font-size:10px;font-weight:600;letter-spacing:.1em;padding:6px 14px;cursor:pointer;text-transform:uppercase;margin-left:auto}
+.btn-print:hover{background:#4a90d9}
+.layout{display:flex}
+.hidden{display:none!important}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab-btn{background:var(--bg2);border:1px solid var(--border);border-bottom:none;color:rgba(255,255,255,.6);
+  font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;padding:8px 15px;cursor:pointer;border-radius:6px 6px 0 0;transition:.15s}
+.tab-btn:hover{color:#fff;background:var(--bg3)}
+.tab-btn.active{color:var(--blue);border-color:var(--blue2);background:var(--bg3);border-bottom:2px solid var(--blue)}
+.tab-btn.col-tab{color:var(--orange)}
+.tab-btn.col-tab.active{color:var(--orange);border-color:#b45309;border-bottom-color:var(--orange)}
+.col-form .inp-row .lbl{width:150px}
+.col-form .inp-row input,.col-form .inp-row select{font-size:12px;padding:4px 8px}
+.sidebar{width:340px;min-width:340px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
+.main{flex:1;min-width:0;max-width:1500px;padding:20px;display:flex;flex-direction:column;gap:0}
+.sg{border-bottom:1px solid var(--border);padding:12px 14px}
+.sg-title{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sg-title::after{content:'';flex:1;height:1px;background:var(--border2)}
+.inp-row{display:flex;align-items:center;margin-bottom:7px;gap:6px}
+.inp-row .lbl{font-size:12px;color:#fff;width:120px;flex-shrink:0;font-weight:500}
+.inp-row .sym{font-size:11px;width:12px;text-align:center;flex-shrink:0;color:rgba(255,255,255,.5)}
+.inp-row input{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);color:#fff;
+  font-size:13px;font-weight:600;padding:5px 10px;border-radius:4px;text-align:center;transition:border-color .15s;font-family:var(--sans)}
+.inp-row input:focus{outline:none;border-color:var(--blue);background:var(--bg4)}
+.inp-row .unit{font-size:11px;color:rgba(255,255,255,.6);width:42px;flex-shrink:0}
+.inp-hint{font-size:10px;color:rgba(255,255,255,.42);margin:-4px 0 8px;line-height:1.4}
+.inp-row select{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);color:#fff;font-size:12px;font-weight:600;padding:5px 8px;border-radius:4px;cursor:pointer;font-family:var(--sans)}
+.inp-row select:focus{outline:none;border-color:var(--blue)}
+.lay-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.lay-tbl th,.lay-tbl td{border:1px solid var(--border);padding:3px 5px;text-align:center}
+.lay-tbl th{background:var(--bg3);font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--blue);font-weight:600}
+.lay-tbl input,.lay-tbl select{width:100%;background:var(--bg3);border:1px solid var(--border);color:#fff;font-size:11px;font-weight:600;padding:3px;border-radius:3px;text-align:center;font-family:var(--sans)}
+.lay-tbl input:focus,.lay-tbl select:focus{outline:none;border-color:var(--blue)}
+.lay-tbl input:disabled{opacity:.25}
+.lay-tbl .clay-row td{background:rgba(240,136,62,.06)}
+.lay-tbl .col-row td{background:rgba(74,144,217,.07)}
+.lay-btn{font-family:var(--mono);font-size:11px;font-weight:600;background:var(--blue2);color:#fff;border:1px solid var(--blue);border-radius:4px;padding:6px 14px;cursor:pointer;margin-top:10px}
+.lay-btn:hover{background:var(--blue)}
+.lay-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;font-weight:700;padding:2px 4px}
+/* section blocks */
+.sec-block{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;background:var(--bg2)}
+.sec-hdr{background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:10px}
+.sec-tag{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;padding:2px 7px;border-radius:2px}
+.tag-blue{background:var(--blue2)}.tag-orange{background:#b45309}.tag-green{background:#166534}
+.tag-red{background:#991b1b}.tag-purple{background:#6d28d9}.tag-cyan{background:#0e7490}
+.tag-pink{background:#9d174d}.tag-teal{background:#0f766e}.tag-yellow{background:#a16207}
+.sec-title{font-size:12px;font-weight:600;color:#fff}
+.sec-ref{margin-left:auto;font-size:10px;color:rgba(255,255,255,.6)}
+.rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)}
+.rep-col{padding:14px;border-right:1px solid var(--border)}
+.rep-col:last-child{border-right:none}
+.rep-col-full{padding:14px}
+.sdiv{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.6);display:flex;align-items:center;gap:8px;margin:10px 0 7px}
+.sdiv:first-child{margin-top:0}
+.sdiv::before{content:'';width:10px;height:1px;background:var(--border2)}
+.sdiv::after{content:'';flex:1;height:1px;background:var(--border2)}
+/* calc */
+.calc-block{margin:6px 0 10px;border-left:2px solid var(--border2)}
+.calc-line1,.calc-line2,.calc-line3{font-size:12px;display:grid;grid-template-columns:20px 18px 1fr;align-items:baseline;padding:2px 0}
+.calc-line1 .cl-ind{display:none}.calc-line1 .cl-eq{display:none}.calc-line1 .cl-body{grid-column:1/4}
+.calc-line2 .cl-ind{display:block}
+.calc-line3{border-left:2px solid rgba(255,255,255,.3);padding:3px 0;margin-top:1px}
+.calc-line3 .cl-ind{display:block}
+.cl-eq{text-align:center;font-weight:500;font-family:var(--mono)}
+.cl-body{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;font-family:var(--mono);color:rgba(255,255,255,.85)}
+.calc-val{font-size:14px;font-weight:700;color:#fff}
+.calc-unit{font-size:10px;color:rgba(255,255,255,.5)}
+/* governing boxes */
+.gov{background:linear-gradient(90deg,rgba(245,200,66,.12),transparent);
+  border-left:3px solid #f5c842;padding:8px 12px;margin-top:8px;border-radius:0 4px 4px 0}
+.gov-lbl{font-size:11px;color:rgba(255,255,255,.7)}
+.gov-val{font-size:18px;font-weight:800;color:#f5c842;display:flex;align-items:baseline;gap:6px}
+.gov-unit{font-size:12px;color:rgba(245,200,66,.7);font-weight:500}
+.gov-tag{font-family:var(--mono);font-size:9px;font-weight:700;background:#c47f00;color:#fff;padding:2px 7px;border-radius:2px;letter-spacing:.1em;margin-right:6px}
+.gov-green{background:linear-gradient(90deg,rgba(74,222,128,.1),transparent);border-left:3px solid var(--green)}
+.gov-green .gov-val{color:var(--green)}.gov-green .gov-unit{color:rgba(74,222,128,.7)}.gov-green .gov-tag{background:#166534}
+.gov-red{background:linear-gradient(90deg,rgba(224,82,82,.12),transparent);border-left:3px solid var(--red)}
+.gov-red .gov-val{color:var(--red)}.gov-red .gov-unit{color:rgba(224,82,82,.7)}.gov-red .gov-tag{background:#991b1b}
+.gov-blue{background:linear-gradient(90deg,rgba(74,144,217,.12),transparent);border-left:3px solid var(--blue)}
+.gov-blue .gov-val{color:var(--blue)}.gov-blue .gov-unit{color:rgba(74,144,217,.7)}.gov-blue .gov-tag{background:#2563a8}
+/* summary table */
+.sum-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.sum-tbl td{padding:6px 10px;border:1px solid var(--border)}
+.sum-tbl tr:first-child td{background:var(--bg3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.sum-tbl .val{font-weight:700;color:var(--yellow);text-align:right;font-family:var(--mono)}
+.st-ok{font-family:var(--mono);font-size:10px;font-weight:700;background:#166534;color:#fff;padding:2px 8px;border-radius:2px}
+.st-ng{font-family:var(--mono);font-size:10px;font-weight:700;background:#991b1b;color:#fff;padding:2px 8px;border-radius:2px}
+.info-box{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:10px 14px;font-size:11px;color:rgba(255,255,255,.7);line-height:1.8}
+.info-box b{color:var(--cyan);font-weight:600}
+/* drawings */
+.draw-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.draw-box{background:var(--bg);border:1px solid var(--border);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.draw-cap{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);
+  padding:8px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.draw-cap span{color:rgba(255,255,255,.4)}
+.draw-box svg{display:block;width:100%;height:auto;background:var(--bg)}
+#scene{flex:1 1 auto;min-height:320px;position:relative;cursor:grab;overflow:hidden;background:radial-gradient(ellipse at center,#16203200,#0b0e14);touch-action:none}
+#scene:active{cursor:grabbing}
+#scene canvas{display:block}
+.d3-hint{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.4);text-align:center;padding:6px}
+
+/* ═══════════════════ PRINT STYLES ═══════════════════ */
+.print-header,.print-header-repeat,.print-footer{display:none}
+@media print{
+  @page{size:A4 portrait;margin:12mm 10mm 16mm 10mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  .hdr,.sidebar,.btn-print{display:none!important}
+  html{min-width:0!important}
+  body{background:#fff!important;color:#222!important;font-size:10.5px!important;line-height:1.4!important}
+  .layout{display:block!important;min-width:0!important}
+  .main{width:100%!important;min-width:0!important;padding:0!important}
+  .print-header{display:flex!important;align-items:center;justify-content:space-between;border-bottom:2.5px solid #1a365d;padding:0 0 5px 0;margin-bottom:6px;page-break-inside:avoid;break-inside:avoid}
+  .print-header-repeat{display:flex!important;align-items:center;justify-content:space-between;border-bottom:2.5px solid #1a365d;padding:0 0 5px 0;margin-bottom:6px;page-break-inside:avoid;break-inside:avoid}
+  .print-header .ph-left,.print-header-repeat .ph-left{font-family:var(--mono);font-size:13px;font-weight:700;color:#1a365d;letter-spacing:.04em}
+  .print-header .ph-left small,.print-header-repeat .ph-left small{display:block;font-size:8.5px;font-weight:500;color:#666;letter-spacing:.06em;margin-top:1px}
+  .print-header .ph-right,.print-header-repeat .ph-right{text-align:right;font-family:var(--mono);font-size:8.5px;color:#555;line-height:1.6}
+  .print-input-summary{display:flex!important;flex-wrap:wrap;gap:3px 14px;background:#f0f4f8;border:1px solid #ccd;border-radius:3px;padding:5px 10px;margin-bottom:6px;font-family:var(--mono);font-size:8.5px;color:#333;page-break-inside:avoid;break-inside:avoid}
+  .print-input-summary b{font-weight:700;color:#1a365d}
+  .print-footer{display:block!important;position:fixed;bottom:0;left:0;right:0;text-align:center;font-family:var(--mono);font-size:7.5px;color:#999;border-top:1px solid #ddd;padding:3px 0 0}
+  .sec-block{border-color:#bbb!important;background:#fff!important;width:100%!important;min-width:0!important;margin-bottom:5px!important;page-break-inside:avoid!important;break-inside:avoid!important}
+  .sec-block.sec-fill{page-break-inside:auto!important;break-inside:auto!important}   /* หมวดที่ยอมให้แตกข้ามหน้า (ส่วนย่อยยังถูกป้องกัน) */
+  #settleResults{page-break-inside:avoid!important;break-inside:avoid!important}      /* Immediate+Consolidation ไปด้วยกัน ไม่ถูกตัดกลาง */
+  .sec-hdr{background:#e8edf4!important;border-bottom:1px solid #bbb!important;padding:4px 10px!important;page-break-after:avoid!important;break-after:avoid!important}
+  .sec-tag{color:#fff!important}.sec-title{color:#222!important;font-size:11px!important}.sec-ref{color:#666!important;font-size:9px!important}
+  .sdiv{color:#555!important;margin:5px 0 4px!important;page-break-after:avoid!important;break-after:avoid!important}
+  .rep-grid{grid-template-columns:1fr 1fr!important;border-top:1px solid #bbb!important}
+  .rep-col{border-right:1px solid #ccc!important;padding:6px 9px!important}
+  .rep-col:last-child{border-right:none!important}
+  .rep-col-full{padding:6px 9px!important}
+  .calc-block{page-break-inside:avoid;break-inside:avoid;margin:3px 0 5px!important;border-left-color:#aaa!important}
+  .calc-line1,.calc-line2,.calc-line3{font-size:10.5px!important;padding:1px 0!important}
+  .calc-line3{border-left-color:#888!important}
+  .cl-body{color:#333!important}.cl-eq{color:#555!important}
+  .calc-val{font-size:11.5px!important;color:#111!important}.calc-unit{color:#555!important}
+  .gov{page-break-inside:avoid;break-inside:avoid;padding:4px 9px!important;margin-top:4px!important;
+    background:linear-gradient(90deg,rgba(200,170,50,.12),transparent)!important;border-left:3px solid #c09800!important}
+  .gov-val{font-size:13px!important;color:#7a5d10!important}.gov-unit{color:#8b6914!important}.gov-lbl{font-size:9.5px!important;color:#555!important}
+  .gov-tag{background:#a67c00!important;color:#fff!important}
+  .gov-green{background:linear-gradient(90deg,rgba(50,160,80,.1),transparent)!important;border-left:3px solid #2f855a!important}
+  .gov-green .gov-val{color:#276749!important}.gov-green .gov-tag{background:#276749!important}
+  .gov-red{background:linear-gradient(90deg,rgba(190,40,40,.1),transparent)!important;border-left:3px solid #b91c1c!important}
+  .gov-red .gov-val{color:#991b1b!important}.gov-red .gov-tag{background:#991b1b!important}
+  .gov-blue{background:linear-gradient(90deg,rgba(40,90,160,.1),transparent)!important;border-left:3px solid #1a365d!important}
+  .gov-blue .gov-val{color:#1a365d!important}.gov-blue .gov-tag{background:#1a365d!important}
+  .sum-tbl tr{page-break-inside:avoid;break-inside:avoid}
+  .sum-tbl td{padding:4px 6px!important;font-size:10px!important;border-color:#bbb!important;color:#222!important}
+  .sum-tbl tr:first-child td{background:#e8edf4!important;color:#222!important}
+  .sum-tbl .val{color:#1a365d!important}
+  .lay-tbl{border:1px solid #9bb3d0!important;font-size:10px!important}
+  .lay-tbl th,.lay-tbl td{border-color:#cdd9e8!important;padding:4px 6px!important;color:#1f2937!important}
+  .lay-tbl th{background:#dde7f3!important;color:#16314f!important;font-weight:700!important}
+  .lay-tbl tr:nth-child(even) td{background:#f3f7fc!important}
+  .lay-tbl .clay-row td,.lay-tbl .col-row td{background:#eef4fb!important}
+  .lay-tbl input,.lay-tbl select{background:transparent!important;border:none!important;color:#0f2b52!important;
+    font-weight:700!important;-webkit-appearance:none!important;appearance:none!important;padding:0!important;text-align:center!important}
+  .lay-tbl input:disabled,.lay-tbl select:disabled{opacity:1!important;color:#b3bcc8!important}
+  .info-box{background:#f4f4f4!important;border-color:#ccc!important;color:#444!important}
+  .info-box b{color:#1a365d!important}
+  .draw-grid{grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .draw-box{border-color:#bbb!important;background:#fff!important;page-break-inside:avoid;break-inside:avoid}
+  .draw-cap{color:#1a365d!important;border-bottom:1px solid #ccc!important}.draw-cap span{color:#777!important}
+  .draw-box svg{background:#fff!important;max-height:300px!important}
+  .no-print{display:none!important}
+  .print-break-before{page-break-before:always!important;break-before:page!important}
+}
+@media screen{.print-header,.print-header-repeat,.print-footer,.print-input-summary,.print-break-before{display:none!important}}
+
+/* ═══════ CALCULATION SHEET (print only) — laid out like Frame3D's report ═══════ */
+#printReport{display:none}
+@media print{
+  body.rep-print .main > :not(#printReport){display:none!important}
+  body.rep-print #printReport{display:block!important}
+  #printReport{font-family:var(--sans);color:#1f2937;font-size:9.5px;line-height:1.35}
+  .rp-pg{width:100%;border-collapse:collapse}
+  .rp-pg > thead > tr > td{padding:0 0 3mm}
+  .rp-pg > tfoot > tr > td{padding:3mm 0 0}
+  .rp-hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1.6px solid #1a365d;padding-bottom:3px}
+  .rp-ttl{font-size:15px;font-weight:600;color:#1a365d;line-height:1.15}
+  .rp-st{font-size:7.5px;color:#8a94a6;letter-spacing:.04em}
+  .rp-hr{text-align:right;font-size:8px;color:#555;line-height:1.5}
+  .rp-ft{border-top:.6px solid #ccc;font-size:7px;color:#999;text-align:center;padding-top:2px}
+  .rp-kv{width:100%;border-collapse:collapse;margin-bottom:5px}
+  .rp-kv td{border:1px solid #d5dde8;padding:3px 7px;font-size:9.5px;width:25%}
+  .rp-kv td:nth-child(odd){background:#eef3f8;color:#334155}
+  .rp-card{border:1px solid #c9d3e0;border-radius:2px;padding:4px 8px 5px;margin-bottom:5px;break-inside:avoid}
+  .rp-ct{font-size:11px;font-weight:600;color:#1a365d;margin-bottom:3px}
+  .rp-figs{display:flex;gap:8px}
+  .rp-fig{flex:1;min-width:0;text-align:center}
+  .rp-fig .cap{font-size:8px;color:#555;margin-bottom:1px}
+  .rp-fig svg{display:block;width:100%;height:46mm}
+  .rp-soil{width:62%;margin:2px auto 6px}
+  .rp-soil .rp-fig svg{height:62mm}
+  .rp-calc{break-before:page}
+  .rp-h{font-size:13px;font-weight:600;color:#5b3cc4;border-bottom:1px solid #ddd6f3;margin:8px 0 4px;padding-bottom:1px;break-after:avoid}
+  .rp-c2{column-count:2;column-gap:7mm;column-rule:.5px solid #e5e7eb}
+  .rp-bl{margin-bottom:6px}                 /* a block may run on into the next column; one equation never splits */
+  .rp-sub{font-weight:600;color:#1a365d;font-size:10px;margin:1px 0 2px;break-after:avoid}
+  .rp-eq{display:grid;grid-template-columns:24% 10px 1fr;column-gap:3px;margin:0 0 3px;break-inside:avoid}
+  .rp-ck,.rp-nt{break-inside:avoid}
+  .rp-l{text-align:right}
+  .rp-e{text-align:center;color:#666}
+  .rp-x{overflow-wrap:anywhere}
+  .rp-x b{color:#111}
+  .rp-ck{margin:1px 0 3px 6%}
+  .rp-ok{color:#2f855a;font-weight:700}
+  .rp-ng{color:#b91c1c;font-weight:700}
+  .rp-nt{font-size:8px;color:#7b8494;margin:0 0 3px 6%}
+  .rp-tb{width:100%;border-collapse:collapse;font-size:8.6px}
+  .rp-tb th,.rp-tb td{border:1px solid #d5dde8;padding:2px 5px;text-align:center}
+  .rp-tb th{background:#eef3f8;color:#1a365d;font-weight:600}
+  .rp-tb td.l{text-align:left}
+  .rp-sum tr{break-inside:avoid}
+  .rp-ov{border:1.2px solid #1a365d;background:#eef3f8;padding:5px 10px;font-size:11px;font-weight:600;color:#1a365d;margin-top:6px;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ HEADER ════════ -->
+<div class="hdr">
+  <div class="hdr-logo">ACI 318</div>
+  <div class="hdr-title">Combined Footing — Multi-Column (Strength Design)</div>
+  <button class="btn-print" id="btn-print">⎙ Print</button>
+  <div class="hdr-dot" style="margin-left:12px"></div>
+</div>
+
+<div class="layout">
+
+<!-- ════════ SIDEBAR ════════ -->
+<div class="sidebar">
+  <div class="sg">
+    <div class="sg-title">Footing — ฐานรากร่วม</div>
+    <div class="inp-row"><span class="lbl">B — กว้าง (X)</span><span class="sym">=</span><input id="B" value="4.60"><span class="unit">m</span></div>
+    <div class="inp-row"><span class="lbl">L — ยาว (Y)</span><span class="sym">=</span><input id="L" value="2.40"><span class="unit">m</span></div>
+    <div class="inp-row"><span class="lbl">H — ความหนา</span><span class="sym">=</span><input id="H" value="0.60"><span class="unit">m</span></div>
+    <div class="inp-row"><span class="lbl">Covering</span><span class="sym">=</span><input id="cov" value="7.5"><span class="unit">cm</span></div>
+    <div class="inp-hint">พิกัดเสาตอม่อ (x, y) วัดจาก<b>จุดศูนย์กลางฐาน</b> · x ตามแนว B (X), y ตามแนว L (Y) · ตารางเสาอยู่ด้านบนของรายงาน</div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Loads — ตัวคูณน้ำหนัก</div>
+    <div class="inp-row"><span class="lbl">Load Factor U</span><span class="sym">=</span><input id="LF" value="1.5"><span class="unit">×</span></div>
+    <div class="inp-hint">P, M<sub>x</sub>, M<sub>y</sub> ของแต่ละเสาเป็น<b>แรงใช้งาน (service)</b> · คูณ U เป็นแรงประลัย (factored) สำหรับออกแบบโครงสร้าง · แรงดันดินตรวจด้วยแรงใช้งาน</div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Materials — วัสดุ</div>
+    <div class="inp-row"><span class="lbl">f'<sub>c</sub></span><span class="sym">=</span><input id="fc" value="240"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">f<sub>y</sub> (เหล็กฐานราก)</span><span class="sym">=</span><input id="fy" value="4000"><span class="unit">ksc</span></div>
+    <div class="inp-row"><span class="lbl">γ<sub>concrete</sub></span><span class="sym">=</span><input id="gc" value="2.4"><span class="unit">t/m³</span></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Pedestal — เสาตอม่อ (global)</div>
+    <div class="inp-row"><span class="lbl">K (effective)</span><span class="sym">=</span><input id="colK" value="1.0"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">β<sub>dns</sub> (sustained)</span><span class="sym">=</span><input id="bdns" value="0.6"><span class="unit"></span></div>
+    <div class="inp-hint">L<sub>u</sub> (ความสูงตอม่อ) อยู่กลุ่ม Soil ด้านล่าง · ขนาดหน้าตัด c<sub>x</sub>,c<sub>y</sub> + แรง P,M = รายต้นในตาราง · <b>เหล็กยืน/ปลอก กรอกในกลุ่ม Pedestal Rebar ด้านล่าง</b></div>
+  </div>
+  <div class="sg">
+    <div class="sg-title">Pedestal Rebar — เหล็กเสริมเสา (รายต้น)</div>
+    <div id="colPedInputs"></div>
+  </div>
+  <div class="sg soil-group">
+    <div class="sg-title">Soil — ดิน</div>
+    <div class="inp-row"><span class="lbl">แหล่ง q<sub>allow</sub></span><span class="sym">=</span><select id="qaSource"><option value="manual">กรอกเอง (override)</option><option value="meyerhof">ใช้ Meyerhof (shape+depth)</option><option value="terzaghi">ใช้ Terzaghi (พื้นฐาน)</option></select></div>
+    <div class="inp-row"><span class="lbl">FS แบกทาน</span><span class="sym">=</span><input id="bcFS" value="3"><span class="unit">×</span></div>
+    <div class="inp-row"><span class="lbl">q<sub>allow</sub> (ที่ใช้)</span><span class="sym">=</span><input id="qa" value="20"><span class="unit">t/m²</span></div>
+    <div class="inp-hint">q<sub>allow,calc</sub> จาก c, φ ชั้นรับน้ำหนัก = <b id="qaCalcShow" style="color:var(--cyan)">—</b> t/m² · เลือก Meyerhof/Terzaghi = ใช้ค่าคำนวณ (ล็อกช่อง) · กรอกเอง = ปลดล็อก</div>
+    <div class="inp-row"><span class="lbl">D<sub>f</sub> ผิวดิน→ผิวบนฐาน</span><span class="sym">=</span><input id="Df" value="1.00"><span class="unit">m</span></div>
+    <div class="inp-row"><span class="lbl">L<sub>u</sub> ความสูงตอม่อ</span><span class="sym">=</span><input id="Lu" value="1.00"><span class="unit">m</span></div>
+    <div class="inp-row"><span class="lbl">ระดับน้ำใต้ดิน</span><span class="sym">=</span><input id="wt" value="2.0"><span class="unit">m</span></div>
+    <div class="inp-row"><span class="lbl">I<sub>f</sub> influence</span><span class="sym">=</span><input id="If" value="0.82"><span class="unit"></span></div>
+    <div class="inp-row"><span class="lbl">S<sub>allow</sub> ยอมให้</span><span class="sym">=</span><input id="Sall" value="25"><span class="unit">mm</span></div>
+    <div class="inp-hint">L<sub>u</sub> = ความสูงตอม่อเฉลี่ย (คิดน้ำหนักตอม่อ) · E<sub>s</sub>, ν, C<sub>c</sub>, e₀ กรอกแยกตามชั้นในตาราง Soil Profile</div>
+  </div>
+  <div class="sg footing-only">
+    <div class="sg-title">Reinforcement แนว X (along B)</div>
+    <div class="inp-row"><span class="lbl">ล่าง n<sub>x,b</sub> · Dia</span><span class="sym">=</span><input id="nxb" value="14" style="max-width:70px"><input id="dbxb" value="16" style="max-width:70px"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">บน n<sub>x,t</sub> · Dia</span><span class="sym">=</span><input id="nxt" value="14" style="max-width:70px"><input id="dbxt" value="16" style="max-width:70px"><span class="unit">mm</span></div>
+    <div class="inp-hint">ฐานรากร่วมรับโมเมนต์<b>สองทิศ</b>: บวก (sagging→เหล็กล่าง) ที่ปลายยื่น · ลบ (hogging→เหล็กบน) ระหว่างเสา</div>
+  </div>
+  <div class="sg footing-only">
+    <div class="sg-title">Reinforcement แนว Y (along L)</div>
+    <div class="inp-row"><span class="lbl">ล่าง n<sub>y,b</sub> · Dia</span><span class="sym">=</span><input id="nyb" value="25" style="max-width:70px"><input id="dbyb" value="16" style="max-width:70px"><span class="unit">mm</span></div>
+    <div class="inp-row"><span class="lbl">บน n<sub>y,t</sub> · Dia</span><span class="sym">=</span><input id="nyt" value="25" style="max-width:70px"><input id="dbyt" value="16" style="max-width:70px"><span class="unit">mm</span></div>
+  </div>
+  <div class="sg footing-only">
+    <div class="sg-title">Stability — เสถียรภาพ (ACI 13.2.6.1)</div>
+    <div class="inp-row"><span class="lbl">FS พลิกคว่ำ (overturning)</span><span class="sym">=</span><input id="FSot" value="1.5"><span class="unit">×</span></div>
+    <div class="inp-row"><span class="lbl">FS เลื่อนไถล (sliding)</span><span class="sym">=</span><input id="FSsl" value="1.5"><span class="unit">×</span></div>
+    <div class="inp-row"><span class="lbl">FS ถูกดึงยก (net uplift)</span><span class="sym">=</span><input id="FSup" value="1.5"><span class="unit">×</span></div>
+    <div class="inp-row"><span class="lbl">h<sub>V</sub> แขนแรงเฉือน→ใต้ฐาน</span><span class="sym">=</span><input id="hV" value="0"><span class="unit">m</span></div>
+    <div class="inp-row"><span class="lbl">μ แรงเสียดทานใต้ฐาน</span><span class="sym">=</span><input id="mu" value="0"><span class="unit"></span></div>
+    <div class="inp-hint">h<sub>V</sub> = 0 → ใช้ L<sub>u</sub>+H (แรงเฉือนกระทำที่หัวตอม่อ) · μ = 0 → ใช้ tan(2φ/3) + adhesion 2c/3 ของชั้นรับน้ำหนัก · แรงเฉือน V<sub>x</sub>,V<sub>y</sub> กรอกรายต้นในตารางเสา</div>
+  </div>
+  <div class="sg" style="border-bottom:none">
+    <div class="sg-title">φ Factors — ACI 318-25 (Table 21.2.1)</div>
+    <div class="inp-row"><span class="lbl">φ ดัด (tension-controlled)</span><span class="sym">=</span><span style="flex:1;text-align:center;font-weight:600;color:var(--cyan)">0.90</span></div>
+    <div class="inp-row"><span class="lbl">φ เฉือน (shear)</span><span class="sym">=</span><span style="flex:1;text-align:center;font-weight:600;color:var(--cyan)">0.75</span></div>
+    <div class="inp-row"><span class="lbl">φ แบกทาน (bearing)</span><span class="sym">=</span><span style="flex:1;text-align:center;font-weight:600;color:var(--cyan)">0.65</span></div>
+    <div class="inp-hint">แผ่นพื้นต้อง tension-controlled (8.3.3.1): ε<sub>t</sub> ≥ ε<sub>ty</sub>+0.003 · ฐานรากบนดินแบบ rigid ใช้ V<sub>c</sub>=0.53√f'c·b·d และ λ<sub>s</sub>=1.0 ได้ (13.2.6.2)</div>
+  </div>
+</div><!-- /sidebar -->
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <div id="tabbar" class="tabs no-print"></div>
+
+  <div id="mainFooting">
+  <div class="print-header">
+    <div class="ph-left">Combined Footing — Multi-Column (ACI 318-25)<small>Resultant Soil Bearing · Beam-Method Flexure · Punching per Column</small></div>
+    <div class="ph-right"><span id="print-date"></span><br>CivilToolsKit — Automated Calculation</div>
+  </div>
+  <div class="print-input-summary" id="print-input-strip"></div>
+
+  <!-- COLUMNS INPUT -->
+  <div class="sec-block">
+    <div class="sec-hdr"><span class="sec-tag tag-orange">Columns</span><span class="sec-title">เสาตอม่อ — ตำแหน่ง · ขนาด · แรงกระทำ (service)</span><span class="sec-ref">x,y วัดจากศูนย์กลางฐาน</span></div>
+    <div class="rep-col-full"><div id="colInputs"></div></div>
+  </div>
+
+  <!-- DRAWINGS -->
+  <div class="sec-block">
+    <div class="sec-hdr"><span class="sec-tag tag-blue">Drawing</span><span class="sec-title">ผังฐานรากร่วม & แผนภาพแรง</span><span class="sec-ref">Plan · SFD/BMD</span></div>
+    <div class="rep-col-full">
+      <div class="draw-grid">
+        <div class="draw-box">
+          <div class="draw-cap">ผัง — Plan (เสา · แรงดันดิน · resultant) <span id="capP"></span></div>
+          <svg id="svgPlan" viewBox="0 0 600 420"></svg>
+        </div>
+        <div class="draw-box">
+          <div class="draw-cap">แรงดันดินใต้ฐาน — Soil Pressure <span id="capQ"></span></div>
+          <svg id="svgPress" viewBox="0 0 600 420"></svg>
+        </div>
+        <div class="draw-box">
+          <div class="draw-cap">แนว X — Shear (SFD) & Moment (BMD) <span id="capBx"></span></div>
+          <svg id="svgBeamX" viewBox="0 0 600 360"></svg>
+        </div>
+        <div class="draw-box">
+          <div class="draw-cap">แนว Y — Shear (SFD) & Moment (BMD) <span id="capBy"></span></div>
+          <svg id="svgBeamY" viewBox="0 0 600 360"></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTIONS + 3D -->
+  <div class="sec-block">
+    <div class="sec-hdr"><span class="sec-tag tag-cyan">Section</span><span class="sec-title">ภาพตัดแสดงเหล็กเสริม & มุมมอง 3 มิติ</span><span class="sec-ref">Section A-A · B-B · 3D</span></div>
+    <div class="rep-col-full">
+      <div class="draw-grid">
+        <div class="draw-box">
+          <div class="draw-cap">หน้าตัด A-A (along B / X) <span id="capSX"></span></div>
+          <svg id="svgSecX" viewBox="0 0 600 360"></svg>
+        </div>
+        <div class="draw-box">
+          <div class="draw-cap">หน้าตัด B-B (along L / Y) <span id="capSY"></span></div>
+          <svg id="svgSecY" viewBox="0 0 600 360"></svg>
+        </div>
+        <div class="draw-box no-print" style="grid-column:1/-1">
+          <div class="draw-cap">มุมมอง 3 มิติ — 3D View <button id="btnDae" class="no-print" title="Export COLLADA .dae (นำเข้า SketchUp ได้เลย · ขนาดจริง เมตร)" style="font-family:var(--mono);font-size:10px;background:transparent;border:1px solid #38bdf8;color:#38bdf8;border-radius:4px;padding:2px 9px;cursor:pointer">⭳ DAE</button></div>
+          <div id="scene"></div>
+          <div class="d3-hint">🖱️ คลิกซ้าย=หมุน · คลิกขวา=เลื่อน · scroll=ซูม · เหล็กฐานแนว X=ส้ม/แนว Y=น้ำเงิน · เหล็กยืนเสา+dowel=เหลือง · ปลอก=ฟ้า · เหล็กบน=สีอ่อน</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GEOMETRY + RESULTANT + BEARING (ไหลต่อจาก Section หน้าเดียวกัน — ไม่บังคับขึ้นหน้าใหม่) -->
+  <div class="sec-block">
+    <div class="sec-hdr"><span class="sec-tag tag-blue">1 — Resultant</span><span class="sec-title">แรงลัพธ์ · ความเยื้องศูนย์ · กำลังแบกทานดิน</span><span class="sec-ref">Statics · ACI 318-25 13.2.6.1</span></div>
+    <div id="bodyGeo"></div>
+  </div>
+
+  <!-- FLEXURE -->
+  <div class="sec-block">
+    <div class="sec-hdr"><span class="sec-tag tag-orange">2 — Flexure</span><span class="sec-title">ออกแบบการดัด (วิธีคาน — เหล็กล่าง+บน)</span><span class="sec-ref">ACI 318-25 22.3 · 8.3.3.1 · 8.6.1.1</span></div>
+    <div id="bodyFlex"></div>
+  </div>
+
+  <!-- SHEAR -->
+  <div class="print-header-repeat print-break-before" aria-hidden="true">
+    <div class="ph-left">Combined Footing — Multi-Column (ACI 318-25)<small>One-way Shear · Punching per Column</small></div>
+    <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+  </div>
+  <div class="sec-block">
+    <div class="sec-hdr"><span class="sec-tag tag-purple">3 — Shear</span><span class="sec-title">แรงเฉือน — ทางเดียว · เจาะทะลุรายต้น · แบกทาน · ระยะฝัง</span><span class="sec-ref">ACI 318-25 13.2.6.2 · 22.6 · 8.4.4.2 · 22.8 · 25.4</span></div>
+    <div id="bodyShear"></div>
+  </div>
+
+  <!-- SETTLEMENT RESULTS + SUMMARY — ขึ้นหน้าใหม่พร้อมหัวกระดาษ -->
+  <div class="print-header-repeat print-break-before" aria-hidden="true">
+    <div class="ph-left">Combined Footing — Multi-Column (ACI 318-25)<small>Settlement Results · Design Check Summary</small></div>
+    <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+  </div>
+  <div class="sec-block">
+    <div class="sec-hdr"><span class="sec-tag tag-pink">4 — Settlement</span><span class="sec-title">ผลการทรุดตัว — Immediate + Consolidation</span><span class="sec-ref">2:1 method · σ' effective</span></div>
+    <div id="settleResults"></div>
+  </div>
+
+  <!-- SUMMARY (ไหลต่อจากผลการทรุดตัว หน้าเดียวกัน) -->
+  <div class="sec-block">
+    <div class="sec-hdr"><span class="sec-tag tag-teal">Summary</span><span class="sec-title">สรุปผลการตรวจสอบ</span><span class="sec-ref">ACI 318-25 + Settlement</span></div>
+    <div class="rep-col-full" id="bodySum"></div>
+  </div>
+  </div><!-- /mainFooting -->
+
+  <!-- ════════ SOIL TAB — ชั้นดิน ════════ -->
+  <div id="mainSoil" class="hidden">
+  <div class="print-header-repeat print-break-before" aria-hidden="true">
+    <div class="ph-left">Combined Footing — Multi-Column (ACI 318-25)<small>Soil Profile</small></div>
+    <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+  </div>
+  <div class="sec-block sec-fill">
+    <div class="sec-hdr"><span class="sec-tag tag-pink">Soil</span><span class="sec-title">ชั้นดิน</span><span class="sec-ref">วัดความลึกจากผิวดิน · σ' effective</span></div>
+    <div class="rep-col-full" style="border-bottom:1px solid var(--border)">
+      <div class="sdiv" style="color:var(--yellow)">Soil Profile — ชั้นดิน (กรอก/เพิ่ม/ลบได้ · วัดความลึกจากผิวดิน)</div>
+      <div id="layerInputs"></div>
+    </div>
+    <div class="rep-col-full" style="border-bottom:1px solid var(--border)">
+      <div class="sdiv" style="color:var(--cyan)">รูปประกอบ — ฐานราก · เสาตอม่อ · ชั้นดิน (Soil Profile)</div>
+      <div class="draw-box" style="max-width:600px;margin:0 auto"><svg id="svgSoil" viewBox="0 0 640 460"></svg></div>
+    </div>
+  </div>
+  </div><!-- /mainSoil -->
+
+  <!-- ════════ AUTO-GENERATED PER-COLUMN PEDESTAL TABS ════════ -->
+  <div id="colTabs"></div>
+
+  <div id="printReport"></div>
+
+  <div class="print-footer">CivilToolsKit · Combined Footing — Multi-Column (ACI 318-25 Strength Method) · <span id="print-footer-date"></span></div>
+
+</div></div><!-- end main, layout -->
+
+<script>
+const $=id=>document.getElementById(id);
+const v=id=>{const e=$(id);return e?(parseFloat(e.value.replace(/,/g,''))||0):0;};
+const f=(x,d=2)=>(isFinite(x)?Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}):'—');
+const SQ=Math.sqrt;
+
+function CB(formula,subst,val,unit){
+  return `<div class="calc-block">
+    <div class="calc-line1"><span class="cl-body">${formula}</span></div>
+    ${subst?`<div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body">${subst}</span></div>`:''}
+    <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val">${val}</span>${unit?`<span class="calc-unit">${unit}</span>`:''}</span></div>
+  </div>`;
+}
+function GOV(label,val,unit,type){
+  const cls=type?`gov gov-${type}`:'gov';
+  const tag=type==='green'?'<span class="gov-tag">OK</span>':type==='red'?'<span class="gov-tag">NG</span>':'';
+  return `<div class="${cls}"><div class="gov-lbl">${label}</div>
+    <div class="gov-val">${tag}<span>${val}</span>${unit?`<span class="gov-unit">${unit}</span>`:''}</div></div>`;
+}
+const SDIV=(t,c)=>`<div class="sdiv"${c?` style="color:${c}"`:''}>${t}</div>`;
+const barA=db=>Math.PI*(db/10)**2/4;   // cm² จาก dia(mm)
+const AS_TOP_TOL=0.10;                  // เหล็กบน: A_s,req ที่น้อยกว่านี้ (cm²) ให้ปัดลงเป็น 0 (ถือว่าไม่ต้องใส่เหล็กบน)
+
+let R={};
+
+/* ════════ COLUMN DATA MODEL ════════ */
+let cols=[
+  {name:'C1', x:-1.50, y:0.00, cx:0.35, cy:0.35, P:60, Mx:3, My:0, Vx:0, Vy:0},
+  {name:'C2', x: 1.20, y:0.00, cx:0.40, cy:0.40, P:80, Mx:0, My:6, Vx:0, Vy:0},
+];
+
+function renderColInputs(){
+  const U=u=>`<span style="font-weight:400;font-size:8px;opacity:.6;display:block">${u}</span>`;
+  let h=`<div style="overflow-x:auto"><table class="lay-tbl">
+    <tr><th>#</th><th>ชื่อ</th><th>x${U('(m)')}</th><th>y${U('(m)')}</th><th>c<sub>x</sub>${U('(m)')}</th><th>c<sub>y</sub>${U('(m)')}</th>
+    <th>P${U('(ton)')}</th><th>M<sub>x</sub>${U('(t·m)')}</th><th>M<sub>y</sub>${U('(t·m)')}</th><th>V<sub>x</sub>${U('(ton)')}</th><th>V<sub>y</sub>${U('(ton)')}</th><th class="no-print"></th></tr>`;
+  cols.forEach((c,i)=>{
+    h+=`<tr class="col-row">
+      <td>${i+1}</td>
+      <td><input data-i="${i}" data-f="name" value="${c.name}" style="text-align:left;min-width:46px"></td>
+      <td><input data-i="${i}" data-f="x" value="${c.x}" style="width:50px"></td>
+      <td><input data-i="${i}" data-f="y" value="${c.y}" style="width:50px"></td>
+      <td><input data-i="${i}" data-f="cx" value="${c.cx}" style="width:48px"></td>
+      <td><input data-i="${i}" data-f="cy" value="${c.cy}" style="width:48px"></td>
+      <td><input data-i="${i}" data-f="P" value="${c.P}" style="width:52px"></td>
+      <td><input data-i="${i}" data-f="Mx" value="${c.Mx}" style="width:48px"></td>
+      <td><input data-i="${i}" data-f="My" value="${c.My}" style="width:48px"></td>
+      <td><input data-i="${i}" data-f="Vx" value="${c.Vx||0}" style="width:44px"></td>
+      <td><input data-i="${i}" data-f="Vy" value="${c.Vy||0}" style="width:44px"></td>
+      <td class="no-print"><button class="lay-del" data-del="${i}" title="ลบเสา">✕</button></td></tr>`;
+  });
+  h+=`</table></div><button class="lay-btn no-print" id="addCol">+ เพิ่มเสาตอม่อ</button>
+    <span class="inp-hint no-print" style="margin-left:10px">x,y วัดจากศูนย์กลางฐาน · P,M,V = แรงใช้งาน (service) ที่หัวตอม่อ · M<sub>x</sub> คู่กับ V<sub>y</sub>, M<sub>y</sub> คู่กับ V<sub>x</sub></span>`;
+  $('colInputs').innerHTML=h;
+  $('colInputs').querySelectorAll('input[data-f]').forEach(el=>{
+    el.addEventListener('input',()=>{const i=+el.dataset.i,fld=el.dataset.f;
+      cols[i][fld]=(fld==='name')?el.value:(parseFloat(el.value)||0); calc();});
+  });
+  $('colInputs').querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{
+    if(cols.length>1)cols.splice(+b.dataset.del,1); renderColInputs(); calc();}));
+  $('addCol').addEventListener('click',()=>{
+    const n=cols.length+1; cols.push({name:'C'+n,x:0,y:0,cx:0.30,cy:0.30,P:40,Mx:0,My:0,Vx:0,Vy:0}); renderColInputs(); calc();});
+}
+
+/* ════════ SOIL PROFILE ════════ */
+let soilLayers=[
+  {name:'ทรายถม',type:'sand',H:1.0,g:1.8,Es:1800,nu:0.30,ccM:'manual',LL:0,Cc:0,e0:0,c:0,phi:30},
+  {name:'ทรายแน่น',type:'sand',H:4.0,g:2.0,Es:3000,nu:0.30,ccM:'manual',LL:0,Cc:0,e0:0,c:0,phi:34},
+  {name:'ดินเหนียวแข็ง',type:'clay',H:3.0,g:1.9,Es:1500,nu:0.45,ccM:'manual',LL:50,Cc:0.12,e0:0.70,c:5,phi:0},
+  {name:'ดินเหนียวแข็งมาก',type:'clay',H:3.0,g:2.0,Es:2000,nu:0.45,ccM:'manual',LL:45,Cc:0.06,e0:0.55,c:10,phi:0},
+];
+function computeCc(L){ if(L.type!=='clay') return 0; const m=L.ccM||'manual';
+  if(m==='skempton') return Math.max(0.009*((L.LL||0)-10),0);
+  if(m==='terzaghi') return Math.max(0.007*((L.LL||0)-7),0);
+  if(m==='nishida')  return Math.max(0.54*((L.e0||0)-0.35),0);
+  if(m==='hough')    return Math.max(0.29*((L.e0||0)-0.27),0);
+  return Math.max(L.Cc||0,0); }
+const CCM={manual:'ระบุเอง',skempton:'Skempton',terzaghi:'Terzaghi',nishida:'Nishida',hough:'Hough'};
+
+function bcFactorsAndQ(method,c,phi,gB,qsur,B,L,Dbc,FS){
+  const phr=phi*Math.PI/180, t=Math.tan(phr), Kp=Math.pow(Math.tan(Math.PI/4+phr/2),2);
+  const Bw=Math.min(B,L), BL=Bw/Math.max(B,L);
+  let Nq,Nc,Ng,sc,sq,sg,dc,dq,dg;
+  if(method==='terzaghi'){
+    const a=Math.exp((0.75*Math.PI-phr/2)*t);
+    Nq=phi<=0?1:a*a/(2*Math.pow(Math.cos(Math.PI/4+phr/2),2));
+    Nc=phi<=0?5.70:(Nq-1)/t;
+    Ng=phi<=0?0:(Nq-1)*Math.tan(1.4*phr);
+    sc=1+0.3*BL; sq=1; sg=1-0.2*BL; dc=1; dq=1; dg=1;
+  }else{
+    Nq=Math.exp(Math.PI*t)*Kp;
+    Nc=phi<=0?5.14:(Nq-1)/t;
+    Ng=phi<=0?0:(Nq-1)*Math.tan(1.4*phr);
+    sc=1+0.2*Kp*BL; sq=sg=phi>=10?1+0.1*Kp*BL:1;
+    const DB=Bw>0?Dbc/Bw:0, rKp=Math.sqrt(Kp);
+    dc=1+0.2*rKp*DB; dq=dg=phi>=10?1+0.1*rKp*DB:1;
+  }
+  const qult=c*Nc*sc*dc + qsur*Nq*sq*dq + 0.5*gB*Bw*Ng*sg*dg;
+  const qnet=Math.max(qult-qsur,0), qaCalc=qsur+qnet/Math.max(FS,1);
+  return {Nq,Nc,Ng,sc,sq,sg,dc,dq,dg,Bw,Kp,qult,qnet,qaCalc};
+}
+
+function renderLayerInputs(){
+  const U=u=>`<span style="font-weight:400;font-size:8px;opacity:.6;display:block">${u}</span>`;
+  let h=`<div style="overflow-x:auto"><table class="lay-tbl"><tr><th>#</th><th>ชื่อชั้น</th><th>ประเภท</th><th>H${U('(m)')}</th><th>γ${U('(t/m³)')}</th><th>c${U('(t/m²)')}</th><th>φ${U('(°)')}</th><th>E<sub>s</sub>${U('(t/m²)')}</th><th>Poisson Ratio ν${U('(—)')}</th><th>วิธี C<sub>c</sub></th><th>LL${U('(%)')}</th><th>C<sub>c</sub>${U('(—)')}</th><th>Void Ratio e₀${U('(—)')}</th><th class="no-print"></th></tr>`;
+  soilLayers.forEach((L,i)=>{const clay=L.type==='clay', auto=clay&&(L.ccM&&L.ccM!=='manual'), useLL=clay&&(L.ccM==='skempton'||L.ccM==='terzaghi');
+    const ccShown=clay?(auto?computeCc(L).toFixed(3):(L.Cc||0)):'';
+    h+=`<tr class="${clay?'clay-row':''}">
+      <td>${i+1}</td>
+      <td><input data-i="${i}" data-f="name" value="${L.name}" style="text-align:left;min-width:78px"></td>
+      <td><select data-i="${i}" data-f="type"><option value="sand"${!clay?' selected':''}>Sand</option><option value="clay"${clay?' selected':''}>Clay</option></select></td>
+      <td><input data-i="${i}" data-f="H" value="${L.H}" style="width:42px"></td>
+      <td><input data-i="${i}" data-f="g" value="${L.g}" style="width:42px"></td>
+      <td><input data-i="${i}" data-f="c" value="${clay?(L.c||0):0}" style="width:42px" ${clay?'':'disabled'}></td>
+      <td><input data-i="${i}" data-f="phi" value="${L.phi||0}" style="width:42px"></td>
+      <td><input data-i="${i}" data-f="Es" value="${L.Es||0}" style="width:52px"></td>
+      <td><input data-i="${i}" data-f="nu" value="${L.nu||0}" style="width:42px"></td>
+      <td>${clay?`<select data-i="${i}" data-f="ccM">${Object.keys(CCM).map(m=>`<option value="${m}"${(L.ccM||'manual')===m?' selected':''}>${CCM[m]}</option>`).join('')}</select>`:''}</td>
+      <td><input data-i="${i}" data-f="LL" value="${L.LL||0}" style="width:42px" ${useLL?'':'disabled'}></td>
+      <td><input data-i="${i}" data-f="Cc" value="${ccShown}" style="width:48px" ${(clay&&!auto)?'':'disabled'}></td>
+      <td><input data-i="${i}" data-f="e0" value="${L.e0||0}" style="width:42px" ${clay?'':'disabled'}></td>
+      <td class="no-print"><button class="lay-del" data-del="${i}" title="ลบชั้น">✕</button></td></tr>`;
+  });
+  h+=`</table></div><button class="lay-btn no-print" id="addLayer">+ เพิ่มชั้นดิน</button>`;
+  $('layerInputs').innerHTML=h;
+  $('layerInputs').querySelectorAll('input[data-f],select[data-f]').forEach(el=>{
+    const ev=el.tagName==='SELECT'?'change':'input';
+    el.addEventListener(ev,()=>{const i=+el.dataset.i,fld=el.dataset.f;
+      soilLayers[i][fld]=(fld==='name'||fld==='type'||fld==='ccM')?el.value:(parseFloat(el.value)||0);
+      if(fld==='type'&&el.value==='sand') soilLayers[i].c=0;
+      if(fld==='type'||fld==='ccM')renderLayerInputs(); calc();});
+  });
+  $('layerInputs').querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{
+    if(soilLayers.length>1)soilLayers.splice(+b.dataset.del,1); renderLayerInputs(); calc();}));
+  $('addLayer').addEventListener('click',()=>{
+    soilLayers.push({name:'ชั้นใหม่',type:'clay',H:2.0,g:1.9,Es:1500,nu:0.45,ccM:'manual',LL:50,Cc:0.10,e0:0.70,c:5,phi:0}); renderLayerInputs(); calc();});
+}
+
+/* ════════ BEAM ANALYSIS (combined-footing SFD/BMD) ════════
+   beam axis u ∈ [-span/2, span/2]; width = transverse footing dim.
+   distributed upward soil load w(u) = Pu/span + 12·Mres·u/span³
+   point loads: each column Pu_i (down) at u=pos_i, applied moment m_i.
+   returns stations[{u,V,M}], peaks. (up positive; M>0 = tension bottom) */
+function beamSFDBMD(Pu, Mres, span, colLoads){
+  // Mres = factored resultant moment about the centroid (= Pu·e) — taken directly so it survives P≈0 or P<0
+  const half=span/2, N=600, du=span/N;
+  const wfun=u=> span>0 ? Pu/span + 12*Mres*u/(span*span*span) : 0;
+  // snap each column to nearest station
+  const pts=colLoads.map(c=>({k:Math.round((c.pos+half)/du), P:c.P, m:c.m}));
+  let V=0, M=0;
+  const stations=[];
+  let Mmax=-1e30,Mmin=1e30,uMax=0,uMin=0,Vmax=0;
+  for(let k=0;k<=N;k++){
+    const u=-half+k*du;
+    pts.forEach(p=>{ if(p.k===k){ V-=p.P; M+=p.m; } });   // apply point load/moment at station
+    stations.push({u,V,M});
+    if(M>Mmax){Mmax=M;uMax=u;}
+    if(M<Mmin){Mmin=M;uMin=u;}
+    if(Math.abs(V)>Math.abs(Vmax))Vmax=V;
+    const wmid=wfun(u+du/2);
+    M+=V*du+0.5*wmid*du*du;
+    V+=wmid*du;
+  }
+  return {stations,Mmax,Mmin,uMax,uMin,Vmax,Vend:V,Mend:M,span,half,N,du};
+}
+// one-way shear: max |V| at sections ≥ d from any column face (critical section ACI)
+function critShear(bm, faces, d){
+  let Vc=0,uAt=0;
+  bm.stations.forEach(st=>{
+    let near=1e9; faces.forEach(fc=>{ near=Math.min(near,Math.abs(st.u-fc)); });
+    if(near>=d-1e-9 && Math.abs(st.V)>Math.abs(Vc)){ Vc=st.V; uAt=st.u; }
+  });
+  return {V:Math.abs(Vc),u:uAt};
+}
+
+function calc(){
+  const B=v('B'),L=v('L'),Hh=v('H'),cov=v('cov')/100,LF=v('LF');
+  const fc=v('fc'),fy=v('fy'),gc=v('gc'),qa=v('qa');
+  const Df=v('Df'),Lu=v('Lu'),wt=v('wt'),gw=1.0,If=v('If'),Sall=v('Sall');
+  // ACI 318-25 Table 21.2.1 — φ flexure 0.90 (tension-controlled), shear 0.75, bearing 0.65 · λ = 1.0 (normalweight)
+  const phif=0.90, phiv=0.75, phib=0.65, lam=1.0, EsSt=2.04e6;   // EsSt = 200 GPa (ksc)
+  const A=B*L;
+  // แรงเฉือนที่หัวตอม่อ → โมเมนต์ที่ใต้ฐาน V·h_V (h_V = 0 → L_u + H)
+  const hVin=v('hV'), hV=hVin>0?hVin:Lu+Hh;
+
+  // ── Resultant of columns (service) about footing centroid ──
+  let Ptot=0, M_Y=0, M_X=0, Acol=0, Wped=0, VxTot=0, VyTot=0;
+  cols.forEach(c=>{ const Vx=c.Vx||0, Vy=c.Vy||0;
+    Ptot+=c.P; M_Y+=c.My+Vx*hV+c.P*c.x; M_X+=c.Mx+Vy*hV+c.P*c.y; VxTot+=Vx; VyTot+=Vy;
+    Acol+=c.cx*c.cy; Wped+=c.cx*c.cy*Lu*gc; });
+  const ex=Math.abs(Ptot)>1e-9?M_Y/Ptot:0, ey=Math.abs(Ptot)>1e-9?M_X/Ptot:0;   // ex→B(X), ey→L(Y)
+
+  // ── Self weight / overburden ──
+  const qself=gc*Hh, qped=A>0?Wped/A:0;
+  const totStress=z=>{let dp=0,s=0; for(const Ld of soilLayers){const t=dp,b=dp+Ld.H; if(z>=b){s+=Ld.g*Ld.H;dp=b;}else{s+=Ld.g*Math.max(z-t,0);break;}} return s;};
+  const qsoil=totStress(Df), qsoilN=A>0?qsoil*(A-Acol)/A:0;
+
+  // ── Soil bearing pressure (service, gross, rigid planar) ──
+  // ส่วนของโมเมนต์ M/S คิดจากโมเมนต์ตรง ๆ (ไม่ใช่ P·e/S ซึ่งหายไปเมื่อ P≈0 และกลับทิศเมื่อ P ดึง)
+  const qload=A>0?Ptot/A:0, baseAdd=qself+qped+qsoilN;
+  const qmx=A>0?6*M_Y/(A*B):0, qmy=A>0?6*M_X/(A*L):0;
+  const qCorner=(sx,sy)=>qload+sx*qmx+sy*qmy+baseAdd;      // sx,sy=±1
+  const qNetCorner=(sx,sy)=>qload+sx*qmx+sy*qmy;           // net (no self/soil)
+  const qmax=qload+Math.abs(qmx)+Math.abs(qmy)+baseAdd;
+  const qmin=qload-Math.abs(qmx)-Math.abs(qmy)+baseAdd;
+  const kernRatio=6*Math.abs(ex)/B+6*Math.abs(ey)/L, outKern=kernRatio>1+1e-9||Ptot<0, uplift=qmin<-1e-9;
+
+  // ── Effective-stress profile + bearing layer ──
+  const effSig=z=>{ let dp=0,sig=0; for(const Ld of soilLayers){const t=dp,b=dp+Ld.H; if(z>=b){sig+=Ld.g*Ld.H;dp=b;}else{sig+=Ld.g*(z-t);break;}} const u=z>wt?gw*(z-wt):0; return sig-u; };
+  const Dbase=Df+Hh;
+  let bD=0, bear=soilLayers[soilLayers.length-1]||{Es:1500,nu:0.3,c:0,phi:0,g:1.9};
+  for(const Ld of soilLayers){ if(Dbase < bD+Ld.H+1e-6){ bear=Ld; break; } bD+=Ld.H; }
+  const Es=bear.Es||1500, nu=bear.nu||0.3;
+
+  // ── q_allow (manual / Meyerhof / Terzaghi) ──
+  const qaSource=($('qaSource')&&$('qaSource').value)||'manual';
+  const bcMethod=(qaSource==='terzaghi')?'terzaghi':'meyerhof';
+  const bcFS=Math.max(v('bcFS')||3,1);
+  const bcC=bear.c||0, bcPhi=bear.phi||0, bcQsur=effSig(Dbase);
+  const bcGam=(Dbase>=wt?Math.max(bear.g-gw,0):bear.g);
+  const bcap=bcFactorsAndQ(bcMethod,bcC,bcPhi,bcGam,bcQsur,B,L,Dbase,bcFS);
+  if($('qaCalcShow')) $('qaCalcShow').textContent=isFinite(bcap.qaCalc)?f(bcap.qaCalc,2):'—';
+  const qaUse=(qaSource==='manual')?qa:(isFinite(bcap.qaCalc)?bcap.qaCalc:qa);
+  if($('qa')){ $('qa').disabled=(qaSource!=='manual'); if(qaSource!=='manual'&&isFinite(bcap.qaCalc)) $('qa').value=f(bcap.qaCalc,2); }
+
+  // ── Uplift: effective area (Meyerhof) on real contact ──
+  const Vbear=Ptot+qself*A+Wped+qsoil*(A-Acol);
+  const exR=Vbear>0?Math.abs(M_Y)/Vbear:0, eyR=Vbear>0?Math.abs(M_X)/Vbear:0;
+  const Bp=B-2*exR, Lp=L-2*eyR, contactOK=Bp>0&&Lp>0&&Vbear>0;
+  const qEff=contactOK?Vbear/(Bp*Lp):Infinity;
+  const qGov=uplift?qEff:qmax;
+  const pressOK=uplift?(contactOK&&qEff<=qaUse):(qmax<=qaUse);
+
+  // ── Stability (ACI 13.2.6.1): overturning about each edge, sliding, net uplift — service loads ──
+  const U=gw*Math.max(Dbase-wt,0)*A;                 // แรงดันน้ำยกใต้ฐาน
+  const Wbase=qself*A+qsoil*(A-Acol)-U;              // ฐาน + ดินถม − แรงยกน้ำ (กระทำที่ศูนย์กลางฐาน)
+  const FSotReq=Math.max(v('FSot')||1.5,1), FSslReq=Math.max(v('FSsl')||1.5,1), FSupReq=Math.max(v('FSup')||1.5,1);
+  function overturn(span,pos,net){ let worst=null;
+    [1,-1].forEach(s=>{ let Mr=Wbase*span/2;
+      cols.forEach(c=>{ Mr+=(c.P+c.cx*c.cy*Lu*gc)*(span/2-s*pos(c)); });
+      const Mo=Math.max(s*net,0), fs=Mo>1e-9?Math.max(Mr,0)/Mo:Infinity;
+      if(!worst||fs<worst.FS) worst={FS:fs,Mr,Mo,side:s,ok:fs>=FSotReq}; });
+    return worst; }
+  const otX=overturn(B,c=>c.x,cols.reduce((s,c)=>s+c.My+(c.Vx||0)*hV,0));
+  const otY=overturn(L,c=>c.y,cols.reduce((s,c)=>s+c.Mx+(c.Vy||0)*hV,0));
+  const overturnOK=otX.ok&&otY.ok;
+  const Tnet=Math.max(-Ptot,0), Wdown=Wbase+Wped;
+  const FSup=Tnet>1e-9?Math.max(Wdown,0)/Tnet:Infinity, pullOK=FSup>=FSupReq;
+  const Hres=Math.hypot(VxTot,VyTot), Nbase=Math.max(Vbear-U,0);
+  const muIn=v('mu'), muSet=muIn>0;
+  const muBase=muSet?muIn:Math.tan(2/3*(bear.phi||0)*Math.PI/180), ca=muSet?0:2/3*(bear.c||0);
+  const Acontact=uplift?(contactOK?Bp*Lp:0):A;       // ส่วนที่เผยอไม่มีแรงยึด
+  const Rslide=muBase*Nbase+ca*Acontact, FSsl=Hres>1e-9?Rslide/Hres:Infinity, slideOK=FSsl>=FSslReq;
+
+  // ── FACTORED beam analysis (flexure + one-way shear) ──
+  const Pu=LF*Ptot;
+  // applied moment at each column = U·(M + V·h_V) — same moment the soil pressure balances
+  const colX=cols.map(c=>({pos:c.x, P:LF*c.P, m:LF*(c.My+(c.Vx||0)*hV)}));
+  const colY=cols.map(c=>({pos:c.y, P:LF*c.P, m:LF*(c.Mx+(c.Vy||0)*hV)}));
+  const bmX=beamSFDBMD(Pu, LF*M_Y, B, colX);
+  const bmY=beamSFDBMD(Pu, LF*M_X, L, colY);
+
+  // ── Layering + effective depth: direction with larger |M| = main → outermost layer (max d) ──
+  const MgX=Math.max(Math.abs(bmX.Mmax),Math.abs(bmX.Mmin)), MgY=Math.max(Math.abs(bmY.Mmax),Math.abs(bmY.Mmin));
+  const mainDir=(MgX>=MgY)?'X':'Y'; window._matMainDir=mainDir;
+  const dbxb=v('dbxb'),dbxt=v('dbxt'),dbyb=v('dbyb'),dbyt=v('dbyt');
+  const xOut=mainDir==='X';
+  const dXb=xOut?Hh-cov-dbxb/2000:Hh-cov-dbyb/1000-dbxb/2000;
+  const dYb=xOut?Hh-cov-dbxb/1000-dbyb/2000:Hh-cov-dbyb/2000;
+  const dXt=xOut?Hh-cov-dbxt/2000:Hh-cov-dbyt/1000-dbxt/2000;
+  const dYt=xOut?Hh-cov-dbxt/1000-dbyt/2000:Hh-cov-dbyt/2000;
+  const davg=(dXb+dYb)/2;
+  const dMinOK=Math.min(dXb,dYb)>=0.15-1e-9;          // ACI 13.3.1.2: d ของเหล็กล่าง ≥ 150 mm
+
+  // ── plain-concrete capacity for hogging M⁻ (ACI Ch.14, ϕ=0.60) → top steel not required if M⁻ ≤ ϕMn,plain ──
+  const fcMPa=fc*0.0980665, ftPlain=0.42*Math.sqrt(fcMPa), hPlain=Math.max(Hh-0.05,0.05);   // h−50mm (cast against soil, 14.5.1.7)
+  const phiMnPlain=bw=>0.60*ftPlain*((bw*1000)*Math.pow(hPlain*1000,2)/6)/1e6/9.80665;        // t·m
+  const plainX=phiMnPlain(L), plainY=phiMnPlain(B);
+  const MnegX=Math.max(-bmX.Mmin,0), MnegY=Math.max(-bmY.Mmin,0);
+  const noTopX=MnegX<=plainX, noTopY=MnegY<=plainY;
+  window._noTop={X:noTopX,Y:noTopY,plainX,plainY,MnegX,MnegY};
+
+  // ── Flexure (ACI 22.3 + 8.3.3.1 tension-controlled + 8.6.1.1 As,min + 8.7.2.2 spacing) ──
+  const b1=fc<=280?0.85:Math.max(0.85-0.05*(fc-280)/70,0.65);
+  const ety=fy/EsSt, etTC=ety+0.003;                         // ε_t ≥ ε_ty + 0.003 (Table 21.2.2)
+  const cdMax=0.003/(0.003+etTC), rhomax=0.85*b1*(fc/fy)*cdMax;
+  const sMaxCrit=Math.min(2*Hh*100,45);                       // cm — lesser of 2h and 18 in. at critical sections
+  function flexDesign(Mu, b, d, nbar, db, isTop, plainOK){
+    Mu=isTop?Math.max(-Mu,0):Math.max(Mu,0);
+    const Ru=Mu/(phif*b*d*d)*0.1;
+    const inside=1-2*Ru/(0.85*fc);
+    let rho=inside<0?NaN:(0.85*fc/fy)*(1-SQ(inside));
+    const need=isNaN(rho);                                    // section too thin (no ρ solution)
+    let Asflex=need?Infinity:rho*(b*100)*(d*100);
+    if(isTop&&isFinite(Asflex)&&Math.round(Asflex*10)/10<=AS_TOP_TOL) Asflex=0;
+    const Asmin=0.0018*(b*100)*(Hh*100);                      // 8.6.1.1 (13.3.4.4) — near the tension face
+    // ล่าง: max(flex, As,min) เสมอ · บน: ถ้า M⁻ ≤ ϕMn,plain → ไม่ต้องใส่ · ถ้าเกิน (หน้าตัดร้าวด้านบน) → max(flex, As,min)
+    const topReq=isTop&&!plainOK&&!need&&Asflex>0;
+    const notReq=isTop&&!need&&!topReq;
+    const AsReq=need?Infinity:(isTop?(topReq?Math.max(Asflex,Asmin):0):Math.max(Asflex,Asmin));
+    const minCtrl=!need&&!notReq&&Asflex<Asmin;
+    const AsProv=nbar*barA(db);
+    // provided steel: a, c, ε_t, ϕMn
+    const aP=AsProv*fy/(0.85*fc*b*100), cP=aP/b1, dcm=d*100;
+    const etP=cP>0?0.003*(dcm-cP)/cP:Infinity;
+    const phiMn=phif*AsProv*fy*(dcm-aP/2)/1e5;               // t·m (ϕ=0.90 valid only when tension-controlled)
+    const tcOK=AsProv<=0||etP>=etTC-1e-9;
+    const over=!need&&rho>rhomax;
+    const nReq=isFinite(AsReq)?(AsReq<=1e-6?0:Math.max(Math.ceil(AsReq/barA(db)),2)):Infinity;
+    const sp=nbar>1?(b-2*cov)/(nbar-1)*100:0;                 // c/c, cm
+    const sClr=sp-db/10, sClrMin=Math.max(2.5,db/10);         // 25.2.1 (aggregate size not checked)
+    const spOK=notReq&&nbar<=0?true:(nbar>=2&&sp<=sMaxCrit+1e-9&&sClr>=sClrMin-1e-9);
+    const ok=notReq?(nbar<=0||(tcOK&&spOK)):(AsProv>=AsReq&&!need&&!over&&tcOK&&spOK);
+    return {Mu,Ru,rho,Asflex,Asmin,minCtrl,AsReq,AsProv,sp,sClr,sClrMin,spOK,nReq,isTop,notReq,topReq,ok,need,over,
+      aP,cP,etP,tcOK,phiMn,nbar,db,d,b};
+  }
+  // X-direction beam width = L ; Y-direction beam width = B
+  const fXb=flexDesign(bmX.Mmax, L, dXb, v('nxb'), dbxb, false);
+  const fXt=flexDesign(bmX.Mmin, L, dXt, v('nxt'), dbxt, true, noTopX);
+  const fYb=flexDesign(bmY.Mmax, B, dYb, v('nyb'), dbyb, false);
+  const fYt=flexDesign(bmY.Mmin, B, dYt, v('nyt'), dbyt, true, noTopY);
+
+  // ── One-way (beam) shear — ACI 13.2.6.2(a): Vc = 0.53λ√f'c·b·d (rigid footing on soil, no size/ρw effect) ──
+  const facesX=[]; cols.forEach(c=>{ facesX.push(c.x-c.cx/2); facesX.push(c.x+c.cx/2); });
+  const facesY=[]; cols.forEach(c=>{ facesY.push(c.y-c.cy/2); facesY.push(c.y+c.cy/2); });
+  const owX=critShear(bmX,facesX,dXb), owY=critShear(bmY,facesY,dYb);
+  const phiVcX=phiv*0.53*lam*SQ(fc)*(L*100)*(dXb*100)/1000, owXok=phiVcX>=owX.V;
+  const phiVcY=phiv*0.53*lam*SQ(fc)*(B*100)*(dYb*100)/1000, owYok=phiVcY>=owY.V;
+
+  // ── Punching per column — 22.6 with λs = 1.0 (13.2.6.2b) + moment transfer γv·Msc (8.4.4.2) ──
+  const qu=A>0?Pu/A:0;
+  const punch=cols.map(c=>{
+    const d=davg;
+    const pxL=c.x-c.cx/2-d/2, pxR=c.x+c.cx/2+d/2, pyB=c.y-c.cy/2-d/2, pyT=c.y+c.cy/2+d/2;
+    const cxL=Math.max(pxL,-B/2), cxR=Math.min(pxR,B/2), cyB=Math.max(pyB,-L/2), cyT=Math.min(pyT,L/2);
+    const sL=pxL>-B/2+1e-6, sR=pxR<B/2-1e-6, sB=pyB>-L/2+1e-6, sT=pyT<L/2-1e-6;
+    const segs=[]; if(sL)segs.push([cxL,cyB,cxL,cyT]); if(sR)segs.push([cxR,cyB,cxR,cyT]);
+    if(sB)segs.push([cxL,cyB,cxR,cyB]); if(sT)segs.push([cxL,cyT,cxR,cyT]);
+    const len=g=>Math.hypot(g[2]-g[0],g[3]-g[1]);
+    const bo=segs.reduce((s,g)=>s+len(g),0);
+    const nS=segs.length, as=nS>=4?40:(nS===3?30:20);
+    const bc=Math.max(c.cx,c.cy)/Math.min(c.cx,c.cy);
+    const Vu=Math.max(LF*c.P-qu*Math.max(cxR-cxL,0)*Math.max(cyT-cyB,0),0);
+    // centroid of critical section + Jc per axis (sides along the bending direction: d·l³/12 + l·d³/12 + d·l·r²; across: l·d·r²)
+    const xc=bo>0?segs.reduce((s,g)=>s+len(g)*(g[0]+g[2])/2,0)/bo:c.x;
+    const yc=bo>0?segs.reduce((s,g)=>s+len(g)*(g[1]+g[3])/2,0)/bo:c.y;
+    const jc=(k,cc)=>segs.reduce((J,g)=>{ const a0=k===0?g[0]:g[1], a1=k===0?g[2]:g[3], l=len(g);
+      return J+(Math.abs(a1-a0)>1e-9 ? d*l**3/12+l*d**3/12+d*l*((a0+a1)/2-cc)**2 : l*d*(a0-cc)**2); },0);
+    const Jx=jc(0,xc), Jy=jc(1,yc);
+    const bxS=Math.max(cxR-cxL,1e-9), byS=Math.max(cyT-cyB,1e-9);
+    const gvx=1-1/(1+(2/3)*Math.sqrt(bxS/byS)), gvy=1-1/(1+(2/3)*Math.sqrt(byS/bxS));
+    const Mscx=LF*(c.My+(c.Vx||0)*hV)+Vu*(c.x-xc), Mscy=LF*(c.Mx+(c.Vy||0)*hV)+Vu*(c.y-yc);
+    const vuv=(bo>0&&d>0)?Vu/(bo*d):0;                       // t/m²
+    let vu=vuv;
+    segs.forEach(g=>[[g[0],g[1]],[g[2],g[3]]].forEach(([x,y])=>{
+      const vv=vuv+(Jx>0?gvx*Mscx*(x-xc)/Jx:0)+(Jy>0?gvy*Mscy*(y-yc)/Jy:0); vu=Math.max(vu,Math.abs(vv)); }));
+    const lamS=1.0;                                           // 13.2.6.2(b)
+    const vc1=1.06*lamS*lam*SQ(fc), vc2=0.53*(1+2/bc)*lamS*lam*SQ(fc), vc3=0.265*(as*d/Math.max(bo,1e-9)+2)*lamS*lam*SQ(fc);
+    const vc=Math.min(vc1,vc2,vc3), phivc=phiv*vc;             // ksc
+    const vuK=vu/10, vuvK=vuv/10;                             // t/m² → ksc
+    const phiVcp=phivc*10*bo*d;                                // ton (equivalent)
+    return {name:c.name,P:c.P,Ain:Math.max(cxR-cxL,0)*Math.max(cyT-cyB,0),bo,nS,as,bc,Vu,xc,yc,Jx,Jy,gvx,gvy,Mscx,Mscy,vuv:vuvK,vu:vuK,vc1,vc2,vc3,vc,phivc,phiVcp,
+      ratio:phivc>0?vuK/phivc:0,ok:phivc>=vuK,d};
+  });
+  const punchOK=punch.every(p=>p.ok);
+
+  // ── Bearing at pedestal → footing (ACI 22.8.3.2: ϕ0.85f'c·A1·√(A2/A1), √ ≤ 2, frustum 1V:2H) ──
+  const bearCol=cols.map(c=>{ const A1=c.cx*c.cy;
+    const kEdge=Math.min((B/2-Math.abs(c.x))/(c.cx/2),(L/2-Math.abs(c.y))/(c.cy/2));
+    const kDepth=Math.min((c.cx+4*Hh)/c.cx,(c.cy+4*Hh)/c.cy);
+    const k=Math.max(1,Math.min(kEdge,kDepth,2));
+    const phiBn=phib*0.85*fc*A1*1e4*k/1000, Puc=LF*c.P;
+    return {name:c.name,A1,k,phiBn,Pu:Puc,ok:phiBn>=Puc}; });
+  const bearColOK=bearCol.every(b=>b.ok);
+
+  // ── Development of footing bars (ACI 13.2.8 → 25.4.2.3 straight / 25.4.3.1 standard hook) ──
+  const psiG=fy<=4220?1.0:(fy<=5620?1.15:1.3);
+  function ldStraight(db,isTop,sClr){ const psiT=(isTop&&(Hh-cov)>0.30)?1.3:1.0, good=sClr>=2*db/10&&cov*100>=db/10;
+    const k=db<=19?(good?6.63:4.42):(good?5.30:3.53);           // = 25 / 20 psi (×1.5 other cases) in ksc
+    return {ld:Math.max(fy*psiT*psiG/(k*lam*SQ(fc))*db/10,30),psiT,good}; }   // cm
+  function ldHook(db){ const psiS=db<=29?1.0:(db<=36?1.15:1.3);
+    return Math.max(fy*psiS/(13.26*lam*SQ(fc))*db/10,8*db/10,15); }        // cm (25.4.3.1a,b,c; ψe=ψcc=ψr=1)
+  function devCheck(dir,fb,ft,bm){ const span=dir==='X'?B:L, half=span/2, covcm=cov*100;
+    let availB=Infinity; cols.forEach(c=>{ const p=dir==='X'?c.x:c.y, w=dir==='X'?c.cx:c.cy;
+      availB=Math.min(availB,(p-w/2+half)*100-covcm,(half-(p+w/2))*100-covcm); });
+    const lb=ldStraight(fb.db,false,fb.sClr), lhb=ldHook(fb.db);
+    const botStraight=availB>=lb.ld, botOK=botStraight||availB>=lhb;
+    let top=null;
+    if(ft.nbar>0&&(ft.topReq||ft.Mu>0)){ const u=bm.uMin, availT=(Math.min(u+half,half-u))*100-covcm, lt=ldStraight(ft.db,true,ft.sClr);
+      top={avail:availT,ld:lt.ld,psiT:lt.psiT,ok:!ft.topReq||availT>=lt.ld}; }
+    return {availB,ldB:lb.ld,good:lb.good,ldhB:lhb,botStraight,botOK,top,ok:botOK&&(!top||top.ok)}; }
+  const devX=devCheck('X',fXb,fXt,bmX), devY=devCheck('Y',fYb,fYt,bmY);
+  const devOK=devX.ok&&devY.ok;
+  // ── Settlement (resultant) ──
+  const qn=Ptot/A;
+  const dSigBase=zp=>zp<=0?qn:qn*B*L/((B+zp)*(L+zp));
+  const Se=Es>0?qn*B*(1-nu*nu)*If/Es*1000:0;
+  let depthC=0, Sc=0, layerRows=''; const setl=[];
+  soilLayers.forEach((Ld,i)=>{
+    const top=depthC, bot=depthC+Ld.H; depthC=bot;
+    if(Ld.type!=='clay') return;
+    const zt=Math.max(top,Dbase), zb=bot; if(zb<=Dbase) return;
+    const Cc=computeCc(Ld);
+    const He=zb-zt, zmid=(zt+zb)/2, zp=zmid-Dbase;
+    const s0=effSig(zmid), ds=dSigBase(zp);
+    const sci=(s0>0&&Cc>0&&He>0)?Cc/(1+Ld.e0)*He*Math.log10((s0+ds)/s0)*1000:0;
+    Sc+=sci;
+    setl.push({i:i+1,name:Ld.name,zt,zb,He,zmid,zp,s0,ds,Cc,e0:Ld.e0,sci});
+    layerRows+=`<tr><td style="text-align:left">${i+1}. ${Ld.name}</td><td>${f(zt,2)}–${f(zb,2)}</td><td>${f(He,2)}</td><td>${f(zmid,2)}</td><td class="val">${f(s0,2)}</td><td class="val">${f(ds,2)}</td><td class="val">${f(Cc,3)}</td><td class="val">${f(sci,1)}</td></tr>`;
+  });
+  const St=Se+Sc, settleOK=St<=Sall;
+
+  // ── geometry checks: columns inside footing ──
+  let geomWarn='';
+  cols.forEach(c=>{ if(Math.abs(c.x)+c.cx/2>B/2+1e-6||Math.abs(c.y)+c.cy/2>L/2+1e-6) geomWarn+=`${c.name} `; });
+
+  const bearOK=pressOK;
+  const flexOK=fXb.ok&&fXt.ok&&fYb.ok&&fYt.ok;
+  const stabOK=overturnOK&&slideOK&&pullOK;
+  const allOK=bearOK&&flexOK&&owXok&&owYok&&punchOK&&settleOK&&stabOK&&bearColOK&&devOK&&dMinOK&&!geomWarn;
+
+  R={B,L,Hh,Df,Lu,wt,ex,ey,Ptot,cols,bmX,bmY,qCorner,qNetCorner,uplift,Bp,Lp,exR,eyR};
+
+  const FSf=x=>isFinite(x)?f(x,2):'∞';
+  /* ── 1. RESULTANT + BEARING + STABILITY ── */
+  $('bodyGeo').innerHTML=`<div class="rep-grid">
+    <div class="rep-col">
+      ${SDIV('Resultant of all columns','var(--cyan)')}
+      ${CB("P<sub>tot</sub> = Σ P<sub>i</sub>",`${cols.map(c=>f(c.P,1)).join(' + ')}`,f(Ptot,2),'ton')}
+      ${CB("h<sub>V</sub> = แขนของแรงเฉือนหัวตอม่อ → ใต้ฐาน",hVin>0?'กรอกเอง':`L<sub>u</sub>+H = ${f(Lu,2)}+${f(Hh,2)}`,f(hV,2),'m')}
+      ${CB("M<sub>Y</sub> = Σ (M<sub>y,i</sub> + V<sub>x,i</sub>·h<sub>V</sub> + P<sub>i</sub>·x<sub>i</sub>)  &nbsp;[เยื้องแนว X]",`ΣV<sub>x</sub>=${f(VxTot,2)} t`,f(M_Y,2),'t·m')}
+      ${CB("M<sub>X</sub> = Σ (M<sub>x,i</sub> + V<sub>y,i</sub>·h<sub>V</sub> + P<sub>i</sub>·y<sub>i</sub>)  &nbsp;[เยื้องแนว Y]",`ΣV<sub>y</sub>=${f(VyTot,2)} t`,f(M_X,2),'t·m')}
+      ${CB("e<sub>x</sub> = M<sub>Y</sub>/P<sub>tot</sub> &nbsp; e<sub>y</sub> = M<sub>X</sub>/P<sub>tot</sub>",`${f(M_Y,2)}/${f(Ptot,2)} ; ${f(M_X,2)}/${f(Ptot,2)}`,`e<sub>x</sub>=${f(ex,3)}, e<sub>y</sub>=${f(ey,3)}`,'m')}
+      ${GOV('P<sub>u</sub> = U·P<sub>tot</sub> (factored)',f(Pu,1),'ton','blue')}
+      ${geomWarn?`<div class="info-box" style="margin-top:8px;border-color:#991b1b;background:rgba(224,82,82,.1)">⚠ เสา <b>${geomWarn}</b> ยื่นเลยขอบฐาน — ขยายฐานหรือย้ายตำแหน่งเสา</div>`:''}
+    </div>
+    <div class="rep-col">
+      ${SDIV('Soil bearing (service, gross)','var(--cyan)')}
+      ${CB("q<sub>load</sub> = P<sub>tot</sub>/A",`${f(Ptot,2)} / ${f(A,3)}`,f(qload,3),'t/m²')}
+      ${CB("q<sub>self</sub>=γ<sub>c</sub>H · q<sub>ped</sub>=ΣW<sub>ped</sub>/A · q<sub>soil</sub>=ΣγH(A−A<sub>col</sub>)/A",`${f(qself,3)} ; ${f(qped,3)} ; ${f(qsoilN,3)}`,`${f(baseAdd,3)}`,'t/m²')}
+      ${CB("q<sub>max</sub> = P/A + 6|M<sub>Y</sub>|/(B²L) + 6|M<sub>X</sub>|/(BL²) + q<sub>self</sub>+q<sub>ped</sub>+q<sub>soil</sub>",`${f(qload,3)} + ${f(Math.abs(qmx),3)} + ${f(Math.abs(qmy),3)} + ${f(baseAdd,3)}`,f(qmax,3),'t/m²')}
+      ${CB("q<sub>min</sub> (ขอบรับน้อยสุด)",'',f(qmin,3),'t/m²')}
+      ${CB("ตรวจ kern: 6|e<sub>x</sub>|/B + 6|e<sub>y</sub>|/L ≤ 1",'',f(kernRatio,2),outKern?'> 1 (นอก kern)':'≤ 1 (ใน kern)')}
+      ${uplift?`
+      ${SDIV('ฐานเผยอบางส่วน → Effective area (Meyerhof)','var(--yellow)')}
+      ${CB("e<sub>res</sub> = M / V<sub>tot</sub>",`V<sub>tot</sub>=${f(Vbear,2)} t`,`e<sub>x</sub>=${f(exR,3)}, e<sub>y</sub>=${f(eyR,3)}`,'m')}
+      ${CB("q<sub>eff</sub> = V<sub>tot</sub>/((B−2e<sub>x</sub>)(L−2e<sub>y</sub>))",contactOK?`${f(Vbear,2)}/(${f(Bp,3)}×${f(Lp,3)})`:'พื้นที่สัมผัสยุบ',contactOK?f(qEff,3):'∞','t/m²')}
+      ${GOV(`q<sub>eff</sub> ≤ q<sub>allow</sub> : ${contactOK?f(qEff,2):'∞'} ≤ ${f(qaUse,2)} t/m²`,bearOK?'PASS':'FAIL','',bearOK?'green':'red')}
+      `:`
+      ${GOV(`q<sub>max</sub> ≤ q<sub>allow</sub> : ${f(qmax,2)} ≤ ${f(qaUse,2)} t/m² (q<sub>min</sub>≥0 สัมผัสเต็มฐาน)`,bearOK?'PASS':'FAIL','',bearOK?'green':'red')}
+      `}
+    </div></div>
+    <div class="rep-col-full" style="border-top:1px solid var(--border)">
+      ${SDIV('กำลังแบกทานดิน → q<sub>allow</sub> — '+(bcMethod==='terzaghi'?'Terzaghi':'Meyerhof'),'var(--yellow)')}
+      <div class="rep-grid" style="border-top:none">
+        <div class="rep-col" style="padding-top:4px">
+          ${CB(`N<sub>q</sub>, N<sub>c</sub>, N<sub>γ</sub> (φ=${f(bcPhi,1)}°)`,`ชั้นรับน้ำหนัก: ${bear.name}`,`${f(bcap.Nq,2)} / ${f(bcap.Nc,2)} / ${f(bcap.Ng,2)}`,'')}
+          ${CB("c, q̄ (กดทับประสิทธิผล), γ' ใต้ฐาน, B<sub>min</sub>",`c=${f(bcC,2)} · q̄=${f(bcQsur,2)} · γ'=${f(bcGam,2)} · B=${f(bcap.Bw,2)}`,'','')}
+        </div>
+        <div class="rep-col" style="padding-top:4px">
+          ${CB("q<sub>ult</sub> = cN<sub>c</sub>s<sub>c</sub>d<sub>c</sub>+q̄N<sub>q</sub>s<sub>q</sub>d<sub>q</sub>+½γ'BN<sub>γ</sub>s<sub>γ</sub>d<sub>γ</sub>",'',f(bcap.qult,2),'t/m²')}
+          ${CB("q<sub>allow,calc</sub> = q̄ + (q<sub>ult</sub>−q̄)/FS",`FS=${f(bcFS,1)}`,f(bcap.qaCalc,2),'t/m²')}
+          ${qaSource==='manual'
+            ? GOV(`q<sub>allow,calc</sub> ${bcap.qaCalc>=qa?'≥':'<'} q<sub>allow</sub>(กรอก) : ${f(bcap.qaCalc,2)} vs ${f(qa,2)}`,bcap.qaCalc>=qa?'ค่าที่กรอกปลอดภัย':'ค่าที่กรอกสูงไป — ควรลด','',bcap.qaCalc>=qa?'green':'red')
+            : GOV(`q<sub>allow</sub> ที่ใช้ = ${f(bcap.qaCalc,2)} t/m²`,'ใช้ค่าคำนวณ','',bcap.qaCalc>0?'green':'red')}
+        </div>
+      </div>
+    </div>
+    <div class="rep-col-full" style="border-top:1px solid var(--border)">
+      ${SDIV('เสถียรภาพ — พลิกคว่ำ · เลื่อนไถล · ถูกดึงยก (ACI 13.2.6.1, แรงใช้งาน)','var(--yellow)')}
+      <div class="rep-grid" style="border-top:none">
+        <div class="rep-col" style="padding-top:4px">
+          ${CB("W<sub>base</sub> = γ<sub>c</sub>HA + q<sub>soil</sub>(A−A<sub>col</sub>) − U<sub>w</sub>",`U<sub>w</sub> = γ<sub>w</sub>·max(D<sub>base</sub>−z<sub>w</sub>,0)·A = ${f(U,2)} t`,f(Wbase,2),'ton')}
+          ${CB(`พลิกรอบขอบ ${otX.side>0?'+':'−'}X : FS = M<sub>R</sub>/M<sub>O</sub>`,`M<sub>R</sub>=${f(otX.Mr,2)} · M<sub>O</sub>=|Σ(M<sub>y</sub>+V<sub>x</sub>h<sub>V</sub>)|=${f(otX.Mo,2)} t·m`,FSf(otX.FS),'')}
+          ${CB(`พลิกรอบขอบ ${otY.side>0?'+':'−'}Y : FS = M<sub>R</sub>/M<sub>O</sub>`,`M<sub>R</sub>=${f(otY.Mr,2)} · M<sub>O</sub>=|Σ(M<sub>x</sub>+V<sub>y</sub>h<sub>V</sub>)|=${f(otY.Mo,2)} t·m`,FSf(otY.FS),'')}
+          ${GOV(`FS<sub>พลิก</sub> ≥ ${f(FSotReq,2)} : X ${FSf(otX.FS)} · Y ${FSf(otY.FS)}`,overturnOK?'PASS':'FAIL','',overturnOK?'green':'red')}
+        </div>
+        <div class="rep-col" style="padding-top:4px">
+          ${CB(muSet?"R = μ·N":"R = tan(2φ/3)·N + (2c/3)·A<sub>contact</sub>",`N=${f(Nbase,2)} t · μ=${f(muBase,3)}${muSet?'':` · c<sub>a</sub>=${f(ca,2)} t/m² · A=${f(Acontact,2)} m²`}`,f(Rslide,2),'ton')}
+          ${CB("H = √(ΣV<sub>x</sub>² + ΣV<sub>y</sub>²) · FS<sub>เลื่อน</sub> = R/H",`H=${f(Hres,2)} t`,FSf(FSsl),'')}
+          ${GOV(`FS<sub>เลื่อน</sub> ≥ ${f(FSslReq,2)} : ${FSf(FSsl)}`,slideOK?'PASS':'FAIL','',slideOK?'green':'red')}
+          ${CB("ถูกดึงยก: FS = W<sub>down</sub>/T<sub>net</sub>",`T<sub>net</sub>=max(−ΣP,0)=${f(Tnet,2)} · W<sub>down</sub>=${f(Wdown,2)} t`,FSf(FSup),'')}
+          ${GOV(`FS<sub>ยก</sub> ≥ ${f(FSupReq,2)} : ${FSf(FSup)}`,pullOK?'PASS':'FAIL','',pullOK?'green':'red')}
+        </div>
+      </div>
+    </div>`;
+
+  /* ── 2. FLEXURE ── */
+  function flexCard(o,title,col,note,dirLbl){
+    const flexLine=o.isTop
+      ? CB("A<sub>s,flex</sub> = ρ·b·d &nbsp;(คิดจากโมเมนต์ลบ M⁻)",o.need?'ราก<0 → หน้าตัดบางไป (เพิ่ม H)':`ρ=${f(o.rho,5)} · ρ<sub>max</sub>=${f(rhomax,5)}`,f(o.Asflex,2),'cm²')
+      : CB("A<sub>s,flex</sub> = ρ·b·d &nbsp;·&nbsp; A<sub>s,min</sub> = 0.0018·b·h",o.need?'ราก<0 → หน้าตัดบางไป (เพิ่ม H)':`A<sub>s,flex</sub>=${f(o.Asflex,2)} · A<sub>s,min</sub>=${f(o.Asmin,2)}`,o.need?'N/A':`${o.minCtrl?'A<sub>s,min</sub> ควบคุม':'flexure ควบคุม'}`,'');
+    const reqLine=o.isTop
+      ? (o.topReq
+        ? CB("A<sub>s,req</sub> = max(A<sub>s,flex</sub>, 0.0018bh) &nbsp;(M⁻ > ϕM<sub>n,plain</sub> → ผิวบนร้าว, 8.6.1.1)",`A<sub>s,min</sub>=${f(o.Asmin,2)}`,f(o.AsReq,2),'cm²')
+        : CB("A<sub>s,req</sub> = 0 &nbsp;(M⁻ ≤ ϕM<sub>n,plain</sub> — คอนกรีตรับเอง, Ch.14)",'',f(0,2),'cm²'))
+      : CB("A<sub>s,req</sub> = max(A<sub>s,flex</sub>, A<sub>s,min</sub>)",'',f(o.AsReq,2),'cm²');
+    const tcLine=o.AsProv>0?CB("ε<sub>t</sub> = 0.003(d−c)/c ≥ ε<sub>ty</sub>+0.003 &nbsp;(tension-controlled, 8.3.3.1)",`a=${f(o.aP,2)} · c=${f(o.cP,2)} cm · ε<sub>ty</sub>+0.003=${f(etTC,5)}`,f(o.etP,5),o.tcOK?'OK':'NG'):'';
+    const phiMnLine=o.AsProv>0?CB("ϕM<sub>n</sub> = ϕA<sub>s,prov</sub>f<sub>y</sub>(d−a/2)",`ϕ=0.90`,f(o.phiMn,2),'t·m'):'';
+    const spLine=o.nbar>=2?CB(`ระยะเหล็ก s = ${f(o.sp,1)} cm ≤ min(2h, 45) = ${f(sMaxCrit,1)} cm &nbsp;(8.7.2.2)`,`ช่องว่างสุทธิ ${f(o.sClr,1)} ≥ ${f(o.sClrMin,1)} cm (25.2.1)`,o.spOK?'OK':'NG',''):'';
+    return `<div class="rep-col">${SDIV(title,col)}
+      ${CB("M<sub>u</sub> (จาก BMD วิธีคาน)",note,f(o.Mu,3),'t·m')}
+      ${CB("R<sub>u</sub> = M<sub>u</sub>/(ϕ·b·d²)",`b=${f(o.b,2)} m · d=${f(o.d,3)} m`,f(o.Ru,2),'ksc')}
+      ${flexLine}
+      ${reqLine}
+      ${CB(`จำนวนเส้นที่ต้องการ n<sub>req</sub> = ⌈A<sub>s,req</sub> / A<sub>bar</sub>⌉ &nbsp;(Dia.${o.db})`,o.need?'หน้าตัดบางไป':`${f(o.AsReq,2)} / ${f(barA(o.db),2)}`,o.need?'N/A':`${o.nReq}–Dia.${o.db}`,o.need?'':'เส้น')}
+      ${tcLine}${phiMnLine}${spLine}
+      ${GOV(`A<sub>s,prov</sub> = ${o.nbar}–Dia.${o.db}${o.sp>0?' @ '+f(o.sp,0)+' cm':''} (กรอกเอง)`,f(o.AsProv,2)+' ≥ '+f(o.AsReq,2)+` cm²  ·  n: ${o.nbar} ${o.nbar>=o.nReq?'≥':'<'} ${o.nReq}`,'',o.ok?'green':'red')}</div>`;
+  }
+  $('bodyFlex').innerHTML=`
+    <div class="rep-col-full"><div class="info-box">ชั้นเหล็ก: แนว <b>${mainDir}</b> มีโมเมนต์มากกว่า → วางชั้นนอกสุด (d มากสุด) · d<sub>X,ล่าง</sub>=${f(dXb,3)} · d<sub>Y,ล่าง</sub>=${f(dYb,3)} · d<sub>X,บน</sub>=${f(dXt,3)} · d<sub>Y,บน</sub>=${f(dYt,3)} m · ρ<sub>max</sub> (ε<sub>t</sub>=ε<sub>ty</sub>+0.003) = ${f(rhomax,5)} · d ≥ 150 mm (13.3.1.2): <b>${dMinOK?'OK':'NG'}</b></div></div>
+    <div class="rep-grid">
+      ${flexCard(fXb,'แนว X — โมเมนต์บวก (เหล็กล่าง)','var(--orange)',`M<sup>+</sup>=${f(bmX.Mmax,2)} @ x=${f(bmX.uMax,2)} m`)}
+      ${flexCard(fXt,'แนว X — โมเมนต์ลบ (เหล็กบน)','var(--cyan)',`M<sup>−</sup>=${f(bmX.Mmin,2)} @ x=${f(bmX.uMin,2)} m`)}
+    </div>
+    <div class="rep-grid" style="border-top:1px solid var(--border)">
+      ${flexCard(fYb,'แนว Y — โมเมนต์บวก (เหล็กล่าง)','var(--purple)',`M<sup>+</sup>=${f(bmY.Mmax,2)} @ y=${f(bmY.uMax,2)} m`)}
+      ${flexCard(fYt,'แนว Y — โมเมนต์ลบ (เหล็กบน)','var(--cyan)',`M<sup>−</sup>=${f(bmY.Mmin,2)} @ y=${f(bmY.uMin,2)} m`)}
+    </div>
+    <div class="rep-col-full" style="border-top:1px solid var(--border)">
+      ${SDIV('ตรวจกรณี "ไม่มีเหล็กบน" — คอนกรีตล้วนรับ M⁻ ได้ไหม (ACI 318 บทที่ 14)','var(--yellow)')}
+      <div class="rep-grid" style="border-top:none">
+        <div class="rep-col">
+          ${CB("ϕM<sub>n,plain</sub> = ϕ·0.42√f'c·b·h²/6",`แนว X: b=L=${f(L,2)} m · h=${f(hPlain,2)} m (หล่อติดดิน −50mm) · 0.42√f'c=${f(ftPlain,2)} MPa · ϕ=0.60`,f(plainX,2),'t·m')}
+          ${GOV(`แนว X: M⁻ ${f(MnegX,2)} ${noTopX?'≤':'>'} ϕM<sub>n,plain</sub> ${f(plainX,2)} t·m`,noTopX?'ตัดเหล็กบนได้ (คอนกรีตรับเอง)':'ต้องมีเหล็กบน ≥ max(A<sub>s,flex</sub>, 0.0018bh)','',noTopX?'green':'red')}
+        </div>
+        <div class="rep-col">
+          ${CB("ϕM<sub>n,plain</sub> แนว Y",`b=B=${f(B,2)} m · h=${f(hPlain,2)} m`,f(plainY,2),'t·m')}
+          ${GOV(`แนว Y: M⁻ ${f(MnegY,2)} ${noTopY?'≤':'>'} ϕM<sub>n,plain</sub> ${f(plainY,2)} t·m`,noTopY?'ตัดเหล็กบนได้ (คอนกรีตรับเอง)':'ต้องมีเหล็กบน ≥ max(A<sub>s,flex</sub>, 0.0018bh)','',noTopY?'green':'red')}
+        </div>
+      </div>
+    </div>`;
+
+  /* ── 3. SHEAR + BEARING + DEVELOPMENT ── */
+  const locName=n=>n>=4?'interior':(n===3?'edge':'corner');
+  let punchRows=punch.map(p=>`<tr>
+    <td style="text-align:left">${p.name}</td><td>${locName(p.nS)}</td>
+    <td class="val">${f(p.bo,3)}</td><td class="val">${f(p.Vu,1)}</td>
+    <td class="val">${f(p.Mscx,2)} / ${f(p.Mscy,2)}</td><td class="val">${f(p.vu,2)}</td><td class="val">${f(p.phivc,2)}</td>
+    <td class="val">${f(p.ratio,2)}</td><td><span class="${p.ok?'st-ok':'st-ng'}">${p.ok?'OK':'NG'}</span></td></tr>`).join('');
+  const pG=punch.reduce((a,p)=>(!a||p.ratio>a.ratio)?p:a,null);
+  const bearRows=bearCol.map(b=>`<tr><td style="text-align:left">${b.name}</td><td class="val">${f(b.A1,3)}</td><td class="val">${f(b.k,2)}</td>
+    <td class="val">${f(b.Pu,1)}</td><td class="val">${f(b.phiBn,1)}</td><td class="val">${f(b.phiBn>0?b.Pu/b.phiBn:0,2)}</td>
+    <td><span class="${b.ok?'st-ok':'st-ng'}">${b.ok?'OK':'NG'}</span></td></tr>`).join('');
+  const devRow=(lbl,o,fb)=>`<tr><td style="text-align:left">${lbl} ล่าง</td><td class="val">${f(o.availB,0)}</td><td class="val">${f(o.ldB,0)}${o.good?'':' *'}</td><td class="val">${f(o.ldhB,0)}</td>
+    <td>${o.botStraight?'ตรง':'ต้องงอขอ'}</td><td><span class="${o.botOK?'st-ok':'st-ng'}">${o.botOK?'OK':'NG'}</span></td></tr>`+
+    (o.top?`<tr><td style="text-align:left">${lbl} บน</td><td class="val">${f(o.top.avail,0)}</td><td class="val">${f(o.top.ld,0)}</td><td class="val">—</td>
+    <td>ตรง (ψ<sub>t</sub>=${f(o.top.psiT,1)})</td><td><span class="${o.top.ok?'st-ok':'st-ng'}">${o.top.ok?'OK':'NG'}</span></td></tr>`:'');
+  $('bodyShear').innerHTML=`<div class="rep-grid">
+    <div class="rep-col">${SDIV('One-way (beam) shear @ d จากหน้าเสา','var(--cyan)')}
+      ${CB("V<sub>u,x</sub> = max |V(x)| จาก SFD (นอกระยะ d)",`@ x=${f(owX.u,2)} m`,f(owX.V,2),'ton')}
+      ${CB("ϕV<sub>c,x</sub> = ϕ·0.53λ√f'c·L·d &nbsp;(13.2.6.2a)",`${f(phiv,2)}×0.53√${f(fc,0)}×${f(L*100,0)}×${f(dXb*100,1)}`,f(phiVcX,2),'ton')}
+      ${GOV(`แนว X : ϕV<sub>c</sub> ≥ V<sub>u</sub>`,f(phiVcX,1)+' ≥ '+f(owX.V,1),'ton',owXok?'green':'red')}
+      ${CB("V<sub>u,y</sub> = max |V(y)| จาก SFD (นอกระยะ d)",`@ y=${f(owY.u,2)} m`,f(owY.V,2),'ton')}
+      ${CB("ϕV<sub>c,y</sub> = ϕ·0.53λ√f'c·B·d &nbsp;(13.2.6.2a)",`${f(phiv,2)}×0.53√${f(fc,0)}×${f(B*100,0)}×${f(dYb*100,1)}`,f(phiVcY,2),'ton')}
+      ${GOV(`แนว Y : ϕV<sub>c</sub> ≥ V<sub>u</sub>`,f(phiVcY,1)+' ≥ '+f(owY.V,1),'ton',owYok?'green':'red')}
+      <div class="info-box" style="margin-top:8px">ACI 318-25 13.2.6.2: ฐานรากตื้นวางบนดิน ออกแบบแบบ rigid → ใช้ V<sub>c</sub> = 2λ√f'c b<sub>w</sub>d (= 0.53λ√f'c ใน ksc) ได้ ไม่ต้องคูณ λ<sub>s</sub> และ ρ<sub>w</sub><sup>1/3</sup> ของ Table 22.5.5.1 · ϕ = 0.75</div>
+    </div>
+    <div class="rep-col">${SDIV('Two-way (punching) shear @ d/2 — รายต้น + โมเมนต์ถ่ายเท','var(--cyan)')}
+      <table class="sum-tbl" style="font-size:11px"><tr><td>เสา</td><td>ตำแหน่ง</td><td>b<sub>o</sub>(m)</td><td>V<sub>u</sub>(t)</td><td>M<sub>sc,x</sub>/M<sub>sc,y</sub>(t·m)</td><td>v<sub>u</sub>(ksc)</td><td>ϕv<sub>c</sub>(ksc)</td><td>ratio</td><td>ผล</td></tr>
+      ${punchRows}</table>
+      ${pG?`${CB(`${pG.name}: v<sub>u</sub> = V<sub>u</sub>/(b<sub>o</sub>d) + γ<sub>v,x</sub>M<sub>sc,x</sub>·x/J<sub>c,x</sub> + γ<sub>v,y</sub>M<sub>sc,y</sub>·y/J<sub>c,y</sub> &nbsp;(8.4.4.2)`,`v<sub>uv</sub>=${f(pG.vuv,2)} ksc · γ<sub>v</sub>=${f(pG.gvx,3)}/${f(pG.gvy,3)} · J<sub>c</sub>=${f(pG.Jx,4)}/${f(pG.Jy,4)} m⁴`,f(pG.vu,2),'ksc')}
+      ${CB("ϕv<sub>c</sub> = ϕ·min[1.06, 0.53(1+2/β), 0.265(2+α<sub>s</sub>d/b<sub>o</sub>)]·λ<sub>s</sub>λ√f'c &nbsp;(Table 22.6.5.2, λ<sub>s</sub>=1.0)",`β=${f(pG.bc,2)} · α<sub>s</sub>=${pG.as} · ${f(pG.vc1,2)} / ${f(pG.vc2,2)} / ${f(pG.vc3,2)} ksc`,f(pG.phivc,2),'ksc')}`:''}
+      ${GOV(`เจาะทะลุทุกต้น (v<sub>u</sub> ≤ ϕv<sub>c</sub>)`,punchOK?'PASS':'FAIL','',punchOK?'green':'red')}
+      <div class="info-box" style="margin-top:8px">V<sub>u</sub> = U·P<sub>i</sub> − q<sub>u,net</sub>·(พื้นที่ในเส้นรอบรูปวิกฤต) · M<sub>sc</sub> = U(M + V·h<sub>V</sub>) + V<sub>u</sub>·(ระยะเยื้องศูนย์ถ่วงหน้าตัดวิกฤต) · γ<sub>v</sub> = 1 − 1/(1+⅔√(b<sub>1</sub>/b<sub>2</sub>)) · เสาริม/มุมตัด b<sub>o</sub> ที่ขอบฐาน → α<sub>s</sub> = 40/30/20</div>
+    </div></div>
+    <div class="rep-grid" style="border-top:1px solid var(--border)">
+    <div class="rep-col">${SDIV('แบกทานใต้ตอม่อ (ACI 22.8.3.2)','var(--cyan)')}
+      <table class="sum-tbl" style="font-size:11px"><tr><td>เสา</td><td>A<sub>1</sub>(m²)</td><td>√(A<sub>2</sub>/A<sub>1</sub>)</td><td>P<sub>u</sub>(t)</td><td>ϕB<sub>n</sub>(t)</td><td>ratio</td><td>ผล</td></tr>${bearRows}</table>
+      ${GOV('ϕB<sub>n</sub> = 0.65·0.85f\'c·A<sub>1</sub>·√(A<sub>2</sub>/A<sub>1</sub>) ≥ P<sub>u</sub>',bearColOK?'PASS':'FAIL','',bearColOK?'green':'red')}
+      <div class="info-box" style="margin-top:8px">A<sub>2</sub> = ฐานล่างของ frustum ลาด 1:2 ที่อยู่ในฐานราก (จำกัดด้วยระยะถึงขอบฐานและความหนา H) · √(A<sub>2</sub>/A<sub>1</sub>) ≤ 2 · ถ้าไม่ผ่าน ต้องให้ dowel รับส่วนเกิน (16.3)</div>
+    </div>
+    <div class="rep-col">${SDIV('ระยะฝังเหล็กฐานราก (ACI 13.2.8 → 25.4.2.3 / 25.4.3.1)','var(--cyan)')}
+      <table class="sum-tbl" style="font-size:11px"><tr><td>เหล็ก</td><td>มีให้(cm)</td><td>ℓ<sub>d</sub>(cm)</td><td>ℓ<sub>dh</sub>(cm)</td><td>ปลาย</td><td>ผล</td></tr>${devRow('X',devX)}${devRow('Y',devY)}</table>
+      ${GOV('ระยะฝังจากหน้าเสา/จุด M⁻ สูงสุด ถึงปลายเหล็ก',devOK?'PASS':'FAIL','',devOK?'green':'red')}
+      <div class="info-box" style="margin-top:8px">ℓ<sub>d</sub> = f<sub>y</sub>ψ<sub>t</sub>ψ<sub>e</sub>ψ<sub>g</sub>/(6.63λ√f'c)·d<sub>b</sub> (≤DB19) หรือ /5.30 (≥DB20) · * = ช่องว่าง &lt; 2d<sub>b</sub> → ×1.5 · ℓ<sub>dh</sub> = f<sub>y</sub>ψ<sub>s</sub>/(13.26λ√f'c)·d<sub>b</sub> ≥ 8d<sub>b</sub>, 15 cm (ACI 318-25, ψ<sub>cc</sub>=ψ<sub>r</sub>=1) · ψ<sub>g</sub>=${f(psiG,2)} · มีให้ = หน้าเสาถึงขอบฐาน − cover</div>
+    </div></div>`;
+
+  /* ── 4. SETTLEMENT ── */
+  $('settleResults').innerHTML=`<div class="rep-grid">
+    <div class="rep-col">${SDIV('Immediate (elastic) settlement','var(--cyan)')}
+      ${CB("q<sub>n</sub> = P<sub>tot</sub>/A (net service)",`${f(Ptot,1)} / ${f(A,3)}`,f(qn,3),'t/m²')}
+      ${CB("S<sub>e</sub> = q<sub>n</sub>·B·(1−ν²)·I<sub>f</sub>/E<sub>s</sub>",`ชั้นรับน้ำหนัก: ${bear.name} (E<sub>s</sub>=${f(Es,0)}, ν=${f(nu,2)})`,f(Se,1),'mm')}
+    </div>
+    <div class="rep-col">${SDIV('Consolidation by clay layer (Σ)','var(--cyan)')}
+      <table class="sum-tbl" style="font-size:11px"><tr><td>ชั้นเหนียว</td><td>ช่วง(m)</td><td>H(m)</td><td>z<sub>mid</sub></td><td>σ'<sub>0</sub></td><td>Δσ</td><td>C<sub>c</sub></td><td>S<sub>c</sub></td></tr>
+      ${layerRows||'<tr><td colspan="8" style="color:rgba(255,255,255,.5)">— ไม่มีชั้นดินเหนียวใต้ระดับฐาน —</td></tr>'}</table>
+      ${GOV("S<sub>total</sub> = S<sub>e</sub> + S<sub>c</sub>",`${f(Se,1)} + ${f(Sc,1)}`,'mm','blue')}
+      ${GOV(`ทรุดตัวรวม ≤ ที่ยอมให้ : ${f(St,1)} ≤ ${f(Sall,0)} mm`,settleOK?'PASS':'FAIL','',settleOK?'green':'red')}
+    </div></div>`;
+
+  /* ── SUMMARY ── */
+  const rt=(d,c)=>c>0?f(d/c,2):(d>0?'∞':'0.00');
+  const fsR=(fs,req)=>isFinite(fs)?f(req/fs,2):'0.00';
+  const rows=[
+    ['กำลังแบกทานดิน (Soil bearing)'+(uplift?' — uplift':''),'13.3.1.1',(uplift?'q<sub>eff</sub> ':'q<sub>max</sub> ')+f(qGov,2),'q<sub>allow</sub> '+f(qaUse,2),rt(qGov,qaUse),bearOK],
+    ['เสถียรภาพ — พลิกคว่ำ X / Y','13.2.6.1',`FS ${FSf(otX.FS)} / ${FSf(otY.FS)}`,`≥ ${f(FSotReq,2)}`,fsR(Math.min(otX.FS,otY.FS),FSotReq),overturnOK],
+    ['เสถียรภาพ — เลื่อนไถล','13.2.6.1',`FS ${FSf(FSsl)}`,`≥ ${f(FSslReq,2)}`,fsR(FSsl,FSslReq),slideOK],
+    ['เสถียรภาพ — ถูกดึงยก','13.2.6.1',`FS ${FSf(FSup)}`,`≥ ${f(FSupReq,2)}`,fsR(FSup,FSupReq),pullOK],
+    ['ความลึกประสิทธิผล d ≥ 150 mm','13.3.1.2',`d<sub>min</sub> ${f(Math.min(dXb,dYb)*1000,0)} mm`,'150 mm',f(150/(Math.min(dXb,dYb)*1000),2),dMinOK],
+    ['ดัด X บวก (ล่าง)','22.3 / 8.6.1.1',`A<sub>s,req</sub> ${f(fXb.AsReq,1)} → <b>${fXb.nReq}–Ø${fXb.db}</b>`,`${fXb.nbar}–Ø${fXb.db} = ${f(fXb.AsProv,1)} cm²`,rt(fXb.AsReq,fXb.AsProv),fXb.ok],
+    ['ดัด X ลบ (บน)','22.3 / Ch.14',fXt.notReq?`ไม่ต้องใส่ (M⁻ ${f(MnegX,1)} ≤ ${f(plainX,1)} t·m)`:`A<sub>s,req</sub> ${f(fXt.AsReq,1)} → <b>${fXt.nReq}–Ø${fXt.db}</b>`,`${fXt.nbar}–Ø${fXt.db} = ${f(fXt.AsProv,1)} cm²`,fXt.notReq?rt(MnegX,plainX):rt(fXt.AsReq,fXt.AsProv),fXt.ok],
+    ['ดัด Y บวก (ล่าง)','22.3 / 8.6.1.1',`A<sub>s,req</sub> ${f(fYb.AsReq,1)} → <b>${fYb.nReq}–Ø${fYb.db}</b>`,`${fYb.nbar}–Ø${fYb.db} = ${f(fYb.AsProv,1)} cm²`,rt(fYb.AsReq,fYb.AsProv),fYb.ok],
+    ['ดัด Y ลบ (บน)','22.3 / Ch.14',fYt.notReq?`ไม่ต้องใส่ (M⁻ ${f(MnegY,1)} ≤ ${f(plainY,1)} t·m)`:`A<sub>s,req</sub> ${f(fYt.AsReq,1)} → <b>${fYt.nReq}–Ø${fYt.db}</b>`,`${fYt.nbar}–Ø${fYt.db} = ${f(fYt.AsProv,1)} cm²`,fYt.notReq?rt(MnegY,plainY):rt(fYt.AsReq,fYt.AsProv),fYt.ok],
+    ['เฉือนทางเดียว X','13.2.6.2(a)','V<sub>u</sub> '+f(owX.V,1),'ϕV<sub>c</sub> '+f(phiVcX,1),rt(owX.V,phiVcX),owXok],
+    ['เฉือนทางเดียว Y','13.2.6.2(a)','V<sub>u</sub> '+f(owY.V,1),'ϕV<sub>c</sub> '+f(phiVcY,1),rt(owY.V,phiVcY),owYok],
+    ['เฉือนเจาะทะลุ + โมเมนต์ถ่ายเท ทุกต้น','22.6 / 8.4.4.2',pG?`${pG.name}: v<sub>u</sub> ${f(pG.vu,2)} ksc`:'—',pG?`ϕv<sub>c</sub> ${f(pG.phivc,2)} ksc`:'—',f(pG?pG.ratio:0,2),punchOK],
+    ['แบกทานใต้ตอม่อ ทุกต้น','22.8.3.2',f(bearCol.length,0)+' ต้น','ϕB<sub>n</sub>',f(Math.max(0,...bearCol.map(b=>b.phiBn>0?b.Pu/b.phiBn:0)),2),bearColOK],
+    ['ระยะฝังเหล็กฐานราก X / Y','13.2.8 / 25.4',`มีให้ ${f(devX.availB,0)} / ${f(devY.availB,0)} cm`,`ℓ<sub>d</sub> ${f(devX.ldB,0)} / ${f(devY.ldB,0)} cm`,f(Math.max(devX.botStraight?devX.ldB/devX.availB:devX.ldhB/devX.availB,devY.botStraight?devY.ldB/devY.availB:devY.ldhB/devY.availB),2),devOK],
+    ['การทรุดตัวรวม (Settlement)','2:1','S '+f(St,1),f(Sall,0)+' mm',rt(St,Sall),settleOK],
+  ];
+  $('bodySum').innerHTML=`<table class="sum-tbl">
+    <tr><td>Check</td><td>ACI 318-25</td><td>Demand</td><td>Capacity</td><td>Ratio</td><td>Status</td></tr>
+    ${rows.map(r=>`<tr><td>${r[0]}</td><td style="color:rgba(255,255,255,.5)">${r[1]}</td>
+      <td class="val">${r[2]}</td><td class="val">${r[3]}</td><td class="val">${r[4]}</td>
+      <td><span class="${r[5]?'st-ok':'st-ng'}">${r[5]?'OK':'NG'}</span></td></tr>`).join('')}
+  </table>
+  ${GOV('ผลรวม (Overall) — '+(allOK?'ผ่านทุกการตรวจสอบ':'มีรายการไม่ผ่าน'),allOK?'PASS':'FAIL','',allOK?'green':'red')}`;
+
+  // print strip
+  $('print-input-strip').innerHTML=`<span><b>ฐาน:</b> ${f(B,2)}×${f(L,2)}×${f(Hh,2)} m</span>
+    <span><b>เสา:</b> ${cols.length} ต้น</span><span><b>ΣP:</b> ${f(Ptot,1)} t</span>
+    <span><b>e:</b> ${f(ex,3)},${f(ey,3)} m</span><span><b>q<sub>max</sub>:</b> ${f(qmax,2)}/${f(qaUse,2)} t/m²</span>
+    <span><b>f'c:</b> ${f(fc,0)} · <b>fy:</b> ${f(fy,0)} ksc</span><span><b>U:</b> ${f(LF,2)}</span>`;
+
+  // captions + drawings
+  $('capP').textContent=`${f(B,2)}×${f(L,2)} m`;
+  $('capQ').textContent=`q ${f(qmax,1)}↓ t/m²`;
+  $('capBx').textContent=`M⁺${f(bmX.Mmax,1)}/M⁻${f(bmX.Mmin,1)}`;
+  $('capBy').textContent=`M⁺${f(bmY.Mmax,1)}/M⁻${f(bmY.Mmin,1)}`;
+  drawPlan(B,L,ex,ey);
+  drawPressure(B,L,qCorner);
+  drawBeam('svgBeamX',bmX,'X (B)','m');
+  drawBeam('svgBeamY',bmY,'Y (L)','m');
+  // ลำดับชั้นเหล็ก (window._matMainDir) กำหนดแล้วตอนคำนวณ d — แนวที่โมเมนต์มากกว่าวางชั้นนอกสุด
+  drawCombinedSection('svgSecX','X');
+  drawCombinedSection('svgSecY','Y');
+  drawSoilProfile(soilLayers,Df,Hh,B,wt,cols,Lu);
+  if($('capSX')) $('capSX').textContent=`B=${f(B,2)} · H=${f(Hh,2)} m`;
+  if($('capSY')) $('capSY').textContent=`L=${f(L,2)} · H=${f(Hh,2)} m`;
+  // ── 3D model data (footing + all pedestals + top/bottom mats) ──
+  normCols();   // เติมค่า default เหล็กยืน/ปลอกเสา (nx,ny,dbL,…) ก่อนสร้างโมเดล 3D — กัน NaN ทำให้เหล็กยืนหาย
+  window._F3D={B,L,Hh,cov,Lu:v('Lu'),mainDir:window._matMainDir,
+    dbxb:v('dbxb'),nxb:Math.max(v('nxb'),1),dbyb:v('dbyb'),nyb:Math.max(v('nyb'),1),
+    dbxt:v('dbxt'),nxt:Math.max(v('nxt')||0,0),dbyt:v('dbyt'),nyt:Math.max(v('nyt')||0,0),  // เหล็กบน: ใส่ 0 = ไม่มีเหล็กบนจริง (อย่าบังคับขั้นต่ำ 1 เส้น)
+    cols:cols.map(c=>({x:c.x,y:c.y,cx:c.cx,cy:c.cy,nx:Math.max(c.nx||3,2),ny:Math.max(c.ny||3,2),dbL:c.dbL||20,tieDb:c.tieDb||9,tieS:c.tieS||0.20,colCov:c.colCov!=null?c.colCov:4.0}))};
+  if(window._render3D) window._render3D();
+
+  // ── per-column pedestal design tabs ──
+  ensureColTabs();
+  renderTabBar();
+  cols.forEach((c,i)=>calcColumn(i));
+
+  // ── print report (Frame3D-style sheet): the drawings once more in the print palette ──
+  const drawAll=()=>{ drawPlan(B,L,ex,ey); drawPressure(B,L,qCorner);
+    drawBeam('svgBeamX',bmX,'X (B)','m'); drawBeam('svgBeamY',bmY,'Y (L)','m');
+    drawCombinedSection('svgSecX','X'); drawCombinedSection('svgSecY','Y');
+    drawSoilProfile(soilLayers,Df,Hh,B,wt,cols,Lu); };
+  const keepPM=window._printMode; window._printMode=true; drawAll();
+  const pics={}; [['plan','svgPlan'],['press','svgPress'],['bx','svgBeamX'],['by','svgBeamY'],['sx','svgSecX'],['sy','svgSecY'],['soil','svgSoil']]
+    .forEach(([k,id])=>{ const e=$(id); pics[k]={vb:e.getAttribute('viewBox'),svg:e.innerHTML}; });
+  window._printMode=keepPM; if(!keepPM) drawAll();
+  if($('printReport')) $('printReport').innerHTML=reportHTML({B,L,Hh,cov,LF,fc,fy,gc,Df,Lu,wt,hV,hVin,A,Ptot,M_Y,M_X,VxTot,VyTot,ex,ey,Pu,
+    qself,qped,qsoil,qsoilN,Acol,Wped,qload,qmx,qmy,qmax,qmin,uplift,Vbear,exR,eyR,Bp,Lp,contactOK,qEff,qGov,pressOK,
+    qaSource,bcMethod,bcap,bcC,bcPhi,bcQsur,bcGam,bcFS,qa,qaUse,bear,Dbase,U,Wbase,FSotReq,FSslReq,FSupReq,otX,otY,
+    Tnet,Wdown,FSup,pullOK,Hres,Nbase,muSet,muBase,ca,Acontact,Rslide,FSsl,slideOK,bmX,bmY,mainDir,xOut,
+    dbxb,dbxt,dbyb,dbyt,dXb,dYb,dXt,dYt,dMinOK,ftPlain,hPlain,plainX,plainY,MnegX,MnegY,noTopX,noTopY,b1,etTC,rhomax,sMaxCrit,
+    fXb,fXt,fYb,fYt,owX,owY,phiVcX,phiVcY,owXok,owYok,qu,punch,bearCol,psiG,devX,devY,qn,Se,Es,nu,If,setl,Sc,St,Sall,settleOK,
+    sumRows:rows,allOK,pics});
+}
+
+/* ════════ PRINT REPORT — calculation sheet laid out like Frame3D's (formula → numbers → result) ════════ */
+function reportHTML(o){
+  const {B,L,Hh,cov,LF,fc,fy,gc,Df,Lu,wt,hV,hVin,A,Ptot,M_Y,M_X,VxTot,VyTot,ex,ey,Pu,qself,qped,qsoil,qsoilN,Acol,Wped,
+    qload,qmx,qmy,qmax,qmin,uplift,Vbear,exR,eyR,Bp,Lp,contactOK,qEff,qGov,pressOK,qaSource,bcMethod,bcap,bcC,bcPhi,bcQsur,
+    bcGam,bcFS,qa,qaUse,bear,Dbase,U,Wbase,FSotReq,FSslReq,FSupReq,otX,otY,Tnet,Wdown,FSup,pullOK,Hres,Nbase,muSet,muBase,
+    ca,Acontact,Rslide,FSsl,slideOK,bmX,bmY,mainDir,xOut,dbxb,dbxt,dbyb,dbyt,dXb,dYb,dXt,dYt,dMinOK,ftPlain,hPlain,plainX,
+    plainY,MnegX,MnegY,noTopX,noTopY,b1,etTC,rhomax,sMaxCrit,fXb,fXt,fYb,fYt,owX,owY,phiVcX,phiVcY,owXok,owYok,qu,punch,
+    bearCol,psiG,devX,devY,qn,Se,Es,nu,If,setl,Sc,St,Sall,settleOK,sumRows,allOK,pics}=o;
+  const F=(x,d=2)=>f(x,d), N=(x,d=2)=>x<0?`(${f(x,d)})`:f(x,d), FS=x=>isFinite(x)?f(x,2):'∞';
+  const BM=fy>=3000?'DB':'RB', SQf=`√${F(fc,0)}`;
+  const PF=ok=>`<span class="${ok?'rp-ok':'rp-ng'}">${ok?'PASS':'FAIL'}</span>`;
+  const EQ=(sym,form,sub,res,unit)=>{
+    const ls=[form,sub,(res!==''&&res!=null)?`<b>${res}</b>${unit?' '+unit:''}`:''].filter(t=>t);
+    return `<div class="rp-eq">${ls.map((t,k)=>`<div class="rp-l">${k===0?sym:''}</div><div class="rp-e">=</div><div class="rp-x">${t}</div>`).join('')}</div>`; };
+  const CK=(t,ok)=>`<div class="rp-ck">${t}${ok==null?'':' &nbsp;'+PF(ok)}</div>`;
+  const NT=t=>`<div class="rp-nt">หมายเหตุ: ${t}</div>`;
+  const BL=(n,t,body)=>`<div class="rp-bl"><div class="rp-sub">${n} ${t}</div>${body}</div>`;
+  const SEC=(n,t,blocks,pre)=>`<h2 class="rp-h">${n} — ${t}</h2>${pre||''}<div class="rp-c2">${blocks.filter(b=>b).join('')}</div>`;
+  const FIG=(k,cap)=>`<div class="rp-fig"><div class="cap">${cap}</div><svg viewBox="${pics[k].vb}" preserveAspectRatio="xMidYMid meet">${pics[k].svg}</svg></div>`;
+  const layerTerms=z=>{ const t=[]; let dp=0; for(const Ld of soilLayers){ const part=Math.min(z,dp+Ld.H)-dp;
+    if(part>1e-9) t.push(`${F(Ld.g)} × ${F(part)}`); dp+=Ld.H; if(z<=dp) break; } return t.join(' + ')||'0'; };
+  const date=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+
+  /* ── page 1: what is designed + drawings ── */
+  const bars=(n,db)=>n>0?`${n}–${BM}${db}`:'—';
+  const kv=[
+    ['B × L × H (m)',`${F(B)} × ${F(L)} × ${F(Hh)}`,'A (m²)',F(A,3)],
+    ['P<sub>tot</sub> (ton)',F(Ptot),'P<sub>u</sub> = U·P<sub>tot</sub>',`${F(Pu,1)} ton (U = ${F(LF)})`],
+    ['M<sub>Y</sub> ; M<sub>X</sub> (t·m)',`${F(M_Y)} ; ${F(M_X)}`,'e<sub>x</sub> ; e<sub>y</sub> (m)',`${F(ex,3)} ; ${F(ey,3)}`],
+    ["f′<sub>c</sub> / f<sub>y</sub> (ksc)",`${F(fc,0)} / ${F(fy,0)}`,'q<sub>allow</sub> (t/m²)',`${F(qaUse)} (${qaSource==='manual'?'กำหนด':(bcMethod==='terzaghi'?'Terzaghi':'Meyerhof')})`],
+    ['เหล็กแนว X ล่าง / บน',`${bars(v('nxb'),dbxb)} / ${bars(v('nxt'),dbxt)}`,'เหล็กแนว Y ล่าง / บน',`${bars(v('nyb'),dbyb)} / ${bars(v('nyt'),dbyt)}`],
+    ['c<sub>c</sub> (cm) ; γ<sub>c</sub> (t/m³)',`${F(cov*100,1)} ; ${F(gc)}`,'D<sub>f</sub> ; L<sub>u</sub> ; z<sub>w</sub> (m)',`${F(Df)} ; ${F(Lu)} ; ${F(wt)}`],
+  ];
+  const colTb=`<table class="rp-tb"><tr><th>เสา</th><th>x (m)</th><th>y (m)</th><th>c<sub>x</sub> × c<sub>y</sub> (m)</th><th>P (ton)</th><th>M<sub>x</sub> (t·m)</th><th>M<sub>y</sub> (t·m)</th><th>V<sub>x</sub> (ton)</th><th>V<sub>y</sub> (ton)</th></tr>
+    ${cols.map(c=>`<tr><td>${c.name}</td><td>${F(c.x)}</td><td>${F(c.y)}</td><td>${F(c.cx)} × ${F(c.cy)}</td><td>${F(c.P)}</td><td>${F(c.Mx)}</td><td>${F(c.My)}</td><td>${F(c.Vx||0)}</td><td>${F(c.Vy||0)}</td></tr>`).join('')}</table>`;
+  const page1=`<table class="rp-kv">${kv.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table>
+    <div class="rp-card"><div class="rp-ct">เสาตอม่อ — ตำแหน่ง ขนาด และแรงใช้งาน (x, y วัดจากศูนย์กลางฐาน)</div>${colTb}</div>
+    <div class="rp-card"><div class="rp-ct">ผังฐานราก &amp; แรงดันใต้ฐาน</div><div class="rp-figs">${FIG('plan','ผัง (Plan)')}${FIG('press','แรงดันดินที่มุมฐาน (gross, service)')}</div></div>
+    <div class="rp-card"><div class="rp-ct">แรงเฉือนและโมเมนต์ดัด (น้ำหนักประลัย)</div><div class="rp-figs">${FIG('bx','แนว X')}${FIG('by','แนว Y')}</div></div>
+    <div class="rp-card"><div class="rp-ct">หน้าตัดเหล็กเสริม (แนว X &amp; แนว Y)</div><div class="rp-figs">${FIG('sx','หน้าตัด A-A (แนว X)')}${FIG('sy','หน้าตัด B-B (แนว Y)')}</div></div>`;
+
+  /* ── 1. resultant ── */
+  const s1=SEC(1,'แรงลัพธ์และระยะเยื้องศูนย์',[
+    BL('1.1','แรงในแนวดิ่งและโมเมนต์รวมที่ศูนย์กลางฐาน (น้ำหนักใช้งาน)',
+      EQ('P<sub>tot</sub>','Σ P<sub>i</sub>',cols.map(c=>N(c.P)).join(' + '),F(Ptot),'ton')+
+      EQ('h<sub>V</sub>',hVin>0?'':'L<sub>u</sub> + H',hVin>0?'':`${F(Lu)} + ${F(Hh)}`,F(hV),'m')+
+      EQ('M<sub>Y</sub>','Σ (M<sub>y,i</sub> + V<sub>x,i</sub>·h<sub>V</sub> + P<sub>i</sub>·x<sub>i</sub>)',
+        cols.map(c=>`${N(c.My)} + ${N(c.Vx||0)} × ${F(hV)} + ${N(c.P)} × ${N(c.x)}`).join(' + '),F(M_Y),'t·m')+
+      EQ('M<sub>X</sub>','Σ (M<sub>x,i</sub> + V<sub>y,i</sub>·h<sub>V</sub> + P<sub>i</sub>·y<sub>i</sub>)',
+        cols.map(c=>`${N(c.Mx)} + ${N(c.Vy||0)} × ${F(hV)} + ${N(c.P)} × ${N(c.y)}`).join(' + '),F(M_X),'t·m')+
+      (hVin>0?NT('h<sub>V</sub> กำหนดเอง'):'')),
+    BL('1.2','ระยะเยื้องศูนย์และแรงประลัย',
+      EQ('e<sub>x</sub>','M<sub>Y</sub> / P<sub>tot</sub>',`${N(M_Y)} / ${N(Ptot)}`,F(ex,3),'m')+
+      EQ('e<sub>y</sub>','M<sub>X</sub> / P<sub>tot</sub>',`${N(M_X)} / ${N(Ptot)}`,F(ey,3),'m')+
+      EQ('P<sub>u</sub>','U · P<sub>tot</sub>',`${F(LF)} × ${N(Ptot)}`,F(Pu),'ton')),
+  ]);
+
+  /* ── 2. pressure ── */
+  const s2=SEC(2,'แรงดันใต้ฐาน (น้ำหนักใช้งาน)',[
+    BL('2.1','แรงดันจากเสาและน้ำหนักฐาน',
+      EQ('A','B · L',`${F(B)} × ${F(L)}`,F(A,3),'m²')+
+      EQ('q<sub>load</sub>','P<sub>tot</sub> / A',`${N(Ptot)} / ${F(A,3)}`,F(qload,3),'t/m²')+
+      EQ('q<sub>self</sub>','γ<sub>c</sub> · H',`${F(gc)} × ${F(Hh)}`,F(qself,3),'t/m²')),
+    BL('2.2','น้ำหนักตอม่อและดินถมบนฐาน',
+      EQ('A<sub>col</sub>','Σ c<sub>x</sub> · c<sub>y</sub>',cols.map(c=>`${F(c.cx)} × ${F(c.cy)}`).join(' + '),F(Acol,3),'m²')+
+      EQ('q<sub>ped</sub>','A<sub>col</sub> · L<sub>u</sub> · γ<sub>c</sub> / A',`${F(Acol,3)} × ${F(Lu)} × ${F(gc)} / ${F(A,3)}`,F(qped,3),'t/m²')+
+      EQ('σ<sub>v</sub>','Σ γ<sub>i</sub> · h<sub>i</sub> (ผิวดินถึง D<sub>f</sub>)',layerTerms(Df),F(qsoil,3),'t/m²')+
+      EQ('q<sub>soil</sub>','σ<sub>v</sub> · (A − A<sub>col</sub>) / A',`${F(qsoil,3)} × (${F(A,3)} − ${F(Acol,3)}) / ${F(A,3)}`,F(qsoilN,3),'t/m²')),
+    BL('2.3','แรงดันสูงสุดและต่ำสุดที่มุมฐาน',
+      EQ('q<sub>M,x</sub>','6 · M<sub>Y</sub> / (A · B)',`6 × ${N(M_Y)} / (${F(A,3)} × ${F(B)})`,F(qmx,3),'t/m²')+
+      EQ('q<sub>M,y</sub>','6 · M<sub>X</sub> / (A · L)',`6 × ${N(M_X)} / (${F(A,3)} × ${F(L)})`,F(qmy,3),'t/m²')+
+      EQ('q<sub>max</sub>','q<sub>load</sub> + |q<sub>M,x</sub>| + |q<sub>M,y</sub>| + q<sub>self</sub> + q<sub>ped</sub> + q<sub>soil</sub>',
+        `${N(qload,3)} + ${F(Math.abs(qmx),3)} + ${F(Math.abs(qmy),3)} + ${F(qself,3)} + ${F(qped,3)} + ${F(qsoilN,3)}`,F(qmax,3),'t/m²')+
+      EQ('q<sub>min</sub>','q<sub>load</sub> − |q<sub>M,x</sub>| − |q<sub>M,y</sub>| + q<sub>self</sub> + q<sub>ped</sub> + q<sub>soil</sub>',
+        `${N(qload,3)} − ${F(Math.abs(qmx),3)} − ${F(Math.abs(qmy),3)} + ${F(qself,3)} + ${F(qped,3)} + ${F(qsoilN,3)}`,F(qmin,3),'t/m²')+
+      NT(uplift?`q<sub>min</sub> = ${F(qmin,3)} t/m² &lt; 0 — ฐานยกตัวบางส่วน ใช้พื้นที่ประสิทธิผล (ข้อ 2.4)`:`q<sub>min</sub> = ${F(qmin,3)} t/m² ≥ 0 — ฐานสัมผัสดินเต็มพื้นที่`)),
+    uplift?BL('2.4','พื้นที่สัมผัสประสิทธิผล (Meyerhof)',
+      EQ('V<sub>tot</sub>','P<sub>tot</sub> + q<sub>self</sub>·A + W<sub>ped</sub> + σ<sub>v</sub>·(A − A<sub>col</sub>)',
+        `${N(Ptot)} + ${F(qself,3)} × ${F(A,3)} + ${F(Wped,3)} + ${F(qsoil,3)} × (${F(A,3)} − ${F(Acol,3)})`,F(Vbear),'ton')+
+      EQ('e<sub>x,r</sub>','|M<sub>Y</sub>| / V<sub>tot</sub>',`${F(Math.abs(M_Y))} / ${F(Vbear)}`,F(exR,3),'m')+
+      EQ('e<sub>y,r</sub>','|M<sub>X</sub>| / V<sub>tot</sub>',`${F(Math.abs(M_X))} / ${F(Vbear)}`,F(eyR,3),'m')+
+      EQ("B′","B − 2e<sub>x,r</sub>",`${F(B)} − 2 × ${F(exR,3)}`,F(Bp,3),'m')+
+      EQ("L′","L − 2e<sub>y,r</sub>",`${F(L)} − 2 × ${F(eyR,3)}`,F(Lp,3),'m')+
+      EQ('q<sub>eff</sub>',"V<sub>tot</sub> / (B′ · L′)",contactOK?`${F(Vbear)} / (${F(Bp,3)} × ${F(Lp,3)})`:'',contactOK?F(qEff,3):'∞','t/m²')):'',
+  ]);
+
+  /* ── 3. bearing capacity ── */
+  const terz=bcMethod==='terzaghi', mName=terz?'Terzaghi':'Meyerhof', bc=bcap;
+  const qName=uplift?'eff':'max';
+  const bcCalc=[
+    BL('3.1',`ตัวคูณกำลังแบกทาน — ${mName} (ชั้นรับน้ำหนัก: ${bear.name||'—'})`,
+      EQ('D<sub>base</sub>','D<sub>f</sub> + H',`${F(Df)} + ${F(Hh)}`,F(Dbase),'m')+
+      EQ('q̄','σ′<sub>v</sub> ที่ D<sub>base</sub>','',F(bcQsur,3),'t/m²')+
+      EQ('γ′',Dbase>=wt?'γ − γ<sub>w</sub>':'γ',Dbase>=wt?`${F(bear.g)} − 1.00`:'',F(bcGam,3),'t/m³')+
+      EQ('N<sub>q</sub>',terz?'a² / (2cos²(45° + φ/2)), a = e<sup>(0.75π − φ/2)tanφ</sup>':'e<sup>π·tanφ</sup> · tan²(45° + φ/2)',`φ = ${F(bcPhi,1)}°`,F(bc.Nq,3),'')+
+      EQ('N<sub>c</sub>',bcPhi<=0?'':'(N<sub>q</sub> − 1) · cotφ',bcPhi<=0?'φ = 0':`(${F(bc.Nq,3)} − 1) / tan ${F(bcPhi,1)}°`,F(bc.Nc,3),'')+
+      EQ('N<sub>γ</sub>','(N<sub>q</sub> − 1) · tan(1.4φ)',`(${F(bc.Nq,3)} − 1) × tan(1.4 × ${F(bcPhi,1)}°)`,F(bc.Ng,3),'')+
+      EQ('s<sub>c</sub> ; s<sub>q</sub> ; s<sub>γ</sub>','',`B/L = ${F(bc.Bw/Math.max(B,L),3)}`,`${F(bc.sc,3)} ; ${F(bc.sq,3)} ; ${F(bc.sg,3)}`,'')+
+      EQ('d<sub>c</sub> ; d<sub>q</sub> ; d<sub>γ</sub>','',`D/B = ${F(Dbase/Math.max(bc.Bw,1e-9),3)}`,`${F(bc.dc,3)} ; ${F(bc.dq,3)} ; ${F(bc.dg,3)}`,'')),
+    BL('3.2','หน่วยแรงแบกทานที่ยอมให้',
+      EQ('q<sub>ult</sub>','c·N<sub>c</sub>·s<sub>c</sub>·d<sub>c</sub> + q̄·N<sub>q</sub>·s<sub>q</sub>·d<sub>q</sub> + ½·γ′·B·N<sub>γ</sub>·s<sub>γ</sub>·d<sub>γ</sub>',
+        `${F(bcC)} × ${F(bc.Nc,3)} × ${F(bc.sc,3)} × ${F(bc.dc,3)} + ${F(bcQsur,3)} × ${F(bc.Nq,3)} × ${F(bc.sq,3)} × ${F(bc.dq,3)} + 0.5 × ${F(bcGam,3)} × ${F(bc.Bw)} × ${F(bc.Ng,3)} × ${F(bc.sg,3)} × ${F(bc.dg,3)}`,F(bc.qult),'t/m²')+
+      EQ('q<sub>allow</sub>','q̄ + (q<sub>ult</sub> − q̄) / FS',`${F(bcQsur,3)} + (${F(bc.qult)} − ${F(bcQsur,3)}) / ${F(bcFS,1)}`,F(bc.qaCalc),'t/m²')),
+  ];
+  const s3=SEC(3,'กำลังแบกทานของดิน',[
+    ...(qaSource==='manual'
+      ?[BL('3.1','หน่วยแรงแบกทานที่ยอมให้',EQ('q<sub>allow</sub>','','',F(qa),'t/m²')+NT('ค่าที่กำหนดในข้อมูลออกแบบ'+
+          (isFinite(bc.qaCalc)?` · ${mName} ให้ ${F(bc.qaCalc)} t/m²`:'')))]
+      :bcCalc),
+    BL(qaSource==='manual'?'3.2':'3.3','ตรวจสอบแรงดันใต้ฐาน',
+      CK(`q<sub>${qName}</sub> = ${F(qGov,3)} ≤ q<sub>allow</sub> = ${F(qaUse)} t/m²`,pressOK)),
+  ]);
+
+  /* ── 4. stability ── */
+  const otBL=(n,ax,ot,span,pos,mk,vk)=>{ const sg=ot.side>0?'−':'+';
+    const mr=`${F(Wbase)} × ${F(span/2)} + `+cols.map(c=>`(${N(c.P)} + ${F(c.cx*c.cy*Lu*gc,3)}) × (${F(span/2)} ${sg} ${N(pos(c))})`).join(' + ');
+    return BL(n,`การพลิกคว่ำรอบขอบ ${ot.side>0?'+':'−'}${ax}`,
+      EQ(`M<sub>R,${ax.toLowerCase()}</sub>`,`W<sub>base</sub>·${ax==='X'?'B':'L'}/2 + Σ(P<sub>i</sub> + W<sub>ped,i</sub>)·(${ax==='X'?'B':'L'}/2 ${sg} ${ax==='X'?'x':'y'}<sub>i</sub>)`,mr,F(ot.Mr),'t·m')+
+      EQ(`M<sub>O,${ax.toLowerCase()}</sub>`,`|Σ (${mk} + ${vk}·h<sub>V</sub>)|`,
+        cols.map(c=>`${N(ax==='X'?c.My:c.Mx)} + ${N(ax==='X'?(c.Vx||0):(c.Vy||0))} × ${F(hV)}`).join(' + '),F(ot.Mo),'t·m')+
+      EQ(`FS<sub>${ax.toLowerCase()}</sub>`,`M<sub>R</sub> / M<sub>O</sub>`,ot.Mo>1e-9?`${F(ot.Mr)} / ${F(ot.Mo)}`:'M<sub>O</sub> = 0',FS(ot.FS),'')+
+      CK(`FS<sub>${ax.toLowerCase()}</sub> = ${FS(ot.FS)} ≥ ${F(FSotReq)}`,ot.ok)); };
+  const s4=SEC(4,'เสถียรภาพ: การพลิกคว่ำ การเลื่อนไถล และแรงดึงยก (น้ำหนักใช้งาน)',[
+    BL('4.1','น้ำหนักต้านทาน',
+      EQ('U<sub>w</sub>','γ<sub>w</sub> · max(D<sub>base</sub> − z<sub>w</sub>, 0) · A',`1.00 × max(${F(Dbase)} − ${F(wt)}, 0) × ${F(A,3)}`,F(U),'ton')+
+      EQ('W<sub>base</sub>','q<sub>self</sub>·A + σ<sub>v</sub>·(A − A<sub>col</sub>) − U<sub>w</sub>',`${F(qself,3)} × ${F(A,3)} + ${F(qsoil,3)} × (${F(A,3)} − ${F(Acol,3)}) − ${F(U)}`,F(Wbase),'ton')),
+    otBL('4.2','X',otX,B,c=>c.x,'M<sub>y,i</sub>','V<sub>x,i</sub>'),
+    otBL('4.3','Y',otY,L,c=>c.y,'M<sub>x,i</sub>','V<sub>y,i</sub>'),
+    BL('4.4','การเลื่อนไถล',
+      EQ('H','√(ΣV<sub>x</sub>² + ΣV<sub>y</sub>²)',`√(${N(VxTot)}² + ${N(VyTot)}²)`,F(Hres),'ton')+
+      EQ('N','V<sub>tot</sub> − U<sub>w</sub>',`${F(Vbear)} − ${F(U)}`,F(Nbase),'ton')+
+      (muSet?EQ('R','μ · N',`${F(muBase,3)} × ${F(Nbase)}`,F(Rslide),'ton')
+        :EQ('μ','tan(2φ/3)',`tan(2 × ${F(bear.phi||0,1)}° / 3)`,F(muBase,3),'')+
+         EQ('R','μ·N + (2c/3)·A<sub>contact</sub>',`${F(muBase,3)} × ${F(Nbase)} + ${F(ca,3)} × ${F(Acontact,3)}`,F(Rslide),'ton'))+
+      EQ('FS<sub>sl</sub>','R / H',Hres>1e-9?`${F(Rslide)} / ${F(Hres)}`:'H = 0',FS(FSsl),'')+
+      CK(`FS<sub>sl</sub> = ${FS(FSsl)} ≥ ${F(FSslReq)}`,slideOK)),
+    BL('4.5','แรงดึงยกฐาน',
+      EQ('T<sub>net</sub>','max(−P<sub>tot</sub>, 0)',`max(${N(-Ptot)}, 0)`,F(Tnet),'ton')+
+      EQ('W<sub>down</sub>','W<sub>base</sub> + W<sub>ped</sub>',`${F(Wbase)} + ${F(Wped,3)}`,F(Wdown),'ton')+
+      EQ('FS<sub>up</sub>','W<sub>down</sub> / T<sub>net</sub>',Tnet>1e-9?`${F(Wdown)} / ${F(Tnet)}`:'T<sub>net</sub> = 0',FS(FSup),'')+
+      CK(`FS<sub>up</sub> = ${FS(FSup)} ≥ ${F(FSupReq)}`,pullOK)),
+  ]);
+
+  /* ── 5. settlement ── */
+  const s5=SEC(5,'การทรุดตัว',[
+    BL('5.1',`การทรุดตัวทันที (ชั้นรับน้ำหนัก: ${bear.name||'—'})`,
+      EQ('q<sub>n</sub>','P<sub>tot</sub> / A',`${N(Ptot)} / ${F(A,3)}`,F(qn,3),'t/m²')+
+      EQ('S<sub>e</sub>','q<sub>n</sub> · B · (1 − ν²) · I<sub>f</sub> / E<sub>s</sub>',`${F(qn,3)} × ${F(B)} × (1 − ${F(nu)}²) × ${F(If)} / ${F(Es,0)} × 1000`,F(Se,1),'mm')),
+    BL('5.2','การทรุดตัวจากการอัดตัวคายน้ำ (ชั้นดินเหนียว)',
+      setl.length?setl.map(l=>
+        EQ(`Δσ<sub>${l.i}</sub>`,'q<sub>n</sub> · B · L / ((B + z)(L + z))',`${F(qn,3)} × ${F(B)} × ${F(L)} / ((${F(B)} + ${F(l.zp)}) × (${F(L)} + ${F(l.zp)}))`,F(l.ds,3),'t/m²')+
+        EQ(`S<sub>c,${l.i}</sub>`,'C<sub>c</sub>/(1 + e<sub>0</sub>) · H · log[(σ′<sub>0</sub> + Δσ)/σ′<sub>0</sub>]',
+          `${F(l.Cc,3)} / (1 + ${F(l.e0)}) × ${F(l.He)} × log[(${F(l.s0,3)} + ${F(l.ds,3)}) / ${F(l.s0,3)}] × 1000`,F(l.sci,1),'mm')+
+        NT(`ชั้น ${l.i} ${l.name}: ช่วง ${F(l.zt)}–${F(l.zb)} m · z = ${F(l.zp)} m ใต้ฐาน · σ′<sub>0</sub> ที่ ${F(l.zmid)} m`)).join('')
+        :NT('ไม่มีชั้นดินเหนียวใต้ระดับฐาน — S<sub>c</sub> = 0')),
+    BL('5.3','การทรุดตัวรวม',
+      EQ('S','S<sub>e</sub> + S<sub>c</sub>',`${F(Se,1)} + ${F(Sc,1)}`,F(St,1),'mm')+
+      CK(`S = ${F(St,1)} ≤ S<sub>allow</sub> = ${F(Sall,0)} mm`,settleOK)),
+  ],`<div class="rp-card rp-soil"><div class="rp-ct">รูปตัดฐานราก &amp; ชั้นดิน</div>${FIG('soil','')}</div>`);
+
+  /* ── 6. flexure ── */
+  const dLine=(sym,outer,db,dbo,val)=>EQ(sym,outer?'H − c<sub>c</sub> − d<sub>b</sub>/2':'H − c<sub>c</sub> − d<sub>b,นอก</sub> − d<sub>b</sub>/2',
+    outer?`${F(Hh)} − ${F(cov,3)} − ${F(db/1000,3)}/2`:`${F(Hh)} − ${F(cov,3)} − ${F(dbo/1000,3)} − ${F(db/1000,3)}/2`,F(val,3),'m');
+  const flexBL=(n,t,o,at)=>{
+    let h=EQ('M<sub>u</sub>','',at,F(o.Mu),'t·m');
+    h+=EQ('R<sub>u</sub>','M<sub>u</sub> / (φ · b · d²)',`${F(o.Mu)} / (0.90 × ${F(o.b)} × ${F(o.d,3)}²) × 0.1`,F(o.Ru),'ksc');
+    if(o.need) h+=NT('1 − 2R<sub>u</sub>/(0.85f′c) &lt; 0 — หน้าตัดบางเกินไป ต้องเพิ่ม H');
+    else{
+      h+=EQ('ρ','(0.85f′c / f<sub>y</sub>) · [1 − √(1 − 2R<sub>u</sub>/(0.85f′c))]',`(0.85 × ${F(fc,0)} / ${F(fy,0)}) × [1 − √(1 − 2 × ${F(o.Ru)} / (0.85 × ${F(fc,0)}))]`,F(o.rho,5),'')+
+        CK(`ρ = ${F(o.rho,5)} ≤ ρ<sub>max</sub> = ${F(rhomax,5)}`,!o.over)+
+        EQ('A<sub>s,flex</sub>','ρ · b · d',`${F(o.rho,5)} × ${F(o.b*100,0)} × ${F(o.d*100,1)}`,F(o.Asflex),'cm²');
+    }
+    if(o.isTop){
+      h+=o.topReq?EQ('A<sub>s,req</sub>','max(A<sub>s,flex</sub>, 0.0018 · b · h)',`max(${F(o.Asflex)}, 0.0018 × ${F(o.b*100,0)} × ${F(Hh*100,0)})`,F(o.AsReq),'cm²')
+        :(o.need?'':EQ('A<sub>s,req</sub>','','',F(0),'cm²')+NT('M<sub>u</sub> ≤ φM<sub>n,plain</sub> (ข้อ 6.2) — ไม่ต้องใช้เหล็กบน'));
+    }else{
+      h+=EQ('A<sub>s,min</sub>','0.0018 · b · h',`0.0018 × ${F(o.b*100,0)} × ${F(Hh*100,0)}`,F(o.Asmin),'cm²');
+      if(!o.need) h+=EQ('A<sub>s,req</sub>','max(A<sub>s,flex</sub>, A<sub>s,min</sub>)',`max(${F(o.Asflex)}, ${F(o.Asmin)})`,F(o.AsReq),'cm²');
+    }
+    if(o.nbar>0){
+      h+=EQ('A<sub>s,prov</sub>',`${o.nbar}–${BM}${o.db}`,`${o.nbar} × ${F(barA(o.db),3)}`,F(o.AsProv),'cm²')+
+        (isFinite(o.AsReq)?CK(`A<sub>s,prov</sub> = ${F(o.AsProv)} ≥ A<sub>s,req</sub> = ${F(o.AsReq)} cm²`,o.AsProv>=o.AsReq-1e-9):'')+
+        EQ('a','A<sub>s</sub> · f<sub>y</sub> / (0.85f′c · b)',`${F(o.AsProv)} × ${F(fy,0)} / (0.85 × ${F(fc,0)} × ${F(o.b*100,0)})`,F(o.aP),'cm')+
+        EQ('c','a / β<sub>1</sub>',`${F(o.aP)} / ${F(b1,3)}`,F(o.cP),'cm')+
+        EQ('ε<sub>t</sub>','0.003 · (d − c) / c',`0.003 × (${F(o.d*100,1)} − ${F(o.cP)}) / ${F(o.cP)}`,F(o.etP,5),'')+
+        CK(`ε<sub>t</sub> = ${F(o.etP,5)} ≥ ε<sub>ty</sub> + 0.003 = ${F(etTC,5)}`,o.tcOK)+
+        EQ('φM<sub>n</sub>','φ · A<sub>s</sub> · f<sub>y</sub> · (d − a/2)',`0.90 × ${F(o.AsProv)} × ${F(fy,0)} × (${F(o.d*100,1)} − ${F(o.aP)}/2) / 10⁵`,F(o.phiMn),'t·m')+
+        (o.nbar>=2?EQ('s','(b − 2c<sub>c</sub>) / (n − 1)',`(${F(o.b*100,0)} − 2 × ${F(cov*100,1)}) / (${o.nbar} − 1)`,F(o.sp,1),'cm')+
+          CK(`s = ${F(o.sp,1)} ≤ min(2h, 45) = ${F(sMaxCrit,1)} cm · ช่องว่าง ${F(o.sClr,1)} ≥ ${F(o.sClrMin,1)} cm`,o.spOK):'');
+    }else h+=NT('ไม่ใส่เหล็ก');
+    return BL(n,t,h); };
+  const ety=fy/2.04e6;
+  const s6=SEC(6,'การออกแบบเหล็กเสริมรับแรงดัด',[
+    BL('6.1','ความลึกประสิทธิผลและขีดจำกัด',
+      NT(`แนว ${mainDir} มีโมเมนต์มากกว่า — วางเป็นเหล็กชั้นนอก`)+
+      dLine('d<sub>X,ล่าง</sub>',xOut,dbxb,dbyb,dXb)+dLine('d<sub>Y,ล่าง</sub>',!xOut,dbyb,dbxb,dYb)+
+      dLine('d<sub>X,บน</sub>',xOut,dbxt,dbyt,dXt)+dLine('d<sub>Y,บน</sub>',!xOut,dbyt,dbxt,dYt)+
+      CK(`d<sub>min</sub> = ${F(Math.min(dXb,dYb)*1000,0)} mm ≥ 150 mm`,dMinOK)+
+      EQ('β<sub>1</sub>',fc<=280?'':'0.85 − 0.05 · (f′c − 280) / 70',fc<=280?`f′c = ${F(fc,0)} ≤ 280 ksc`:`0.85 − 0.05 × (${F(fc,0)} − 280) / 70`,F(b1,3),'')+
+      EQ('ε<sub>ty</sub> + 0.003','f<sub>y</sub> / E<sub>s</sub> + 0.003',`${F(fy,0)} / 2,040,000 + 0.003`,F(etTC,5),'')+
+      EQ('ρ<sub>max</sub>','0.85 · β<sub>1</sub> · (f′c / f<sub>y</sub>) · 0.003 / (0.003 + ε<sub>ty</sub> + 0.003)',
+        `0.85 × ${F(b1,3)} × (${F(fc,0)} / ${F(fy,0)}) × 0.003 / (0.003 + ${F(etTC,5)})`,F(rhomax,5),'')),
+    BL('6.2','กำลังคอนกรีตล้วนรับโมเมนต์ลบ (บทที่ 14)',
+      EQ('f<sub>r</sub>','0.42 · √f′c',`0.42 × √${F(fc*0.0980665,2)}`,F(ftPlain,3),'MPa')+
+      EQ('h′','H − 50 mm',`${F(Hh)} − 0.05`,F(hPlain,3),'m')+
+      EQ('φM<sub>n,plain,x</sub>','0.60 · f<sub>r</sub> · L · h′² / 6',`0.60 × ${F(ftPlain,3)} × ${F(L*1000,0)} × ${F(hPlain*1000,0)}² / 6 / (10⁶ × 9.807)`,F(plainX),'t·m')+
+      CK(`M⁻<sub>x</sub> = ${F(MnegX)} ${noTopX?'≤':'&gt;'} φM<sub>n,plain,x</sub> = ${F(plainX)} t·m → ${noTopX?'ไม่ต้องใช้เหล็กบน':'ต้องใช้เหล็กบน'}`)+
+      EQ('φM<sub>n,plain,y</sub>','0.60 · f<sub>r</sub> · B · h′² / 6',`0.60 × ${F(ftPlain,3)} × ${F(B*1000,0)} × ${F(hPlain*1000,0)}² / 6 / (10⁶ × 9.807)`,F(plainY),'t·m')+
+      CK(`M⁻<sub>y</sub> = ${F(MnegY)} ${noTopY?'≤':'&gt;'} φM<sub>n,plain,y</sub> = ${F(plainY)} t·m → ${noTopY?'ไม่ต้องใช้เหล็กบน':'ต้องใช้เหล็กบน'}`)),
+    flexBL('6.3','แนว X — โมเมนต์บวก (เหล็กล่าง, b = L)',fXb,`BMD @ x = ${F(bmX.uMax)} m`),
+    flexBL('6.4','แนว X — โมเมนต์ลบ (เหล็กบน, b = L)',fXt,`BMD @ x = ${F(bmX.uMin)} m`),
+    flexBL('6.5','แนว Y — โมเมนต์บวก (เหล็กล่าง, b = B)',fYb,`BMD @ y = ${F(bmY.uMax)} m`),
+    flexBL('6.6','แนว Y — โมเมนต์ลบ (เหล็กบน, b = B)',fYt,`BMD @ y = ${F(bmY.uMin)} m`),
+  ]);
+
+  /* ── 7. one-way shear ── */
+  const owBL=(n,ax,ow,b,bn,d,phiVc,ok)=>BL(n,`แนว ${ax}`,
+    EQ(`V<sub>u,${ax.toLowerCase()}</sub>`,'max |V| ที่ระยะ ≥ d จากผิวเสา',`SFD @ ${ax.toLowerCase()} = ${F(ow.u)} m`,F(ow.V),'ton')+
+    EQ(`φV<sub>c,${ax.toLowerCase()}</sub>`,`φ · 0.53 · λ · √f′c · ${bn} · d`,`0.75 × 0.53 × 1.0 × ${SQf} × ${F(b*100,0)} × ${F(d*100,1)} / 1000`,F(phiVc),'ton')+
+    CK(`V<sub>u</sub> = ${F(ow.V)} ≤ φV<sub>c</sub> = ${F(phiVc)} ton`,ok));
+  const s7=SEC(7,'แรงเฉือนทางเดียว (Beam shear)',[
+    owBL('7.1','X',owX,L,'L',dXb,phiVcX,owXok),
+    owBL('7.2','Y',owY,B,'B',dYb,phiVcY,owYok)+NT('ฐานรากบนดินแบบ rigid ใช้ V<sub>c</sub> = 0.53λ√f′c·b·d (ACI 13.2.6.2a)'),
+  ]);
+
+  /* ── 8. punching ── */
+  const locName=n=>n>=4?'เสาภายใน':(n===3?'เสาริม':'เสามุม');
+  const s8=SEC(8,'แรงเฉือนเจาะทะลุรอบเสาตอม่อ',[
+    BL('8.1','แรงดันประลัยเฉลี่ย',EQ('q<sub>u</sub>','P<sub>u</sub> / A',`${F(Pu)} / ${F(A,3)}`,F(qu,3),'t/m²')),
+    ...punch.map((p,k)=>BL(`8.${k+2}`,`เสา ${p.name} (${locName(p.nS)})`,
+      EQ('b<sub>o</sub>','เส้นรอบรูปวิกฤตที่ระยะ d/2',`d = ${F(p.d,3)} m · ${p.nS} ด้าน`,F(p.bo,3),'m')+
+      EQ('V<sub>u</sub>','U · P − q<sub>u</sub> · A<sub>in</sub>',`${F(LF)} × ${N(p.P)} − ${F(qu,3)} × ${F(p.Ain,3)}`,F(p.Vu),'ton')+
+      EQ('v<sub>uv</sub>','V<sub>u</sub> / (b<sub>o</sub> · d)',`${F(p.Vu)} / (${F(p.bo,3)} × ${F(p.d,3)}) / 10`,F(p.vuv),'ksc')+
+      EQ('M<sub>sc,x</sub> ; M<sub>sc,y</sub>','U·(M + V·h<sub>V</sub>) + V<sub>u</sub>·e<sub>c</sub>','',`${F(p.Mscx)} ; ${F(p.Mscy)}`,'t·m')+
+      EQ('γ<sub>v,x</sub> ; γ<sub>v,y</sub>','1 − 1 / (1 + ⅔√(b<sub>1</sub>/b<sub>2</sub>))','',`${F(p.gvx,3)} ; ${F(p.gvy,3)}`,'')+
+      EQ('J<sub>c,x</sub> ; J<sub>c,y</sub>','','',`${F(p.Jx,4)} ; ${F(p.Jy,4)}`,'m⁴')+
+      EQ('v<sub>u</sub>','v<sub>uv</sub> + γ<sub>v,x</sub>·M<sub>sc,x</sub>·x/J<sub>c,x</sub> + γ<sub>v,y</sub>·M<sub>sc,y</sub>·y/J<sub>c,y</sub>','',F(p.vu),'ksc')+
+      EQ('v<sub>c1</sub>','1.06 · λ<sub>s</sub> · λ · √f′c',`1.06 × 1.0 × 1.0 × ${SQf}`,F(p.vc1),'ksc')+
+      EQ('v<sub>c2</sub>','0.53 · (1 + 2/β) · √f′c',`0.53 × (1 + 2/${F(p.bc)}) × ${SQf}`,F(p.vc2),'ksc')+
+      EQ('v<sub>c3</sub>','0.265 · (α<sub>s</sub>·d/b<sub>o</sub> + 2) · √f′c',`0.265 × (${p.as} × ${F(p.d,3)} / ${F(p.bo,3)} + 2) × ${SQf}`,F(p.vc3),'ksc')+
+      EQ('φv<sub>c</sub>','0.75 · min(v<sub>c1</sub>, v<sub>c2</sub>, v<sub>c3</sub>)',`0.75 × ${F(p.vc)}`,F(p.phivc),'ksc')+
+      CK(`v<sub>u</sub> = ${F(p.vu)} ≤ φv<sub>c</sub> = ${F(p.phivc)} ksc`,p.ok)+
+      (k===0?NT('v<sub>u</sub> = ค่าสูงสุดที่มุมหน้าตัดวิกฤต (ACI 8.4.4.2) · λ<sub>s</sub> = 1.0 (13.2.6.2b)'):''))),
+  ]);
+
+  /* ── 9. bearing under pedestals + development ── */
+  const devBL=(n,ax,o,fb)=>{ const db=fb.db, k=db<=19?(o.good?6.63:4.42):(o.good?5.30:3.53), psiS=db<=29?1.0:(db<=36?1.15:1.3);
+    let h=EQ('ℓ<sub>d</sub>','f<sub>y</sub> · ψ<sub>t</sub> · ψ<sub>g</sub> / (k · λ · √f′c) · d<sub>b</sub> ≥ 30 cm',`${F(fy,0)} × 1.0 × ${F(psiG)} / (${F(k)} × 1.0 × ${SQf}) × ${F(db/10,1)}`,F(o.ldB,1),'cm')+
+      EQ('ℓ<sub>dh</sub>','f<sub>y</sub> · ψ<sub>s</sub> / (13.26 · λ · √f′c) · d<sub>b</sub> ≥ 8d<sub>b</sub>, 15 cm',`${F(fy,0)} × ${F(psiS)} / (13.26 × ${SQf}) × ${F(db/10,1)}`,F(o.ldhB,1),'cm')+
+      EQ('ℓ<sub>avail</sub>','ผิวเสาถึงขอบฐาน − c<sub>c</sub>','',F(o.availB,1),'cm')+
+      CK(o.botStraight?`ℓ<sub>avail</sub> = ${F(o.availB,1)} ≥ ℓ<sub>d</sub> = ${F(o.ldB,1)} cm (ปลายตรง)`:`ℓ<sub>avail</sub> = ${F(o.availB,1)} ${o.botOK?'≥':'&lt;'} ℓ<sub>dh</sub> = ${F(o.ldhB,1)} cm (งอขอ)`,o.botOK);
+    if(o.top) h+=EQ('ℓ<sub>d,บน</sub>','ψ<sub>t</sub> = '+F(o.top.psiT,1),'',F(o.top.ld,1),'cm')+
+      CK(`ℓ<sub>avail,บน</sub> = ${F(o.top.avail,1)} ≥ ℓ<sub>d</sub> = ${F(o.top.ld,1)} cm`,o.top.ok);
+    if(!o.good) h+=NT('ช่องว่างเหล็ก &lt; 2d<sub>b</sub> หรือระยะหุ้ม &lt; d<sub>b</sub> → k ลดลง');
+    return BL(n,`ระยะฝังเหล็กแนว ${ax} (${fb.nbar}–${BM}${db})`,h); };
+  const s9=SEC(9,'แบกทานใต้ตอม่อและระยะฝังเหล็ก',[
+    BL('9.1','แบกทานใต้ตอม่อ (ACI 22.8.3.2)',bearCol.map(b=>
+      EQ(`φB<sub>n,${b.name}</sub>`,'0.65 · 0.85f′c · A<sub>1</sub> · √(A<sub>2</sub>/A<sub>1</sub>)',`0.65 × 0.85 × ${F(fc,0)} × ${F(b.A1*1e4,0)} × ${F(b.k)} / 1000`,F(b.phiBn,1),'ton')+
+      CK(`P<sub>u</sub> = ${F(b.Pu,1)} ≤ φB<sub>n</sub> = ${F(b.phiBn,1)} ton`,b.ok)).join('')+
+      NT('√(A<sub>2</sub>/A<sub>1</sub>) ≤ 2 จำกัดด้วยระยะถึงขอบฐานและความหนา H')),
+    devBL('9.2','X',devX,fXb),
+    devBL('9.3','Y',devY,fYb),
+  ]);
+
+  /* ── 10. pedestals (detail is printed from each column tab) ── */
+  const cr=window._colRows||[];
+  const s10=SEC(10,'สรุปผลเสาตอม่อ',cols.map((c,i)=>{ const r=cr[i]; if(!r) return '';
+    return BL(`10.${i+1}`,`เสา ${c.name} (${F(c.cx)} × ${F(c.cy)} m)`,
+      `<table class="rp-tb">${r.rows.map(x=>`<tr><td class="l">${x[0]}</td><td>${x[1]}</td><td>${PF(x[2])}</td></tr>`).join('')}</table>`); }).concat(
+      [NT('รายละเอียดการคำนวณเสาตอม่อ พิมพ์จากแท็บของเสาแต่ละต้น')]));
+
+  /* ── summary ── */
+  const sum=`<h2 class="rp-h">สรุปผลการตรวจสอบ</h2>
+    <table class="rp-tb rp-sum"><tr><th>รายการตรวจสอบ</th><th>ACI 318-25</th><th>Demand</th><th>Capacity</th><th>Ratio</th><th>ผล</th></tr>
+    ${sumRows.map(r=>`<tr><td class="l">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${PF(r[5])}</td></tr>`).join('')}</table>
+    <div class="rp-ov">สรุปผลรวม (Overall): ${PF(allOK)}${allOK?'':' — มีรายการไม่ผ่าน'}</div>`;
+
+  return `<table class="rp-pg"><thead><tr><td><div class="rp-hd">
+      <div><div class="rp-ttl">Combined Footing Design Report</div><div class="rp-st">ANALYSIS &amp; DESIGN — ACI 318-25 / SOIL BEARING</div></div>
+      <div class="rp-hr">${date}<br>CivilToolsKit — Automated Calculation</div></div></td></tr></thead>
+    <tfoot><tr><td><div class="rp-ft">Combined Footing — CivilToolsKit · พิมพ์ ${date} · เอกสารนี้สร้างโดยโปรแกรม โปรดตรวจสอบโดยวิศวกรผู้ควบคุม</div></td></tr></tfoot>
+    <tbody><tr><td>${page1}<div class="rp-calc">${s1}${s2}${s3}${s4}${s5}${s6}${s7}${s8}${s9}${s10}${sum}</div></td></tr></tbody></table>`;
+}
+
+/* ════════ DRAWINGS ════════ */
+function pal(){
+  return window._printMode ? {
+    bg:'#fff',foot:'#eef2f8',footEdge:'#444',col:'#d6e4f5',colEdge:'#1a4a8a',colTxt:'#1a4a8a',
+    dim:'#333',grid:'#cbd5e6',pos:'#c05010',neg:'#1a4a8a',press:'#3a7abd',
+    main:'#c05010',cut:'#1a4a8a',purple:'#6d28d9',green:'#2f855a',red:'#b91c1c'
+  } : {
+    bg:'#0f1117',foot:'#2b3550',footEdge:'#8aa0c8',col:'#1e3a5f',colEdge:'#4a90d9',colTxt:'#9cc4f0',
+    dim:'#cdd8ee',grid:'#283250',pos:'#f0883e',neg:'#4a90d9',press:'#22d3ee',
+    main:'#f0883e',cut:'#4a90d9',purple:'#a78bfa',green:'#4ade80',red:'#e05252'
+  };
+}
+// moment vector (right-hand rule) — line with DOUBLE arrowhead at tip
+function momVec(x0,y0,x1,y1,color,label){
+  const ang=Math.atan2(y1-y0,x1-x0), ah=7, gap=5;
+  let g=`<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="${color}" stroke-width="2.2"/>`;
+  [0,gap].forEach(off=>{ const bx=x1-off*Math.cos(ang), by=y1-off*Math.sin(ang);
+    g+=`<path d="M ${bx.toFixed(1)} ${by.toFixed(1)} L ${(bx-ah*Math.cos(ang-0.45)).toFixed(1)} ${(by-ah*Math.sin(ang-0.45)).toFixed(1)} M ${bx.toFixed(1)} ${by.toFixed(1)} L ${(bx-ah*Math.cos(ang+0.45)).toFixed(1)} ${(by-ah*Math.sin(ang+0.45)).toFixed(1)}" stroke="${color}" stroke-width="2" fill="none"/>`; });
+  if(label){ const anchor=Math.cos(ang)>0.3?'start':(Math.cos(ang)<-0.3?'end':'middle');
+    const lx=x1+(Math.cos(ang)>0.3?6:(Math.cos(ang)<-0.3?-6:0)), ly=y1+(Math.sin(ang)>0.3?13:-5);
+    g+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="${color}" font-size="9.5" font-family="IBM Plex Mono" text-anchor="${anchor}">${label}</text>`; }
+  return g;
+}
+function drawSoilProfile(layers,Df,Hh,B,wt,cols,Lu){
+  const p=pal(), W=640,Hsvg=460, mT=46,mB=28,mL=86,mR=150;
+  const availH=Hsvg-mT-mB, bandX=mL, bandW=W-mL-mR;
+  let total=0; layers.forEach(l=>total+=l.H); total=Math.max(total,Df+Hh+0.5);
+  const sc=availH/total, yOf=d=>mT+d*sc, cxc=bandX+bandW/2;
+  const fw=bandW*0.9, hsc=B>0?fw/B:1;                         // horizontal scale (m→px) ให้ฐานพอดี ~90% ของแถบ
+  const hAbove=Math.max((Lu||0)-Df,0);                        // ส่วนตอม่อที่โผล่เหนือดิน = L_u − D_f
+  const col=t=>t==='clay'?'#7a5c3e':'#b89a6a';
+  let s=`<rect x="0" y="0" width="${W}" height="${Hsvg}" fill="${p.bg}"/>`;
+  let d0=0;
+  layers.forEach((l,i)=>{ const yT=yOf(d0), yB=yOf(d0+l.H);
+    s+=`<rect x="${bandX}" y="${yT.toFixed(1)}" width="${bandW}" height="${(yB-yT).toFixed(1)}" fill="${col(l.type)}" fill-opacity="0.5" stroke="${p.dim}" stroke-width="0.7"/>`;
+    s+=`<text x="${bandX+bandW+6}" y="${((yT+yB)/2-2).toFixed(1)}" fill="${p.dim}" font-size="9.5" font-family="IBM Plex Mono">${i+1}. ${l.name}</text>`;
+    s+=`<text x="${bandX+bandW+6}" y="${((yT+yB)/2+10).toFixed(1)}" fill="${p.dim}" font-size="8" font-family="IBM Plex Mono">H=${f(l.H,1)}m γ=${f(l.g,1)} t/m³${l.type==='clay'?' Cc='+f(computeCc(l),2):''}</text>`;
+    d0+=l.H; });
+  s+=`<line x1="${bandX-14}" y1="${mT}" x2="${bandX+bandW+12}" y2="${mT}" stroke="${p.dim}" stroke-width="1.5"/>`;
+  s+=`<text x="${bandX-16}" y="${mT-4}" fill="${p.dim}" font-size="9" text-anchor="end" font-family="IBM Plex Mono">ผิวดิน 0.00</text>`;
+  if(wt>0&&wt<=total){ const yw=yOf(wt);
+    s+=`<line x1="${bandX}" y1="${yw.toFixed(1)}" x2="${bandX+bandW}" y2="${yw.toFixed(1)}" stroke="#4a90d9" stroke-width="1.3" stroke-dasharray="6 3"/>`;
+    s+=`<path d="M ${bandX+12} ${(yw-9).toFixed(1)} l 8 0 l -4 8 z" fill="#4a90d9"/><text x="${bandX+26}" y="${(yw-2).toFixed(1)}" fill="#7fb0e0" font-size="8.5" font-family="IBM Plex Mono">GWT ${f(wt,2)}</text>`; }
+  const fyT=yOf(Df), fyB=yOf(Df+Hh), colTopY=yOf(-hAbove);
+  // ── ฐานราก (กว้าง B ตามแนว X) ──
+  s+=`<rect x="${(cxc-fw/2).toFixed(1)}" y="${fyT.toFixed(1)}" width="${fw.toFixed(1)}" height="${(fyB-fyT).toFixed(1)}" fill="#9aa6bd" stroke="#243049" stroke-width="2"/>`;
+  s+=`<text x="${cxc}" y="${((fyT+fyB)/2+4).toFixed(1)}" fill="#1a2030" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">ฐานราก B=${f(B,2)} m</text>`;
+  // ── เสาตอม่อแต่ละต้น (ที่ตำแหน่ง x) ──
+  (cols||[]).forEach(c=>{ const cw=Math.max((c.cx||0.3)*hsc,6), cxs=cxc+(c.x||0)*hsc;
+    s+=`<rect x="${(cxs-cw/2).toFixed(1)}" y="${colTopY.toFixed(1)}" width="${cw.toFixed(1)}" height="${(fyT-colTopY).toFixed(1)}" fill="${p.col}" stroke="${p.colEdge}" stroke-width="2"/>`;
+    s+=`<text x="${cxs.toFixed(1)}" y="${(colTopY+13).toFixed(1)}" fill="${p.colTxt}" font-size="8.5" text-anchor="middle" font-family="IBM Plex Mono">${c.name||''}</text>`;
+  });
+  // ── Df dimension ──
+  const dimX=bandX-40;
+  s+=`<line x1="${dimX}" y1="${mT}" x2="${dimX}" y2="${fyT.toFixed(1)}" stroke="${p.dim}"/><line x1="${dimX-4}" y1="${mT}" x2="${dimX+4}" y2="${mT}" stroke="${p.dim}"/><line x1="${dimX-4}" y1="${fyT.toFixed(1)}" x2="${dimX+4}" y2="${fyT.toFixed(1)}" stroke="${p.dim}"/>`;
+  s+=`<text x="${dimX-6}" y="${((mT+fyT)/2).toFixed(1)}" fill="${p.dim}" font-size="9.5" font-family="IBM Plex Mono" transform="rotate(-90 ${dimX-6} ${((mT+fyT)/2).toFixed(1)})" text-anchor="middle">D_f=${f(Df,2)} m</text>`;
+  $('svgSoil').innerHTML=s;
+}
+function drawPlan(B,L,ex,ey){
+  const p=pal(), W=600,Hsvg=420, m=64;
+  const sc=Math.min((W-2*m)/B,(Hsvg-2*m)/L), fw=B*sc, fh=L*sc, ox=(W-fw)/2, oy=(Hsvg-fh)/2;
+  const X=x=>ox+fw/2+x*sc, Y=y=>oy+fh/2-y*sc;   // y up
+  let s=`<rect x="0" y="0" width="${W}" height="${Hsvg}" fill="${p.bg}"/>`;
+  s+=`<rect x="${ox}" y="${oy}" width="${fw}" height="${fh}" fill="${p.foot}" stroke="${p.footEdge}" stroke-width="2"/>`;
+  // center axes
+  s+=`<line x1="${X(0)}" y1="${oy}" x2="${X(0)}" y2="${oy+fh}" stroke="${p.grid}" stroke-dasharray="4 4"/>`;
+  s+=`<line x1="${ox}" y1="${Y(0)}" x2="${ox+fw}" y2="${Y(0)}" stroke="${p.grid}" stroke-dasharray="4 4"/>`;
+  cols.forEach(c=>{ const cw=c.cx*sc, ch=c.cy*sc, cxp=X(c.x), cyp=Y(c.y), hw=cw/2, hh=ch/2;
+    s+=`<rect x="${cxp-hw}" y="${cyp-hh}" width="${cw}" height="${ch}" fill="${p.col}" stroke="${p.colEdge}" stroke-width="2"/>`;
+    s+=`<text x="${cxp}" y="${cyp-hh-6}" fill="${p.colTxt}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">${c.name}</text>`;
+    s+=`<text x="${cxp}" y="${cyp+hh+13}" fill="${p.colTxt}" font-size="8.5" text-anchor="middle" font-family="IBM Plex Mono">${f(c.P,0)}t · ${c.cx}×${c.cy}</text>`;
+    // axial P: ⊗ = into page (กดลง, compression) · ⊙ = out (ดึงขึ้น, uplift)
+    const ar=6.5, k=ar*0.66;
+    s+=`<circle cx="${cxp}" cy="${cyp}" r="${ar}" fill="${p.bg}" fill-opacity="0.85" stroke="${p.dim}" stroke-width="1.4"/>`;
+    if(c.P>=0){ s+=`<line x1="${cxp-k}" y1="${cyp-k}" x2="${cxp+k}" y2="${cyp+k}" stroke="${p.dim}" stroke-width="1.3"/><line x1="${cxp-k}" y1="${cyp+k}" x2="${cxp+k}" y2="${cyp-k}" stroke="${p.dim}" stroke-width="1.3"/>`; }
+    else { s+=`<circle cx="${cxp}" cy="${cyp}" r="2.2" fill="${p.dim}"/>`; }
+    // moment vectors (RHR, double arrowhead): My ∥ Y (vertical) · Mx ∥ X (horizontal)
+    const dlen=Math.max(hw,hh,11)+18;
+    if(Math.abs(c.My)>0.01){ const sg=c.My>0?1:-1; s+=momVec(cxp,cyp,cxp,cyp-sg*dlen,p.neg,'Mᵧ '+f(c.My,1)); }
+    if(Math.abs(c.Mx)>0.01){ const sg=c.Mx>0?1:-1; s+=momVec(cxp,cyp,cxp+sg*dlen,cyp,p.pos,'Mₓ '+f(c.Mx,1)); }
+  });
+  s+=`<text x="${ox}" y="15" fill="${p.dim}" font-size="8.5" font-family="IBM Plex Mono">⊗=P กดลง · ➤➤=โมเมนต์ (กฎมือขวา) Mᵧ∥Y, Mₓ∥X</text>`;
+  // resultant
+  s+=`<circle cx="${X(ex)}" cy="${Y(ey)}" r="5" fill="${p.pos}" stroke="${p.bg}" stroke-width="1.5"/>`;
+  s+=`<text x="${X(ex)+8}" y="${Y(ey)-6}" fill="${p.pos}" font-size="9.5" font-family="IBM Plex Mono">R (e=${f(ex,2)},${f(ey,2)})</text>`;
+  // dims
+  s+=`<text x="${W/2}" y="${oy+fh+34}" fill="${p.dim}" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">B = ${B.toFixed(2)} m (X)</text>`;
+  s+=`<text x="${ox-22}" y="${Hsvg/2}" fill="${p.dim}" font-size="11" text-anchor="middle" font-family="IBM Plex Mono" transform="rotate(-90 ${ox-22} ${Hsvg/2})">L = ${L.toFixed(2)} m (Y)</text>`;
+  $('svgPlan').innerHTML=s;
+}
+function drawPressure(B,L,qCorner){
+  // 3D-ish: show pressure trapezoid (corner values) as shaded; bilinear corners
+  const p=pal(), W=600,Hsvg=420, m=70;
+  const sc=Math.min((W-2*m)/B,(Hsvg-150)/L)*0.9, fw=B*sc, fh=L*sc*0.5, ox=(W-fw)/2, oy=120;
+  const skew=fh*0.7;
+  const corners={ // plan corners projected isometric-ish
+    bl:[ox,oy+fh], br:[ox+fw,oy+fh], tl:[ox+skew,oy], tr:[ox+fw+skew,oy]
+  };
+  const q=[qCorner(-1,-1),qCorner(1,-1),qCorner(1,1),qCorner(-1,1)]; // bl,br,tr,tl signs (x,y)
+  const qm=Math.max(...q,0.001), hsc=120/qm;
+  let s=`<rect x="0" y="0" width="${W}" height="${Hsvg}" fill="${p.bg}"/>`;
+  // base slab (parallelogram)
+  s+=`<path d="M ${corners.bl} L ${corners.br} L ${corners.tr} L ${corners.tl} Z" fill="${p.foot}" stroke="${p.footEdge}" stroke-width="1.5"/>`;
+  // pressure prisms at each corner (vertical bars downward = pressure)
+  const pts=[['bl',q[0]],['br',q[1]],['tr',q[2]],['tl',q[3]]];
+  pts.forEach(([k,qq])=>{ const [cx,cy]=corners[k]; const hh=qq*hsc;
+    s+=`<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy+hh}" stroke="${p.press}" stroke-width="2.5"/>`;
+    s+=`<text x="${cx}" y="${cy+hh+12}" fill="${p.press}" font-size="9.5" text-anchor="middle" font-family="IBM Plex Mono">${f(qq,1)}</text>`;
+  });
+  // connect tips
+  const tip=k=>{const[cx,cy]=corners[k];return `${cx},${cy+ ({bl:q[0],br:q[1],tr:q[2],tl:q[3]})[k]*hsc}`;};
+  s+=`<path d="M ${tip('bl')} L ${tip('br')} L ${tip('tr')} L ${tip('tl')} Z" fill="${p.press}" fill-opacity="0.16" stroke="${p.press}" stroke-width="1" stroke-dasharray="3 2"/>`;
+  s+=`<text x="${W/2}" y="${Hsvg-26}" fill="${p.dim}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">แรงดันดินที่มุมฐาน (gross, service) — t/m²</text>`;
+  s+=`<text x="${W/2}" y="${Hsvg-10}" fill="${p.dim}" font-size="9" text-anchor="middle" font-family="IBM Plex Mono">บิดเอียงตามความเยื้องศูนย์ของแรงลัพธ์</text>`;
+  $('svgPress').innerHTML=s;
+}
+function drawBeam(elId,bm,axisLbl,unit){
+  const p=pal(), W=600,Hsvg=360, mL=44,mR=20, mT=30;
+  const x0=mL, x1=W-mR, plotW=x1-x0;
+  const half=bm.span/2;
+  const X=u=>x0+(u+half)/bm.span*plotW;
+  // two stacked plots: SFD (top), BMD (bottom)
+  const sfdY=mT, sfdH=120, bmdY=mT+150, bmdH=130;
+  const Vmax=Math.max(...bm.stations.map(s=>Math.abs(s.V)),0.001);
+  const Mabs=Math.max(Math.abs(bm.Mmax),Math.abs(bm.Mmin),0.001);
+  let s=`<rect x="0" y="0" width="${W}" height="${Hsvg}" fill="${p.bg}"/>`;
+  // helper baseline
+  const axis=(yc,h,lbl)=>{ let g=`<line x1="${x0}" y1="${yc}" x2="${x1}" y2="${yc}" stroke="${p.dim}" stroke-width="1"/>`;
+    g+=`<text x="${x0-6}" y="${yc-h/2-4}" fill="${p.dim}" font-size="9" text-anchor="end" font-family="IBM Plex Mono">${lbl}</text>`; return g; };
+  // column markers
+  // columns at the same station share one marker and one label ("C1, C2"); labels that would
+  // still overlap a neighbour are lifted onto a second row
+  const marks=[];
+  cols.map(c=>({xx:X(axisLbl[0]==='X'?c.x:c.y),name:c.name})).sort((a,b)=>a.xx-b.xx).forEach(m=>{
+    const last=marks[marks.length-1];
+    if(last&&Math.abs(m.xx-last.xx)<1) last.name+=', '+m.name; else marks.push({...m});
+  });
+  let prevEnd=-1e9, prevRow=0;
+  marks.forEach(m=>{ const half=m.name.length*2.7;
+    const row=(m.xx-half<prevEnd+4&&prevRow===0)?1:0;
+    s+=`<line x1="${m.xx}" y1="${sfdY-6}" x2="${m.xx}" y2="${bmdY+bmdH+6}" stroke="${p.grid}" stroke-dasharray="3 3"/>`;
+    s+=`<text x="${m.xx}" y="${sfdY-9-row*10}" fill="${p.colTxt}" font-size="8.5" text-anchor="middle" font-family="IBM Plex Mono">${m.name}</text>`;
+    if(row===0) prevEnd=m.xx+half; prevRow=row;
+  });
+  // SFD
+  const sfdMid=sfdY+sfdH/2;
+  s+=axis(sfdMid,sfdH,'V (ton)');
+  let path='M '+X(-half)+' '+sfdMid;
+  bm.stations.forEach(st=>{ path+=' L '+X(st.u).toFixed(1)+' '+(sfdMid-st.V/Vmax*sfdH/2*0.9).toFixed(1); });
+  s+=`<path d="${path}" fill="none" stroke="${p.neg}" stroke-width="1.6"/>`;
+  s+=`<text x="${x1}" y="${sfdMid-sfdH/2}" fill="${p.neg}" font-size="9" text-anchor="end" font-family="IBM Plex Mono">|V|max=${f(Vmax,1)}</text>`;
+  // BMD (positive plotted downward as tension-bottom convention; show both)
+  const bmdMid=bmdY+bmdH/2;
+  s+=axis(bmdMid,bmdH,'M (t·m)');
+  let mp='M '+X(-half)+' '+bmdMid;
+  bm.stations.forEach(st=>{ mp+=' L '+X(st.u).toFixed(1)+' '+(bmdMid-st.M/Mabs*bmdH/2*0.9).toFixed(1); });
+  s+=`<path d="${mp} L ${X(half)} ${bmdMid} Z" fill="${p.pos}" fill-opacity="0.14" stroke="${p.pos}" stroke-width="1.6"/>`;
+  // a peak is labelled only when it exists (≥ 0.05 t·m) — no "M⁻ 0.0" on a footing with no hogging
+  if(bm.Mmax>=0.05) s+=`<text x="${X(bm.uMax)}" y="${bmdMid-bm.Mmax/Mabs*bmdH/2*0.9-4}" fill="${p.pos}" font-size="9" text-anchor="middle" font-family="IBM Plex Mono">M⁺ ${f(bm.Mmax,1)}</text>`;
+  if(bm.Mmin<=-0.05) s+=`<text x="${X(bm.uMin)}" y="${bmdMid-bm.Mmin/Mabs*bmdH/2*0.9+12}" fill="${p.neg}" font-size="9" text-anchor="middle" font-family="IBM Plex Mono">M⁻ ${f(bm.Mmin,1)}</text>`;
+  s+=`<text x="${W/2}" y="${Hsvg-6}" fill="${p.dim}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">แนว ${axisLbl} — ${(-half).toFixed(2)} … ${half.toFixed(2)} ${unit} (M⁺=เหล็กล่าง · M⁻=เหล็กบน)</text>`;
+  $(elId).innerHTML=s;
+}
+
+/* ── reinforced-concrete cross section (combined footing: top + bottom steel + all columns) ── */
+function drawCombinedSection(elId,dir){
+  const p=pal(), W=600,Hsvg=360, mB=58,mTop=54;
+  const B=v('B'),L=v('L'),Hh=v('H'),cov=v('cov')/100;
+  const span=dir==='X'?B:L;
+  const mainN=Math.max(dir==='X'?v('nxb'):v('nyb'),1), mainDb=dir==='X'?v('dbxb'):v('dbyb');
+  const topNraw=dir==='X'?v('nxt'):v('nyt'), topDb=dir==='X'?v('dbxt'):v('dbyt');   // เหล็กบนแนวยาว (ตามที่กรอก)
+  const hasTop=topNraw>0;                                                           // hasTop → ให้ตรงกับ 3D View (วาดเฉพาะเมื่อมีเหล็กบนจริง)
+  const cutN =Math.max(dir==='X'?v('nyb'):v('nxb'),2), cutDb =dir==='X'?v('dbyb'):v('dbxb');
+  const topCutN=dir==='X'?v('nyt'):v('nxt');                                        // เหล็กบนแนวตัด (วงกลมแถวบน) ตามที่กรอก — ตรงกับ 3D
+  const stubs=cols.map(c=>({pos:dir==='X'?c.x:c.y, size:dir==='X'?c.cx:c.cy, name:c.name}));
+  const availW=W-90, availH=Hsvg-mB-mTop, stub=Math.min(54,availH*0.34);
+  const sc=Math.min(availW/span,(availH-stub)/Math.max(Hh,0.1)), fw=span*sc, fh=Hh*sc;
+  const ox=(W-fw)/2, baseY=Hsvg-mB, topY=baseY-fh, covpx=cov*sc, Xp=x=>W/2+x*sc;
+  const lwMain=Math.min(Math.max((mainDb/1000)*sc,3),8), lwTop=Math.min(Math.max((topDb/1000)*sc,2.5),7);
+  const r=Math.min(Math.max((cutDb/1000)*sc/2,2.5),5);
+  let s=`<rect x="0" y="0" width="${W}" height="${Hsvg}" fill="${p.bg}"/>`;
+  s+=`<line x1="${ox-26}" y1="${topY}" x2="${ox+fw+26}" y2="${topY}" stroke="${p.dim}" stroke-dasharray="5 3" opacity="0.45"/>`;
+  s+=`<rect x="${ox}" y="${topY}" width="${fw}" height="${fh}" fill="${p.foot}" stroke="${p.footEdge}" stroke-width="2"/>`;
+  stubs.forEach(c=>{ const cw=c.size*sc, cxp=Xp(c.pos);
+    s+=`<rect x="${cxp-cw/2}" y="${topY-stub}" width="${cw}" height="${stub}" fill="${p.col}" stroke="${p.colEdge}" stroke-width="2"/>`;
+    s+=`<text x="${cxp}" y="${topY-stub/2+3}" fill="${p.colTxt}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">${c.name}</text>`;
+  });
+  const xL=ox+covpx, xR=ox+fw-covpx;
+  // ── ลำดับชั้นเหล็ก: "แนวหลัก" (โมเมนต์มากกว่า) = ชั้นนอกสุด → ตะแกรงล่างอยู่ล่างสุด, ตะแกรงบนอยู่บนสุด (ได้ d มากสุด) · แนวรองอยู่ชั้นใน ──
+  // mainDir คำนวณจากโมเมนต์จริง จึงสลับชั้นตามขนาดฐานราก (ถ้าด้านยาว/โมเมนต์มากเป็นแนว Y → Y กลายเป็นชั้นนอก)
+  const mainDir=window._matMainDir||'X', isMain=(dir===mainDir);
+  const tCut=2*r, mainLower=isMain;
+  // bottom mat layering
+  const tLowB=mainLower?lwMain:tCut, tUpB=mainLower?tCut:lwMain;
+  const yLowB=baseY-covpx-tLowB/2, yUpB=yLowB-tLowB/2-tUpB/2;
+  const yBot=mainLower?yLowB:yUpB, yBotCirc=mainLower?yUpB:yLowB;
+  const dowelLW=2.6, yDowelRest=yUpB-tUpB/2-dowelLW/2;                         // dowel วาง "อยู่บน" เหล็กชั้นบนของตะแกรงล่าง (ก้น dowel แตะหลังเหล็กชั้นบน) — ตรงกับ 3D
+  const hkB=Math.max(Math.min(fw*0.05,fh*0.5),8), hkR=Math.max(hkB*0.30,7);   // hkR=ระยะหักเข้าด้านใน
+  const yHkB=topY+covpx;                                                       // ปลายขางอล่างยกขึ้นถึงระยะหุ้มผิวบน (Covering Concrete)
+  // bottom main basket (orange): ก้นตรง → ขางอตั้งขึ้น → หักเข้าด้านในอีกครั้ง (standard hook)
+  s+=`<path d="M ${(xL+hkR).toFixed(1)} ${yHkB.toFixed(1)} L ${xL} ${yHkB.toFixed(1)} L ${xL} ${yBot.toFixed(1)} L ${xR} ${yBot.toFixed(1)} L ${xR} ${yHkB.toFixed(1)} L ${(xR-hkR).toFixed(1)} ${yHkB.toFixed(1)}" fill="none" stroke="${p.main}" stroke-width="${lwMain}" stroke-linejoin="round" stroke-linecap="round"/>`;
+  // top mat layering (เหล็กบน): แนวหลัก = บนสุด (ชั้นนอก), แนวรอง = อยู่ใต้
+  const topMainUpper=isMain, tUpT=topMainUpper?lwTop:tCut, tLowT=topMainUpper?tCut:lwTop;
+  const yUpT=topY+covpx+tUpT/2, yLowT=yUpT+tUpT/2+tLowT/2;
+  const yTop=topMainUpper?yUpT:yLowT, yTopCirc=topMainUpper?yLowT:yUpT;
+  // top main (orange): เหล็กบนวางเป็นตะแกรงที่ผิวบน — เส้นตรง ไม่มีขางอ (วาดเฉพาะเมื่อมีเหล็กบนจริง · ตรงกับ 3D)
+  if(hasTop) s+=`<line x1="${xL.toFixed(1)}" y1="${yTop.toFixed(1)}" x2="${xR.toFixed(1)}" y2="${yTop.toFixed(1)}" stroke="${p.main}" stroke-width="${lwTop}" stroke-linecap="round" opacity="0.92"/>`;
+  // cut (transverse) bars — circles. แถวล่าง = เหล็กล่างแนวตัด · แถวบน = เหล็กบนแนวตัด (จำนวน/ระดับชั้นตามที่กรอก → ตรงกับ 3D)
+  const circX=(n,k)=>ox+covpx+r+(fw-2*covpx-2*r)*(n<=1?0.5:k/(n-1));
+  const nb=Math.max(cutN,2);
+  for(let i=0;i<nb;i++){ const x=circX(nb,i);
+    s+=`<circle cx="${x.toFixed(1)}" cy="${yBotCirc.toFixed(1)}" r="${r}" fill="${p.cut}" stroke="${p.colTxt}" stroke-width="1"/>`;
+  }
+  if(topCutN>0){ for(let i=0;i<topCutN;i++){ const x=circX(topCutN,i);
+    s+=`<circle cx="${x.toFixed(1)}" cy="${yTopCirc.toFixed(1)}" r="${r}" fill="${p.cut}" stroke="${p.colTxt}" stroke-width="0.8" opacity="0.8"/>`;
+  } }
+  // dowels per column (yellow): vertical from column to bottom mat, hooked outward
+  const cbar=p.bg==='#fff'?'#9a7b0a':'#f5c842', hkpx=Math.max(12*(mainDb/1000)*sc,8);
+  stubs.forEach(c=>{ const cw=c.size*sc, cxp=Xp(c.pos);
+    const x0=cxp-cw/2+Math.max(covpx*0.6,4), x1=cxp+cw/2-Math.max(covpx*0.6,4);
+    [x0,x1].forEach(x=>{ const side=x<cxp?-1:1, xe=Math.max(xL+lwMain/2,Math.min(xR-lwMain/2,x+side*hkpx));
+      s+=`<line x1="${x.toFixed(1)}" y1="${(topY-stub).toFixed(1)}" x2="${x.toFixed(1)}" y2="${yDowelRest.toFixed(1)}" stroke="${cbar}" stroke-width="2.6" stroke-linecap="round"/>`;
+      s+=`<line x1="${x.toFixed(1)}" y1="${yDowelRest.toFixed(1)}" x2="${xe.toFixed(1)}" y2="${yDowelRest.toFixed(1)}" stroke="${cbar}" stroke-width="2.6" stroke-linecap="round"/>`;
+    });
+  });
+  // dim
+  const dy=baseY+22;
+  s+=`<line x1="${ox}" y1="${dy}" x2="${ox+fw}" y2="${dy}" stroke="${p.dim}"/><line x1="${ox}" y1="${dy-4}" x2="${ox}" y2="${dy+4}" stroke="${p.dim}"/><line x1="${ox+fw}" y1="${dy-4}" x2="${ox+fw}" y2="${dy+4}" stroke="${p.dim}"/>`;
+  s+=`<text x="${W/2}" y="${dy+15}" fill="${p.dim}" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">${dir==='X'?'B':'L'} = ${span.toFixed(2)} m · H = ${Hh.toFixed(2)} m</text>`;
+  // legend
+  const topLeg=hasTop?`บน ${topNraw}-Dia.${topDb}`:'บน — ไม่มี (ตัดเหล็กบน)';
+  const layerLeg=isMain?'ชั้นนอก (โมเมนต์มากกว่า)':'ชั้นใน';
+  s+=`<text x="${ox}" y="16" fill="${p.main}" font-size="9.5" font-family="IBM Plex Mono">━ ล่าง ${mainN}-Dia.${mainDb} · ${topLeg} (แนว ${dir} · ${layerLeg})</text>`;
+  const topCutLeg=topCutN>0?` · บน ${topCutN}-Dia.${dir==='X'?v('dbyt'):v('dbxt')}`:'';
+  s+=`<text x="${ox}" y="30" fill="${p.cut}" font-size="9.5" font-family="IBM Plex Mono">● ล่าง ${cutN}-Dia.${cutDb}${topCutLeg} แนว ${dir==='X'?'Y':'X'} (ตัด) · <tspan fill="${cbar}">━ dowel เสา</tspan></text>`;
+  $(elId).innerHTML=s;
+}
+
+/* ════════ PER-COLUMN PEDESTAL TABS ════════ */
+let activeTab='footing';
+function normCols(){ const d={nx:3,ny:3,dbL:20,colCov:4.0,fyL:4000,tieDb:9,tieS:0.20,fyT:2400,Vx:0,Vy:0,alphaMode:'auto',alphaManual:1.3};
+  cols.forEach(c=>{ if(c.V&&!c.Vx&&!c.Vy){ c.Vx=c.V; } delete c.V;   // ค่า V เดิม (ทิศเดียว) → ย้ายไป V_x
+    for(const k in d) if(c[k]==null) c[k]=d[k]; }); }
+function applyTabVisibility(){
+  const mf=$('mainFooting'); if(mf) mf.classList.toggle('hidden',activeTab!=='footing');
+  const ms=$('mainSoil'); if(ms) ms.classList.toggle('hidden',activeTab!=='soil');
+  document.body.classList.toggle('rep-print',activeTab==='footing'||activeTab==='soil');   // ฐานราก/ชั้นดิน → พิมพ์เล่มรายการคำนวณ
+  document.querySelectorAll('.soil-group').forEach(el=>el.classList.toggle('hidden',activeTab!=='footing'&&activeTab!=='soil'));
+  cols.forEach((c,i)=>{ const el=$('mainCol_'+i); if(el) el.classList.toggle('hidden',activeTab!=='col'+i); });
+  document.querySelectorAll('.footing-only').forEach(el=>el.classList.toggle('hidden',activeTab!=='footing'));   // ซ่อน Soil/Reinforcement เมื่ออยู่แท็บเสา
+}
+function switchTab(t){ activeTab=t; applyTabVisibility(); renderTabBar(); renderColPedSidebar(); }
+// sidebar input ของเสาที่กำลังเลือกแท็บอยู่ (ใช้ id c{i}_{field} ร่วมกับ wireColInputs)
+function renderColPedSidebar(){
+  const box=$('colPedInputs'); if(!box) return;
+  if(!/^col\d+$/.test(activeTab||'')){
+    box.innerHTML=`<div class="inp-hint">เลือกแท็บเสา (เช่น ${cols[0]?(cols[0].name||'C1'):'C1'}) ด้านบนของรายงาน เพื่อกรอกเหล็กยืน/ปลอก/biaxial ของเสานั้น</div>`;
+    return;
+  }
+  const i=+activeTab.replace('col',''), c=cols[i]; if(!c){box.innerHTML='';return;}
+  const row=(fl,label,val,unit)=>`<div class="inp-row"><span class="lbl">${label}</span><span class="sym">=</span><input id="c${i}_${fl}" value="${val}"><span class="unit">${unit||''}</span></div>`;
+  const aM=c.alphaMode||'auto';
+  box.innerHTML=`<div class="inp-hint" style="margin-bottom:8px">กำลังแก้: <b style="color:var(--orange)">${c.name||('C'+(i+1))}</b> · c<sub>x</sub>×c<sub>y</sub>=${c.cx}×${c.cy} m · P=${f(c.P,1)} t</div>
+    <div class="sdiv" style="color:var(--orange);margin-top:2px">เหล็กยืน — Longitudinal</div>
+    ${row('nx','n<sub>x</sub> /ด้าน (X)',c.nx,'เส้น')}
+    ${row('ny','n<sub>y</sub> /ด้าน (Y)',c.ny,'เส้น')}
+    ${row('dbL','Dia. เหล็กยืน',c.dbL,'mm')}
+    ${row('colCov','Covering',c.colCov,'cm')}
+    ${row('fyL','f<sub>y</sub> เหล็กยืน',c.fyL,'ksc')}
+    <div class="sdiv" style="color:var(--cyan)">ปลอก · เฉือน · biaxial</div>
+    ${row('tieDb','Dia. ปลอก',c.tieDb,'mm')}
+    ${row('tieS','ระยะปลอก s',c.tieS,'m')}
+    ${row('fyT','f<sub>yt</sub> ปลอก',c.fyT,'ksc')}
+    <div class="inp-row"><span class="lbl">α biaxial</span><span class="sym">=</span><select id="c${i}_alphaMode"><option value="auto"${aM==='auto'?' selected':''}>Auto (P_u/ϕP_o)</option><option value="cons"${aM==='cons'?' selected':''}>1.0 (อนุรักษ์)</option><option value="manual"${aM==='manual'?' selected':''}>กำหนดเอง</option></select></div>
+    ${row('alphaManual','α กำหนดเอง',c.alphaManual,'')}`;
+  wireColInputs(i);
+}
+function renderTabBar(){
+  const bar=$('tabbar'); if(!bar) return;
+  let h=`<button class="tab-btn${activeTab==='soil'?' active':''}" data-tab="soil">ชั้นดิน</button>`;
+  h+=`<button class="tab-btn${activeTab==='footing'?' active':''}" data-tab="footing">ฐานราก (Footing)</button>`;
+  cols.forEach((c,i)=>{ h+=`<button class="tab-btn col-tab${activeTab==='col'+i?' active':''}" data-tab="col${i}">${c.name||('C'+(i+1))}</button>`; });
+  bar.innerHTML=h;
+  bar.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+}
+function colTabHTML(i){ const c=cols[i];
+  return `<div id="mainCol_${i}" class="coltab hidden">
+    <div class="print-header">
+      <div class="ph-left">เสาตอม่อ ${c.name} — Pedestal (ACI 318-25)<small>Axial · Biaxial P-M · Ties · Shear · Bearing · Dowel</small></div>
+      <div class="ph-right"><span class="print-date-repeat"></span><br>CivilToolsKit — Automated Calculation</div>
+    </div>
+    <div class="print-input-summary" id="pis_${i}"></div>
+    <div class="sec-block">
+      <div class="sec-hdr"><span class="sec-tag tag-orange">Input</span><span class="sec-title">เสาตอม่อ ${c.name} — c<sub>x</sub>×c<sub>y</sub>=${c.cx}×${c.cy} m · P=${f(c.P,1)} t (จากตาราง)</span><span class="sec-ref">กรอกเหล็กเสริมในแถบด้านข้าง (Pedestal Rebar)</span></div>
+      <div class="rep-col-full" id="colInpRO_${i}"></div>
+    </div>
+    <div class="sec-block">
+      <div class="sec-hdr"><span class="sec-tag tag-blue">Drawing</span><span class="sec-title">หน้าตัดเสา & Dowel ฝากลงฐาน — ${c.name}</span><span class="sec-ref">Section · Elevation</span></div>
+      <div class="rep-col-full"><div class="draw-grid">
+        <div class="draw-box"><div class="draw-cap">หน้าตัดเสา — Column Section <span id="capCol_${i}"></span></div><svg id="svgColSec_${i}" viewBox="0 0 600 380"></svg></div>
+        <div class="draw-box"><div class="draw-cap">Dowel ฝากลงฐาน — Elevation <span id="capDw_${i}"></span></div><svg id="svgDowel_${i}" viewBox="0 0 600 440"></svg></div>
+      </div></div>
+    </div>
+    <div class="sec-block"><div class="sec-hdr"><span class="sec-tag tag-orange">1 — Column</span><span class="sec-title">กำลังรับแรงตามแกน & ความชะลูด</span><span class="sec-ref">ACI 22.4/10.6</span></div><div id="bodyCol_${i}"></div></div>
+    <div class="sec-block"><div class="sec-hdr"><span class="sec-tag tag-cyan">2 — P-M</span><span class="sec-title">Interaction Diagram (Bresler biaxial)</span><span class="sec-ref">ACI 22.4</span></div><div id="bodyPM_${i}"></div></div>
+    <div class="sec-block"><div class="sec-hdr"><span class="sec-tag tag-blue">3 — Detailing</span><span class="sec-title">รายละเอียดเหล็กยืน</span><span class="sec-ref">ACI 25.7.2.3</span></div><div id="bodyLong_${i}"></div></div>
+    <div class="sec-block"><div class="sec-hdr"><span class="sec-tag tag-purple">4 — Ties</span><span class="sec-title">เหล็กปลอก</span><span class="sec-ref">ACI 25.7.2</span></div><div id="bodyTie_${i}"></div></div>
+    <div class="sec-block"><div class="sec-hdr"><span class="sec-tag tag-red">5 — Shear</span><span class="sec-title">แรงเฉือนในเสา</span><span class="sec-ref">ACI 22.5</span></div><div id="bodyShearCol_${i}"></div></div>
+    <div class="sec-block"><div class="sec-hdr"><span class="sec-tag tag-green">6 — Bearing</span><span class="sec-title">แบกทานหัวเสา</span><span class="sec-ref">ACI 22.8</span></div><div id="bodyBearTop_${i}"></div></div>
+    <div class="sec-block"><div class="sec-hdr"><span class="sec-tag tag-pink">7 — Dowel</span><span class="sec-title">เหล็ก Dowel ฝากลงฐาน</span><span class="sec-ref">ACI 16.3/25.4.9</span></div><div id="bodyDowel_${i}"></div></div>
+    <div class="sec-block"><div class="sec-hdr"><span class="sec-tag tag-teal">Summary</span><span class="sec-title">สรุปผลเสาตอม่อ ${c.name}</span><span class="sec-ref">ACI 318</span></div><div class="rep-col-full" id="bodyColSum_${i}"></div></div>
+  </div>`;
+}
+function wireColInputs(i){
+  ['nx','ny','dbL','colCov','fyL','tieDb','tieS','fyT','alphaManual'].forEach(fl=>{
+    const el=$('c'+i+'_'+fl); if(el) el.addEventListener('input',()=>{ cols[i][fl]=parseFloat(el.value)||0; calcColumn(i); });
+  });
+  const am=$('c'+i+'_alphaMode'); if(am) am.addEventListener('change',()=>{ cols[i].alphaMode=am.value; calcColumn(i); });
+}
+function ensureColTabs(){
+  normCols();
+  const cont=$('colTabs'); if(!cont) return;
+  const need=cont.childElementCount!==cols.length || cols.some((c,i)=>!$('mainCol_'+i));
+  if(need){
+    cont.innerHTML=cols.map((c,i)=>colTabHTML(i)).join('');
+    cols.forEach((c,i)=>wireColInputs(i));
+    if(/^col\d+$/.test(activeTab)){ const idx=+activeTab.replace('col',''); if(!(idx>=0&&idx<cols.length)) activeTab='footing'; }
+    applyTabVisibility();
+  }
+  renderColPedSidebar();
+}
+
+/* ════════ COLUMN (PEDESTAL) DESIGN — per column i ════════ */
+function calcColumn(i){
+  const c=cols[i]; if(!c||!$('bodyCol_'+i)) return;
+  const cx=c.cx, cy=c.cy, fc=v('fc'), P=c.P, Mx=c.Mx, My=c.My, LF=v('LF');
+  const fyL=c.fyL||4000, fyT=c.fyT||2400;
+  const Lu=v('Lu'), K=v('colK'), cov=(c.colCov||4)/100;
+  const colNx=Math.max(c.nx,2), colNy=Math.max(c.ny,2), dbL=c.dbL, tieDb=c.tieDb, tieS=c.tieS;
+  const nL=2*colNx+2*colNy-4;
+  const dwN=nL, dwDb=dbL, Hf=v('H'), covF=v('cov')/100;
+  const Pu=LF*P, Ag=cx*100*cy*100, covcm=c.colCov||4;
+  const AstL=nL*barA(dbL), rhoG=AstL/Ag, rhoOK=rhoG>=0.01&&rhoG<=0.08;
+  const phiC=0.65, Pnmax=0.80*(0.85*fc*(Ag-AstL)+fyL*AstL), phiPnmax=phiC*Pnmax/1000;
+  const axialOK=phiPnmax>=Pu;
+  const rmin=0.3*Math.min(cx,cy), klr=K*Lu/rmin, isShort=klr<=22;
+  const sMax=Math.min(16*dbL,48*tieDb,Math.min(cx,cy)*1000)/1000, tieSOK=tieS>0&&tieS<=sMax;
+  const tieSizeOK=(dbL<=32?tieDb>=9:tieDb>=12);
+  const AstD=dwN*barA(dwDb), AstDmin=0.005*Ag, dowelAreaOK=AstD>=AstDmin;
+  const fcM=fc*0.0980665, fyM=fyL*0.0980665;
+  const ldc=Math.max(0.24*fyM/Math.sqrt(fcM)*dwDb,0.043*fyM*dwDb,200);
+  const availFtg=(Hf-covF)*1000, ldcOK=availFtg>=ldc;
+  const lap=Math.max(fyM<=420?0.071*fyM*dwDb:(0.13*fyM-24)*dwDb,300);
+
+  const insetcm=covcm+tieDb/10+dbL/20, hxc=cx*50-insetcm, hyc=cy*50-insetcm, Abar=barA(dbL);
+  const bars=colBars(colNx,colNy,hxc,hyc,Abar);
+  const barsX=bars.map(b=>({As:b.As,d:cy*50-b.y})), barsY=bars.map(b=>({As:b.As,d:cx*50-b.x}));
+  const pmX=buildPM(fc,fyL,cx*100,cy*100,barsX), pmY=buildPM(fc,fyL,cy*100,cx*100,barsY);
+  const Mux=LF*Math.abs(Mx), Muy=LF*Math.abs(My);
+  const phiMnx=phiMnAt(pmX,Pu), phiMny=phiMnAt(pmY,Pu);
+  const slender=!isShort, Ec=15100*Math.sqrt(fc), bdns=Math.min(Math.max(v('bdns')||0.6,0),1), Lucm=Lu*100;
+  const magf=Ig=>{const EI=0.4*Ec*Ig/(1+bdns), Pc=Math.PI*Math.PI*EI/Math.pow(K*Lucm,2)/1000, den=1-Pu/(0.75*Pc); return {Pc, delta:den>0?Math.max(1,1/den):99};};
+  const Igx=(cx*100)*Math.pow(cy*100,3)/12, Igy=(cy*100)*Math.pow(cx*100,3)/12;
+  const mgx=magf(Igx), mgy=magf(Igy);
+  const eminx=(15+0.03*cy*1000)/1000, eminy=(15+0.03*cx*1000)/1000;
+  const M2x=Math.max(Mux,slender?Pu*eminx:0), M2y=Math.max(Muy,slender?Pu*eminy:0);
+  const Mcx=slender?mgx.delta*M2x:Mux, Mcy=slender?mgy.delta*M2y:Muy;
+  const stabilityOK=!slender||(mgx.delta<50&&mgy.delta<50);
+  const rX=phiMnx>0?Mcx/phiMnx:(Mcx>0?9.9:0), rY=phiMny>0?Mcy/phiMny:(Mcy>0?9.9:0);
+  const alphaMode=c.alphaMode||'auto';
+  let alpha; if(alphaMode==='cons') alpha=1.0; else if(alphaMode==='manual') alpha=Math.max(1.0,Math.min(c.alphaManual||1,2.0)); else alpha=Math.max(1.0,Math.min(1.0+0.5*(phiPnmax>0?Pu/phiPnmax:0),1.5));
+  const betaC=Math.pow(0.5,1/alpha);
+  const biax=(Mcx>0&&Mcy>0), biaxRatio=Math.pow(rX,alpha)+Math.pow(rY,alpha);
+  const pmRatio=biax?biaxRatio:Math.max(rX,rY), pmOK=axialOK&&pmRatio<=1.0&&stabilityOK;
+  const govX=rX>=rY, MuG=govX?Mcx:Mcy, phiMnG=govX?phiMnx:phiMny, axisLbl=govX?'X (ลึก c_y)':'Y (ลึก c_x)', pmG=govX?pmX:pmY;
+
+  const minBarsOK=nL>=4;
+  const sClearX=colNx>1?(2*hxc)/(colNx-1)-dbL/10:2*hxc, sClearY=colNy>1?(2*hyc)/(colNy-1)-dbL/10:2*hyc;
+  const sClear=Math.min(sClearX,sClearY), sClearMin=Math.max(1.5*dbL/10,4);
+  const spacingOK=sClear>=sClearMin, needCrosstie=sClear>15;
+
+  // ── Shear, each direction — ACI 318-25 22.5: Vc per Table 22.5.5.1 → (a) if Av ≥ Av,min (10.6.2.2), else (c) with λs·ρw^(1/3) ──
+  const phiVsh=0.75, Av=2*barA(tieDb), Nu=Pu*1000, NuAg=Math.min(Nu/(6*Ag),0.05*fc);   // Nu/6Ag ≤ 0.05f'c (22.5.5.1.2)
+  const shearDir=(Vserv,bw,h,nFace)=>{                    // bw, h in cm · nFace = bars on the tension face
+    const Vu=LF*Math.abs(Vserv||0), d=h-covcm-tieDb/10-dbL/20;
+    const AvMin=Math.max(0.2*Math.sqrt(fc),3.5)*bw*(tieS*100)/fyT, avOK=Av>=AvMin-1e-9;   // 0.75√f'c, 50 psi → ksc
+    const rhoW=nFace*barA(dbL)/(bw*d), lamS=Math.min(1,Math.sqrt(2/(1+d/25.4)));   // 22.5.5.1.3 (d in in. → cm/25.4)
+    let vc=avOK?0.53*Math.sqrt(fc)+NuAg:2.12*lamS*Math.pow(rhoW,1/3)*Math.sqrt(fc)+NuAg;
+    if(Nu>=0) vc=Math.max(vc,0.265*Math.sqrt(fc));         // 22.5.5.1.1 lower bound λ√f'c (no net tension)
+    vc=Math.max(0,Math.min(vc,1.33*Math.sqrt(fc)));          // ≤ 5λ√f'c
+    const Vc=vc*bw*d/1000, Vs=tieS>0?Av*fyT*d/(tieS*100)/1000:0, secLim=2.12*Math.sqrt(fc)*bw*d/1000;   // 22.5.1.2: 8√f'c
+    const phiVn=phiVsh*(Vc+Math.min(Vs,secLim)), secOK=Vu<=phiVsh*(Vc+secLim);
+    return {Vu,d,bw,AvMin,avOK,rhoW,lamS,vc,Vc,Vs,secLim,phiVn,secOK,ok:phiVn>=Vu&&secOK}; };
+  const shX=shearDir(c.Vx,cy*100,cx*100,colNy), shY=shearDir(c.Vy,cx*100,cy*100,colNx);
+  const shG=(shX.phiVn>0?shX.Vu/shX.phiVn:0)>=(shY.phiVn>0?shY.Vu/shY.phiVn:0)?shX:shY;
+  const Vu=shG.Vu, phiVn=shG.phiVn, shearOK=shX.ok&&shY.ok;
+  const phiPnbTop=0.65*0.85*fc*Ag/1000, bearTopOK=phiPnbTop>=Pu;
+
+  const colOK=axialOK&&rhoOK&&pmOK&&minBarsOK&&spacingOK&&tieSOK&&tieSizeOK&&shearOK&&bearTopOK&&dowelAreaOK&&ldcOK&&stabilityOK;
+
+  $('bodyCol_'+i).innerHTML=`<div class="rep-grid">
+    <div class="rep-col">${SDIV('Section & axial capacity','var(--cyan)')}
+      ${CB("A<sub>g</sub> = c<sub>x</sub>·c<sub>y</sub>",`${f(cx*100,0)}×${f(cy*100,0)}`,f(Ag,0),'cm²')}
+      ${CB("A<sub>st</sub> = n·(πd<sub>b</sub>²/4)",`${nL}×${f(barA(dbL),2)}`,f(AstL,2),'cm²')}
+      ${CB("ρ<sub>g</sub> = A<sub>st</sub>/A<sub>g</sub>",`${f(AstL,2)}/${f(Ag,0)}`,f(rhoG*100,2)+'%','')}
+      ${GOV("ρ<sub>g</sub> ต้องอยู่ 1–8%",rhoOK?'PASS':'FAIL','',rhoOK?'green':'red')}
+      ${CB("ϕP<sub>n,max</sub> = 0.80ϕ[0.85f'c(A<sub>g</sub>−A<sub>st</sub>)+f<sub>y</sub>A<sub>st</sub>]",`ϕ=0.65 (tied) · f<sub>y</sub>=${f(fyL,0)} ksc`,f(phiPnmax,1),'ton')}
+      ${GOV(`ϕP<sub>n,max</sub> ≥ P<sub>u</sub> : ${f(phiPnmax,1)} ≥ ${f(Pu,1)}`,axialOK?'PASS':'FAIL','ton',axialOK?'green':'red')}
+    </div>
+    <div class="rep-col">${SDIV('Slenderness '+(slender?'(ชะลูด — ขยายโมเมนต์)':'(สั้น)'),'var(--cyan)')}
+      ${CB("kL<sub>u</sub>/r &nbsp;(r ≈ 0.3·min(c))",`${f(K,2)}×${f(Lu,2)}/${f(rmin,3)}`,f(klr,1),'')}
+      ${slender?CB("P<sub>c</sub> = π²EI/(kL<sub>u</sub>)²",`x:${f(mgx.Pc,0)} / y:${f(mgy.Pc,0)} t`,`${f(Math.min(mgx.Pc,mgy.Pc),0)}`,'ton'):''}
+      ${slender?CB("δ = 1/(1−P<sub>u</sub>/0.75P<sub>c</sub>) ≥ 1",`x:${f(mgx.delta,2)} / y:${f(mgy.delta,2)}`,`${f(Math.max(mgx.delta,mgy.delta),2)}`,'×'):''}
+      ${GOV(slender?(stabilityOK?'เสาชะลูด — ขยายโมเมนต์ δ (P-Δ)':'ไม่เสถียร: P<sub>u</sub> ≥ 0.75P<sub>c</sub>'):'เสาสั้น (kL/r ≤ 22) — ไม่ต้องขยาย',slender?(stabilityOK?'OK':'FAIL'):'OK','',(!slender||stabilityOK)?'green':'red')}
+    </div></div>`;
+
+  window._PuCol=Pu;
+  $('bodyPM_'+i).innerHTML=`<div class="rep-grid">
+    <div class="rep-col">${SDIV(biax?'P-M Interaction (X · Y · ผลลัพธ์)':'Uniaxial P-M (แกน: '+axisLbl+')','var(--cyan)')}
+      <div style="display:flex;justify-content:center;padding:4px">${biax?drawPMDiagramBiax(pmX,pmY,alpha,Math.atan2(Mcy,Mcx),Mcx,Mcy,Pu):drawPMDiagram(pmG,MuG,Pu,axisLbl)}</div></div>
+    <div class="rep-col">${SDIV('Capacity at P_u & check','var(--cyan)')}
+      ${CB("ϕM<sub>n,x</sub> @ P<sub>u</sub> (about X)",`P<sub>u</sub>=${f(Pu,1)} t`,f(phiMnx,2),'t·m')}
+      ${CB("ϕM<sub>n,y</sub> @ P<sub>u</sub> (about Y)",``,f(phiMny,2),'t·m')}
+      ${CB("M<sub>ux</sub> / M<sub>uy</sub> (factored)",`LF×|M|`,`${f(Mux,2)} / ${f(Muy,2)}`,'t·m')}
+      ${slender?CB("M<sub>cx</sub> / M<sub>cy</sub> = δ·M₂ (ขยาย P-Δ)",`δ: ${f(mgx.delta,2)} / ${f(mgy.delta,2)}`,`${f(Mcx,2)} / ${f(Mcy,2)}`,'t·m'):''}
+      ${biax?CB(`Bresler: (M<sub>${slender?'cx':'ux'}</sub>/ϕM<sub>nx</sub>)<sup>α</sup>+(M<sub>${slender?'cy':'uy'}</sub>/ϕM<sub>ny</sub>)<sup>α</sup>`,`${f(rX,3)}<sup>${f(alpha,2)}</sup>+${f(rY,3)}<sup>${f(alpha,2)}</sup>`,f(pmRatio,3),'≤1.0'):CB(`Ratio = M<sub>${slender?'c':'u'}</sub>/ϕM<sub>n</sub>`,``,f(pmRatio,3),'≤1.0')}
+      ${CB("α (auto: 1.0+0.5·P<sub>u</sub>/ϕP<sub>n,max</sub>)",`${alphaMode==='auto'?'1.0+0.5×'+f(Pu/phiPnmax,2):alphaMode==='cons'?'อนุรักษ์':'กำหนดเอง'} · β=${f(betaC,2)}`,f(alpha,2),'')}
+      ${GOV(`P-M Interaction : ratio ${f(pmRatio,3)} ≤ 1.0`,pmOK?'PASS':'FAIL','',pmOK?'green':'red')}
+    </div></div>
+    ${biax?`<div class="rep-grid" style="border-top:1px solid var(--border)">
+      <div class="rep-col">${SDIV('Biaxial Load Contour (ที่ P_u คงที่)','var(--yellow)')}
+        <div style="display:flex;justify-content:center;padding:4px">${drawLoadContour(phiMnx,phiMny,Mcx,Mcy,alpha)}</div></div>
+      <div class="rep-col">${SDIV('โมเมนต์สองแกนพร้อมกัน','var(--yellow)')}
+        <div class="info-box">เมื่อ M<sub>x</sub> และ M<sub>y</sub> กระทำพร้อมกัน หน้าตัดต้องอยู่ภายใน <b>load contour</b> ที่ระดับ P<sub>u</sub> · ตัดแกนที่ ϕM<sub>nx</sub>=${f(phiMnx,2)}, ϕM<sub>ny</sub>=${f(phiMny,2)} t·m · <b>α=${f(alpha,2)}</b></div>
+        ${GOV(`จุด (M<sub>ux</sub>,M<sub>uy</sub>) ${pmOK?'อยู่ใน':'อยู่นอก'} contour`,pmOK?'PASS':'FAIL','',pmOK?'green':'red')}
+      </div></div>`:''}`;
+
+  $('bodyLong_'+i).innerHTML=`<div class="rep-grid">
+    <div class="rep-col">${SDIV('จำนวน & ระยะเหล็กยืน','var(--cyan)')}
+      ${CB("จำนวนเหล็กยืน (≥ 4 สำหรับปลอกเดี่ยว)",``,nL+' เส้น','')}
+      ${GOV("จำนวน ≥ 4",minBarsOK?'PASS':'FAIL','',minBarsOK?'green':'red')}
+      ${CB("s<sub>clear</sub> = ช่องไฟต่อด้าน − d<sub>b</sub>",`X:${f(sClearX,1)} / Y:${f(sClearY,1)} cm`,f(sClear,1),'cm')}
+      ${GOV(`s<sub>clear</sub> ≥ max(1.5d<sub>b</sub>,40mm) = ${f(sClearMin,1)} cm`,spacingOK?'PASS':'FAIL','',spacingOK?'green':'red')}
+    </div>
+    <div class="rep-col">${SDIV('Crosstie (ACI 25.7.2.3)','var(--cyan)')}
+      ${CB("เกณฑ์: bar ห่างสุทธิ > 15 cm ต้องมี crosstie",``,f(sClear,1)+' cm','')}
+      <div class="info-box" style="margin-top:8px">${needCrosstie?'⚠ ระยะสุทธิ > 15 cm → <b>ต้องใส่ crosstie</b>':'ระยะสุทธิ ≤ 15 cm → ปลอกเดี่ยวรัดเพียงพอ'}</div>
+    </div></div>`;
+
+  $('bodyTie_'+i).innerHTML=`<div class="rep-grid">
+    <div class="rep-col">${SDIV('Tie spacing limit','var(--cyan)')}
+      ${CB("s<sub>max</sub> = min(16d<sub>b,ยืน</sub>, 48d<sub>b,ปลอก</sub>, c<sub>min</sub>)",`min(${f(16*dbL,0)}, ${f(48*tieDb,0)}, ${f(Math.min(cx,cy)*1000,0)})`,f(sMax*1000,0),'mm')}
+      ${GOV(`s ≤ s<sub>max</sub> : ${f(tieS*1000,0)} ≤ ${f(sMax*1000,0)} mm`,tieSOK?'PASS':'FAIL','',tieSOK?'green':'red')}
+    </div>
+    <div class="rep-col">${SDIV('Tie size','var(--cyan)')}
+      ${CB("ขนาดปลอกขั้นต่ำ",dbL<=32?'เหล็กยืน ≤ Dia.32 → ปลอก ≥ Dia.9':'เหล็กยืน > Dia.32 → ปลอก ≥ Dia.12',`Dia.${tieDb}`,'')}
+      ${GOV("ขนาดเหล็กปลอกเพียงพอ",tieSizeOK?'PASS':'FAIL','',tieSizeOK?'green':'red')}
+    </div></div>`;
+
+  const shCard=(o,lbl,Vs0)=>`<div class="rep-col">${SDIV(lbl,'var(--cyan)')}
+      ${CB("V<sub>u</sub> = U·V",`${f(LF,2)}×${f(Vs0||0,1)} · b<sub>w</sub>=${f(o.bw,0)} · d=${f(o.d,1)} cm`,f(o.Vu,2),'ton')}
+      ${CB("A<sub>v,min</sub> = max(0.2√f'c, 3.5)·b<sub>w</sub>s/f<sub>yt</sub> &nbsp;(10.6.2.2)",`A<sub>v</sub>=${f(Av,2)} cm² (2 ขา) @ ${f(tieS*100,0)} cm`,`${f(o.AvMin,2)} → ${o.avOK?'A<sub>v</sub> ≥ A<sub>v,min</sub>':'A<sub>v</sub> < A<sub>v,min</sub>'}`,'cm²')}
+      ${o.avOK?CB("v<sub>c</sub> = 0.53λ√f'c + N<sub>u</sub>/6A<sub>g</sub> &nbsp;(Table 22.5.5.1a)",`N<sub>u</sub>/6A<sub>g</sub>=${f(NuAg,2)} ksc`,f(o.vc,2),'ksc')
+        :CB("v<sub>c</sub> = 2.12λ<sub>s</sub>λ(ρ<sub>w</sub>)<sup>1/3</sup>√f'c + N<sub>u</sub>/6A<sub>g</sub> &nbsp;(Table 22.5.5.1c)",`λ<sub>s</sub>=${f(o.lamS,3)} · ρ<sub>w</sub>=${f(o.rhoW,4)} · N<sub>u</sub>/6A<sub>g</sub>=${f(NuAg,2)}`,f(o.vc,2),'ksc')}
+      ${CB("ϕV<sub>n</sub> = 0.75(V<sub>c</sub> + V<sub>s</sub>) &nbsp;· V<sub>s</sub> = A<sub>v</sub>f<sub>yt</sub>d/s",`V<sub>c</sub>=${f(o.Vc,2)} · V<sub>s</sub>=${f(o.Vs,2)} t`,f(o.phiVn,2),'ton')}
+      ${GOV(`ϕV<sub>n</sub> ≥ V<sub>u</sub> : ${f(o.phiVn,1)} ≥ ${f(o.Vu,1)}${o.secOK?'':' · เกินขีดจำกัดหน้าตัด 22.5.1.2'}`,o.ok?'PASS':'FAIL','ton',o.ok?'green':'red')}
+    </div>`;
+  $('bodyShearCol_'+i).innerHTML=`<div class="rep-grid">${shCard(shX,'แรงเฉือน V<sub>x</sub> (ตามแนว X)',c.Vx)}${shCard(shY,'แรงเฉือน V<sub>y</sub> (ตามแนว Y)',c.Vy)}</div>`;
+
+  $('bodyBearTop_'+i).innerHTML=`<div class="rep-grid">
+    <div class="rep-col">${SDIV('Bearing on top of pedestal','var(--cyan)')}
+      ${CB("ϕP<sub>nb</sub> = ϕ·0.85f'c·A<sub>1</sub> (A<sub>2</sub>=A<sub>1</sub>)",`ϕ=0.65`,f(phiPnbTop,1),'ton')}
+      ${GOV(`ϕP<sub>nb</sub> ≥ P<sub>u</sub> : ${f(phiPnbTop,1)} ≥ ${f(Pu,1)}`,bearTopOK?'PASS':'FAIL','ton',bearTopOK?'green':'red')}
+    </div></div>`;
+
+  $('bodyDowel_'+i).innerHTML=`<div class="rep-grid">
+    <div class="rep-col">${SDIV('Dowel area (interface)','var(--cyan)')}
+      ${CB("A<sub>s,dowel</sub> = n·(πd<sub>b</sub>²/4)",`${dwN}×${f(barA(dwDb),2)}`,f(AstD,2),'cm²')}
+      ${CB("A<sub>s,min</sub> = 0.005·A<sub>g</sub>",`0.005×${f(Ag,0)}`,f(AstDmin,2),'cm²')}
+      ${GOV(`A<sub>s,dowel</sub> ≥ 0.005A<sub>g</sub> : ${f(AstD,2)} ≥ ${f(AstDmin,2)}`,dowelAreaOK?'PASS':'FAIL','cm²',dowelAreaOK?'green':'red')}
+    </div>
+    <div class="rep-col">${SDIV('Development & lap','var(--cyan)')}
+      ${CB("l<sub>dc</sub> = max(0.24f<sub>y</sub>/√f'c·d<sub>b</sub>, 0.043f<sub>y</sub>d<sub>b</sub>, 200)",`(MPa, mm)`,f(ldc,0),'mm')}
+      ${CB("ระยะฝังในฐาน = H − cov",`${f(Hf,2)}−${f(covF,3)}`,f(availFtg,0),'mm')}
+      ${GOV(`l<sub>dc</sub> ≤ ระยะฝังในฐาน : ${f(ldc,0)} ≤ ${f(availFtg,0)} mm`,ldcOK?'PASS':'FAIL','',ldcOK?'green':'red')}
+      ${CB("ต่อทาบในเสา (compression lap)",`≈`,f(lap,0),'mm')}
+    </div></div>
+    <div class="rep-col-full" style="border-top:1px solid var(--border)">
+      <div class="info-box">Dowel = เหล็กยืนเสา <b>${dwN}-Dia.${dwDb}</b> · ฝังลงฐานอย่างน้อย <b>l<sub>dc</sub>=${f(ldc,0)} mm</b> (งอขอ 90° วางบนตะแกรงล่างฐาน) ต่อทาบในเสา <b>${f(lap,0)} mm</b> · ถ้าฝังไม่พอให้เพิ่มความหนาฐานหรือลดขนาดเหล็ก</div>
+    </div>`;
+
+  const rows=[
+    ['ρ<sub>g</sub> เหล็กยืน 1–8%',`${f(rhoG*100,2)}%`,rhoOK],
+    ['จำนวนเหล็กยืน ≥ 4',`${nL} เส้น`,minBarsOK],
+    ['ระยะสุทธิเหล็กยืน',`${f(sClear,1)} ≥ ${f(sClearMin,1)} cm`,spacingOK],
+    ['กำลังตามแกน ϕP<sub>n,max</sub> ≥ P<sub>u</sub>',`${f(phiPnmax,1)} ≥ ${f(Pu,1)} t`,axialOK],
+    ['P-M Interaction ratio ≤ 1.0',`${f(pmRatio,3)}`,pmOK],
+    [slender?'เสาชะลูด — ขยายโมเมนต์ (δ)':'ความชะลูด kL/r ≤ 22',slender?`kL/r=${f(klr,1)}, δ=${f(Math.max(mgx.delta,mgy.delta),2)}`:`${f(klr,1)}`,stabilityOK],
+    ['แรงเฉือน ϕV<sub>n</sub> ≥ V<sub>u</sub>',`${f(phiVn,1)} ≥ ${f(Vu,1)} t`,shearOK],
+    ['ระยะเรียงปลอก s ≤ s<sub>max</sub>',`${f(tieS*1000,0)} ≤ ${f(sMax*1000,0)} mm`,tieSOK],
+    ['ขนาดเหล็กปลอก',`Dia.${tieDb}`,tieSizeOK],
+    ['แบกทานหัวเสา ϕP<sub>nb</sub> ≥ P<sub>u</sub>',`${f(phiPnbTop,1)} ≥ ${f(Pu,1)} t`,bearTopOK],
+    ['พื้นที่ dowel ≥ 0.005A<sub>g</sub>',`${f(AstD,2)} ≥ ${f(AstDmin,2)} cm²`,dowelAreaOK],
+    ['ระยะฝัง dowel l<sub>dc</sub>',`${f(ldc,0)} ≤ ${f(availFtg,0)} mm`,ldcOK],
+  ];
+  (window._colRows=window._colRows||[])[i]={name:c.name,rows,ok:colOK};
+  $('bodyColSum_'+i).innerHTML=`<table class="sum-tbl"><tr><td>Check</td><td>ค่า</td><td>Status</td></tr>
+    ${rows.map(r=>`<tr><td>${r[0]}</td><td class="val">${r[1]}</td><td><span class="${r[2]?'st-ok':'st-ng'}">${r[2]?'OK':'NG'}</span></td></tr>`).join('')}
+    </table>${GOV('ผลรวมเสาตอม่อ '+c.name+' (Overall)',colOK?'PASS':'FAIL','',colOK?'green':'red')}`;
+
+  if($('capCol_'+i)) $('capCol_'+i).textContent=`${f(cx,2)}×${f(cy,2)} · ${nL}-Dia.${dbL} (x:${colNx} y:${colNy})`;
+  if($('capDw_'+i)) $('capDw_'+i).textContent=`${dwN}-Dia.${dwDb}`;
+  drawColSection('svgColSec_'+i,cx,cy,cov,bars,dbL,tieDb);
+  drawDowelElevation('svgDowel_'+i,cx,cy,Hf,covF,dwN,dwDb,ldc,availFtg,lap,v('B'),c.x,v('dbxb'),v('dbyb'));
+  if($('pis_'+i)) $('pis_'+i).innerHTML=[
+    `<div><b>${c.name} =</b> ${cx}×${cy} m</div>`,`<div><b>Pu =</b> ${f(Pu,1)} ton</div>`,
+    `<div><b>Long =</b> ${nL}-Dia.${dbL} (x:${colNx} y:${colNy}) · f<sub>y</sub>=${f(fyL,0)}</div>`,
+    `<div><b>Tie =</b> Dia.${tieDb}@${f(tieS*100,0)}cm · f<sub>yt</sub>=${f(fyT,0)}</div>`,
+    `<div><b>P-M =</b> ${f(pmRatio,2)} ${pmOK?'OK':'NG'}</div>`,
+  ].join('<div>|</div>');
+  if($('colInpRO_'+i)) $('colInpRO_'+i).innerHTML=`<div class="rep-grid" style="border-top:none">
+    <div class="rep-col">${SDIV('เหล็กยืน — Longitudinal','var(--orange)')}
+      ${CB('เหล็กยืน n<sub>x</sub>×n<sub>y</sub> ต่อด้าน',`รวม 2·n<sub>x</sub>+2·n<sub>y</sub>−4`,`${colNx}×${colNy} → ${nL}`,'เส้น')}
+      ${CB('Dia. เหล็กยืน · f<sub>y</sub>','',`Dia.${dbL} · ${f(fyL,0)}`,'mm · ksc')}
+      ${CB('Covering','',f(covcm,1),'cm')}
+    </div>
+    <div class="rep-col">${SDIV('ปลอก · เฉือน · biaxial','var(--cyan)')}
+      ${CB('ปลอก Dia. @ ระยะ s','',`Dia.${tieDb} @ ${f(tieS*100,0)}`,'mm · cm')}
+      ${CB('f<sub>yt</sub> ปลอก · V<sub>x</sub>/V<sub>y</sub> (service, จากตาราง)','',`${f(fyT,0)} · ${f(c.Vx||0,1)}/${f(c.Vy||0,1)}`,'ksc · ton')}
+      ${CB('α biaxial','',f(alpha,2),'')}
+    </div></div>`;
+}
+
+/* ── P-M interaction (strain compatibility) ── */
+function buildPM(fc,fy,b,h,bars){
+  if(!(h>0)||!(b>0)||!bars.length) return {pts:[{phiP:0,phiM:0}],cap:0,Pn0:0};
+  const Es=2.04e6, ecu=0.003, b1=fc<=280?0.85:Math.max(0.85-0.05*(fc-280)/70,0.65);
+  const Ast=bars.reduce((s,x)=>s+x.As,0), Ag=b*h, Pn0=0.85*fc*(Ag-Ast)+fy*Ast;
+  const cap=0.80*0.65*Pn0, dmax=Math.max(...bars.map(x=>x.d)), fyEy=fy/Es, pts=[];
+  const N=80;
+  for(let k=0;k<=N;k++){ const cc=h*(3.0-2.96*k/N); if(cc<=1e-6) continue;
+    const a=Math.min(b1*cc,h); let Pn=0.85*fc*a*b, Mn=0.85*fc*a*b*(h/2-a/2);
+    bars.forEach(bar=>{let es=ecu*(cc-bar.d)/cc, fs=Math.max(-fy,Math.min(fy,es*Es)); if(bar.d<a)fs-=0.85*fc; Pn+=fs*bar.As; Mn+=fs*bar.As*(h/2-bar.d);});
+    const et=ecu*(dmax-cc)/cc;
+    let phi=et>=0.005?0.9:(et<=fyEy?0.65:0.65+(et-fyEy)/(0.005-fyEy)*0.25);
+    pts.push({phiP:Math.min(phi*Pn,cap)/1000, phiM:phi*Mn/100000});
+  }
+  pts.push({phiP:-0.9*fy*Ast/1000, phiM:0});
+  return {pts, cap:cap/1000, Pn0:Pn0/1000};
+}
+function phiMnAt(pm,Pu){
+  const a=pm.pts;
+  if(Pu>a[0].phiP) return 0;
+  for(let i=0;i<a.length-1;i++){ if(a[i].phiP>=Pu&&a[i+1].phiP<=Pu){ const t=(a[i].phiP-Pu)/(a[i].phiP-a[i+1].phiP||1e-9); return Math.max(a[i].phiM+t*(a[i+1].phiM-a[i].phiM),0);} }
+  return Math.max(a[a.length-1].phiM,0);
+}
+function drawPMDiagram(pm,Mu,Pu,axisLbl){
+  const p=pal(), W=440,H=330, mL=54,mR=18,mT=16,mB=42, pw=W-mL-mR, ph=H-mT-mB;
+  const Mmax=(Math.max(...pm.pts.map(t=>t.phiM),Mu)*1.18)||1;
+  const Pmax=Math.max(pm.cap,Pu)*1.1, Pmin=Math.min(0,...pm.pts.map(t=>t.phiP));
+  const X=m=>mL+(m/Mmax)*pw, Y=pp=>mT+ph-((pp-Pmin)/(Pmax-Pmin))*ph;
+  let s=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:${p.bg};border-radius:4px">`;
+  for(let i=0;i<=4;i++){const m=Mmax*i/4,xx=X(m);
+    s+=`<line x1="${xx}" y1="${mT}" x2="${xx}" y2="${mT+ph}" stroke="${p.dim}" stroke-opacity="0.13"/>`;
+    s+=`<text x="${xx}" y="${mT+ph+12}" fill="${p.dim}" font-size="8.5" text-anchor="middle" font-family="IBM Plex Mono">${f(m,1)}</text>`;}
+  for(let i=0;i<=5;i++){const pp=Pmin+(Pmax-Pmin)*i/5,yy=Y(pp);
+    s+=`<line x1="${mL}" y1="${yy}" x2="${mL+pw}" y2="${yy}" stroke="${p.dim}" stroke-opacity="0.13"/>`;
+    s+=`<text x="${mL-5}" y="${yy+3}" fill="${p.dim}" font-size="8.5" text-anchor="end" font-family="IBM Plex Mono">${f(pp,0)}</text>`;}
+  s+=`<line x1="${mL}" y1="${mT}" x2="${mL}" y2="${mT+ph}" stroke="${p.dim}" stroke-width="1"/>`;
+  s+=`<line x1="${mL}" y1="${Y(0)}" x2="${mL+pw}" y2="${Y(0)}" stroke="${p.dim}" stroke-width="1"/>`;
+  let d=''; pm.pts.forEach((t,i)=>{d+=(i?'L':'M')+X(Math.max(t.phiM,0)).toFixed(1)+' '+Y(t.phiP).toFixed(1)+' ';});
+  s+=`<path d="${d}" fill="none" stroke="${p.main}" stroke-width="2"/>`;
+  s+=`<line x1="${mL}" y1="${Y(pm.cap)}" x2="${mL+pw}" y2="${Y(pm.cap)}" stroke="${p.cut}" stroke-dasharray="4 3"/>`;
+  const inside=Mu<=phiMnAt(pm,Pu)&&Pu<=pm.cap;
+  s+=`<circle cx="${X(Mu)}" cy="${Y(Pu)}" r="5" fill="${inside?p.cut:p.main}" stroke="#fff" stroke-width="1.5"/>`;
+  s+=`<text x="${Math.min(X(Mu)+8,W-90)}" y="${Y(Pu)-6}" fill="${p.dim}" font-size="9.5" font-family="IBM Plex Mono">(${f(Mu,1)}, ${f(Pu,1)})</text>`;
+  s+=`<text x="${mL+pw/2}" y="${H-6}" fill="${p.dim}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">ϕMn (t·m) — ${axisLbl}</text>`;
+  s+=`<text x="13" y="${mT+ph/2}" fill="${p.dim}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono" transform="rotate(-90 13 ${mT+ph/2})">ϕPn (ton)</text>`;
+  s+=`</svg>`; return s;
+}
+function drawPMDiagramBiax(pmX,pmY,alpha,theta,Mdx,Mdy,Pu){
+  const p=pal(), W=440,H=330, mL=54,mR=18,mT=16,mB=42, pw=W-mL-mR, ph=H-mT-mB;
+  const Mr=Math.hypot(Mdx,Mdy), cap=pmX.cap;
+  const Ps=[]; for(let i=0;i<=44;i++) Ps.push(cap*(1-i/44));
+  const resC=Ps.map(P=>{const mnx=phiMnAt(pmX,P),mny=phiMnAt(pmY,P); let mr=0; if(mnx>0&&mny>0){const den=Math.pow(Math.cos(theta)/mnx,alpha)+Math.pow(Math.sin(theta)/mny,alpha); mr=den>0?Math.pow(den,-1/alpha):0;} return {M:mr,P};});
+  const Mmax=(Math.max(...pmX.pts.map(t=>t.phiM),...pmY.pts.map(t=>t.phiM),Mr)*1.15)||1;
+  const Pmax=Math.max(cap,Pu)*1.1, Pmin=Math.min(0,...pmX.pts.map(t=>t.phiP));
+  const X=m=>mL+(m/Mmax)*pw, Y=pp=>mT+ph-((pp-Pmin)/(Pmax-Pmin))*ph;
+  let s=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:${p.bg};border-radius:4px">`;
+  for(let i=0;i<=4;i++){const m=Mmax*i/4,xx=X(m);
+    s+=`<line x1="${xx}" y1="${mT}" x2="${xx}" y2="${mT+ph}" stroke="${p.dim}" stroke-opacity="0.13"/>`;
+    s+=`<text x="${xx}" y="${mT+ph+12}" fill="${p.dim}" font-size="8.5" text-anchor="middle" font-family="IBM Plex Mono">${f(m,1)}</text>`;}
+  for(let i=0;i<=5;i++){const pp=Pmin+(Pmax-Pmin)*i/5,yy=Y(pp);
+    s+=`<line x1="${mL}" y1="${yy}" x2="${mL+pw}" y2="${yy}" stroke="${p.dim}" stroke-opacity="0.13"/>`;
+    s+=`<text x="${mL-5}" y="${yy+3}" fill="${p.dim}" font-size="8.5" text-anchor="end" font-family="IBM Plex Mono">${f(pp,0)}</text>`;}
+  s+=`<line x1="${mL}" y1="${mT}" x2="${mL}" y2="${mT+ph}" stroke="${p.dim}"/><line x1="${mL}" y1="${Y(0)}" x2="${mL+pw}" y2="${Y(0)}" stroke="${p.dim}"/>`;
+  const curve=(pts,col,w,dash)=>{let d=''; pts.forEach((t,i)=>{d+=(i?'L':'M')+X(Math.max(t.phiM!=null?t.phiM:t.M,0)).toFixed(1)+' '+Y(t.phiP!=null?t.phiP:t.P).toFixed(1)+' ';}); return `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}"${dash?` stroke-dasharray="${dash}"`:''}/>`;};
+  s+=curve(pmX.pts,p.cut,1.5,'5 3');
+  s+=curve(pmY.pts,p.purple,1.5,'5 3');
+  s+=curve(resC,p.main,2.4);
+  s+=`<line x1="${mL}" y1="${Y(cap)}" x2="${mL+pw}" y2="${Y(cap)}" stroke="${p.dim}" stroke-dasharray="2 3" stroke-opacity="0.5"/>`;
+  const inside=Mr<=((function(){const mnx=phiMnAt(pmX,Pu),mny=phiMnAt(pmY,Pu); if(!(mnx>0&&mny>0))return 0; const den=Math.pow(Math.cos(theta)/mnx,alpha)+Math.pow(Math.sin(theta)/mny,alpha); return Math.pow(den,-1/alpha);})());
+  s+=`<circle cx="${X(Mr)}" cy="${Y(Pu)}" r="5" fill="${inside?p.green:p.red}" stroke="#fff" stroke-width="1.5"/>`;
+  s+=`<text x="${Math.min(X(Mr)+8,W-95)}" y="${Y(Pu)-6}" fill="${p.dim}" font-size="9.5" font-family="IBM Plex Mono">(${f(Mr,1)}, ${f(Pu,1)})</text>`;
+  s+=`<g font-family="IBM Plex Mono" font-size="8.5">
+    <line x1="${mL+8}" y1="${mT+10}" x2="${mL+24}" y2="${mT+10}" stroke="${p.cut}" stroke-width="1.5" stroke-dasharray="5 3"/><text x="${mL+28}" y="${mT+13}" fill="${p.dim}">X</text>
+    <line x1="${mL+50}" y1="${mT+10}" x2="${mL+66}" y2="${mT+10}" stroke="${p.purple}" stroke-width="1.5" stroke-dasharray="5 3"/><text x="${mL+70}" y="${mT+13}" fill="${p.dim}">Y</text>
+    <line x1="${mL+92}" y1="${mT+10}" x2="${mL+108}" y2="${mT+10}" stroke="${p.main}" stroke-width="2.4"/><text x="${mL+112}" y="${mT+13}" fill="${p.dim}">ผลลัพธ์ θ=${f(theta*180/Math.PI,0)}°</text></g>`;
+  s+=`<text x="${mL+pw/2}" y="${H-6}" fill="${p.dim}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">ϕMn (t·m)</text>`;
+  s+=`<text x="13" y="${mT+ph/2}" fill="${p.dim}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono" transform="rotate(-90 13 ${mT+ph/2})">ϕPn (ton)</text></svg>`;
+  return s;
+}
+function drawLoadContour(Mnx,Mny,Mux,Muy,alpha){
+  const p=pal(), W=440,H=330, mL=54,mR=18,mT=16,mB=42, pw=W-mL-mR, ph=H-mT-mB;
+  const Xmax=(Math.max(Mnx,Mux)*1.2)||1, Ymax=(Math.max(Mny,Muy)*1.2)||1;
+  const X=m=>mL+(m/Xmax)*pw, Y=m=>mT+ph-(m/Ymax)*ph;
+  let s=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:${p.bg};border-radius:4px">`;
+  for(let i=0;i<=4;i++){const m=Xmax*i/4,xx=X(m);
+    s+=`<line x1="${xx}" y1="${mT}" x2="${xx}" y2="${mT+ph}" stroke="${p.dim}" stroke-opacity="0.13"/>`;
+    s+=`<text x="${xx}" y="${mT+ph+12}" fill="${p.dim}" font-size="8.5" text-anchor="middle" font-family="IBM Plex Mono">${f(m,1)}</text>`;}
+  for(let i=0;i<=4;i++){const m=Ymax*i/4,yy=Y(m);
+    s+=`<line x1="${mL}" y1="${yy}" x2="${mL+pw}" y2="${yy}" stroke="${p.dim}" stroke-opacity="0.13"/>`;
+    s+=`<text x="${mL-5}" y="${yy+3}" fill="${p.dim}" font-size="8.5" text-anchor="end" font-family="IBM Plex Mono">${f(m,1)}</text>`;}
+  s+=`<line x1="${mL}" y1="${mT}" x2="${mL}" y2="${mT+ph}" stroke="${p.dim}"/>`;
+  s+=`<line x1="${mL}" y1="${mT+ph}" x2="${mL+pw}" y2="${mT+ph}" stroke="${p.dim}"/>`;
+  let d='';
+  for(let i=0;i<=40;i++){const mx=Mnx*i/40; const vv=1-Math.pow(Mnx>0?mx/Mnx:0,alpha); const my=vv>0?Mny*Math.pow(vv,1/alpha):0; d+=(i?'L':'M')+X(mx).toFixed(1)+' '+Y(my).toFixed(1)+' ';}
+  s+=`<path d="${d}" fill="${p.main}22" stroke="${p.main}" stroke-width="2"/>`;
+  const inside=(Mnx>0&&Mny>0)?(Math.pow(Mux/Mnx,alpha)+Math.pow(Muy/Mny,alpha)<=1):false;
+  s+=`<circle cx="${X(Mux)}" cy="${Y(Muy)}" r="5" fill="${inside?p.green:p.main}" stroke="#fff" stroke-width="1.5"/>`;
+  s+=`<text x="${Math.min(X(Mux)+8,W-95)}" y="${Y(Muy)-6}" fill="${p.dim}" font-size="9.5" font-family="IBM Plex Mono">(${f(Mux,1)}, ${f(Muy,1)})</text>`;
+  s+=`<text x="${mL+pw/2}" y="${H-6}" fill="${p.dim}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">ϕMnx (t·m)</text>`;
+  s+=`<text x="13" y="${mT+ph/2}" fill="${p.dim}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono" transform="rotate(-90 13 ${mT+ph/2})">ϕMny (t·m)</text>`;
+  s+=`<text x="${mL+pw-4}" y="${mT+12}" fill="${p.cut}" font-size="9" text-anchor="end" font-family="IBM Plex Mono">contour @ Pu=${f(window._PuCol||0,0)}t, α=${alpha}</text>`;
+  s+=`</svg>`; return s;
+}
+function colBars(nx,ny,hxc,hyc,Abar){
+  const pts=[], seen=new Set();
+  const add=(x,y)=>{const k=x.toFixed(2)+','+y.toFixed(2); if(!seen.has(k)){seen.add(k);pts.push({x,y,As:Abar});}};
+  const lin=(a,b,n)=>n<=1?[(a+b)/2]:Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+  lin(-hxc,hxc,nx).forEach(x=>{add(x,hyc);add(x,-hyc);});
+  lin(-hyc,hyc,ny).forEach(y=>{add(-hxc,y);add(hxc,y);});
+  return pts;
+}
+function drawColSection(elId,cx,cy,cov,bars,dbL,tieDb){
+  const p=pal(), W=600,Hsvg=380, m=80, nL=bars.length;
+  const sc=Math.min((W-2*m)/cx,(Hsvg-2*m)/cy);
+  const cw=cx*sc, ch=cy*sc, ox=(W-cw)/2, oy=(Hsvg-ch)/2, ccx=W/2, ccy=Hsvg/2;
+  let s=`<rect x="0" y="0" width="${W}" height="${Hsvg}" fill="${p.bg}"/>`;
+  s+=`<rect x="${ox}" y="${oy}" width="${cw}" height="${ch}" fill="${p.col}" stroke="${p.colEdge}" stroke-width="2"/>`;
+  {
+    const pxcm=sc/100, Wc=cx*100, Hc=cy*100, covc=cov*100, diaT=tieDb/10, diaM=dbL/10;
+    const stiW=Math.min(Math.max(diaT*pxcm,1.6),8);
+    const rW=(diaT+diaM)/2, fillet=Math.min(Math.max(rW,1.2),Math.min(Wc,Hc)*0.12)*pxcm;
+    const zL=-(Wc/2-covc-diaT/2), zR=Wc/2-covc-diaT/2, yB=-(Hc/2-covc-diaT/2), yT=Hc/2-covc-diaT/2;
+    const innerW=zR-zL, tail=Math.min(6*diaT, innerW*0.42);
+    const D=Math.PI/180, s1=Math.SQRT1_2, yC=yT-rW, zC=zL+rW;
+    const Pt=th=>({y:yC+rW*Math.sin(th), z:zC+rW*Math.cos(th)});
+    const arc=(a,b,n)=>{const o=[];for(let i=0;i<=n;i++)o.push(Pt(a+(b-a)*i/n));return o;};
+    const hookA=arc(45*D,180*D,14), hookB=arc(90*D,225*D,14);
+    const tipA={y:hookA[0].y-s1*tail, z:hookA[0].z+s1*tail};
+    const tipB={y:hookB[hookB.length-1].y-s1*tail, z:hookB[hookB.length-1].z+s1*tail};
+    const ptsC=[tipA,...hookA,{y:yB,z:zL},{y:yB,z:zR},{y:yT,z:zR},...hookB,tipB];
+    const S=ptsC.map(q=>({x:ccx+q.z*pxcm, y:ccy-q.y*pxcm}));
+    const len=vv=>Math.hypot(vv.x,vv.y), Vv=(a,b)=>({x:b.x-a.x,y:b.y-a.y});
+    let d=`M ${S[0].x.toFixed(1)} ${S[0].y.toFixed(1)}`;
+    for(let j=1;j<S.length-1;j++){
+      const Pc=S[j], inV=Vv(S[j-1],Pc), outV=Vv(Pc,S[j+1]);
+      const il=len(inV)||1e-6, ol=len(outV)||1e-6, dd=Math.min(fillet, il*0.5, ol*0.5);
+      const A={x:Pc.x-inV.x/il*dd, y:Pc.y-inV.y/il*dd}, Bp={x:Pc.x+outV.x/ol*dd, y:Pc.y+outV.y/ol*dd};
+      d+=` L ${A.x.toFixed(1)} ${A.y.toFixed(1)} Q ${Pc.x.toFixed(1)} ${Pc.y.toFixed(1)} ${Bp.x.toFixed(1)} ${Bp.y.toFixed(1)}`;
+    }
+    const last=S[S.length-1]; d+=` L ${last.x.toFixed(1)} ${last.y.toFixed(1)}`;
+    s+=`<path d="${d}" fill="none" stroke="${p.cut}" stroke-width="${stiW.toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  const r=Math.min(Math.max(dbL/1000*sc/2,3.5),7);
+  bars.forEach(b=>{const px=ccx+(b.x/100)*sc, py=ccy-(b.y/100)*sc;
+    s+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${r}" fill="${p.main}" stroke="${p.colEdge}" stroke-width="1"/>`;});
+  const dy=oy+ch+26;
+  s+=`<line x1="${ox}" y1="${dy}" x2="${ox+cw}" y2="${dy}" stroke="${p.dim}"/><text x="${W/2}" y="${dy+15}" fill="${p.dim}" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">c<tspan baseline-shift="sub" font-size="8">x</tspan> = ${cx.toFixed(2)} m</text>`;
+  const dx=ox+cw+24;
+  s+=`<line x1="${dx}" y1="${oy}" x2="${dx}" y2="${oy+ch}" stroke="${p.dim}"/><text x="${dx+8}" y="${oy+ch/2}" fill="${p.dim}" font-size="11" text-anchor="middle" font-family="IBM Plex Mono" transform="rotate(90 ${dx+8} ${oy+ch/2})">c<tspan baseline-shift="sub" font-size="8">y</tspan> = ${cy.toFixed(2)} m</text>`;
+  s+=`<text x="${ox}" y="${oy-30}" fill="${p.main}" font-size="11" font-family="IBM Plex Mono">● ${nL}-Dia.${dbL} เหล็กยืน</text>`;
+  s+=`<text x="${ox}" y="${oy-14}" fill="${p.cut}" font-size="11" font-family="IBM Plex Mono">▭ ปลอก Dia.${tieDb}</text>`;
+  $(elId).innerHTML=s;
+}
+function drawDowelElevation(elId,cx,cy,Hf,covF,dwN,dwDb,ldc,avail,lap,B,ecx,dbBotM,dbTopM){
+  const p=pal(), W=600,Hsvg=440, m=70;
+  const availW=W-2*m, availH=Hsvg-2*m;
+  const colShow=Math.max(Hf*1.3,(lap/1000)+0.35), totalH=Hf+colShow;
+  const sc=Math.min(availW/Math.max(B,cx*1.6), availH/totalH);
+  const baseY=Hsvg-m, fw=B*sc, fh=Hf*sc, ox=(W-fw)/2, fTop=baseY-fh;
+  const cw=cx*sc, ccx=W/2+(ecx||0)*sc, colTopY=fTop-colShow*sc;
+  let s=`<rect x="0" y="0" width="${W}" height="${Hsvg}" fill="${p.bg}"/>`;
+  s+=`<rect x="${ox}" y="${fTop}" width="${fw}" height="${fh}" fill="${p.foot}" stroke="${p.footEdge}" stroke-width="2"/>`;
+  s+=`<rect x="${ccx-cw/2}" y="${colTopY}" width="${cw}" height="${fTop-colTopY}" fill="${p.col}" stroke="${p.colEdge}" stroke-width="2"/>`;
+  s+=`<text x="${ccx}" y="${colTopY+15}" fill="${p.colTxt}" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">เสาตอม่อ</text>`;
+  s+=`<line x1="${ox}" y1="${fTop}" x2="${ox+fw}" y2="${fTop}" stroke="${p.dim}" stroke-dasharray="4 3"/>`;
+  const dbBot=(dbBotM||16)/1000, dbTop=(dbTopM||16)/1000;
+  const yBotMat=baseY-covF*sc-dbBot*sc/2;
+  const yTopMat=yBotMat-dbBot*sc/2-dbTop*sc/2;
+  const xML=ox+covF*sc, xMR=ox+fw-covF*sc;
+  s+=`<line x1="${xML}" y1="${yBotMat}" x2="${xMR}" y2="${yBotMat}" stroke="${p.cut}" stroke-width="2.5"/>`;
+  s+=`<text x="${xMR}" y="${yBotMat+12}" fill="${p.cut}" font-size="9" text-anchor="end" font-family="IBM Plex Mono">ตะแกรงล่างฐาน</text>`;
+  s+=`<line x1="${xML}" y1="${yTopMat}" x2="${xMR}" y2="${yTopMat}" stroke="${p.main}" stroke-width="2.5"/>`;
+  s+=`<text x="${xMR}" y="${yTopMat-4}" fill="${p.main}" font-size="9" text-anchor="end" font-family="IBM Plex Mono">ตะแกรงบนฐาน (เหล็กยืนพักบนนี้)</text>`;
+  const cbar=p.bg==='#fff'?'#9a7b0a':'#f5c842';
+  const dwInset=cw*0.30, hookLen=12*(dwDb/1000)*sc;
+  const yHook=yTopMat-dbTop*sc/2-(dwDb/1000)*sc/2;
+  const topDw=Math.max(fTop-(lap/1000)*sc, colTopY+6);
+  [-1,1].forEach(side=>{const x=ccx+side*dwInset;
+    s+=`<line x1="${x}" y1="${topDw}" x2="${x}" y2="${yHook}" stroke="${cbar}" stroke-width="3.5"/>`;
+    s+=`<line x1="${x}" y1="${yHook}" x2="${x+side*hookLen}" y2="${yHook}" stroke="${cbar}" stroke-width="3.5" stroke-linecap="round"/>`;});
+  const dimX=ox+fw+22;
+  s+=`<line x1="${dimX}" y1="${fTop}" x2="${dimX}" y2="${yHook}" stroke="${p.dim}"/><line x1="${dimX-4}" y1="${fTop}" x2="${dimX+4}" y2="${fTop}" stroke="${p.dim}"/><line x1="${dimX-4}" y1="${yHook}" x2="${dimX+4}" y2="${yHook}" stroke="${p.dim}"/>`;
+  s+=`<text x="${dimX+8}" y="${(fTop+yHook)/2}" fill="${p.dim}" font-size="9.5" font-family="IBM Plex Mono" transform="rotate(90 ${dimX+8} ${(fTop+yHook)/2})" text-anchor="middle">ฝังในฐาน ${f(avail,0)} ≥ l_dc ${f(ldc,0)} mm</text>`;
+  const lapX=ccx-cw/2-18;
+  s+=`<line x1="${lapX}" y1="${topDw}" x2="${lapX}" y2="${fTop}" stroke="${cbar}"/><text x="${lapX-8}" y="${(topDw+fTop)/2}" fill="${cbar}" font-size="9.5" font-family="IBM Plex Mono" transform="rotate(-90 ${lapX-8} ${(topDw+fTop)/2})" text-anchor="middle">ต่อทาบ ${f(lap,0)} mm</text>`;
+  s+=`<text x="${ox}" y="${Hsvg-10}" fill="${cbar}" font-size="11" font-family="IBM Plex Mono">━ ${dwN}-Dia.${dwDb} dowel · งอขอ ≥ 12d_b = ${f(12*dwDb,0)} mm</text>`;
+  $(elId).innerHTML=s;
+}
+
+/* ════════ INIT ════════ */
+function setDates(){ const d=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  ['print-date','print-footer-date'].forEach(id=>{if($(id))$(id).textContent=d;});
+  document.querySelectorAll('.print-date-repeat').forEach(e=>e.textContent=d);
+}
+$('btn-print').addEventListener('click',()=>{ window._printMode=true; calc(); window.print(); setTimeout(()=>{window._printMode=false; calc();},500); });
+window.addEventListener('beforeprint',()=>{ window._printMode=true; calc(); });
+window.addEventListener('afterprint',()=>{ window._printMode=false; calc(); });
+document.querySelectorAll('.sidebar input, .sidebar select').forEach(el=>{
+  el.addEventListener('input',calc); el.addEventListener('change',calc);
+});
+setDates();
+renderColInputs();
+renderLayerInputs();
+calc();
+</script>
+
+<!-- ════════ 3D VIEW (Three.js) — combined footing + multiple pedestals ════════ -->
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+let THREE, OrbitControls;
+try{
+  THREE = await import('three');
+  ({ OrbitControls } = await import('three/addons/controls/OrbitControls.js'));
+}catch(e){ const h=document.getElementById('scene'); if(h) h.innerHTML='<div style="color:#8896b8;font-family:monospace;font-size:11px;padding:20px;text-align:center">3D view ต้องใช้อินเทอร์เน็ต (โหลด Three.js ไม่ได้)</div>'; throw e; }
+
+const host=document.getElementById('scene');
+let renderer,camera,scene,controls,group,framed=false;
+function init(){
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(host.clientWidth||600, host.clientHeight||340);
+  host.appendChild(renderer.domElement);
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(45,(host.clientWidth||600)/(host.clientHeight||340),0.02,200);
+  camera.position.set(3,3,4);
+  scene.add(new THREE.AmbientLight(0xffffff,0.8));
+  const d1=new THREE.DirectionalLight(0xffffff,0.65); d1.position.set(4,7,5); scene.add(d1);
+  const d2=new THREE.DirectionalLight(0xffffff,0.3); d2.position.set(-4,3,-5); scene.add(d2);
+  controls=new OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true; controls.dampingFactor=0.12;
+  controls.mouseButtons={LEFT:THREE.MOUSE.ROTATE,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.PAN};
+  controls.rotateSpeed=0.9;
+  controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
+  group=new THREE.Group(); scene.add(group);
+  let lw=0,lh=0;
+  (function loop(){ requestAnimationFrame(loop);
+    const w=host.clientWidth,h=host.clientHeight;
+    if(w>0&&h>0&&(w!==lw||h!==lh)){lw=w;lh=h;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
+    controls.update(); renderer.render(scene,camera);
+  })();
+}
+function clearGroup(){ for(let i=group.children.length-1;i>=0;i--){const c=group.children[i]; group.remove(c); c.traverse&&c.traverse(o=>{o.geometry&&o.geometry.dispose();o.material&&o.material.dispose&&o.material.dispose();});} }
+function box(w,d,h,color,op){ const g=new THREE.BoxGeometry(w,h,d); const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({color,transparent:true,opacity:op}));
+  m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.4}))); return m; }
+function bar(len,axis,color,dia){ const g=new THREE.CylinderGeometry(dia/2,dia/2,len,10); const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color,metalness:0.4,roughness:0.5}));
+  if(axis==='x')m.rotation.z=Math.PI/2; else if(axis==='z')m.rotation.x=Math.PI/2; return m; }
+function roundedTube(pts, rad, bendR, mat, closed=false){
+  if(!pts || pts.length<2) return null;
+  const path=new THREE.CurvePath(), n=pts.length;
+  if(!closed){
+    let prev=pts[0].clone();
+    for(let i=1;i<n-1;i++){
+      const A=pts[i-1],B=pts[i],C=pts[i+1];
+      const dA=new THREE.Vector3().subVectors(B,A), lA=dA.length(); dA.normalize();
+      const dC=new THREE.Vector3().subVectors(C,B), lC=dC.length(); dC.normalize();
+      const r=Math.min(bendR,lA*0.49,lC*0.49);
+      const p1=B.clone().addScaledVector(dA,-r), p2=B.clone().addScaledVector(dC,r);
+      path.add(new THREE.LineCurve3(prev.clone(),p1));
+      path.add(new THREE.QuadraticBezierCurve3(p1,B.clone(),p2));
+      prev=p2.clone();
+    }
+    path.add(new THREE.LineCurve3(prev,pts[n-1].clone()));
+  } else {
+    const P1=[],P2=[],BB=[];
+    for(let i=0;i<n;i++){
+      const A=pts[(i-1+n)%n],B=pts[i],C=pts[(i+1)%n];
+      const dA=new THREE.Vector3().subVectors(B,A), lA=dA.length(); dA.normalize();
+      const dC=new THREE.Vector3().subVectors(C,B), lC=dC.length(); dC.normalize();
+      const r=Math.min(bendR,lA*0.49,lC*0.49);
+      P1[i]=B.clone().addScaledVector(dA,-r); P2[i]=B.clone().addScaledVector(dC,r); BB[i]=B.clone();
+    }
+    for(let i=0;i<n;i++){
+      path.add(new THREE.QuadraticBezierCurve3(P1[i],BB[i],P2[i]));
+      path.add(new THREE.LineCurve3(P2[i].clone(),P1[(i+1)%n].clone()));
+    }
+  }
+  const segs=Math.min(420,Math.max(40,Math.ceil(path.getLength()/(Math.max(bendR,0.005)*Math.PI/90))));
+  const tube=new THREE.Mesh(new THREE.TubeGeometry(path,segs,rad,10,closed), mat);
+  const _np=Math.min(90,Math.max(8,Math.round(path.getLength()/0.035)));
+  let _ln=path.getSpacedPoints(_np); if(closed && _ln.length>1) _ln=_ln.slice(0,-1);
+  const _el={pts:_ln, r:rad, closed:!!closed, hex:(mat&&mat.color)?mat.color.getHexString():'cccccc'};
+  if(closed){ tube.userData.exportLine=_el; return tube; }
+  const grp=new THREE.Group(); grp.add(tube);
+  const cap=new THREE.SphereGeometry(rad,12,8);
+  const a=new THREE.Mesh(cap,mat); a.position.copy(pts[0]); grp.add(a);
+  const b=new THREE.Mesh(cap,mat); b.position.copy(pts[pts.length-1]); grp.add(b);
+  grp.userData.exportLine=_el;
+  return grp;
+}
+function basketBar(len,axis,color,dia,footH,cov,legInset=0){
+  const mat=new THREE.MeshStandardMaterial({color,metalness:0.5,roughness:0.45}), V=(x,y,z)=>new THREE.Vector3(x,y,z);
+  const mlen=Math.max(len-2*legInset,len*0.4), legH=Math.max(footH-2*cov,0.05), hk=Math.min(mlen*0.10,legH*0.7), eP=mlen/2;
+  const pts = axis==='x'
+    ? [V(-eP+hk,legH,0),V(-eP,legH,0),V(-eP,0,0),V(eP,0,0),V(eP,legH,0),V(eP-hk,legH,0)]
+    : [V(0,legH,-eP+hk),V(0,legH,-eP),V(0,0,-eP),V(0,0,eP),V(0,legH,eP),V(0,legH,eP-hk)];
+  return roundedTube(pts,dia/2,Math.min(2*dia,legH*0.3),mat,false);
+}
+function colStirrup(y, hx, hz, dia, mainDia, mat){
+  const V=(x,yy,z)=>new THREE.Vector3(x,yy,z), D=Math.PI/180;
+  const md=mainDia>0?mainDia:dia*2, rW=(dia+md)/2;
+  const fillet=Math.min(Math.max(rW,dia*1.2),Math.min(hx,hz)*0.5);
+  const tail=Math.min(6*dia, hz*0.84, hx*0.9);
+  const xC=hx-rW, zC=-hz+rW;
+  const P=th=>V(xC+rW*Math.sin(th), y, zC+rW*Math.cos(th));
+  const arc=(a,b,n)=>{const o=[];for(let i=0;i<=n;i++)o.push(P(a+(b-a)*i/n));return o;};
+  const dir=new THREE.Vector3(-Math.SQRT1_2,0,Math.SQRT1_2);
+  const BL=V(-hx,y,-hz), BR=V(-hx,y,hz), TR=V(hx,y,hz);
+  const hookA=arc(45*D,180*D,12), tipA=hookA[0].clone().addScaledVector(dir,tail);
+  const hookB=arc(90*D,225*D,12), tipB=hookB[hookB.length-1].clone().addScaledVector(dir,tail);
+  const corners=[tipA,...hookA,BL,BR,TR,...hookB,tipB];
+  const nA=1+hookA.length, nB=hookB.length+1;
+  corners.forEach((c,i)=>{ c.y = i<nA ? y-dia/2 : (i>=corners.length-nB ? y+dia/2 : y); });
+  return roundedTube(corners, dia/2, fillet, mat, false);
+}
+function colBars3D(nx,ny,hx,hz){
+  const pts=[],seen=new Set();
+  const add=(x,z)=>{const k=x.toFixed(3)+','+z.toFixed(3); if(!seen.has(k)){seen.add(k);pts.push({x,z});}};
+  const lin=(a,b,n)=>n<=1?[(a+b)/2]:Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+  lin(-hx,hx,nx).forEach(x=>{add(x,hz);add(x,-hz);});
+  lin(-hz,hz,ny).forEach(z=>{add(-hx,z);add(hx,z);});
+  return pts;
+}
+function buildPedestal3D(c,F,colH,halfX,halfZ,yDowelRest,fX,fZ){
+  const Hh=F.Hh, V=(x,y,z)=>new THREE.Vector3(x,y,z), ex=c.x, ez=c.y;
+  group.add((m=>{m.position.set(ex,Hh+colH/2,ez);return m;})(box(c.cx,c.cy,colH,0x4a90d9,0.18)));
+  const covc=(c.colCov||4)/100, dbL=c.dbL, tieDb=c.tieDb, nx=Math.max(c.nx,2), ny=Math.max(c.ny,2);
+  const dL=Math.max(dbL/1000,0.012), dT=Math.max(tieDb/1000,0.008);
+  const inset=covc+tieDb/1000+dbL/2000, hxc=Math.max(c.cx/2-inset,0.02), hzc=Math.max(c.cy/2-inset,0.02);
+  const bars=colBars3D(nx,ny,hxc,hzc);
+  const lmat=new THREE.MeshStandardMaterial({color:0xf5c842,metalness:0.5,roughness:0.45});
+  const tmat=new THREE.MeshStandardMaterial({color:0x22d3ee,metalness:0.5,roughness:0.45});
+  const hk=12*(dbL/1000), yTopc=Hh+colH;
+  bars.forEach(b=>{
+    const px=ex+b.x, pz=ez+b.z;
+    let dx=b.x,dz=b.z,dl=Math.hypot(dx,dz)||1; dx/=dl; dz/=dl;
+    let tx=Math.max(-fX,Math.min(fX,px+hk*dx)), tz=Math.max(-fZ,Math.min(fZ,pz+hk*dz));
+    const pts=[V(tx,yDowelRest,tz), V(px,yDowelRest,pz), V(px,yTopc,pz)];
+    const m=roundedTube(pts,dL/2,Math.min(2*dL,hk*0.4),lmat,false); if(m)group.add(m);
+  });
+  let mhx=0,mhz=0; bars.forEach(b=>{mhx=Math.max(mhx,Math.abs(b.x));mhz=Math.max(mhz,Math.abs(b.z));});
+  const tox=mhx+dL/2+dT/2, toz=mhz+dL/2+dT/2, tS=Math.max(c.tieS,0.05); let cnt=0;
+  for(let y=Hh+tS*0.5; y<=Hh+colH-0.02 && cnt<40; y+=tS,cnt++){
+    const t=colStirrup(y,tox,toz,dT,dL,tmat); if(t){t.position.x+=ex;t.position.z+=ez;group.add(t);}
+  }
+}
+window._render3D=function(){
+  if(!group) return; const F=window._F3D; if(!F||!F.cols) return;
+  clearGroup();
+  const {B,L,Hh,cov}=F, add=(mesh,x,y,z)=>{mesh.position.set(x,y,z);group.add(mesh);return mesh;};
+  add(box(B,L,Hh,0x8aa0c8,0.16),0,Hh/2,0);
+  const colH=Math.max(F.Lu||0.5,0.3);
+  // bottom mat — แนวหลัก (mainDir, โมเมนต์มากกว่า) = ชั้นล่างสุด (d มากสุด) · แนวรอง = วางทับด้านบน
+  const xOuter=(F.mainDir!=='Y');   // X เป็นชั้นนอก(ล่างสุด/บนสุด) เว้นแต่โมเมนต์แนว Y มากกว่า
+  const dvxB=Math.max(F.dbxb/1000,0.009), dvyB=Math.max(F.dbyb/1000,0.009);
+  const yBotX=xOuter?cov+dvxB/2:cov+dvyB+dvxB/2, yBotY=xOuter?cov+dvxB+dvyB/2:cov+dvyB/2;
+  const halfX=B/2-cov, halfZ=L/2-cov, wrapB=dvxB/2+dvyB/2, posZb=halfZ-wrapB, posXb=halfX-wrapB;
+  for(let i=0;i<F.nxb;i++){ const z=F.nxb>1?-posZb+2*posZb*i/(F.nxb-1):0; add(basketBar(2*halfX,'x',0xf0883e,dvxB,Hh,cov,0),0,yBotX,z); }
+  for(let i=0;i<F.nyb;i++){ const x=F.nyb>1?-posXb+2*posXb*i/(F.nyb-1):0; add(basketBar(2*halfZ,'z',0x4a90d9,dvyB,Hh,cov,0),x,yBotY,0); }
+  // top mat — แนวหลัก = บนสุด (ชั้นนอก) · แนวรอง = อยู่ใต้
+  const dvxT=Math.max(F.dbxt/1000,0.008), dvyT=Math.max(F.dbyt/1000,0.008);
+  const yTopX=xOuter?Hh-cov-dvxT/2:Hh-cov-dvyT-dvxT/2, yTopY=xOuter?Hh-cov-dvxT-dvyT/2:Hh-cov-dvyT/2;
+  for(let i=0;i<F.nxt;i++){ const z=F.nxt>1?-posZb+2*posZb*i/(F.nxt-1):0; add(bar(2*halfX,'x',0xf6b07a,dvxT),0,yTopX,z); }
+  for(let i=0;i<F.nyt;i++){ const x=F.nyt>1?-posXb+2*posXb*i/(F.nyt-1):0; add(bar(2*halfZ,'z',0x86b9e8,dvyT),x,yTopY,0); }
+  // pedestals + their longitudinal/dowel/tie reinforcement — dowel วางบน "เหล็กชั้นบนของตะแกรงล่าง"
+  const yUpperBot=Math.max(yBotX,yBotY), dUpperBot=(yBotX>=yBotY?dvxB:dvyB);
+  const yDowelRest=yUpperBot+dUpperBot/2+Math.max(F.cols[0]?F.cols[0].dbL/1000:0.016,0.012)/2;
+  const fX=Math.max(halfX-dvxB/2,0.05), fZ=Math.max(halfZ-dvyB/2,0.05);
+  F.cols.forEach(c=>buildPedestal3D(c,F,colH,halfX,halfZ,yDowelRest,fX,fZ));
+  if(!framed){ const md=Math.max(B,L,Hh+colH), d=md*1.9; camera.position.set(d*0.85,d*0.7,d); controls.target.set(0,(Hh+colH)*0.4,0); controls.update(); framed=true; }
+  window._3Dinfo={children:group.children.length, canvas:[renderer.domElement.width,renderer.domElement.height]};
+};
+
+/* ── Export COLLADA (.dae) — real size (m), import to SketchUp ── */
+function exportDAE3D(){
+  try{ if(window._render3D) window._render3D(); }catch(e){}
+  if(!group){ alert('ยังไม่มีโมเดล 3D'); return; }
+  group.updateMatrixWorld(true);
+  const buckets={};
+  const tri=(arr,a,b,c)=>{ arr.push(a.x,a.y,a.z,b.x,b.y,b.z,c.x,c.y,c.z); };
+  const SIDES=10;
+  function tubeOut(pts,r,closed,arr){
+    const n=pts.length; if(n<2) return; const rings=[]; let prevN=null;
+    for(let i=0;i<n;i++){
+      const t=new THREE.Vector3();
+      if(closed) t.subVectors(pts[(i+1)%n],pts[(i-1+n)%n]);
+      else if(i===0) t.subVectors(pts[1],pts[0]);
+      else if(i===n-1) t.subVectors(pts[n-1],pts[n-2]);
+      else t.subVectors(pts[i+1],pts[i-1]);
+      if(t.lengthSq()<1e-12) t.set(0,1,0); t.normalize();
+      let nrm = prevN ? prevN.clone().addScaledVector(t,-prevN.dot(t)) : null;
+      if(!nrm || nrm.lengthSq()<1e-9){ const a=Math.abs(t.y)<0.9?new THREE.Vector3(0,1,0):new THREE.Vector3(1,0,0); nrm=new THREE.Vector3().crossVectors(t,a); }
+      nrm.normalize(); prevN=nrm.clone();
+      const bin=new THREE.Vector3().crossVectors(t,nrm).normalize(), ring=[];
+      for(let s=0;s<SIDES;s++){ const ang=2*Math.PI*s/SIDES; ring.push(pts[i].clone().addScaledVector(nrm,r*Math.cos(ang)).addScaledVector(bin,r*Math.sin(ang))); }
+      rings.push(ring);
+    }
+    const segN=closed?n:n-1;
+    for(let i=0;i<segN;i++){ const r0=rings[i],r1=rings[(i+1)%n]; for(let s=0;s<SIDES;s++){ const s2=(s+1)%SIDES; tri(arr,r0[s],r0[s2],r1[s2]); tri(arr,r0[s],r1[s2],r1[s]); } }
+    if(!closed){ for(let s=1;s<SIDES-1;s++){ tri(arr,rings[0][0],rings[0][s+1],rings[0][s]); tri(arr,rings[n-1][0],rings[n-1][s],rings[n-1][s+1]); } }
+  }
+  const rebarObjs=[]; group.traverse(o=>{ if(o.userData&&o.userData.exportLine) rebarObjs.push(o); });
+  rebarObjs.forEach(o=>{ const el=o.userData.exportLine, mw=o.matrixWorld;
+    const pts=el.pts.map(p=>p.clone().applyMatrix4(mw));
+    const key='S_'+el.hex, arr=buckets[key]||(buckets[key]=[]); tubeOut(pts, el.r, el.closed, arr);
+  });
+  const tmp=new THREE.Vector3();
+  group.traverse(o=>{
+    if(!o.isMesh || !o.geometry) return;
+    let p=o,skip=false; while(p){ if(p.userData&&p.userData.exportLine){skip=true;break;} p=p.parent; }
+    if(skip) return;
+    const pos=o.geometry.attributes && o.geometry.attributes.position; if(!pos) return;
+    const mat=Array.isArray(o.material)?o.material[0]:o.material; if(!mat) return;
+    const hex=mat.color?mat.color.getHexString():'cccccc';
+    const key=(mat.transparent?'C_':'S_')+hex, arr=buckets[key]||(buckets[key]=[]);
+    const mw=o.matrixWorld, idx=o.geometry.index;
+    const emit=i=>{ tmp.fromBufferAttribute(pos,i).applyMatrix4(mw); arr.push(tmp.x,tmp.y,tmp.z); };
+    if(idx){ for(let i=0;i<idx.count;i++) emit(idx.getX(i)); } else { for(let i=0;i<pos.count;i++) emit(i); }
+  });
+  const nameFor=key=>{ const c=key[0]==='C', hex=key.slice(2);
+    const m={'8aa0c8':'Footing_Concrete','4a90d9':c?'Pedestal_Concrete':'Rebar_Y_bot','f0883e':'Rebar_X_bot','f6b07a':'Rebar_X_top','86b9e8':'Rebar_Y_top','f5c842':'Column_Long_Dowel','22d3ee':'Tie'};
+    return (m[hex]||(c?'Concrete':'Steel'))+'_'+hex; };
+  let effects='',materials='',geometries='',nodes='',tris=0;
+  Object.keys(buckets).forEach(key=>{
+    const arr=buckets[key]; if(!arr||arr.length<9) return;
+    const hex=key.slice(2), name=nameFor(key), sid='sym_'+key, gid='geo_'+key;
+    const r=(parseInt(hex.slice(0,2),16)/255).toFixed(4), gg=(parseInt(hex.slice(2,4),16)/255).toFixed(4), b=(parseInt(hex.slice(4,6),16)/255).toFixed(4);
+    const nV=arr.length/3;
+    effects+=`<effect id="eff_${key}"><profile_COMMON><technique sid="t"><lambert><diffuse><color>${r} ${gg} ${b} 1</color></diffuse></lambert></technique></profile_COMMON></effect>`;
+    materials+=`<material id="mat_${key}" name="${name}"><instance_effect url="#eff_${key}"/></material>`;
+    let pp=''; for(let i=0;i<nV;i++) pp+=(i?' ':'')+i;
+    geometries+=`<geometry id="${gid}" name="${name}"><mesh>`+
+      `<source id="${gid}-pos"><float_array id="${gid}-arr" count="${arr.length}">${arr.map(n=>(+n.toFixed(5))).join(' ')}</float_array>`+
+      `<technique_common><accessor source="#${gid}-arr" count="${nV}" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>`+
+      `<vertices id="${gid}-vtx"><input semantic="POSITION" source="#${gid}-pos"/></vertices>`+
+      `<triangles count="${nV/3}" material="${sid}"><input semantic="VERTEX" source="#${gid}-vtx" offset="0"/><p>${pp}</p></triangles>`+
+      `</mesh></geometry>`;
+    nodes+=`<node id="n_${key}" name="${name}"><instance_geometry url="#${gid}"><bind_material><technique_common><instance_material symbol="${sid}" target="#mat_${key}"/></technique_common></bind_material></instance_geometry></node>`;
+    tris+=nV/3;
+  });
+  const now=new Date().toISOString();
+  const dae='<?xml version="1.0" encoding="utf-8"?>\n'+
+    '<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">'+
+    `<asset><contributor><authoring_tool>CivilToolkit CombinedFooting</authoring_tool></contributor><created>${now}</created><modified>${now}</modified><unit meter="1" name="meter"/><up_axis>Y_UP</up_axis></asset>`+
+    `<library_effects>${effects}</library_effects><library_materials>${materials}</library_materials>`+
+    `<library_geometries>${geometries}</library_geometries>`+
+    `<library_visual_scenes><visual_scene id="scene" name="scene">${nodes}</visual_scene></library_visual_scenes>`+
+    '<scene><instance_visual_scene url="#scene"/></scene></COLLADA>';
+  const blob=new Blob([dae],{type:'model/vnd.collada+xml'});
+  const url=URL.createObjectURL(blob);
+  const F=window._F3D||{}, fn=`combined_footing_${F.B||0}x${F.L||0}x${F.Hh||0}m.dae`;
+  const a=document.createElement('a'); a.href=url; a.download=fn;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+}
+const _daeBtn=document.getElementById('btnDae'); if(_daeBtn) _daeBtn.onclick=exportDAE3D;
+init();
+if(window._F3D) window._render3D();
+</script>
+</body></html>
