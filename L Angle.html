@@ -520,12 +520,13 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <div class="sec-block">
   <div class="sec-hdr"><span class="sec-tag tag-green">E3 — Compr</span><span class="sec-title">Compression — Flexural Buckling Strong &amp; Weak Axis</span><span class="sec-ref">AISC 360-22 E3 / E7</span></div>
   <div class="rep-col-full" style="border-top:1px solid var(--border)">
-    <div class="sdiv">Q — Reduction factor for slender elements (E7)</div>
+    <div class="sdiv">A<sub>e</sub> — Effective area for slender legs (E7, 360-22) · Flexural-torsional (E4)</div>
     <div style="display:flex;gap:20px;margin-bottom:10px;flex-wrap:wrap">
-      <div style="font-size:12px">Q<sub>s</sub> (flange) = <span style="color:var(--yellow);font-weight:700" id="co_Qs">—</span></div>
-      <div style="font-size:12px">Q<sub>a</sub> (web) = <span style="color:var(--yellow);font-weight:700" id="co_Qa">—</span></div>
-      <div style="font-size:12px">Q = Q<sub>s</sub>×Q<sub>a</sub> = <span style="color:var(--yellow);font-weight:700" id="co_Q">—</span></div>
-      <div style="font-size:12px">4.71√(E/QF<sub>y</sub>) = <span style="color:var(--yellow);font-weight:700" id="co_lim">—</span></div>
+      <div style="font-size:12px">A<sub>e</sub> แกน w (cm²) = <span style="color:var(--yellow);font-weight:700" id="co_Qs">—</span></div>
+      <div style="font-size:12px">A<sub>e</sub> แกน z (cm²) = <span style="color:var(--yellow);font-weight:700" id="co_Qa">—</span></div>
+      <div style="font-size:12px">A<sub>e</sub>/A<sub>g</sub> (ค่าน้อย) = <span style="color:var(--yellow);font-weight:700" id="co_Q">—</span></div>
+      <div style="font-size:12px">4.71√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:700" id="co_lim">—</span></div>
+      <div style="font-size:12px;margin-top:4px" id="co_ft">—</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
       <div style="border-right:1px solid var(--border);padding-right:14px">
@@ -841,8 +842,9 @@ function calculate(){
   if(A/2 <= A_h + t*t){
     // PNA in horizontal-leg region (y_p ≤ t) — rare, tall-narrow angle
     // Below: portion of both legs up to y_p; this is complex
-    y_p = (A/2) / bf;   // approximate for very thin legs
-    Zx = 0;  // fallback (will refine if needed)
+    y_p = (A/2) / bf;   // PNA inside the horizontal leg: area below = bf·y_p
+    // below: bf·y_p at y_p/2 · above: horizontal-leg rest bf·(t−y_p) + vertical leg t·(d−t)
+    Zx = bf*y_p*(y_p/2) + bf*(t-y_p)*((t-y_p)/2) + t*(d-t)*((t+d)/2 - y_p);
   } else {
     y_p = (A/2 - A_h) / t;
     // Below y_p:
@@ -1009,7 +1011,9 @@ function calculate(){
   const htw = d/t;
   const lsh = 1.10*Math.sqrt(1.2*E/Fy);   // G4: limit = 1.10√(1.2·E/Fy)
   const shx_case1 = htw <= lsh;
-  const Cv1 = shx_case1 ? 1.0 : Math.min(lsh/htw, 1.0);
+  const lsh2 = 1.37*Math.sqrt(1.2*E/Fy);
+  const cv2f = r => r<=lsh ? 1.0 : (r<=lsh2 ? lsh/r : 1.51*1.2*E/(r*r*Fy));   // G2-9..G2-11 (G3: kv = 1.2)
+  const Cv1 = cv2f(htw);
   const phiVx = 0.90;   // G4 uses φ=0.90
   const OmVx = 1.67;
   const Vnx = 0.6*Fy*Aw*Cv1/1e3;
@@ -1029,7 +1033,7 @@ function calculate(){
   const Afy = bf*t;
   const bftf = bf/t;
   const lsh_f = lsh;
-  const Cv2 = bftf<=lsh_f?1.0:Math.min(lsh_f/bftf, 1.0);
+  const Cv2 = cv2f(bftf);
   const Vny = 0.6*Fy*Afy*Cv2/1e3;
   sv('shy_Afy',Afy,0);tx('shy_Afy_sub',bf+' × '+t);
   sv('shy_bftf',bftf,2);sv('shy_limit',lsh_f,2);sv('shy_Cv2',Cv2,3);
@@ -1040,44 +1044,66 @@ function calculate(){
   // For L-angle: check ALL three modes: rx, ry, AND rz (minor principal)
   // E3: Fcr = 0.658^(Fy/Fe)·Fy  or  0.877·Fe  based on KL/r
   // Qs for single angle (Case 4 of E7): for slender unstiffened element
-  let Qs = 1;
-  if(lf > lrf_c){
-    // E7-10: Qs = 1.34 - 0.76*(b/t)*√(Fy/E)  when 0.45√(E/Fy) < b/t ≤ 0.91√(E/Fy)
-    // E7-11: Qs = 0.53·E / (Fy·(b/t)²)       when b/t > 0.91√(E/Fy)
-    if(lf <= 0.91*Math.sqrt(E/Fy)){
-      Qs = 1.34 - 0.76*lf*Math.sqrt(Fy/E);
-    } else {
-      Qs = 0.53*E/(Fy*lf*lf);
-    }
-    Qs = Math.min(Qs, 1);
+  // AISC 360-22 E7 — legs are unstiffened elements (Table B4.1a case 3): λr = 0.45√(E/Fy), c1 = 0.22, c2 = 1.49
+  const legs = [{b:d,t:t},{b:bf,t:t}];
+  function Aeff(Fcr){
+    let Ae = A;
+    legs.forEach(L=>{
+      const lam = L.b/L.t, lr = 0.45*Math.sqrt(E/Fy);
+      if(lam > lr*Math.sqrt(Fy/Fcr)){
+        const Fel = (1.49*lr/lam)**2*Fy, rr = Math.sqrt(Fel/Fcr);
+        const be = Math.min(L.b, L.b*(1-0.22*rr)*rr);
+        Ae -= (L.b-be)*L.t;
+      }
+    });
+    return Ae;
   }
-  const Qa = 1;   // no stiffened elements in L-angle
-  const Q = Qs*Qa;
-  sv('co_Qs',Qs,4);sv('co_Qa',Qa,4);sv('co_Q',Q,4);
-
-  // ── Compression E3: check PRINCIPAL axes (w=major, z=minor) ──
-  // For single angles, AISC E5 notes that MINOR principal axis typically governs.
-  // We check all candidates including principal axes (rw, rz) — NOT geometric (rx, ry).
+  // E3 flexural buckling about principal axes (full Fy; local buckling through Ae)
   const KLrw = Kx*Lx/rw, KLrz = Ky*Ly/rz;
-  const rw_ = fcrCalc(KLrw,E,Q,Fy);     // major principal — typically not governing
-  const rz_ = fcrCalc(KLrz,E,Q,Fy);     // minor principal — usually governs for L-angles
+  const rw_ = fcrCalc(KLrw,E,1,Fy);
+  const rz_ = fcrCalc(KLrz,E,1,Fy);
   sv('co_lim',rw_.lim,1);
-  const Pnw = rw_.Fcr*A/1e3, Pnz = rz_.Fcr*A/1e3;
+  const Aew = Aeff(rw_.Fcr), Aez = Aeff(rz_.Fcr);
+  const Pnw = rw_.Fcr*Aew/1e3, Pnz = rz_.Fcr*Aez/1e3;
+  sv('co_Qs',Aew/100,2); sv('co_Qa',Aez/100,2); sv('co_Q',Math.min(Aew,Aez)/A,4);
 
   sv('co_KLrx',KLrw,1);sv('co_Fex',rw_.Fe*ksc,1);sv('co_Fcrx',rw_.Fcr*ksc,1);
-  tx('co_regime_x','KL/rw='+f(KLrw,1)+' ('+rw_.reg+') → Fcrw='+f(rw_.Fcr*ksc,1)+' ksc [major principal]');
+  tx('co_regime_x','KL/rw='+f(KLrw,1)+' ('+rw_.reg+') → Fcrw='+f(rw_.Fcr*ksc,1)+' ksc [major principal] · Ae='+f(Aew/100,2)+' cm²');
   sv('co_phiPnx',0.9*Pnw*kgf,0);sv('co_ASDPnx',Pnw/1.67*kgf,0);
 
   sv('co_KLry',KLrz,1);sv('co_Fey',rz_.Fe*ksc,1);sv('co_Fcry',rz_.Fcr*ksc,1);
-  tx('co_regime_y','KL/rz='+f(KLrz,1)+' ('+rz_.reg+') → Fcrz='+f(rz_.Fcr*ksc,1)+' ksc [MINOR principal]');
+  tx('co_regime_y','KL/rz='+f(KLrz,1)+' ('+rz_.reg+') → Fcrz='+f(rz_.Fcr*ksc,1)+' ksc [MINOR principal] · Ae='+f(Aez/100,2)+' cm²');
   sv('co_phiPny',0.9*Pnz*kgf,0);sv('co_ASDPny',Pnz/1.67*kgf,0);
 
+  // E4 — flexural-torsional buckling of single angles (required when b/t > 0.71√(E/Fy))
+  const btMax = Math.max(d,bf)/t, ftReq = btMax > 0.71*Math.sqrt(E/Fy);
+  const Gs = E/2.6;
+  const xs = t/2-xbar, ys = t/2-ybar;                       // shear center (leg intersection) – centroid
+  // find which rotated direction is the MAJOR principal axis (I about axis u = Ix·c² + Iy·s² − 2Ixy·c·s)
+  const Iu = Ix*ca*ca + Iy*sa*sa - 2*Ixy*ca*sa;
+  const uM = Math.abs(Iu-Iw) <= Math.abs(Iu-Iz) ? [ca,sa] : [-sa,ca];
+  const w0 = xs*uM[0] + ys*uM[1];                           // offset along major axis (pairs with Few)
+  const z0 = -xs*uM[1] + ys*uM[0];                          // offset along minor axis (pairs with Fez)
+  const ro2 = w0*w0 + z0*z0 + (Iw+Iz)/A;
+  const Few = rw_.Fe, Fez_ = rz_.Fe;
+  const Fet = (PI*PI*E*Cw/(Ky*Ly)**2 + Gs*J)/(A*ro2);       // KzLz = KyLy
+  const cub = F => (F-Few)*(F-Fez_)*(F-Fet) - F*F*(F-Fez_)*(w0*w0/ro2) - F*F*(F-Few)*(z0*z0/ro2);   // E4-6
+  let lo = 0, hi = Math.min(Few, Fez_, Fet);
+  for(let k=0;k<200;k++){ const m=(lo+hi)/2; if(cub(m)<0) lo=m; else hi=m; }
+  const FeFT = (lo+hi)/2;
+  const FcrFT = Fy/FeFT <= 2.25 ? Math.pow(0.658,Fy/FeFT)*Fy : 0.877*FeFT;
+  const PnFT = ftReq ? FcrFT*Aeff(FcrFT)/1e3 : Infinity;
+  hx('co_ft', ftReq
+    ? 'E4 flexural-torsional: b/t='+f(btMax,1)+' > 0.71√(E/Fy)='+f(0.71*Math.sqrt(E/Fy),1)+' → F<sub>e</sub>='+f(FeFT*ksc,0)+' ksc, F<sub>cr</sub>='+f(FcrFT*ksc,0)+' ksc, P<sub>n</sub>='+f(PnFT*kgf,0)+' kg'
+    : 'E4: b/t='+f(btMax,1)+' ≤ 0.71√(E/Fy)='+f(0.71*Math.sqrt(E/Fy),1)+' → ไม่ต้องคิด flexural-torsional');
+
   // Minor principal axis almost always governs for single angles in compression
-  const Pn_gov = Math.min(Pnw, Pnz);
+  const Pn_gov = Math.min(Pnw, Pnz, PnFT);
   const Pnx = Pnw;   // alias for legacy summary IDs
   const Pny = Pnz;   // alias for legacy summary IDs
   let col, gov_mode;
-  if(Pn_gov===Pnw){col='Major principal (w-axis) governs'; gov_mode='w';}
+  if(Pn_gov===PnFT){col='Flexural-torsional (E4) governs'; gov_mode='ft';}
+  else if(Pn_gov===Pnw){col='Major principal (w-axis) governs'; gov_mode='w';}
   else {col='MINOR principal (z-axis) governs — typical for L-angles in compression'; gov_mode='z';}
   sv('co_phiPn_gov',0.9*Pn_gov*kgf,0);sv('co_ASDPn_gov',Pn_gov/1.67*kgf,0);
   tx('co_gov_axis',col+' | KL/rz='+f(KLrz,1)+'  KL/rw='+f(KLrw,1));
