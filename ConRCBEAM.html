@@ -2004,7 +2004,14 @@ function drawSpacingPanel(viols){
    Moment Capacity Envelope vs Demand (Real Mu from analysis)
    ───────────────────────────────────────────────────────────── */
 const mnToggle={mainTop:false,mainBot:false,colExt:false,midExt:false,total:true,demand:true};
-function getLdCm(dia_mm){ return 50 * (dia_mm/10); }
+// ACI 318-19 Table 25.4.2.3 (case: clear spacing ≥ db, cover ≥ db, min. stirrups), ksc units:
+//   DB ≤ 20: ld = fy·ψt·ψe / (6.6·λ·√fc') · db      DB > 20: ld = fy·ψt·ψe / (5.3·λ·√fc') · db
+//   ψt = 1.3 for top bars (> 30 cm of fresh concrete below), ψe = 1.0 (uncoated), ld ≥ 30 cm
+function getLdCm(dia_mm, side){
+  const db = dia_mm/10, psiT = side==='top' ? 1.3 : 1.0;
+  const k = dia_mm <= 20 ? 6.6 : 5.3;
+  return Math.max(30, MAT.Fy*psiT/(k*Math.sqrt(MAT.fc))*db);
+}
 function getAllBars(){
   const bars=[]; const B=data.beam;
   const Ltot=B.L.reduce((a,b)=>a+b,0);
@@ -2040,7 +2047,7 @@ function barMnContrib(bar){
 }
 function devFactor(bar,x){
   if(x<bar.x0||x>bar.x1) return 0;
-  const Ld=getLdCm(bar.d);
+  const Ld=getLdCm(bar.d, bar.side);
   const fromStart = bar.aS ? Infinity : (x-bar.x0)/Ld;
   const fromEnd   = bar.aE ? Infinity : (bar.x1-x)/Ld;
   return Math.max(0, Math.min(1, Math.min(fromStart,fromEnd)));
@@ -2148,7 +2155,7 @@ function secxStir(x){   // หา stirrup (Ø, spacing) ที่ตำแหน
 }
 function secxShearCap(b,d,stir){   // ACI 318-22: φVn=0.75(Vc+Vs)
   if(!d||d<=0) return null;
-  const Vc=0.53*Math.sqrt(MAT.fc)*b*d, dS=(stir.d||9)/10, Av=2*Math.PI*dS*dS/4, s=stir.sp||10, Vs=Av*MAT.Fys*d/s;
+  const Vc=0.53*Math.sqrt(MAT.fc)*b*d, dS=(stir.d||9)/10, Av=2*Math.PI*dS*dS/4, s=stir.sp||10, VsMax=2.12*Math.sqrt(MAT.fc)*b*d, Vs=Math.min(Av*MAT.Fys*d/s, VsMax);   // ACI 22.5.1.2
   return {d, Vc, Vs, phiVn:0.75*(Vc+Vs), dS, s, Av};
 }
 function secxWhitney(tensBars,b){   // กำลังออกแบบ ACI Whitney (เหล็กดึงอย่างเดียว) — ตรงกับ Mn envelope + RC tools
@@ -2503,7 +2510,7 @@ function drawMnEnvelope(){
   bars.forEach(bar=>{
     if(!mnToggle[bar.grp]) return;
     const Mn=barMnContrib(bar); if(Mn<1) return;
-    const Ld=getLdCm(bar.d);
+    const Ld=getLdCm(bar.d, bar.side);
     const yPeak=bar.side==='top'?Mn:-Mn;
     const x0=bar.x0,x1=bar.x1,Lbar=x1-x0;
     let rS=bar.aS?0:Ld, rE=bar.aE?0:Ld;
@@ -2635,7 +2642,7 @@ function computeShearEnvelope(side){
       const dStirCm = (st.d||9)/10;
       const Av = 2 * Math.PI * dStirCm * dStirCm / 4;  // 2 legs
       const sSp = st.sp||10;
-      const Vs = Av * Fys * d / sSp;
+      const Vs = Math.min(Av * Fys * d / sSp, 2.12 * Math.sqrt(fc) * B.W * d);   // Vs ≤ 2.12√fc'·b·d (ACI 22.5.1.2)
       return phiV * (Vc + Vs);
     }
     segs.push({x0:xL,            x1:xL+third,    phiVn:phiVn(dColL,colSL), d:dColL});

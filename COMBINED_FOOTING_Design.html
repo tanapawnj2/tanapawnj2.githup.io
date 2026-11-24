@@ -758,7 +758,9 @@ function calc(){
     const need=isNaN(rho);                                    // section too thin (no ρ solution)
     let Asflex=need?Infinity:rho*(b*100)*(d*100);
     if(isTop&&isFinite(Asflex)&&Math.round(Asflex*10)/10<=AS_TOP_TOL) Asflex=0;
-    const Asmin=0.0018*(b*100)*(Hh*100);                      // 8.6.1.1 (13.3.4.4) — near the tension face
+    // ACI 318-19 Table 24.4.3.2: fy < 4200 ksc → 0.0020 · fy ≥ 4200 ksc → max(0.0018·4200/fy, 0.0014)
+    const rhoTS=fy<4200?0.0020:Math.max(0.0018*4200/fy,0.0014);
+    const Asmin=rhoTS*(b*100)*(Hh*100);                      // 8.6.1.1 (13.3.4.4) — near the tension face
     // ล่าง: max(flex, As,min) เสมอ · บน: ถ้า M⁻ ≤ ϕMn,plain → ไม่ต้องใส่ · ถ้าเกิน (หน้าตัดร้าวด้านบน) → max(flex, As,min)
     const topReq=isTop&&!plainOK&&!need&&Asflex>0;
     const notReq=isTop&&!need&&!topReq;
@@ -776,7 +778,7 @@ function calc(){
     const sClr=sp-db/10, sClrMin=Math.max(2.5,db/10);         // 25.2.1 (aggregate size not checked)
     const spOK=notReq&&nbar<=0?true:(nbar>=2&&sp<=sMaxCrit+1e-9&&sClr>=sClrMin-1e-9);
     const ok=notReq?(nbar<=0||(tcOK&&spOK)):(AsProv>=AsReq&&!need&&!over&&tcOK&&spOK);
-    return {Mu,Ru,rho,Asflex,Asmin,minCtrl,AsReq,AsProv,sp,sClr,sClrMin,spOK,nReq,isTop,notReq,topReq,ok,need,over,
+    return {Mu,Ru,rho,Asflex,Asmin,rhoTS,minCtrl,AsReq,AsProv,sp,sClr,sClrMin,spOK,nReq,isTop,notReq,topReq,ok,need,over,
       aP,cP,etP,tcOK,phiMn,nbar,db,d,b};
   }
   // X-direction beam width = L ; Y-direction beam width = B
@@ -954,10 +956,10 @@ function calc(){
   function flexCard(o,title,col,note,dirLbl){
     const flexLine=o.isTop
       ? CB("A<sub>s,flex</sub> = ρ·b·d &nbsp;(คิดจากโมเมนต์ลบ M⁻)",o.need?'ราก<0 → หน้าตัดบางไป (เพิ่ม H)':`ρ=${f(o.rho,5)} · ρ<sub>max</sub>=${f(rhomax,5)}`,f(o.Asflex,2),'cm²')
-      : CB("A<sub>s,flex</sub> = ρ·b·d &nbsp;·&nbsp; A<sub>s,min</sub> = 0.0018·b·h",o.need?'ราก<0 → หน้าตัดบางไป (เพิ่ม H)':`A<sub>s,flex</sub>=${f(o.Asflex,2)} · A<sub>s,min</sub>=${f(o.Asmin,2)}`,o.need?'N/A':`${o.minCtrl?'A<sub>s,min</sub> ควบคุม':'flexure ควบคุม'}`,'');
+      : CB("A<sub>s,flex</sub> = ρ·b·d &nbsp;·&nbsp; A<sub>s,min</sub> = "+o.rhoTS.toFixed(4)+"·b·h (Table 24.4.3.2)",o.need?'ราก<0 → หน้าตัดบางไป (เพิ่ม H)':`A<sub>s,flex</sub>=${f(o.Asflex,2)} · A<sub>s,min</sub>=${f(o.Asmin,2)}`,o.need?'N/A':`${o.minCtrl?'A<sub>s,min</sub> ควบคุม':'flexure ควบคุม'}`,'');
     const reqLine=o.isTop
       ? (o.topReq
-        ? CB("A<sub>s,req</sub> = max(A<sub>s,flex</sub>, 0.0018bh) &nbsp;(M⁻ > ϕM<sub>n,plain</sub> → ผิวบนร้าว, 8.6.1.1)",`A<sub>s,min</sub>=${f(o.Asmin,2)}`,f(o.AsReq,2),'cm²')
+        ? CB("A<sub>s,req</sub> = max(A<sub>s,flex</sub>, "+o.rhoTS.toFixed(4)+"bh) &nbsp;(M⁻ > ϕM<sub>n,plain</sub> → ผิวบนร้าว, 8.6.1.1)",`A<sub>s,min</sub>=${f(o.Asmin,2)}`,f(o.AsReq,2),'cm²')
         : CB("A<sub>s,req</sub> = 0 &nbsp;(M⁻ ≤ ϕM<sub>n,plain</sub> — คอนกรีตรับเอง, Ch.14)",'',f(0,2),'cm²'))
       : CB("A<sub>s,req</sub> = max(A<sub>s,flex</sub>, A<sub>s,min</sub>)",'',f(o.AsReq,2),'cm²');
     const tcLine=o.AsProv>0?CB("ε<sub>t</sub> = 0.003(d−c)/c ≥ ε<sub>ty</sub>+0.003 &nbsp;(tension-controlled, 8.3.3.1)",`a=${f(o.aP,2)} · c=${f(o.cP,2)} cm · ε<sub>ty</sub>+0.003=${f(etTC,5)}`,f(o.etP,5),o.tcOK?'OK':'NG'):'';
@@ -987,11 +989,11 @@ function calc(){
       <div class="rep-grid" style="border-top:none">
         <div class="rep-col">
           ${CB("ϕM<sub>n,plain</sub> = ϕ·0.42√f'c·b·h²/6",`แนว X: b=L=${f(L,2)} m · h=${f(hPlain,2)} m (หล่อติดดิน −50mm) · 0.42√f'c=${f(ftPlain,2)} MPa · ϕ=0.60`,f(plainX,2),'t·m')}
-          ${GOV(`แนว X: M⁻ ${f(MnegX,2)} ${noTopX?'≤':'>'} ϕM<sub>n,plain</sub> ${f(plainX,2)} t·m`,noTopX?'ตัดเหล็กบนได้ (คอนกรีตรับเอง)':'ต้องมีเหล็กบน ≥ max(A<sub>s,flex</sub>, 0.0018bh)','',noTopX?'green':'red')}
+          ${GOV(`แนว X: M⁻ ${f(MnegX,2)} ${noTopX?'≤':'>'} ϕM<sub>n,plain</sub> ${f(plainX,2)} t·m`,noTopX?'ตัดเหล็กบนได้ (คอนกรีตรับเอง)':'ต้องมีเหล็กบน ≥ max(A<sub>s,flex</sub>, A<sub>s,min</sub>)','',noTopX?'green':'red')}
         </div>
         <div class="rep-col">
           ${CB("ϕM<sub>n,plain</sub> แนว Y",`b=B=${f(B,2)} m · h=${f(hPlain,2)} m`,f(plainY,2),'t·m')}
-          ${GOV(`แนว Y: M⁻ ${f(MnegY,2)} ${noTopY?'≤':'>'} ϕM<sub>n,plain</sub> ${f(plainY,2)} t·m`,noTopY?'ตัดเหล็กบนได้ (คอนกรีตรับเอง)':'ต้องมีเหล็กบน ≥ max(A<sub>s,flex</sub>, 0.0018bh)','',noTopY?'green':'red')}
+          ${GOV(`แนว Y: M⁻ ${f(MnegY,2)} ${noTopY?'≤':'>'} ϕM<sub>n,plain</sub> ${f(plainY,2)} t·m`,noTopY?'ตัดเหล็กบนได้ (คอนกรีตรับเอง)':'ต้องมีเหล็กบน ≥ max(A<sub>s,flex</sub>, A<sub>s,min</sub>)','',noTopY?'green':'red')}
         </div>
       </div>
     </div>`;
@@ -1307,10 +1309,10 @@ function reportHTML(o){
         EQ('A<sub>s,flex</sub>','ρ · b · d',`${F(o.rho,5)} × ${F(o.b*100,0)} × ${F(o.d*100,1)}`,F(o.Asflex),'cm²');
     }
     if(o.isTop){
-      h+=o.topReq?EQ('A<sub>s,req</sub>','max(A<sub>s,flex</sub>, 0.0018 · b · h)',`max(${F(o.Asflex)}, 0.0018 × ${F(o.b*100,0)} × ${F(Hh*100,0)})`,F(o.AsReq),'cm²')
+      h+=o.topReq?EQ('A<sub>s,req</sub>',`max(A<sub>s,flex</sub>, ${o.rhoTS.toFixed(4)} · b · h)`,`max(${F(o.Asflex)}, ${o.rhoTS.toFixed(4)} × ${F(o.b*100,0)} × ${F(Hh*100,0)})`,F(o.AsReq),'cm²')
         :(o.need?'':EQ('A<sub>s,req</sub>','','',F(0),'cm²')+NT('M<sub>u</sub> ≤ φM<sub>n,plain</sub> (ข้อ 6.2) — ไม่ต้องใช้เหล็กบน'));
     }else{
-      h+=EQ('A<sub>s,min</sub>','0.0018 · b · h',`0.0018 × ${F(o.b*100,0)} × ${F(Hh*100,0)}`,F(o.Asmin),'cm²');
+      h+=EQ('A<sub>s,min</sub>',`${o.rhoTS.toFixed(4)} · b · h (ACI Table 24.4.3.2)`,`${o.rhoTS.toFixed(4)} × ${F(o.b*100,0)} × ${F(Hh*100,0)}`,F(o.Asmin),'cm²');
       if(!o.need) h+=EQ('A<sub>s,req</sub>','max(A<sub>s,flex</sub>, A<sub>s,min</sub>)',`max(${F(o.Asflex)}, ${F(o.Asmin)})`,F(o.AsReq),'cm²');
     }
     if(o.nbar>0){

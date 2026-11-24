@@ -162,7 +162,7 @@ footer{text-align:center;padding:2rem;font-size:11px;font-family:var(--mono);col
   </div>  </div>
   <div class="cs">
     <div class="cstep"><div class="sb">1</div><div class="stx"><strong>Part 1</strong><div class="sf">= A × B × C / 100³ × 7,850</div><div class="sc" id="cP1"></div></div></div>
-    <div class="cstep"><div class="sb">2</div><div class="stx"><strong>Part 2</strong><div class="sf">= 0.5 × (A+D) × E × (B−(B−F)/2) / 100³ × 7,850</div><div class="sc" id="cP2"></div></div></div>
+    <div class="cstep"><div class="sb">2</div><div class="stx"><strong>Part 2</strong><div class="sf">= E/6 × [A·B + D·F + (A+D)(B+F)] / 100³ × 7,850 (prismoid)</div><div class="sc" id="cP2"></div></div></div>
     <div class="cstep"><div class="sb ac">3</div><div class="stx"><strong>Total</strong> = Part 1 + Part 2 + ปะกับตุ้ม<div class="sc" id="cTot"></div></div></div>
   </div>
 </div>
@@ -301,14 +301,15 @@ function updateAll(){
   const beta=+document.getElementById('iBeta').value||0;
 
   // Weight
-  const p1=A*B*C/1e6*RHO,avgB=B-(B-F)/2,p2=0.5*(A+D)*E*avgB/1e6*RHO,tot=p1+p2+pk;
+  // part 2 tapers from A×B (bottom) to D×F (top) over height E → prismoid: V = E/6·[A·B + D·F + (A+D)(B+F)]
+  const p1=A*B*C/1e6*RHO,p2=E/6*(A*B+D*F+(A+D)*(B+F))/1e6*RHO,tot=p1+p2+pk;
   document.getElementById('rP1').textContent=fmt(p1);
   document.getElementById('rP2').textContent=fmt(p2);
   document.getElementById('rPK').textContent=fmt(pk);
   document.getElementById('rTot').textContent=fmt(tot);
   
   document.getElementById('cP1').textContent=`= (${A}×${B}×${C}) / 1,000,000 × 7,850 = ${fmt(p1)} kg`;
-  document.getElementById('cP2').textContent=`= 0.5×(${A}+${D})×${E}×(${B}−(${B}−${F})/2) / 1,000,000 × 7,850\n= 0.5×${A+D}×${E}×${fmt(avgB)} / 1,000,000 × 7,850 = ${fmt(p2)} kg`;
+  document.getElementById('cP2').textContent=`= ${E}/6 × [${A}×${B} + ${D}×${F} + (${A}+${D})×(${B}+${F})] / 1,000,000 × 7,850\n= ${E}/6 × ${fmt(A*B+D*F+(A+D)*(B+F))} / 1,000,000 × 7,850 = ${fmt(p2)} kg`;
   document.getElementById('cTot').textContent=`= ${fmt(p1)} + ${fmt(p2)} + ${fmt(pk)} = ${fmt(tot)} kg`;
 
   // Rotation matrices

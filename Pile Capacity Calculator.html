@@ -1586,7 +1586,7 @@
       <div style="margin-top:24px; padding-top:20px; border-top:1px dashed var(--line);">
         <h3 style="font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">Unit Skin Friction (β-method) &amp; End Bearing &mdash; Sand Layers</h3>
         <p style="color:var(--ink-dim); font-size:0.85rem; margin-bottom:12px;">
-          f<sub>s</sub> = K<sub>0</sub> × σ'<sub>v,mid</sub> × tan(δ) (β-method) &middot; q<sub>p</sub> = σ'<sub>v,bottom</sub> × N<sub>q</sub> (Terzaghi, ที่ก้นชั้น)
+          f<sub>s</sub> = K<sub>0</sub> × σ'<sub>v,mid</sub> × tan(δ) ≤ f<sub>s,lim</sub> (β-method, ค่าจำกัดตาม API RP 2A) &middot; q<sub>p</sub> = σ'<sub>v,bottom</sub> × N<sub>q</sub> ≤ q<sub>p,lim</sub> (Terzaghi, ที่ก้นชั้น)
         </p>
         <div class="table-wrapper">
           <table id="sandFrictionTable">
@@ -2127,6 +2127,25 @@ function calcNq(phi_deg) {
   return Nq;
 }
 
+// ========== Limiting unit skin friction / end bearing in sand ==========
+// API RP 2A-WSD Table 6.4.3-1 (limits by soil friction angle) — linear interpolation, kPa
+const SAND_LIMITS = [ // [phi_deg, fs_max kPa, qp_max kPa]
+  [15, 47.8, 1900], [20, 67.0, 2900], [25, 81.3, 4800], [30, 95.7, 9600], [35, 114.8, 12000]
+];
+function sandLimits(phi_deg) {
+  const T = SAND_LIMITS;
+  if (phi_deg <= T[0][0]) return { fsMax: T[0][1], qpMax: T[0][2] };
+  if (phi_deg >= T[T.length-1][0]) return { fsMax: T[T.length-1][1], qpMax: T[T.length-1][2] };
+  for (let i = 0; i < T.length-1; i++) {
+    if (phi_deg <= T[i+1][0]) {
+      const r = (phi_deg - T[i][0]) / (T[i+1][0] - T[i][0]);
+      return { fsMax: T[i][1] + r*(T[i+1][1]-T[i][1]), qpMax: T[i][2] + r*(T[i+1][2]-T[i][2]) };
+    }
+  }
+}
+const sandFs = (phi, K0, sig, tanD) => Math.min(K0 * sig * tanD, sandLimits(phi).fsMax);
+const sandQp = (phi, sig, Nq) => Math.min(sig * Nq, sandLimits(phi).qpMax);
+
 // ========== Su (Undrained Shear Strength) ==========
 // Returns Su based on layer.suMode:
 //   - 'nspt'   → Su = suFactor × N-SPT  (default)
@@ -2207,7 +2226,8 @@ function renderLayers() {
       const tanD = calcTanDelta(layer.phi);
       const delta = 0.75 * layer.phi;
       const Nq = calcNq(layer.phi);
-      k0Preview = `<span class="k0-preview">K<sub>0</sub> = ${K0.toFixed(3)} &middot; δ = ${delta.toFixed(2)}° &middot; tan(δ) = ${tanD.toFixed(3)} &middot; N<sub>q</sub> = ${Nq.toFixed(2)}</span>`;
+      const LIM = sandLimits(layer.phi);
+      k0Preview = `<span class="k0-preview">f<sub>s,lim</sub> = ${LIM.fsMax.toFixed(1)} kPa · q<sub>p,lim</sub> = ${LIM.qpMax.toFixed(0)} kPa (API RP 2A) &middot; K<sub>0</sub> = ${K0.toFixed(3)} &middot; δ = ${delta.toFixed(2)}° &middot; tan(δ) = ${tanD.toFixed(3)} &middot; N<sub>q</sub> = ${Nq.toFixed(2)}</span>`;
     }
 
     const adhesionOptions = Object.entries(ADHESION_METHODS).map(([key, info]) =>
@@ -3222,8 +3242,8 @@ function renderSandFrictionTable() {
     const Nq = calcNq(l.phi);
     const sigEffMid = getEffStressAtDepth(mid).sigmaEff;
     const sigEffBot = getEffStressAtDepth(bottom).sigmaEff;
-    const fs = K0 * sigEffMid * tanD;
-    const qp = sigEffBot * Nq;
+    const fs = sandFs(l.phi, K0, sigEffMid, tanD);
+    const qp = sandQp(l.phi, sigEffBot, Nq);
     const contribution = fs * l.thickness;
     totalShaftPerUnit += contribution;
 
@@ -3282,7 +3302,7 @@ function drawSkinFrictionProfile() {
       const K0 = calcK0(l.phi);
       const tanD = calcTanDelta(l.phi);
       const { sigmaEff } = getEffStressAtDepth(mid);
-      fs = K0 * sigmaEff * tanD;
+      fs = sandFs(l.phi, K0, sigmaEff, tanD);
     } else if (l.soilType === 'clay') {
       const su = getSu(l);
       if (su != null) {
@@ -3553,7 +3573,7 @@ function drawEndBearingProfile() {
     if (l.soilType === 'sand' && l.phi != null) {
       const Nq = calcNq(l.phi);
       const { sigmaEff } = getEffStressAtDepth(bottom);
-      qp = sigmaEff * Nq;
+      qp = sandQp(l.phi, sigmaEff, Nq);
     } else if (l.soilType === 'clay') {
       const su = getSu(l);
       if (su != null) {
@@ -4163,7 +4183,7 @@ function renderPileCapacity() {
       const K0 = calcK0(l.phi);
       const tanD = calcTanDelta(l.phi);
       const sigEffMid = getEffStressAtDepth((top + bottom) / 2).sigmaEff;  // mid of full layer
-      fs = K0 * sigEffMid * tanD;
+      fs = sandFs(l.phi, K0, sigEffMid, tanD);
     } else if (l.soilType === 'clay') {
       const su = getSu(l);
       if (su != null) {
@@ -4215,8 +4235,8 @@ function renderPileCapacity() {
   if (tipLayer.soilType === 'sand' && tipLayer.phi != null) {
     const Nq = calcNq(tipLayer.phi);
     const sigEffTip = getEffStressAtDepth(tipDepth).sigmaEff;
-    qp = sigEffTip * Nq;
-    qpDetail = `q<sub>p</sub> = σ'<sub>v</sub>(${sigEffTip.toFixed(1)}) × N<sub>q</sub>(${Nq.toFixed(2)}) = ${qp.toFixed(2)} kPa`;
+    qp = sandQp(tipLayer.phi, sigEffTip, Nq);
+    qpDetail = `q<sub>p</sub> = min(σ'<sub>v</sub>(${sigEffTip.toFixed(1)}) × N<sub>q</sub>(${Nq.toFixed(2)}), q<sub>p,lim</sub> ${sandLimits(tipLayer.phi).qpMax.toFixed(0)}) = ${qp.toFixed(2)} kPa`;
   } else if (tipLayer.soilType === 'clay') {
     const su = getSu(tipLayer);
     if (su != null) {
