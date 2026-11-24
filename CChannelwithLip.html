@@ -496,8 +496,17 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       </div>
       <div class="gov"><div class="gov-lbl">M<sub>ne-x</sub> = S<sub>fx</sub> × F<sub>n-x</sub> / 100</div>
         <div class="gov-val"><span class="gov-tag">so</span><span id="fx_Mne">—</span><span class="gov-unit">kg-m</span></div></div>
-      <div class="sdiv">Local Buckling</div>
-      <div class="gov"><div class="gov-lbl">M<sub>nl-x</sub> = S<sub>fx</sub> × F<sub>n-x</sub> / 100</div>
+      <div class="sdiv">Local Buckling — DSM §F3.2</div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">M<sub>crl-x</sub> = S<sub>fx</sub> × F<sub>crl</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_Mcrl_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fx_Mcrl">—</span><span class="calc-unit">kg-m</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ<sub>l</sub> = √(M<sub>ne-x</sub> / M<sub>crl-x</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fx_ll_cond">—</span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">M<sub>nl-x</sub> = M<sub>ne</sub> ถ้า λ<sub>l</sub> ≤ 0.776, ไม่เช่นนั้น [1−0.15(M<sub>crl</sub>/M<sub>ne</sub>)<sup>0.4</sup>](M<sub>crl</sub>/M<sub>ne</sub>)<sup>0.4</sup>M<sub>ne</sub></div>
         <div class="gov-val"><span class="gov-tag">so</span><span id="fx_Mnl">—</span><span class="gov-unit">kg-m</span></div></div>
     </div>
     <!-- Y axis -->
@@ -519,7 +528,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
         <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Pex">—</span><span class="calc-unit">kg</span></span></div>
       </div>
       <div class="calc-block">
-        <div class="calc-line1"><span class="cl-ind"></span><span class="cl-eq"></span><span class="cl-body">M<sub>cre-y</sub> = C<sub>b</sub> × r<sub>o</sub> × √(P<sub>ex</sub> × P<sub>t</sub>)</span></div>
+        <div class="calc-line1"><span class="cl-ind"></span><span class="cl-eq"></span><span class="cl-body">F<sub>cre-y</sub> = C<sub>s</sub>·A·σ<sub>ex</sub>[j + C<sub>s</sub>√(j² + r<sub>o</sub>²σ<sub>t</sub>/σ<sub>ex</sub>)] / S<sub>fy</sub> → M<sub>cre-y</sub> = F<sub>cre-y</sub>·S<sub>fy</sub> (C<sub>s</sub> = ±1 ใช้ค่าน้อย, §F2.1.1)</span></div>
         <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Mcre_sub">—</span></div>
         <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Mcre">—</span><span class="calc-unit">kg-m</span></span></div>
       </div>
@@ -536,23 +545,17 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       </div>
       <div class="gov"><div class="gov-lbl">M<sub>ne-y</sub> = S<sub>fy</sub> × F<sub>n-y</sub> / 100</div>
         <div class="gov-val"><span class="gov-tag">so</span><span id="fy_Mne">—</span><span class="gov-unit">kg-m</span></div></div>
-      <div class="sdiv">Local Buckling (Sec/Set)</div>
+      <div class="sdiv">Local Buckling — DSM §F3.2</div>
       <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">S<sub>ec-y</sub> = I<sub>y</sub> / (b'−x<sub>c</sub>) / 1000</span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Secy_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Secy">—</span><span class="calc-unit">cm³</span></span></div>
+        <div class="calc-line1"><span class="cl-body">M<sub>crl-y</sub> = S<sub>fy</sub> × F<sub>crl</sub> / 100</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Mcrl_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Mcrl">—</span><span class="calc-unit">kg-m</span></span></div>
       </div>
       <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">S<sub>et-y</sub> = I<sub>y</sub> / x<sub>c</sub> / 1000</span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_Sety_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_Sety">—</span><span class="calc-unit">cm³</span></span></div>
+        <div class="calc-line1"><span class="cl-body">λ<sub>l</sub> = √(M<sub>ne-y</sub> / M<sub>crl-y</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_ll_cond">—</span></div>
       </div>
-      <div class="calc-block">
-        <div class="calc-line1"><span class="cl-ind"></span><span class="cl-eq"></span><span class="cl-body">S<sub>et</sub>·F<sub>y</sub> = S<sub>et-y</sub> × F<sub>y</sub> / 100</span></div>
-        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="fy_SetFy_sub">—</span></div>
-        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="fy_SetFy">—</span><span class="calc-unit">kg-m</span></span></div>
-      </div>
-      <div class="gov"><div class="gov-lbl">M<sub>nl-y</sub> = min(S<sub>ec</sub>·F<sub>n</sub>, S<sub>et</sub>·F<sub>y</sub>)</div>
+      <div class="gov"><div class="gov-lbl">M<sub>nl-y</sub> = M<sub>ne</sub> ถ้า λ<sub>l</sub> ≤ 0.776, ไม่เช่นนั้น [1−0.15(M<sub>crl</sub>/M<sub>ne</sub>)<sup>0.4</sup>](M<sub>crl</sub>/M<sub>ne</sub>)<sup>0.4</sup>M<sub>ne</sub></div>
         <div class="gov-val"><span class="gov-tag">so</span><span id="fy_Mnl">—</span><span class="gov-unit">kg-m</span></div></div>
     </div>
   </div>
@@ -609,51 +612,45 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
 </div>
 
-<!-- ④ COMPRESSION LOCAL BUCKLING -->
+<!-- ④ LOCAL BUCKLING (DSM) -->
 <div class="sec-block">
   <div class="sec-hdr">
     <span class="sec-tag tag-purple">Local</span>
-    <span class="sec-title">Compression Local Buckling — Effective Width Method</span>
-    <span class="sec-ref">AISI S100 §E3/B4</span>
+    <span class="sec-title">Local Buckling — Direct Strength Method (Element Model)</span>
+    <span class="sec-ref">AISI S100-16 §2.3.1.1 · §E3.2</span>
   </div>
   <div class="rep-col-full">
-    <div class="calc-block">
-      <div class="calc-line1"><span class="cl-body">F<sub>n</sub> = min(F<sub>n-x</sub>, F<sub>n-y</sub>)</span></div>
-      <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="l_Fn_sub">—</span></div>
-      <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_Fn">—</span><span class="calc-unit">ksc</span></span></div>
-    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,.55);margin-bottom:6px">F<sub>crl</sub> = k·π²E / [12(1−μ²)] · (t/w)² ของแต่ละชิ้น แล้วใช้ค่าน้อยสุด · k: ปีก/เอวรับแรงอัด 4, ขอบพับ 0.43, เอวรับดัด (ψ=1) 24</div>
     <table class="loc-tbl">
       <thead><tr>
-        <th style="text-align:left">Element</th>
-        <th>λ = dim/t</th><th>λ<sub>r</sub></th><th>λ<sub>r</sub>√(F<sub>y</sub>/F<sub>n</sub>)</th>
-        <th>c<sub>1</sub></th><th>c<sub>2</sub></th>
-        <th>F<sub>el</sub> (ksc)</th><th>b<sub>e</sub> (cm)</th><th>Status</th>
+        <th style="text-align:left">Element</th><th>w (mm)</th><th>w/t</th>
+        <th>k (อัด)</th><th>F<sub>crl</sub> อัด (ksc)</th><th>k (ดัด-x)</th><th>F<sub>crl</sub> ดัด (ksc)</th>
       </tr></thead>
       <tbody>
-        <tr><td class="lft">Web a'/t</td><td id="l_lWeb">—</td><td id="l_lrWeb">—</td><td id="l_lrfnWeb">—</td><td>0.18</td><td>1.31</td><td id="l_FelWeb">—</td><td id="l_beWeb">—</td><td id="l_stWeb">—</td></tr>
-        <tr><td class="lft">Flange b'/t</td><td id="l_lFl">—</td><td id="l_lrFl">—</td><td id="l_lrfnFl">—</td><td>0.18</td><td>1.31</td><td id="l_FelFl">—</td><td id="l_beFl">—</td><td id="l_stFl">—</td></tr>
-        <tr><td class="lft">Lip c'/t</td><td id="l_lLip">—</td><td id="l_lrLip">—</td><td id="l_lrfnLip">—</td><td>0.22</td><td>1.49</td><td id="l_FelLip">—</td><td id="l_beLip">—</td><td id="l_stLip">—</td></tr>
+        <tr><td class="lft">Web</td><td id="l_wWeb">—</td><td id="l_lWeb">—</td><td id="l_kcWeb">—</td><td id="l_fcWeb">—</td><td id="l_kfWeb">—</td><td id="l_ffWeb">—</td></tr>
+        <tr><td class="lft">Flange</td><td id="l_wFl">—</td><td id="l_lFl">—</td><td id="l_kcFl">—</td><td id="l_fcFl">—</td><td id="l_kfFl">—</td><td id="l_ffFl">—</td></tr>
+        <tr><td class="lft">Lip</td><td id="l_wLip">—</td><td id="l_lLip">—</td><td id="l_kcLip">—</td><td id="l_fcLip">—</td><td id="l_kfLip">—</td><td id="l_ffLip">—</td></tr>
       </tbody>
     </table>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px">
       <div>
-        <div class="calc-block">
-          <div class="calc-line1"><span class="cl-body">A<sub>e</sub> = 2b<sub>e,lip</sub>·t/10 + 2b<sub>e,fl</sub>·t/10 + b<sub>e,web</sub>·t/10</span></div>
-          <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="l_Ae_sub">—</span></div>
-          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_Ae">—</span><span class="calc-unit">cm²</span></span></div>
-        </div>
-        <div class="calc-block">
-          <div class="calc-line1"><span class="cl-body">P<sub>nl</sub> = A<sub>e</sub> · F<sub>n</sub></span></div>
-          <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="l_Pnl_sub">—</span></div>
-          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_Pnl_val">—</span><span class="calc-unit">kg</span></span></div>
-        </div>
-        <div class="calc-block">
-          <div class="calc-line1"><span class="cl-body">P<sub>n</sub> = global compression</span></div>
-          <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_Pn">—</span><span class="calc-unit">kg</span></span></div>
-        </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">P<sub>crl</sub> = A<sub>g</sub> × min F<sub>crl</sub>(อัด)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="l_Pcrl_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_Pcrl">—</span><span class="calc-unit">kg</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">λ<sub>l</sub> = √(P<sub>ne</sub> / P<sub>crl</sub>)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="l_ll_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="l_ll">—</span><span class="calc-unit"></span></span></div>
+      </div>
       </div>
       <div>
-        <div class="gov"><div class="gov-lbl">P<sub>nl</sub> govern = min(P<sub>nl</sub>, P<sub>n</sub>)</div>
+        <div class="calc-block">
+          <div class="calc-line1"><span class="cl-body" id="l_Pnl_cond">—</span></div>
+          <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="l_Pnl_sub">—</span></div>
+        </div>
+        <div class="gov"><div class="gov-lbl">P<sub>nl</sub> (§E3.2)</div>
           <div class="gov-val"><span class="gov-tag">so</span><span id="l_Pnl_gov">—</span><span class="gov-unit">kg</span></div></div>
       </div>
     </div>
@@ -669,9 +666,9 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
   <div class="rep-grid">
     <div class="rep-col">
-      <div class="sdiv">Axis X</div>
+      <div class="sdiv">Flexural-Torsional (แกน x + บิด) §E2.2</div>
       <div class="calc-block">
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">F<sub>cre-x</sub> = <span id="cx_Fcre" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">ksc</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">F<sub>cre,FT</sub> = P<sub>FT</sub>/A<sub>g</sub> = <span id="cx_Fcre" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">ksc</span></div>
       </div>
       <div class="calc-block">
         <div class="calc-line1"><span class="cl-body">λ<sub>c-x</sub> = √(F<sub>y</sub> / F<sub>cre-x</sub>)</span></div>
@@ -691,9 +688,9 @@ canvas{display:block;border-radius:4px;background:#0f1117}
       </div>
     </div>
     <div class="rep-col">
-      <div class="sdiv">Axis Y</div>
+      <div class="sdiv">Flexural (แกน y) §E2.1</div>
       <div class="calc-block">
-        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">F<sub>cre-y</sub> = <span id="cy_Fcre" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">ksc</span></div>
+        <div style="font-family:var(--mono);font-size:12px;padding:3px 0;color:var(--cyan)">F<sub>cre-y</sub> = P<sub>ey</sub>/A<sub>g</sub> = <span id="cy_Fcre" style="color:var(--blue);font-weight:700">—</span> <span style="color:var(--dim);font-size:10px">ksc</span></div>
       </div>
       <div class="calc-block">
         <div class="calc-line1"><span class="cl-body">λ<sub>c-y</sub> = √(F<sub>y</sub> / F<sub>cre-y</sub>)</span></div>
@@ -1375,41 +1372,52 @@ function calculate(){
   const Pt=1/(ro/10)**2*(G*Jt/10000+(PI**2)*E*Cw/1000000/(Kt*Lt)**2);
   const Mcre_x=Cb*(ro/1000)*Math.sqrt(Pey*Pt);
   const Fcre_x=Mcre_x*100/Sfx;
-  const Mcre_y=Cb*(ro/1000)*Math.sqrt(Pex*Pt);
-  const Fcre_y=Mcre_y*100/Sfy;
-  const Fn278=2.78*Fy,Fn056=0.56*Fy;
-  const fnCalc=Fc=>{if(Fc>=Fn278)return Fy;if(Fc>Fn056)return 10/9*Fy*(1-10*Fy/(36*Fc));return Fc;};
-  const Fn_x=fnCalc(Fcre_x),Fn_y=fnCalc(Fcre_y);
-  const Mne_x=Sfx*Fn_x/100,Mne_y=Sfy*Fn_y/100;
-  const My_x=Sfx*Fy/100,My_y=Sfy*Fy/100;
-  // ── Effective Width (Excel rows 72-74); reference stress = D71 = MIN(D65,N65) compression global Fn ──
-  const lc_x=Math.sqrt(Fy/Fcre_x),lc_y=Math.sqrt(Fy/Fcre_y);
-  const Fn_cx=lc_x>1.5?0.877*Fy/(lc_x**2):(0.658**(lc_x**2))*Fy;
-  const Fn_cy=lc_y>1.5?0.877*Fy/(lc_y**2):(0.658**(lc_y**2))*Fy;
-  const Fn_c=Math.min(Fn_cx,Fn_cy);
-  const Fn_min=Fn_c;
-  const lc=(slD,flatD,lrC,c1,c2)=>{
-    const lam=slD/tt,lr=lrC*Math.sqrt(E/Fy),lrFn=lr*Math.sqrt(Fy/Fn_min);
-    const Fel=(c2*lr/lam)**2*Fy;
-    const sl=lam>lrFn;
-    const be=sl?flatD/10*(1-c1*Math.sqrt(Fel/Fn_min))*Math.sqrt(Fel/Fn_min):flatD/10;
-    return{lam,lr,lrFn,Fel,be,sl};
-  };
-  const lip=lc(J3,P3,0.45,0.22,1.49);
-  const fl=lc(J2,P2,1.49,0.18,1.31);
-  const wb=lc(J1,P1,1.49,0.18,1.31);
-  const beL=lip.be*10, beF=fl.be*10, beW=wb.be*10;  // effective flats in mm (Excel AI72/AI73/AI74)
-  const Ae=2*lip.be*tt/10+2*fl.be*tt/10+wb.be*tt/10;
-  // Ix-eff (Excel D44): P1→beW, P2→beF, P3→beL
-  const Ixeff=2*tt*(0.0417*(beW**3)+beF*(beW/2+r)**2+P4*(beW/2+0.637*r)**2+0.149*(r**3)+0.0833*(beL**3)+beL/4*(beW-beL)**2+P4*(beW/2+0.637*r)**2+0.149*(r**3));
-  const Secx=Ixeff/(H/2)/1000;
-  const Mnlx=Secx*Fn_x/100;
-  // Iy-eff (Excel J43): P2→beF, P3→beL, parallel-axis term uses Ae (mm²) not Ag
-  const Iyeff=2*tt*(beF*(beF/2+r)**2+(beF**3)/12+0.356*(r**3)+beL*(beF+2*r)**2+P4*(beF+1.637*r)**2+0.149*(r**3))-Ae*100*(xc**2);
-  const Secy_e=Iyeff/(J2-xc)/1000;
-  const Sety_e=Iyeff/xc/1000;
-  const SetFy=Sety_e*Fy/100;
-  const Mnly=Math.min(Secy_e*Fn_y/100,SetFy);
+  // ═══════════ AISI S100-16 — Direct Strength Method (DSM) ═══════════
+  // units: dims mm, stresses ksc, forces kg, moments kg-m, Sf cm³, A mm²
+  const MU2 = 1 - 0.3 ** 2;
+  const Ag_cm2 = A / 100;
+  // ── Global: LTB about x (symmetry axis) — F2.1.1: Fcre = Cb·ro·A·√(σey·σt)/Sf ──
+  // ── Global: bending about y (⊥ symmetry axis) — F2.1.1: Fcre = Cs·A·σex[j + Cs√(j² + ro²σt/σex)]/(CTF·Sf)
+  const sig_ex = Pex / Ag_cm2, sig_ey = Pey / Ag_cm2, sig_t = Pt / Ag_cm2;          // ksc
+  const jcm = jj / 10, rocm = ro / 10;                                               // cm
+  const FcreY = Cs => Cs * Ag_cm2 * sig_ex * (jcm + Cs * Math.sqrt(jcm * jcm + rocm * rocm * sig_t / sig_ex)) / Sfy;
+  const Fcre_y = Math.min(FcreY(1), FcreY(-1));                                      // CTF = 1, worst Cs
+  const Mcre_y = Fcre_y * Sfy / 100;
+  const Fn278 = 2.78 * Fy, Fn056 = 0.56 * Fy;
+  const fnCalc = Fc => { if (Fc >= Fn278) return Fy; if (Fc > Fn056) return 10 / 9 * Fy * (1 - 10 * Fy / (36 * Fc)); return Fc; };
+  const Fn_x = fnCalc(Fcre_x), Fn_y = fnCalc(Fcre_y);
+  const Mne_x = Sfx * Fn_x / 100, Mne_y = Sfy * Fn_y / 100;
+  const My_x = Sfx * Fy / 100, My_y = Sfy * Fy / 100;
+
+  // ── Global compression — E2: min(flexural-y, flexural-torsional about x) ──
+  const betaFT = 1 - (X0 / ro) ** 2;
+  const Pft = ((Pex + Pt) - Math.sqrt((Pex + Pt) ** 2 - 4 * betaFT * Pex * Pt)) / (2 * betaFT);
+  const Fcre_cx = Pft / Ag_cm2, Fcre_cy = Pey / Ag_cm2;                              // ksc
+  const lc_x = Math.sqrt(Fy / Fcre_cx), lc_y = Math.sqrt(Fy / Fcre_cy);
+  const fnComp = lc => lc > 1.5 ? 0.877 * Fy / (lc ** 2) : (0.658 ** (lc ** 2)) * Fy;
+  const Fn_cx = fnComp(lc_x), Fn_cy = fnComp(lc_y);
+  const Fn_c = Math.min(Fn_cx, Fn_cy);
+  const Fn_min = Fn_c;
+  const Pne_x = Fn_cx * Ag_cm2, Pne_y = Fn_cy * Ag_cm2, Pn = Math.min(Pne_x, Pne_y);
+
+  // ── Local buckling — element model (S100-16 §2.3.1.1): Fcrl = k·π²E/(12(1−μ²))·(t/w)² ──
+  const plateF = (k, w) => k * PI ** 2 * E / (12 * MU2) * (tt / w) ** 2;           // ksc
+  const elem = (name, w, kC, kF) => ({ name, w, lam: w / tt, kC, kF, FcrC: plateF(kC, w), FcrF: plateF(kF, w) });
+  const wb  = elem('Web',    P1, 4,    24);   // web: uniform comp. k=4 · pure bending ψ=1 k=24
+  const fl  = elem('Flange', P2, 4,    4);    // flange with edge stiffener
+  const lip = elem('Lip',    P3, 0.43, 0.43); // unstiffened lip
+  const Fcrl_c  = Math.min(wb.FcrC, fl.FcrC, lip.FcrC);
+  const Fcrl_fx = Math.min(wb.FcrF, fl.FcrF, lip.FcrF);
+  const Fcrl_fy = Fcrl_c;                      // minor-axis bending: uniform-compression k (conservative)
+  const Pcrl  = Fcrl_c * Ag_cm2;
+  const Mcrlx = Sfx * Fcrl_fx / 100, Mcrly = Sfy * Fcrl_fy / 100;
+  const dsmL = (Rne, Rcr) => { const l = Math.sqrt(Rne / Rcr); return { l, R: l <= 0.776 ? Rne : (1 - 0.15 * (Rcr / Rne) ** 0.4) * (Rcr / Rne) ** 0.4 * Rne }; };
+  const LC  = dsmL(Pn, Pcrl),    Pnl  = LC.R,  ll_c = LC.l;      // E3.2
+  const LX  = dsmL(Mne_x, Mcrlx), Mnlx = LX.R, ll_x = LX.l;      // F3.2
+  const LY  = dsmL(Mne_y, Mcrly), Mnly = LY.R, ll_y = LY.l;
+  const Mnlxo = dsmL(My_x, Mcrlx).R;                              // for H2 (Mne = My)
+  const Pnl_val = Pnl, Ae = Pnl / Fn_c;                           // kept for print (Ae = equivalent area)
+
 
   // Flexure X
   s('fx_Sfx',Sfx);
@@ -1441,7 +1449,9 @@ function calculate(){
     : `${f(Fcre_x,0)}`;
   h('fx_Fn_cond', fn_cond_x);
   h('fx_Fn_formula', fn_formula_x);
-  t('fx_Fn_sub2', fn_sub2_x);s('fx_Fn',Fn_x,0);sso('fx_Mne',Mne_x);s('fx_Mnl',Mnlx);
+  t('fx_Fn_sub2', fn_sub2_x);s('fx_Fn',Fn_x,0);sso('fx_Mne',Mne_x);
+  const llTxt = (l) => l <= 0.776 ? `λ<sub>l</sub> = ${f(l,3)} ≤ 0.776 → M<sub>nl</sub> = M<sub>ne</sub>` : `λ<sub>l</sub> = ${f(l,3)} > 0.776 → ลดกำลังจากการโก่งเฉพาะที่`;
+  t('fx_Mcrl_sub',`${f(Sfx,2)} × ${f(Fcrl_fx,0)} / 100`);s('fx_Mcrl',Mcrlx);h('fx_ll_cond',llTxt(ll_x));sso('fx_Mnl',Mnlx);
 
   // Flexure Y
   s('fy_Sfy',Sfy);
@@ -1465,42 +1475,34 @@ function calculate(){
   h('fy_Fn_cond2', fn_cond_y);
   h('fy_Fn_formula', fn_formula_y);
   t('fy_Fn_sub', fn_sub_y);
-  t('fy_Secy_sub',`${f(Iyeff/1e4,2)} / ${f((J2-xc)/10,2)} / 1000`);
-  t('fy_Sety_sub',`${f(Iyeff/1e4,2)} / ${f(xc/10,2)} / 1000`);
-  t('fy_SetFy_sub',`${f(Sety_e,2)} × ${Fy} / 100`);s('fy_Myy',My_y);
+  s('fy_Myy',My_y);
   t('fy_Pex_sub',`π²×${E}×${f(Ix/1e4)} / (${Kx}×${Lx})² × 1/10000`);
   s('fy_Pex',Pex,0);
-  t('fy_Mcre_sub',`${Cb}×${f(ro/1000,4)}×√(${f(Pex,0)}×${f(Pt,0)})`);
+  t('fy_Mcre_sub',`j = ${f(jcm,2)} cm, r<sub>o</sub> = ${f(rocm,2)} cm, σ<sub>ex</sub> = ${f(sig_ex,0)}, σ<sub>t</sub> = ${f(sig_t,0)} ksc → F<sub>cre-y</sub> = ${f(Fcre_y,0)} ksc`);
   s('fy_Mcre',Mcre_y);
   t('fy_Fcre_sub',`${f(Mcre_y,2)}×100/${f(Sfy,2)}`);
   s('fy_Fcre',Fcre_y,0);s('fy_Fn',Fn_y,0);sso('fy_Mne',Mne_y);
-  s('fy_Secy',Secy_e);s('fy_Sety',Sety_e);s('fy_SetFy',SetFy);sso('fy_Mnl',Mnly);
+  t('fy_Mcrl_sub',`${f(Sfy,2)} × ${f(Fcrl_fy,0)} / 100`);s('fy_Mcrl',Mcrly);h('fy_ll_cond',llTxt(ll_y));sso('fy_Mnl',Mnly);
 
-  // Local Buckling (effective widths computed above)
-  s('l_Fn',Fn_min,0);
-  const stL=sl=>`<span class="${sl?'slender':'compact'}">${sl?'Slender':'Compact'}</span>`;
-  const ids=['Lip','Fl','Web'];const arr=[lip,fl,wb];
-  ids.forEach((id,i)=>{
-    s('l_l'+id,arr[i].lam);s('l_lr'+id,arr[i].lr);s('l_lrfn'+id,arr[i].lrFn);
-    s('l_Fel'+id,arr[i].Fel,0);s('l_be'+id,arr[i].be,3);
-    h('l_st'+id,stL(arr[i].sl));
+  // Local Buckling — DSM element model
+  [['Web',wb],['Fl',fl],['Lip',lip]].forEach(([id,el])=>{
+    s('l_w'+id,el.w,2);s('l_l'+id,el.lam,2);s('l_kc'+id,el.kC,2);s('l_fc'+id,el.FcrC,0);s('l_kf'+id,el.kF,2);s('l_ff'+id,el.FcrF,0);
   });
-  s('l_Ae',Ae,4);
-  const Pne_x=Fn_cx*A/100,Pne_y=Fn_cy*A/100,Pn=Math.min(Pne_x,Pne_y);
-  const Pnl_val=Ae*Fn_c,Pnl=Math.min(Pnl_val,Pn);
-  t('l_Ae_sub',`2×${f(lip.be,3)}×${tt}/10 + 2×${f(fl.be,3)}×${tt}/10 + ${f(wb.be,3)}×${tt}/10`);
-  t('l_Pnl_sub',`${f(Ae,4)} × ${f(Fn_c,0)}`);
-  s('l_Pnl_val',Pnl_val,0);s('l_Pn',Pn,0);sso('l_Pnl_gov',Pnl,0);
+  t('l_Pcrl_sub',`${f(Ag_cm2,3)} × ${f(Fcrl_c,0)}`);s('l_Pcrl',Pcrl,0);
+  t('l_ll_sub',`√(${f(Pn,0)} / ${f(Pcrl,0)})`);s('l_ll',ll_c,3);
+  h('l_Pnl_cond', ll_c<=0.776 ? `λ<sub>l</sub> = ${f(ll_c,3)} ≤ 0.776 → P<sub>nl</sub> = P<sub>ne</sub>` : `λ<sub>l</sub> = ${f(ll_c,3)} > 0.776 → P<sub>nl</sub> = [1−0.15(P<sub>crl</sub>/P<sub>ne</sub>)<sup>0.4</sup>](P<sub>crl</sub>/P<sub>ne</sub>)<sup>0.4</sup>P<sub>ne</sub>`);
+  t('l_Pnl_sub', ll_c<=0.776 ? `${f(Pn,0)}` : `[1−0.15×(${f(Pcrl,0)}/${f(Pn,0)})^0.4]×(${f(Pcrl,0)}/${f(Pn,0)})^0.4×${f(Pn,0)}`);
+  sso('l_Pnl_gov',Pnl,0);
 
   // Compression
-  s('cx_Fcre',Fcre_x,0);
-  t('cx_lc_sub',`√(${Fy} / ${f(Fcre_x,0)})`);s('cx_lc',lc_x,3);
+  s('cx_Fcre',Fcre_cx,0);
+  t('cx_lc_sub',`√(${Fy} / ${f(Fcre_cx,0)})`);s('cx_lc',lc_x,3);
   h('cx_lc_cond', lc_x<=1.5 ? `λ<sub>c-x</sub> = ${f(lc_x,3)} ≤ 1.5  →  Inelastic` : `λ<sub>c-x</sub> = ${f(lc_x,3)} > 1.5  →  Elastic`);
   t('cx_Fn_formula',lc_x<=1.5?`Fn = 0.658^(λc²) × Fy`:`Fn = 0.877 × Fy / λc²`);
   t('cx_Fn_sub',lc_x<=1.5?`0.658^(${f(lc_x,3)}²) × ${Fy}`:`0.877 × ${Fy} / ${f(lc_x,3)}²`);
   s('cx_Fn',Fn_cx,0);t('cx_Pne_sub',`${f(A/100,2)} × ${f(Fn_cx,0)}`);s('cx_Pne',Pne_x,0);
-  s('cy_Fcre',Fcre_y,0);
-  t('cy_lc_sub',`√(${Fy} / ${f(Fcre_y,0)})`);s('cy_lc',lc_y,3);
+  s('cy_Fcre',Fcre_cy,0);
+  t('cy_lc_sub',`√(${Fy} / ${f(Fcre_cy,0)})`);s('cy_lc',lc_y,3);
   h('cy_lc_cond', lc_y<=1.5 ? `λ<sub>c-y</sub> = ${f(lc_y,3)} ≤ 1.5  →  Inelastic` : `λ<sub>c-y</sub> = ${f(lc_y,3)} > 1.5  →  Elastic`);
   t('cy_Fn_formula',lc_y<=1.5?`Fn = 0.658^(λc²) × Fy`:`Fn = 0.877 × Fy / λc²`);
   t('cy_Fn_sub',lc_y<=1.5?`0.658^(${f(lc_y,3)}²) × ${Fy}`:`0.877 × ${Fy} / ${f(lc_y,3)}²`);
@@ -1542,10 +1544,20 @@ function calculate(){
   sso('dt_Pnd',Pnd,0);
 
   // Flexure Distortional X
-  const Mcrdx = Sfx*Fcrd/100;
+  // Flexural distortional (S100-16 §2.3.3.3, ξweb = −1): own Lcrd, kφwe, kφwg
+  const flexT  = Ixf*(Xof-xhf)**2 + Cwf - (Ixyf**2/Iyf)*(Xof-xhf)**2;
+  const Lcrd_f = (4*PI**4*H*nu2/tt**3*flexT + PI**4*H**4/720)**0.25;
+  const Ld_f   = Math.min(Lm, Lcrd_f);
+  const kfe_f  = (PI/Ld_f)**4*(E/100*flexT) + (PI/Ld_f)**2*G*Jf/100;
+  const kfg_f  = (PI/Ld_f)**2*(Ixf+Iyf+Af*(xhf**2+yof**2-2*yof*(Xof-xhf)*(Ixyf/Iyf)+(Xof-xhf)**2*(Ixyf/Iyf)**2));
+  const kwe_f  = E/100*tt**3/(12*nu2)*(3/H + (PI/Ld_f)**2*19*H/60 + (PI/Ld_f)**4*H**3/240);
+  const LH = Ld_f/H;
+  const kwg_f  = H*tt*PI**2/13440*(((45360*2+62160)*LH**2 + 448*PI**2 + (1/LH)**2*(53+3*2)*PI**4)/(PI**4 + 28*PI**2*LH**2 + 420*LH**4));
+  const Fcrd_f = (kfe_f + kwe_f)/(kfg_f + kwg_f)*100;   // ksc
+  const Mcrdx = Sfx*Fcrd_f/100;
   const ldx   = Math.sqrt(My_x/Mcrdx);
   const Mndx  = ldx<=0.673 ? My_x : (1-0.22*Math.sqrt(Mcrdx/My_x))*Math.sqrt(Mcrdx/My_x)*My_x;
-  t('fx_Mcrdx_sub', `${f(Sfx,2)} × ${f(Fcrd,0)} / 100`);
+  t('fx_Mcrdx_sub', `${f(Sfx,2)} × F<sub>crd,flex</sub> ${f(Fcrd_f,0)} / 100  (L<sub>crd</sub>=${f(Lcrd_f,0)} mm)`);
   s('fx_Mcrdx', Mcrdx);
   t('fx_ldx_sub', `√(${f(My_x,2)} / ${f(Mcrdx,2)})`);
   s('fx_ldx', ldx,3);
@@ -1568,17 +1580,18 @@ function calculate(){
   s('fy_Mndy', Mndy);
 
   // Shear
-  const Aw=H*tt/100,Vy=Aw*Fy*0.6,kv=5.34;
-  const Vcr=(PI**2)*E*kv*(H/10)*(tt/10)/(12*nu2*(H/tt)**2);
+  // S100-16 §G2.1 (no tension field): h = flat web depth
+  const hw=P1, Aw=hw*tt/100, Vy=0.6*Aw*Fy, kv=5.34;
+  const Fcr=(PI**2)*E*kv/(12*nu2*(hw/tt)**2);
+  const Vcr=Fcr*Aw;
   const lv=Math.sqrt(Vy/Vcr);
-  const Vn=lv>0.587?(1-0.25*(Vcr/Vy)**0.65)*(Vcr/Vy)**0.65*Vy:Vy;
-  const Fcr=(PI**2)*E*kv/(12*nu2*(H/tt)**2);
+  const Vn=lv<=0.815?Vy:(lv<=1.227?0.815*Math.sqrt(Vcr*Vy):Vcr);
   const Vcr2=Fcr*Aw;
-  t('sh_Aw_sub',`${H} × ${tt} / 100`);s('sh_Aw',Aw,3);
+  t('sh_Aw_sub',`h ${f(hw,2)} × ${tt} / 100`);s('sh_Aw',Aw,3);
   t('sh_Vy_sub',`0.6 × ${f(Aw,3)} × ${Fy}`);s('sh_Vy',Vy,0);
-  t('sh_Vcr_sub',`π²×${f(E,0)}×${kv}×${f(H/10,3)}×${f(tt/10,3)} / [12×0.91×(${H}/${tt})²]`);s('sh_Vcr',Vcr,0);
+  t('sh_Vcr_sub',`π²×${f(E,0)}×${kv}×${f(Aw,3)} / [12×0.91×(${f(hw,2)}/${tt})²]`);s('sh_Vcr',Vcr,0);
   t('sh_lv_sub',`√(${f(Vy,0)} / ${f(Vcr,0)})`);s('sh_lv',lv,3);
-  t('sh_lv_cond',lv<=0.587?`λv = ${f(lv,3)} ≤ 0.587  →  Vn = Vy = ${f(Vy,0)} kg`:`λv = ${f(lv,3)} > 0.587  →  Vn = [1−0.25(Vcr/Vy)^0.65]×(Vcr/Vy)^0.65×Vy`);
+  t('sh_lv_cond',lv<=0.815?`λv = ${f(lv,3)} ≤ 0.815  →  Vn = Vy`:(lv<=1.227?`0.815 < λv = ${f(lv,3)} ≤ 1.227  →  Vn = 0.815√(Vcr·Vy)`:`λv = ${f(lv,3)} > 1.227  →  Vn = Vcr`));
   sso('sh_Vn',Vn,0);s('sh_Fcr',Fcr,0);s('sh_Vcr2',Vcr2,0);
 
   // Summary
@@ -1602,21 +1615,17 @@ function calculate(){
   s('dt_Pnd_gov',Pnd,0);
 
   // ── Vn formula/sub ───────────────────────────────────────────
-  h('sh_Vn_formula', lv<=0.587
-    ? `V<sub>n</sub> = V<sub>y</sub>`
-    : `V<sub>n</sub> = [1−0.25·(V<sub>cr</sub>/V<sub>y</sub>)<sup>0.65</sup>]·(V<sub>cr</sub>/V<sub>y</sub>)<sup>0.65</sup>·V<sub>y</sub>`);
-  h('sh_Vn_sub', lv<=0.587
-    ? `${f(Vy,0)}`
-    : `[1−0.25×(${f(Vcr,0)}/${f(Vy,0)})<sup>0.65</sup>]×(${f(Vcr,0)}/${f(Vy,0)})<sup>0.65</sup>×${f(Vy,0)}`);
+  h('sh_Vn_formula', lv<=0.815 ? `V<sub>n</sub> = V<sub>y</sub>` : (lv<=1.227 ? `V<sub>n</sub> = 0.815√(V<sub>cr</sub>·V<sub>y</sub>)` : `V<sub>n</sub> = V<sub>cr</sub>`));
+  h('sh_Vn_sub', lv<=0.815 ? `${f(Vy,0)}` : (lv<=1.227 ? `0.815×√(${f(Vcr,0)}×${f(Vy,0)})` : `${f(Vcr,0)}`));
   s('sh_Vn',Vn,0);
   s('sh_Vn_gov',Vn,0);
 
   // ── Fcr / Vcr2 sub ───────────────────────────────────────────
-  t('sh_Fcr_sub',`π²×${E}×${kv} / (12×0.91×(${H}/${tt})²)`);
+  t('sh_Fcr_sub',`π²×${E}×${kv} / (12×0.91×(${f(hw,2)}/${tt})²)`);
   t('sh_Vcr2_sub',`${f(Aw,3)} × ${f(Fcr,0)}`);
 
   // ── l_Fn_sub ─────────────────────────────────────────────────
-  t('l_Fn_sub',`min(${f(Fn_x,0)}, ${f(Fn_y,0)})`);
+
 
   // ── Summary ──────────────────────────────────────────────────
   s('sum_Pey', Pey, 0);
@@ -1625,43 +1634,43 @@ function calculate(){
   s('sum_Vy',  Vy,  0);
   s('sum_Vcr', Vcr, 0);
   // Mn-x govern
-  // Excel Cal S91 = MIN(Mnl-x, Mne-x), S92 = MIN(Mnl-y, Mne-y) — distortional NOT in governing min
-  const mnx_min = Math.min(Mne_x, Mnlx);
+  // S100-16: Mn = min(Mne, Mnl, Mnd)
+  const mnx_min = Math.min(Mne_x, Mnlx, Mndx);
   s('sum_Mnx_gov', mnx_min);
-  const mnx_mode = mnx_min===Mnlx ? 'Local Buckling governs' : 'LTB governs';
+  const mnx_mode = mnx_min===Mne_x ? 'LTB / Yielding governs' : mnx_min===Mnlx ? 'Local Buckling governs' : 'Distortional governs';
   t('sum_Mnx_mode', mnx_mode);
   // Mn-y govern
-  const mny_min = Math.min(Mne_y, Mnly);
+  const mny_min = Math.min(Mne_y, Mnly, Mndy);
   s('sum_Mny_gov', mny_min);
-  const mny_mode = mny_min===Mnly ? 'Local Buckling governs' : 'LTB governs';
+  const mny_mode = mny_min===Mne_y ? 'Global / Yielding governs' : mny_min===Mnly ? 'Local Buckling governs' : 'Distortional governs';
   t('sum_Mny_mode', mny_mode);
-  // Excel Cal X128 = MIN(Pnd, Pnl, Pn, Pey, Pex) — Pt NOT in governing min
-  const pn_min = Math.min(Pey, Pex, Pn, Pnl, Pnd);
+  // S100-16: Pn = min(Pne, Pnl, Pnd)
+  const pn_min = Math.min(Pn, Pnl, Pnd);   // S100: Pn = min(Pne, Pnl, Pnd)
   s('sum_Pn_gov', pn_min, 0);
-  const pn_mode = pn_min===Pnd ? 'P<sub>nd</sub> Distortional governs'
+  const pn_mode = pn_min===Pn ? 'P<sub>ne</sub> Global Buckling governs'
     : pn_min===Pnl ? 'P<sub>nl</sub> Local Buckling governs'
-    : pn_min===Pn  ? 'P<sub>n</sub> Global Buckling governs'
-    : pn_min===Pey ? 'P<sub>ey</sub> Euler Y governs'
-    : 'P<sub>ex</sub> Euler X governs';
+    : 'P<sub>nd</sub> Distortional governs';
   h('sum_Pn_mode', pn_mode);
   // Vn govern
   s('sum_Vn_gov', Vn, 0);
-  h('sum_Vn_mode', lv<=0.587 ? `Yielding governs &nbsp;(λ<sub>v</sub> = ${f(lv,3)} ≤ 0.587)` : `Shear Buckling governs &nbsp;(λ<sub>v</sub> = ${f(lv,3)} > 0.587)`);
+  h('sum_Vn_mode', lv<=0.815 ? `Yielding governs &nbsp;(λ<sub>v</sub> = ${f(lv,3)} ≤ 0.815)` : `Shear Buckling governs &nbsp;(λ<sub>v</sub> = ${f(lv,3)} > 0.815)`);
 
-  // ── Combined Check (Applied Force) — replicate Excel Cal sheet BH120-123 / BI144,BI145 ──
+  // ── Combined Check — AISI S100-16 §H1.2 (P+M) and §H2 (M+V) ──
   const Pap=parseInput('inp_P'),Mxap=parseInput('inp_Mx'),Myap=parseInput('inp_My'),Vyap=parseInput('inp_Vy');
   let nSec=parseInput('inp_n'); if(!(nSec>0))nSec=1;
   const codeEl=document.getElementById('inp_code');
   const code=codeEl&&codeEl.value==='ASD'?'ASD':'LRFD';
   // Capacities scaled by n (Excel XLOOKUP n→base or 2·base; base = governing Pn / Mn-x / Mn-y / Vn)
   const AL113=pn_min*nSec, AL114=mnx_min*nSec, AL115=mny_min*nSec, AL116=Vn*nSec;
-  const PHI=0.9, OM=1.67;
-  // P+M : Excel BH120 (LRFD) / BH121 (ASD)
-  const pm_LRFD=Pap/(PHI*AL113)+Mxap/(PHI*AL114)+Myap/(PHI*AL115);
-  const pm_ASD =OM*Pap/AL113+OM*Mxap/AL114+OM*Myap/AL115;
-  // M+V : Excel BH122 (LRFD) / BH123 (ASD) — C-section: M÷(Φ·Mn-x), V÷(Φ·Vn)
-  const mv_LRFD=Math.sqrt((Mxap/(PHI*AL114))**2+(Vyap/(PHI*AL116))**2);
-  const mv_ASD =Math.sqrt((OM*Mxap/AL114)**2+(OM*Vyap/AL116)**2);
+  // S100-16 resistance factors: φc=0.85 Ωc=1.80 · φb=0.90 Ωb=1.67 · φv=0.95 Ωv=1.60
+  const PHC=0.85, PHB=0.90, PHV=0.95, OMC=1.80, OMB=1.67, OMV=1.60;
+  const AL114o = Mnlxo*nSec;   // H2 uses Mnlxo (local buckling with Mne = My)
+  // H1.2: P/Pa + Mx/Max + My/May ≤ 1
+  const pm_LRFD=Pap/(PHC*AL113)+Mxap/(PHB*AL114)+Myap/(PHB*AL115);
+  const pm_ASD =OMC*Pap/AL113+OMB*Mxap/AL114+OMB*Myap/AL115;
+  // H2: √((M/Malxo)² + (V/Va)²) ≤ 1
+  const mv_LRFD=Math.sqrt((Mxap/(PHB*AL114o))**2+(Vyap/(PHV*AL116))**2);
+  const mv_ASD =Math.sqrt((OMB*Mxap/AL114o)**2+(OMV*Vyap/AL116)**2);
   const isASD=code==='ASD';
   const r_pm=isASD?pm_ASD:pm_LRFD, r_mv=isASD?mv_ASD:mv_LRFD;
   const ckBadge=(id,rv)=>{const e=document.getElementById(id);if(!e)return;const ok=rv<=1;e.textContent=ok?'OK':'Not OK';e.className='sec-tag '+(ok?'tag-green':'tag-red');};
@@ -1669,14 +1678,15 @@ function calculate(){
   s('ck_pm',r_pm,3); ckBadge('ck_pm_st',r_pm);
   s('ck_mv',r_mv,3); ckBadge('ck_mv_st',r_mv);
   t('ck_pm_sub',isASD
-     ?`1.67·${f(Pap,0)}/${f(AL113,0)} + 1.67·${f(Mxap,2)}/${f(AL114,2)} + 1.67·${f(Myap,2)}/${f(AL115,2)}`
-     :`${f(Pap,0)}/(0.9·${f(AL113,0)}) + ${f(Mxap,2)}/(0.9·${f(AL114,2)}) + ${f(Myap,2)}/(0.9·${f(AL115,2)})`);
+     ?`1.80·${f(Pap,0)}/${f(AL113,0)} + 1.67·${f(Mxap,2)}/${f(AL114,2)} + 1.67·${f(Myap,2)}/${f(AL115,2)}  [H1.2]`
+     :`${f(Pap,0)}/(0.85·${f(AL113,0)}) + ${f(Mxap,2)}/(0.9·${f(AL114,2)}) + ${f(Myap,2)}/(0.9·${f(AL115,2)})  [H1.2]`);
   t('ck_mv_sub',isASD
-     ?`√((1.67·${f(Mxap,2)}/${f(AL114,2)})² + (1.67·${f(Vyap,0)}/${f(AL116,0)})²)`
-     :`√((${f(Mxap,2)}/(0.9·${f(AL114,2)}))² + (${f(Vyap,0)}/(0.9·${f(AL116,0)}))²)`);
+     ?`√((1.67·${f(Mxap,2)}/${f(AL114o,2)})² + (1.60·${f(Vyap,0)}/${f(AL116,0)})²)  [H2]`
+     :`√((${f(Mxap,2)}/(0.9·${f(AL114o,2)}))² + (${f(Vyap,0)}/(0.95·${f(AL116,0)}))²)  [H2]`);
 
     drawSection('sectionCanvas',H,B,C,r,tt,xc,m);
   // sectionCanvas2 removed
+  window._cfsPrint={Pcrl_p:Pcrl,llc_p:ll_c,Fcre_cx_p:Fcre_cx,Fcre_cy_p:Fcre_cy};
   populatePrint(H,B,C,tt,r,Fy,E,G,Lx,Ly,Lt,Kx,Ky,Kt,Cb,
     A,Ix,Iy,xc,X0,jj,Jt,Cw,ro,Sfx,Sfy,
     kfe,kwe,kfg,kwg,Lm,Lcrd,Ld,Fcrd,
@@ -1829,6 +1839,7 @@ function populatePrint(H,B,C,tt,r,Fy,E,G,Lx,Ly,Lt,Kx,Ky,Kt,Cb,
   lc_x,lc_y,Fn_cx,Fn_cy,Pne_x,Pne_y,
   Py,Pcrd,ld,Pnd,
   Aw,Vy,Vcr,lv,Vn,pn_min,J1,J2,P1,P2,P3){
+  const {Pcrl_p,llc_p,Fcre_cx_p,Fcre_cy_p}=window._cfsPrint||{};
 
   const ps=(id,v,d=2)=>{const e=document.getElementById(id);if(e)e.textContent=f(v,d);};
   const pt=(id,txt)=>{const e=document.getElementById(id);if(e)e.textContent=txt;};
@@ -1855,7 +1866,7 @@ function populatePrint(H,B,C,tt,r,Fy,E,G,Lx,Ly,Lt,Kx,Ky,Kt,Cb,
   ps('p2_Pex',Pex,0);pt('p2_Pex_sub','π²×'+f(E,0)+'×'+f(Ix/1e4,2)+' / ('+Kx+'×'+Lx+')²');
   ps('p2_Pt',Pt,0);
   ps('p2_Mcrex',Mcre_x);pt('p2_Mcrex_sub',Cb+'×'+f(ro/1000,4)+'×√('+f(Pey,0)+'×'+f(Pt,0)+')');
-  ps('p2_Mcrey',Mcre_y);pt('p2_Mcrey_sub',Cb+'×'+f(ro/1000,4)+'×√('+f(Pex,0)+'×'+f(Pt,0)+')');
+  ps('p2_Mcrey',Mcre_y);pt('p2_Mcrey_sub','Cs = ±1 (ค่าน้อย), Fcre-y = '+f(Fcre_y,0)+' ksc');
   ps('p2_Fcrex',Fcre_x,0);pt('p2_Fcrex_sub',f(Mcre_x,2)+'×100/'+f(Sfx,2));
   ps('p2_Fcrey',Fcre_y,0);pt('p2_Fcrey_sub',f(Mcre_y,2)+'×100/'+f(Sfy,2));
   ps('p2_Fnx',Fn_x,0);ps('p2_Fny',Fn_y,0);
@@ -1870,14 +1881,11 @@ function populatePrint(H,B,C,tt,r,Fy,E,G,Lx,Ly,Lt,Kx,Ky,Kt,Cb,
   ps('p2_Mnx_gov',mnx_min);ps('p2_Mny_gov',mny_min);
 
   // Page 3
-  ps('p3_Fn',Fn_min,0);
-  ps('p3_lLip',lip.lam);ps('p3_lrLip',lip.lr);ps('p3_lrfnLip',lip.lrFn);ps('p3_FelLip',lip.Fel,0);pt('p3_bLip',f(P3,2));ps('p3_beLip',lip.be,3);
-  ps('p3_lFl',fl.lam);ps('p3_lrFl',fl.lr);ps('p3_lrfnFl',fl.lrFn);ps('p3_FelFl',fl.Fel,0);pt('p3_bFl',f(P2,2));ps('p3_beFl',fl.be,3);
-  ps('p3_lWeb',wb.lam);ps('p3_lrWeb',wb.lr);ps('p3_lrfnWeb',wb.lrFn);ps('p3_FelWeb',wb.Fel,0);pt('p3_bWeb',f(P1,2));ps('p3_beWeb',wb.be,3);
-  ps('p3_Ae',Ae,4);pt('p3_Pnl_sub',f(Ae,4)+'×'+f(Fn_c,0));ps('p3_Pnl_val',Pnl_val,0);ps('p3_Pn_global',Pn,0);ps('p3_Pnl',Pnl,0);
-  ps('p3_Fcrex',Fcre_x,0);ps('p3_Fcrey',Fcre_y,0);
-  ps('p3_lcx',lc_x,3);pt('p3_lcx_sub','√('+Fy+'/'+f(Fcre_x,0)+')');pt('p3_lcx_cond',lc_x<=1.5?'≤':'>');
-  ps('p3_lcy',lc_y,3);pt('p3_lcy_sub','√('+Fy+'/'+f(Fcre_y,0)+')');pt('p3_lcy_cond',lc_y<=1.5?'≤':'>');
+  [['Lip',lip],['Fl',fl],['Web',wb]].forEach(([id,el])=>{ps('p3_w'+id,el.w,2);ps('p3_l'+id,el.lam,2);ps('p3_kc'+id,el.kC,2);ps('p3_fc'+id,el.FcrC,0);ps('p3_kf'+id,el.kF,2);ps('p3_ff'+id,el.FcrF,0);});
+  ps('p3_Pcrl',Pcrl_p,0);ps('p3_llc',llc_p,3);ps('p3_Pn_global',Pn,0);ps('p3_Pnl',Pnl,0);
+  ps('p3_Fcrex',Fcre_cx_p,0);ps('p3_Fcrey',Fcre_cy_p,0);
+  ps('p3_lcx',lc_x,3);pt('p3_lcx_sub','√('+Fy+'/'+f(Fcre_cx_p,0)+')');pt('p3_lcx_cond',lc_x<=1.5?'≤':'>');
+  ps('p3_lcy',lc_y,3);pt('p3_lcy_sub','√('+Fy+'/'+f(Fcre_cy_p,0)+')');pt('p3_lcy_cond',lc_y<=1.5?'≤':'>');
   ps('p3_Fncx',Fn_cx,0);ps('p3_Fncy',Fn_cy,0);ps('p3_Pnex',Pne_x,0);ps('p3_Pney',Pne_y,0);
   ps('p3_Py',Py,0);pt('p3_Py_sub',f(A/100,2)+'×'+Fy);
   ps('p3_Pcrd',Pcrd,0);pt('p3_Pcrd_sub',f(A/100,2)+'×'+f(Fcrd,0));
@@ -1885,7 +1893,7 @@ function populatePrint(H,B,C,tt,r,Fy,E,G,Lx,Ly,Lt,Kx,Ky,Kt,Cb,
   ps('p3_ld',ld,3);pt('p3_ld_sub','√('+f(Py,0)+'/'+f(Pcrd,0)+')');
   pt('p3_ld_cond',ld<=0.561?'≤':'>');ps('p3_Pnd',Pnd,0);
   ps('p3_Aw',Aw,3);ps('p3_Vy',Vy,0);ps('p3_Vcr',Vcr,0);
-  ps('p3_lv',lv,3);pt('p3_lv_cond',lv<=0.587?'≤':'>');ps('p3_Vn',Vn,0);ps('p3_Vn2',Vn,0);
+  ps('p3_lv',lv,3);pt('p3_lv_cond',lv<=0.815?'≤ 0.815 → Vn = Vy':(lv<=1.227?'≤ 1.227 → Vn = 0.815√(Vcr·Vy)':'> 1.227 → Vn = Vcr'));ps('p3_Vn',Vn,0);ps('p3_Vn2',Vn,0);
   ps('p3_Mnx_gov',mnx_min);ps('p3_Mny_gov',mny_min);ps('p3_Pn_gov',pn_min,0);
 }
 
@@ -2019,7 +2027,7 @@ function populatePrint(H,B,C,tt,r,Fy,E,G,Lx,Ly,Lt,Kx,Ky,Kt,Cb,
         <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Pex"></span><span class="pr-eq-unit">kg</span></span>
       </div>
       <div class="pr-eq-group">
-        <span class="pr-eq-sym">M<sub>cre-y</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Cb·ro·√(Pex·Pt)</span>
+        <span class="pr-eq-sym">M<sub>cre-y</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">Fcre-y·Sfy, Fcre-y = Cs·A·σex[j + Cs√(j²+ro²σt/σex)]/Sfy</span>
         <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span id="p2_Mcrey_sub"></span></span>
         <span></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><span class="pr-eq-val" id="p2_Mcrey"></span><span class="pr-eq-unit">kg-m</span></span>
       </div>
@@ -2073,21 +2081,21 @@ function populatePrint(H,B,C,tt,r,Fy,E,G,Lx,Ly,Lt,Kx,Ky,Kt,Cb,
 <div class="pr-outer">
 <div class="pr-hdr-bar">C Channel Section With Lip — AISI S100 &nbsp;|&nbsp; Compression, Shear &amp; Summary</div>
 <div class="pr-body">
-  <div class="pr-sec">Compression Local Buckling — Effective Width Method — §E4</div>
-  <div style="font-size:12px">Fn = min(Fn-x, Fn-y) = <b id="p3_Fn"></b> ksc</div>
+  <div class="pr-sec">Local Buckling — Direct Strength Method (element model) — §2.3.1.1, §E3.2, §F3.2</div>
+  <div style="font-size:12px">Fcrl = k·π²E/[12(1−μ²)]·(t/w)² · ใช้ค่าน้อยสุดของแต่ละชิ้น</div>
   <table class="pr-tbl" style="margin:6px 0">
     <thead><tr>
-      <th class="lft">Section</th><th>λ</th><th>λr</th><th>λr√(Fy/Fn)</th><th>c₁</th><th>c₂</th><th>Fel (ksc)</th><th>b (mm)</th><th>be (cm)</th>
+      <th class="lft">Element</th><th>w (mm)</th><th>w/t</th><th>k อัด</th><th>Fcrl อัด (ksc)</th><th>k ดัด-x</th><th>Fcrl ดัด (ksc)</th>
     </tr></thead>
     <tbody>
-      <tr><td class="lft">Lip</td><td id="p3_lLip"></td><td id="p3_lrLip"></td><td id="p3_lrfnLip"></td><td>0.22</td><td>1.49</td><td id="p3_FelLip"></td><td id="p3_bLip"></td><td id="p3_beLip"></td></tr>
-      <tr><td class="lft">Flange</td><td id="p3_lFl"></td><td id="p3_lrFl"></td><td id="p3_lrfnFl"></td><td>0.18</td><td>1.31</td><td id="p3_FelFl"></td><td id="p3_bFl"></td><td id="p3_beFl"></td></tr>
-      <tr><td class="lft">Web</td><td id="p3_lWeb"></td><td id="p3_lrWeb"></td><td id="p3_lrfnWeb"></td><td>0.18</td><td>1.31</td><td id="p3_FelWeb"></td><td id="p3_bWeb"></td><td id="p3_beWeb"></td></tr>
+      <tr><td class="lft">Lip</td><td id="p3_wLip"></td><td id="p3_lLip"></td><td id="p3_kcLip"></td><td id="p3_fcLip"></td><td id="p3_kfLip"></td><td id="p3_ffLip"></td></tr>
+      <tr><td class="lft">Flange</td><td id="p3_wFl"></td><td id="p3_lFl"></td><td id="p3_kcFl"></td><td id="p3_fcFl"></td><td id="p3_kfFl"></td><td id="p3_ffFl"></td></tr>
+      <tr><td class="lft">Web</td><td id="p3_wWeb"></td><td id="p3_lWeb"></td><td id="p3_kcWeb"></td><td id="p3_fcWeb"></td><td id="p3_kfWeb"></td><td id="p3_ffWeb"></td></tr>
     </tbody>
   </table>
   <div class="pr-eq-group">
-    <span class="pr-eq-sym">A<sub>e</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><b id="p3_Ae"></b> cm²</span>
-    <span></span><span class="pr-eq-op"></span><span class="pr-eq-rhs">Pnl = Ae·Fn = <span id="p3_Pnl_sub"></span> = <span id="p3_Pnl_val"></span> &lt; <span id="p3_Pn_global"></span> kg</span>
+    <span class="pr-eq-sym">P<sub>crl</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs"><b id="p3_Pcrl"></b> kg &nbsp; λ<sub>l</sub> = √(Pne/Pcrl) = <b id="p3_llc"></b> (0.776)</span>
+    <span></span><span class="pr-eq-op"></span><span class="pr-eq-rhs">Pne = <span id="p3_Pn_global"></span> kg</span>
   </div>
   <div class="pr-so"><span class="pr-so-lbl">Pnl =</span><span class="pr-so-val" id="p3_Pnl"></span><span class="pr-so-unit">kg</span></div>
 
@@ -2095,13 +2103,13 @@ function populatePrint(H,B,C,tt,r,Fy,E,G,Lx,Ly,Lt,Kx,Ky,Kt,Cb,
   <div class="pr-2col">
     <div>
       <div style="font-weight:600;font-size:11.5px;margin-bottom:4px">Global Buckling</div>
-      <div style="font-size:12px">Fcre-x = <b id="p3_Fcrex"></b> ksc</div>
+      <div style="font-size:12px">Fcre,FT (flexural-torsional) = <b id="p3_Fcrex"></b> ksc</div>
       <div class="pr-eq-group">
         <span class="pr-eq-sym">λ<sub>c-x</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">√(Fy/Fcre-x) = <span id="p3_lcx_sub"></span> = <span id="p3_lcx"></span>&nbsp;<span id="p3_lcx_cond"></span>&nbsp;1.5</span>
       </div>
       <div style="font-size:12px">Fn-x = <b id="p3_Fncx"></b> ksc</div>
       <div class="pr-so"><span class="pr-so-lbl">Pne-x =</span><span class="pr-so-val" id="p3_Pnex"></span><span class="pr-so-unit">kg</span></div>
-      <div style="font-size:12px;margin-top:6px">Fcre-y = <b id="p3_Fcrey"></b> ksc</div>
+      <div style="font-size:12px;margin-top:6px">Fcre (flexural, แกน y) = <b id="p3_Fcrey"></b> ksc</div>
       <div class="pr-eq-group">
         <span class="pr-eq-sym">λ<sub>c-y</sub></span><span class="pr-eq-op">=</span><span class="pr-eq-rhs">√(Fy/Fcre-y) = <span id="p3_lcy_sub"></span> = <span id="p3_lcy"></span>&nbsp;<span id="p3_lcy_cond"></span>&nbsp;1.5</span>
       </div>
@@ -2130,11 +2138,11 @@ function populatePrint(H,B,C,tt,r,Fy,E,G,Lx,Ly,Lt,Kx,Ky,Kt,Cb,
     </div>
   </div>
 
-  <div class="pr-sec pr-sec2">Shear Strength — §G2</div>
+  <div class="pr-sec pr-sec2">Shear Strength — §G2.1 (ไม่คิด tension field)</div>
   <div>
-    <div style="font-size:12px">Aw = H×t/100 = <b id="p3_Aw"></b> cm² &nbsp;|&nbsp; Vy = 0.6·Aw·Fy = <b id="p3_Vy"></b> kg &nbsp;|&nbsp; kv = 5.34</div>
+    <div style="font-size:12px">Aw = h×t/100 (h = เอวช่วงตรง) = <b id="p3_Aw"></b> cm² &nbsp;|&nbsp; Vy = 0.6·Aw·Fy = <b id="p3_Vy"></b> kg &nbsp;|&nbsp; kv = 5.34</div>
     <div style="font-size:12px;margin-top:4px">Vcr = <b id="p3_Vcr"></b> kg</div>
-    <div style="font-size:12px">λv = √(Vy/Vcr) = <b id="p3_lv"></b> &nbsp;<span id="p3_lv_cond"></span>&nbsp; 0.587</div>
+    <div style="font-size:12px">λv = √(Vy/Vcr) = <b id="p3_lv"></b> &nbsp;<span id="p3_lv_cond"></span></div>
     <div class="pr-so" style="margin-top:4px"><span class="pr-so-lbl" style="font-weight:700">So &nbsp; Vn =</span><span class="pr-so-val" id="p3_Vn"></span><span class="pr-so-unit">kg</span></div>
   </div>
 
