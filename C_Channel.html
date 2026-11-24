@@ -565,7 +565,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
         <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="shx_Aw">—</span><span class="calc-unit">mm²</span></span></div>
       </div>
       <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">h/t<sub>w</sub> = <span id="shx_htw">—</span> &nbsp; vs &nbsp; 2.24√(E/F<sub>y</sub>) = <span id="shx_limit">—</span></span></div>
+        <div class="calc-line1"><span class="cl-body">h/t<sub>w</sub> = <span id="shx_htw">—</span> &nbsp; vs &nbsp; ขีดจำกัด = <span id="shx_limit">—</span></span></div>
         <div class="calc-line1"><span class="cl-body">C<sub>v1</sub> = <span id="shx_Cv1">—</span></span></div>
       </div>
       <div class="calc-block">
@@ -586,7 +586,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
         <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="shy_Afy">—</span><span class="calc-unit">mm²</span></span></div>
       </div>
       <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">b<sub>f</sub>/2t<sub>f</sub> = <span id="shy_bftf">—</span> &nbsp; vs &nbsp; 1.10√(k<sub>v</sub>E/F<sub>y</sub>) k<sub>v</sub>=1.2 = <span id="shy_limit">—</span></span></div>
+        <div class="calc-line1"><span class="cl-body">b<sub>f</sub>/t<sub>f</sub> = <span id="shy_bftf">—</span> &nbsp; vs &nbsp; 1.10√(k<sub>v</sub>E/F<sub>y</sub>) k<sub>v</sub>=1.2 = <span id="shy_limit">—</span></span></div>
         <div class="calc-line1"><span class="cl-body">C<sub>v2</sub> = <span id="shy_Cv2">—</span></span></div>
       </div>
       <div class="calc-block">
@@ -613,12 +613,12 @@ canvas{display:block;border-radius:4px;background:#0f1117}
 <div class="sec-block">
   <div class="sec-hdr"><span class="sec-tag tag-green">E3 — Compr</span><span class="sec-title">Compression — Flexural Buckling Strong &amp; Weak Axis</span><span class="sec-ref">AISC 360-22 E3 / E7</span></div>
   <div class="rep-col-full" style="border-top:1px solid var(--border)">
-    <div class="sdiv">Q — Reduction factor for slender elements (E7)</div>
+    <div class="sdiv">A<sub>e</sub> — Effective area for slender elements (E7, 360-22)</div>
     <div style="display:flex;gap:20px;margin-bottom:10px;flex-wrap:wrap">
-      <div style="font-size:12px">Q<sub>s</sub> (flange) = <span style="color:var(--yellow);font-weight:700" id="co_Qs">—</span></div>
-      <div style="font-size:12px">Q<sub>a</sub> (web) = <span style="color:var(--yellow);font-weight:700" id="co_Qa">—</span></div>
-      <div style="font-size:12px">Q = Q<sub>s</sub>×Q<sub>a</sub> = <span style="color:var(--yellow);font-weight:700" id="co_Q">—</span></div>
-      <div style="font-size:12px">4.71√(E/QF<sub>y</sub>) = <span style="color:var(--yellow);font-weight:700" id="co_lim">—</span></div>
+      <div style="font-size:12px">A<sub>e</sub> แกน x (cm²) = <span style="color:var(--yellow);font-weight:700" id="co_Qs">—</span></div>
+      <div style="font-size:12px">A<sub>e</sub> แกน y (cm²) = <span style="color:var(--yellow);font-weight:700" id="co_Qa">—</span></div>
+      <div style="font-size:12px">A<sub>e</sub>/A<sub>g</sub> (ค่าน้อย) = <span style="color:var(--yellow);font-weight:700" id="co_Q">—</span></div>
+      <div style="font-size:12px">4.71√(E/F<sub>y</sub>) = <span style="color:var(--yellow);font-weight:700" id="co_lim">—</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
       <div style="border-right:1px solid var(--border);padding-right:14px">
@@ -954,7 +954,8 @@ function calculate(){
   // ── Flexure X — F2 (Mn in kN·m internally, display in kg·m) ───
   const Mpx=Fy*Zx/1e6,Myx=Fy*Sx/1e6;   // kN·m
   const Lp_=1.76*ry*Math.sqrt(E/Fy);     // mm
-  const c1=J/(Sx*ho);
+  const c_ch=(ho/2)*Math.sqrt(Iy/Cw);   // F2-8b (channels)
+  const c1=J*c_ch/(Sx*ho);
   const Lr_=1.95*rts*(E/(0.7*Fy))*Math.sqrt(c1+Math.sqrt(c1**2+6.76*(0.7*Fy/E)**2)); // mm
   // Fy in MPa, Zx/Sx in mm³ → kN·m; convert display to kg·m
   sv('fx_Mp',Mpx*kgf,1);tx('fx_Mp_sub',f(Fy*ksc,1)+' ksc × '+f(Zx/1e6,4)+' m³');
@@ -972,11 +973,24 @@ function calculate(){
     tx('fx_Mn_formula','Mn=Cb[Mp−(Mp−0.7FySx)(Lb−Lp)/(Lr−Lp)]');
     tx('fx_Mn_sub',f(Cb,2)+'['+f(Mpx*kgf,0)+'−('+f((Mpx-0.7*Myx)*kgf,0)+')('+f(Lb/1000,3)+'−'+f(Lp_/1000,3)+')/('+f(Lr_/1000,3)+'−'+f(Lp_/1000,3)+')]');
   } else {
-    const Fcrl=Cb*PI**2*E/(Lb/rts)**2*Math.sqrt(1+0.078*J*Lb**2/(Sx*ho*rts**2));
+    const Fcrl=Cb*PI**2*E/(Lb/rts)**2*Math.sqrt(1+0.078*J*c_ch*Lb**2/(Sx*ho*rts**2));
     Mnx=Math.min(Fcrl*Sx/1e6,Mpx);ltb='Elastic LTB — Lb>Lr';
     tx('fx_regime','Lb='+f(Lb/1000,3)+' m > Lr='+f(Lr_/1000,3)+' m → Elastic LTB (Eq. F2-3)');
     tx('fx_Mn_formula','Mn=Fcr·Sx | Fcr='+f(Fcrl*ksc,1)+' ksc');tx('fx_Mn_sub','= '+f(Mnx*kgf,0)+' kg·m');
   }
+  // F3 — compression flange local buckling (noncompact / slender flange)
+  if(fcls!=='Compact'){
+    let MnFLB;
+    if(fcls==='Noncompact') MnFLB=Mpx-(Mpx-0.7*Myx)*(lf-lpf)/(lrf-lpf);            // F3-1
+    else { const kc=Math.min(0.76,Math.max(0.35,4/Math.sqrt(hc/tw))); MnFLB=0.9*E*kc*Sx/lf**2/1e6; }  // F3-2
+    if(MnFLB<Mnx){
+      Mnx=MnFLB; ltb='Flange Local Buckling (F3) — flange '+fcls;
+      tx('fx_regime','Flange '+fcls+' (λ='+f(lf,2)+') → FLB governs (Eq. '+(fcls==='Noncompact'?'F3-1':'F3-2')+')');
+      tx('fx_Mn_formula', fcls==='Noncompact'?'Mn=Mp−(Mp−0.7FySx)(λ−λpf)/(λrf−λpf)':'Mn=0.9E·kc·Sx/λ²');
+      tx('fx_Mn_sub','= '+f(Mnx*kgf,0)+' kg·m');
+    }
+  }
+  if(wcls!=='Compact') tx('fx_regime', (document.getElementById('fx_regime')||{}).textContent+' · ⚠ web '+wcls+' — ต้องตรวจตาม F4/F5 (ยังไม่คำนวณ)');
   sv('fx_Mn',Mnx*kgf,0);sv('fx_phiMn',0.9*Mnx*kgf,0);sv('fx_ASDMn',Mnx/1.67*kgf,0);
 
   // ── Flexure Y — F6 (display in kg·m) ─────────────────────────
@@ -990,10 +1004,10 @@ function calculate(){
     tx('fy_regime','Flange Compact (λ='+f(lf,2)+'≤λpf='+f(lpf,2)+') → Eq. F6-1');
     tx('fy_Mn_formula','Mn = Mp-y = Fy·Zy ≤ 1.6Fy·Sy');tx('fy_Mn_sub','= '+f(Mpy*kgf,0)+' kg·m');
   } else if(fcls==='Noncompact'){
-    Mny=Math.max(Mpy-(Mpy-Myy)*(lf-lpf)/(lrf-lpf),Myy);wy='Noncompact → Linear interp.';
+    Mny=Mpy-(Mpy-0.7*Myy)*(lf-lpf)/(lrf-lpf);wy='Noncompact → Linear interp.';
     tx('fy_regime','Flange Noncompact ('+f(lf,2)+') → Eq. F6-2');
-    tx('fy_Mn_formula','Mn=Mp-y−(Mp-y−My-y)(λ−λpf)/(λrf−λpf)');
-    tx('fy_Mn_sub',f(Mpy*kgf,0)+'−('+f((Mpy-Myy)*kgf,0)+')('+f(lf,2)+'−'+f(lpf,2)+')/('+f(lrf,2)+'−'+f(lpf,2)+')');
+    tx('fy_Mn_formula','Mn=Mp-y−(Mp-y−0.7Fy·Sy)(λ−λpf)/(λrf−λpf)');
+    tx('fy_Mn_sub',f(Mpy*kgf,0)+'−('+f((Mpy-0.7*Myy)*kgf,0)+')('+f(lf,2)+'−'+f(lpf,2)+')/('+f(lrf,2)+'−'+f(lpf,2)+')');
   } else {
     Mny=0.69*E*Sy/lf**2/1e6;wy='Slender → Fcr·Sy';
     tx('fy_regime','Flange Slender ('+f(lf,2)+'>'+f(lrf,2)+') → Eq. F6-3');
@@ -1003,14 +1017,15 @@ function calculate(){
 
   // ── Shear X — G2 (display in kg) ────────────────────────────
   const Aw=d*tw,htw=(d-2*tf)/tw,lsh=2.24*Math.sqrt(E/Fy);
-  // G2.1(a): h/tw ≤ 2.24√(E/Fy) → Cv1=1.0, φv=1.00, Ωv=1.50
-  // G2.1(b): h/tw >  2.24√(E/Fy) → Cv1<1.0,  φv=0.90, Ωv=1.67
-  const shx_case1 = htw <= lsh;
-  const Cv1 = shx_case1 ? 1.0 : Math.min(lsh/htw, 1.0);
+  // G2.1(a): rolled I-shapes with h/tw ≤ 2.24√(E/Fy) → Cv1=1, φv=1.00, Ωv=1.50 (not for channels)
+  // G2.1(b): kv = 5.34 (no stiffeners) → Cv1 = 1 if h/tw ≤ 1.10√(kvE/Fy), else 1.10√(kvE/Fy)/(h/tw)
+  const lsh_b = 1.10*Math.sqrt(5.34*E/Fy);
+  const shx_case1 = false;
+  const Cv1 = shx_case1 ? 1.0 : (htw <= lsh_b ? 1.0 : lsh_b/htw);
   const phiVx = shx_case1 ? 1.00 : 0.90;
   const OmVx  = shx_case1 ? 1.50 : 1.67;
   const Vnx=0.6*Fy*Aw*Cv1/1e3;   // kN
-  sv('shx_Aw',Aw,0);tx('shx_Aw_sub',d+' × '+tw);sv('shx_htw',htw,2);sv('shx_limit',lsh,2);sv('shx_Cv1',Cv1,3);
+  sv('shx_Aw',Aw,0);tx('shx_Aw_sub',d+' × '+tw);sv('shx_htw',htw,2);tx('shx_limit', shx_case1 ? f(lsh,2)+' (G2.1a)' : f(lsh_b,2)+' = 1.10√(5.34E/Fy) (G2.1b)');sv('shx_Cv1',Cv1,3);
   tx('shx_Vn_sub','0.6 × '+f(Fy*ksc,1)+' ksc × '+f(Aw/1e4,4)+' m² × '+f(Cv1,3));
   sv('shx_Vn',Vnx*kgf,0);
   sv('shx_phiVn',phiVx*Vnx*kgf,0);
@@ -1027,25 +1042,38 @@ function calculate(){
   // G3: Vn-y = 0.6Fy·Afy·Cv2,  φv=0.90, Ωv=1.67
   // Cv2 based on kv=1.2 for outstanding flange element (Table B4.1a note)
   // limit = 1.10√(kv·E/Fy) where kv=1.2
-  const Afy=2*bf*tf,bftf=bf/(2*tf);
+  const Afy=2*bf*tf,bftf=bf/tf;   // G6: b = bf/2 (I-shape), bf (channel)
   const lsh_f=1.10*Math.sqrt(1.2*E/Fy);   // flange shear limit (kv=1.2)
-  const Cv2=bftf<=lsh_f?1.0:Math.min(lsh_f/bftf,1.0);
+  const lsh_f2=1.37*Math.sqrt(1.2*E/Fy);
+  const Cv2=bftf<=lsh_f?1.0:(bftf<=lsh_f2?lsh_f/bftf:1.51*1.2*E/(bftf**2*Fy));   // G2-9..G2-11
   const Vny=0.6*Fy*Afy*Cv2/1e3;   // kN
   sv('shy_Afy',Afy,0);tx('shy_Afy_sub','2 × '+bf+' × '+tf);sv('shy_bftf',bftf,2);sv('shy_limit',lsh_f,2);sv('shy_Cv2',Cv2,3);
   tx('shy_Vn_sub','0.6 × '+f(Fy*ksc,1)+' ksc × '+f(Afy/1e4,4)+' m² × '+f(Cv2,3));
   sv('shy_Vn',Vny*kgf,0);sv('shy_phiVn',0.9*Vny*kgf,0);sv('shy_ASDVn',Vny/1.67*kgf,0);
 
   // ── Compression E3/E7 (Fcr in MPa internally, display ksc/kg) ─
-  let Qs=1,Qa=1;
-  if(lf>lrf_c)Qs=Math.min(0.69*E/(Fy*lf**2),1);
-  if(lw>lrw_c){const be=Math.min(1.92*tw*Math.sqrt(E/Fy)*(1-0.34/lw*Math.sqrt(E/Fy)),hw);Qa=Math.min((A-(hw-be)*tw)/A,1);}
-  const Q=Qs*Qa;
-  sv('co_Qs',Qs,4);sv('co_Qa',Qa,4);sv('co_Q',Q,4);
-
+  // AISC 360-22 E7: Ae = A − Σ(b − be)·t,  be = b(1 − c1√(Fel/Fcr))√(Fel/Fcr) when λ > λr√(Fy/Fcr)
+  const E7el=[{b:bf,t:tf,n:2,u:true},{b:hw,t:tw,n:1,u:false}];
+  function Aeff(Fcr){
+    let Ae=A;
+    E7el.forEach(el=>{
+      const lam=el.b/el.t, lr=(el.u?0.56:1.49)*Math.sqrt(E/Fy);
+      const c1e=el.u?0.22:0.18, c2e=el.u?1.49:1.31;
+      if(lam>lr*Math.sqrt(Fy/Fcr)){
+        const Fel=(c2e*lr/lam)**2*Fy, rr=Math.sqrt(Fel/Fcr);
+        const be=Math.min(el.b, el.b*(1-c1e*rr)*rr);
+        Ae-=el.n*(el.b-be)*el.t;
+      }
+    });
+    return Ae;
+  }
+  const Q=1;   // E3 uses full Fy; local buckling via Ae (E7, 360-22)
   const KLrx=Kx*Lx/rx,KLry=Ky*Ly/ry;
   const rx_=fcrCalc(KLrx,E,Q,Fy),ry_=fcrCalc(KLry,E,Q,Fy);
   sv('co_lim',rx_.lim,1);
-  const Pnx=rx_.Fcr*A/1e3,Pny=ry_.Fcr*A/1e3;   // kN
+  const Aex=Aeff(rx_.Fcr),Aey=Aeff(ry_.Fcr);
+  const Pnx=rx_.Fcr*Aex/1e3,Pny=ry_.Fcr*Aey/1e3;   // kN (E7-1: Pn = Fcr·Ae)
+  sv('co_Qs',Aex/100,2);sv('co_Qa',Aey/100,2);sv('co_Q',Math.min(Aex,Aey)/A,4);
 
   sv('co_KLrx',KLrx,1);sv('co_Fex',rx_.Fe*ksc,1);sv('co_Fcrx',rx_.Fcr*ksc,1);
   tx('co_regime_x','KLx/rx='+f(KLrx,1)+' ('+rx_.reg+') → Fcrx='+f(rx_.Fcr*ksc,1)+' ksc');
@@ -1073,14 +1101,14 @@ function calculate(){
   let Fcr_FT,reg_FT;
   if(KLr_eq_FT<=lim_FT){Fcr_FT=Q*Math.pow(0.658,Q*Fy/Fe_FT)*Fy;reg_FT='Inelastic';}
   else{Fcr_FT=0.877*Fe_FT;reg_FT='Elastic';}
-  const PnFT=Fcr_FT*A/1e3;   // kN
+  const PnFT=Fcr_FT*Aeff(Fcr_FT)/1e3;   // kN (E7: Fcr·Ae)
 
   // Display E4
   sv('ft_x0',x0,2);sv('ft_r0sq',r0sq,1);sv('ft_H',H_,4);
   sv('ft_G',G_*ksc,0);sv('ft_KzLz',KzLz,0);
   sv('ft_Fez',Fez*ksc,1);sv('ft_Fesym',Fex*ksc,1);
   sv('ft_FeFT',Fe_FT*ksc,1);sv('ft_FcrFT',Fcr_FT*ksc,1);
-  tx('ft_regime','Fe-equiv KL/r='+f(KLr_eq_FT,1)+' '+(KLr_eq_FT<=lim_FT?'≤':'>')+' lim='+f(lim_FT,1)+' → '+reg_FT+' → Fcr-FT = '+(KLr_eq_FT<=lim_FT?'Q·0.658^(QFy/Fe)·Fy':'0.877·Fe'));
+  tx('ft_regime','Fe-equiv KL/r='+f(KLr_eq_FT,1)+' '+(KLr_eq_FT<=lim_FT?'≤':'>')+' lim='+f(lim_FT,1)+' → '+reg_FT+' → Fcr-FT = '+(KLr_eq_FT<=lim_FT?'0.658^(Fy/Fe)·Fy':'0.877·Fe'));
   sv('ft_phiPn',0.9*PnFT*kgf,0);sv('ft_ASDPn',PnFT/1.67*kgf,0);
 
   // Governing compression now includes FT mode
@@ -1112,7 +1140,7 @@ function calculate(){
   const Pc =kf*Pn_gov*kgf*nSec;
   const Mcx=kf*Mnx*kgf*nSec;
   const Mcy=kf*Mny*kgf*nSec;
-  const Vcx=kf*Vnx*kgf*nSec;
+  const Vcx=(isASD?1/OmVx:phiVx)*Vnx*kgf*nSec;
   const Vcy=kf*Vny*kgf*nSec;
   const prr=Pc>0?Pap/Pc:0;
   const mterm=(Mcx>0?Mxap/Mcx:0)+(Mcy>0?Myap/Mcy:0);
