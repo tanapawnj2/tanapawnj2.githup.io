@@ -349,7 +349,17 @@ tr:hover td{background:rgba(74,144,217,.04)}
       </select>
     </div>
     <div class="fld"><label>RB</label><div class="iw"><input oninput="calculate()" type="number" id="RB" value="6" step="2"><span class="unit">mm</span></div></div>
-    <div class="fld"><label>@ Spacing</label><div class="iw"><input type="number" id="stirrupSpacing" value="15" step="1" min="1" oninput="checkStirrup()"><span class="unit">cm</span></div></div>
+    <div class="fld"><label id="lbl-spacing">@ Spacing</label><div class="iw"><input type="number" id="stirrupSpacing" value="15" step="1" min="1" oninput="calculate()"><span class="unit">cm</span></div></div>
+    <div class="fld"><label>ชนิดปลอก</label>
+      <select onchange="calculate()" id="tieType">
+        <option value="tied" selected>ปลอกเดี่ยว (Tied)</option>
+        <option value="cross">ปลอก + เหล็กยึดรั้ง</option>
+        <option value="spiral">ปลอกเกลียว (Spiral)</option>
+        <option value="seismic">ปลอกรัดแผ่นดินไหว</option>
+      </select>
+    </div>
+    <div class="fld" id="fld-cX"><label>ยึดรั้ง n(X)</label><div class="iw"><input oninput="calculate()" type="number" id="tieCX" value="1" step="1" min="0"><span class="unit">ขา</span></div></div>
+    <div class="fld" id="fld-cY"><label>ยึดรั้ง n(Y)</label><div class="iw"><input oninput="calculate()" type="number" id="tieCY" value="0" step="1" min="0"><span class="unit">ขา</span></div></div>
   </div>
 
 </div><!-- /sidebar -->
@@ -398,34 +408,30 @@ tr:hover td{background:rgba(74,144,217,.04)}
       <div class="result-row"><span class="result-label">Status X</span><span id="res-slendX">—</span></div>
       <div class="result-row"><span class="result-label">kl/r-y</span><span class="result-value yellow" id="res-klry">—</span></div>
       <div class="result-row"><span class="result-label">Status Y</span><span id="res-slendY">—</span></div>
-      <div class="result-row"><span class="result-label">R (reduction)</span><span class="result-value orange" id="res-R">—</span></div>
+      <div class="result-row"><span class="result-label">δns <em>(x / y)</em></span><span class="result-value orange" id="res-R">—</span></div>
     </div>
     <!-- Right: Capacity + Shear + Stirrup -->
     <div id="results-section-right" style="padding:12px 14px">
       <div class="sdiv"><span>Capacity Check</span></div>
       <div class="result-row"><span class="result-label" id="lbl-MnxP">Mn-x <em>(at P)</em></span><span class="result-value cyan" id="res-MnxP">—</span></div>
-      <div class="result-row"><span class="result-label">Mx/Mn-x</span><span class="result-value" id="res-ratioX">—</span></div>
+      <div class="result-row"><span class="result-label">Mux/ϕMn-x</span><span class="result-value" id="res-ratioX">—</span></div>
       <div class="result-row"><span class="result-label" id="lbl-MnyP">Mn-y <em>(at P)</em></span><span class="result-value orange" id="res-MnyP">—</span></div>
-      <div class="result-row"><span class="result-label">My/Mn-y</span><span class="result-value" id="res-ratioY">—</span></div>
+      <div class="result-row"><span class="result-label">Muy/ϕMn-y</span><span class="result-value" id="res-ratioY">—</span></div>
       <div class="result-row"><span class="result-label" id="lbl-biaxFormula">(Mx/Mn-x)ⁿ + (My/Mn-y)ⁿ</span><span class="result-value" id="res-biaxVal">—</span></div>
       <div class="result-row" style="justify-content:flex-end"><span id="res-biaxCheck">—</span></div>
       <div class="sdiv"><span>Shear Capacity</span></div>
       <div class="result-row"><span class="result-label">Av <em>(2-leg)</em></span><span class="result-value" id="res-Av">—</span></div>
       <div class="result-row"><span class="result-label">Vs</span><span class="result-value green" id="res-Vs">—</span></div>
       <div class="result-row"><span class="result-label">Vc-x</span><span class="result-value cyan" id="res-Vcx">—</span></div>
-      <div class="result-row"><span class="result-label">Vn-x</span><span class="result-value cyan" id="res-Vnx">—</span></div>
-      <div class="result-row"><span class="result-label">Vx (demand)</span><span class="result-value" id="res-Vx-demand">—</span></div>
+      <div class="result-row"><span class="result-label">ϕVn-x <em>(0.75)</em></span><span class="result-value cyan" id="res-Vnx">—</span></div>
+      <div class="result-row"><span class="result-label">Vu-x (demand)</span><span class="result-value" id="res-Vx-demand">—</span></div>
       <div class="result-row"><span class="result-label">Vx Check</span><span id="res-shear-x">—</span></div>
       <div class="result-row"><span class="result-label">Vc-y</span><span class="result-value orange" id="res-Vcy">—</span></div>
-      <div class="result-row"><span class="result-label">Vn-y</span><span class="result-value orange" id="res-Vny">—</span></div>
-      <div class="result-row"><span class="result-label">Vy (demand)</span><span class="result-value" id="res-Vy-demand">—</span></div>
+      <div class="result-row"><span class="result-label">ϕVn-y <em>(0.75)</em></span><span class="result-value orange" id="res-Vny">—</span></div>
+      <div class="result-row"><span class="result-label">Vu-y (demand)</span><span class="result-value" id="res-Vy-demand">—</span></div>
       <div class="result-row"><span class="result-label">Vy Check</span><span id="res-shear-y">—</span></div>
-      <div class="sdiv"><span>Stirrup Spacing</span></div>
-      <div class="result-row"><span class="result-label">16×DB</span><span class="result-value" id="res-s1">—</span></div>
-      <div class="result-row"><span class="result-label">48×RB</span><span class="result-value" id="res-s2">—</span></div>
-      <div class="result-row"><span class="result-label">min(H,W)</span><span class="result-value" id="res-s3">—</span></div>
-      <div class="result-row"><span class="result-label">Max @</span><span class="result-value yellow" id="res-smax">—</span></div>
-      <div class="result-row"><span class="result-label" style="font-weight:700;color:#fff">ผลตรวจสอบ</span><span id="res-stirrup-check">—</span></div>
+      <div class="sdiv"><span id="conf-title">Confinement</span></div>
+      <div id="res-conf"></div>
     </div>
   </div>
 </div>
@@ -463,7 +469,7 @@ tr:hover td{background:rgba(74,144,217,.04)}
       <div style="padding:6px 12px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.14em;color:var(--cyan);text-transform:uppercase">X Axis</div>
       <div class="table-area">
         <table>
-          <thead><tr><th>Point</th><th class="td-x">Mn-x (t-m)</th><th class="td-x">ϕPn-x (t)</th></tr></thead>
+          <thead><tr><th>Point</th><th class="td-x">ϕMn-x (t-m)</th><th class="td-x">ϕPn-x (t)</th></tr></thead>
           <tbody id="tableBodyX"><tr><td colspan="3" style="text-align:center;padding:12px;color:rgba(255,255,255,.4)">—</td></tr></tbody>
         </table>
       </div>
@@ -472,7 +478,7 @@ tr:hover td{background:rgba(74,144,217,.04)}
       <div style="padding:6px 12px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.14em;color:var(--orange);text-transform:uppercase">Y Axis</div>
       <div class="table-area">
         <table>
-          <thead><tr><th>Point</th><th class="td-y">Mn-y (t-m)</th><th class="td-y">ϕPn-y (t)</th></tr></thead>
+          <thead><tr><th>Point</th><th class="td-y">ϕMn-y (t-m)</th><th class="td-y">ϕPn-y (t)</th></tr></thead>
           <tbody id="tableBodyY"><tr><td colspan="3" style="text-align:center;padding:12px;color:rgba(255,255,255,.4)">—</td></tr></tbody>
         </table>
       </div>
@@ -546,7 +552,12 @@ function drawSectionCanvas(i, bars) {
   ctx.strokeStyle = '#556';
   ctx.lineWidth = stirW;
   ctx.lineJoin = 'round';
-  ctx.beginPath(); ctx.rect(sx, sy, sw, sh); ctx.stroke();
+  const CDc = window._confDraw || {};
+  if (CDc.isSpiral) {
+    ctx.beginPath(); ctx.arc(ox+cw/2, oy+ch/2, (CDc.Dch/2)*scale - stirW/2, 0, Math.PI*2); ctx.stroke();
+  } else {
+    ctx.beginPath(); ctx.rect(sx, sy, sw, sh); ctx.stroke();
+  }
 
   // ── Rebar bars ──
   const barCenterOffset = coverPx + stirW + barR;
@@ -566,6 +577,24 @@ function drawSectionCanvas(i, bars) {
     barPositions.push({ x: ox + cw - barCenterOffset,  y: by });
   }
 
+  if (CDc.isSpiral) {
+    barPositions.length = 0;
+    for (let k = 0; k < CDc.nBars; k++) {
+      const th = 2*Math.PI*k/CDc.nBars + Math.PI/CDc.nBars;
+      barPositions.push({ x: ox+cw/2 + CDc.rBar*scale*Math.cos(th), y: oy+ch/2 + CDc.rBar*scale*Math.sin(th) });
+    }
+  } else if (window._confSupport && (CDc.cX > 0 || CDc.cY > 0)) {
+    const SUPc = window._confSupport;
+    ctx.lineWidth = stirW*0.8; ctx.lineCap = 'round';
+    SUPc.X.filter(k => k > 0 && k < nX-1).forEach(k => {
+      const a = barPositions[2*k], b = barPositions[2*k+1];
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    });
+    SUPc.Y.filter(k => k > 0 && k < nY-1).forEach(k => {
+      const a = barPositions[2*nX + 2*(k-1)], b = barPositions[2*nX + 2*(k-1) + 1];
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    });
+  }
   barPositions.forEach(b => {
     // outer glow
     ctx.beginPath(); ctx.arc(b.x, b.y, barR+3, 0, Math.PI*2);
@@ -741,6 +770,20 @@ function drawSection(i, d_x, dp_x, d_y, dp_y, Ast, Ast_x, Ast_y) {
   const sy = oy + coverPx;
   const sw = cw - 2*coverPx;
   const sh = ch - 2*coverPx;
+  const CD = window._confDraw || {};
+  if (CD.isSpiral) {
+    // spiral: circle (outside dia. = Dch), bars re-laid on a circle
+    const ccx = ox + cw/2, ccy = oy + ch/2;
+    const rs = (CD.Dch/2) * scale - stirW/2;
+    s += `
+    <circle cx="${ccx}" cy="${ccy}" r="${rs}" fill="none" stroke="url(#stirGrad)" stroke-width="${stirW}" filter="url(#barShadow)"/>
+    <circle cx="${ccx}" cy="${ccy}" r="${rs - stirW*0.9}" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.8" stroke-dasharray="3,3"/>`;
+    bars.length = 0;
+    for (let k = 0; k < CD.nBars; k++) {
+      const th = 2*Math.PI*k/CD.nBars + Math.PI/CD.nBars;
+      bars.push({ x: ccx + CD.rBar*scale*Math.cos(th), y: ccy + CD.rBar*scale*Math.sin(th) });
+    }
+  } else {
   s += `
     <rect x="${sx}" y="${sy}" width="${sw}" height="${sh}"
       fill="none" stroke="url(#stirGrad)" stroke-width="${stirW}"
@@ -750,6 +793,24 @@ function drawSection(i, d_x, dp_x, d_y, dp_y, Ast, Ast_x, Ast_y) {
     <rect x="${sx}" y="${sy}" width="${sw}" height="${sh}"
       fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="${stirW*0.3}"
       stroke-linecap="round" stroke-linejoin="round" rx="2"/>`;
+  // crossties (vertical ones hold n(X) bars, horizontal ones hold n(Y) bars)
+  const SUP = window._confSupport;
+  if (SUP && (CD.cX > 0 || CD.cY > 0)) {
+    SUP.X.filter(k => k > 0 && k < nX-1).forEach(k => {
+      const a = bars[2*k], b = bars[2*k+1];
+      s += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#a8b0c0" stroke-width="${stirW*0.8}" stroke-linecap="round"/>`;
+    });
+    SUP.Y.filter(k => k > 0 && k < nY-1).forEach(k => {
+      const a = bars[2*nX + 2*(k-1)], b = bars[2*nX + 2*(k-1) + 1];
+      s += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#a8b0c0" stroke-width="${stirW*0.8}" stroke-linecap="round"/>`;
+    });
+  }
+  // seismic: 135° hook mark at top-left corner
+  if (CD.tieType === 'seismic') {
+    const hk = Math.max(8, 6*stirW);
+    s += `<path d="M${sx} ${sy} l${hk*0.7} ${hk*0.7} M${sx} ${sy} l${hk*0.25} ${hk*0.95}" stroke="#a8b0c0" stroke-width="${stirW*0.9}" stroke-linecap="round" fill="none"/>`;
+  }
+  }
 
   // ── Rebar bars ──
   bars.forEach(b => {
@@ -845,15 +906,7 @@ function drawSection(i, d_x, dp_x, d_y, dp_y, Ast, Ast_x, Ast_y) {
   `;
 }
 
-function checkStirrup() {
-  const max = window._stirrupMax;
-  if (max === undefined) return;
-  const val = parseFloat(document.getElementById('stirrupSpacing').value);
-  const el = document.getElementById('res-stirrup-check');
-  if (isNaN(val) || val <= 0) { el.innerHTML = '—'; return; }
-  const ok = val <= max;
-  el.innerHTML = `<span class="status-pill ${ok ? 'status-ok' : 'status-fail'}">${ok ? '✓ ผ่าน' : '✗ ไม่ผ่าน'}</span>`;
-}
+function checkStirrup() { calculate(); }
 
 // charts managed via window._chartX / window._chartY
 
@@ -878,6 +931,9 @@ function getInputs() {
     Vx: parseFloat(document.getElementById('Vx').value) || 0,
     Vy: parseFloat(document.getElementById('Vy').value) || 0,
     biaxN: parseFloat(document.getElementById('biaxN').value) || 1.5,
+    tieType: document.getElementById('tieType').value,
+    cX: parseFloat(document.getElementById('tieCX').value) || 0,
+    cY: parseFloat(document.getElementById('tieCY').value) || 0,
   };
 }
 
@@ -893,10 +949,10 @@ function calculate() {
   const barR = i.DB / 10 / 2; // cm radius of main bar
   const stirrupR = i.RB / 10 / 2;
 
-  const d_x  = i.H - i.cover - barR;   // effective depth x-axis
-  const dp_x = i.cover + barR;          // d' x-axis
-  const d_y  = i.W - i.cover - barR;
-  const dp_y = i.cover + barR;
+  const d_x  = i.H - i.cover - 2*stirrupR - barR;   // effective depth x-axis (cover + stirrup + bar/2)
+  const dp_x = i.cover + 2*stirrupR + barR;          // d' x-axis
+  const d_y  = i.W - i.cover - 2*stirrupR - barR;
+  const dp_y = i.cover + 2*stirrupR + barR;
 
   // Ast
   const barArea = Math.PI * (i.DB / 10) ** 2 / 4; // cm²
@@ -918,223 +974,214 @@ function calculate() {
 
   const klrx = i.k * i.L / rx;
   const klry = i.k * i.L / ry;
-  // Slenderness limit: 34 - 12(M1/M2), M1/M2 = 0.5 fixed per design assumption
-  const limit = 34 - 12 * 0.5; // = 28
+  // ════════════════════════════════════════════════════════════════
+  // ACI 318-19 Strength Design (ksc, cm, kg → tons, t-m)
+  // ════════════════════════════════════════════════════════════════
+  const fc = i.fc, fy = i.fy, Es = i.Es;
+  const beta1 = fc <= 280 ? 0.85 : Math.max(0.65, 0.85 - 0.05 * (fc - 280) / 70);  // 22.2.2.4.3
+  const ety  = fy / Es;                 // 21.2.2.1
+  const etTC = ety + 0.003;             // tension-controlled limit (21.2.2)
+  const tieType  = i.tieType || 'tied';
+  const isSpiral = tieType === 'spiral';
+  const PHI_C = isSpiral ? 0.75 : 0.65, PHI_T = 0.90;   // Table 21.2.2 (spiral / other)
+  const PN_MAX_F = isSpiral ? 0.85 : 0.80;              // 22.4.2.1
+  const phiOf = et => et <= ety ? PHI_C : (et >= etTC ? PHI_T : PHI_C + (PHI_T - PHI_C) * (et - ety) / 0.003);
+  const clampFy = s => Math.max(-fy, Math.min(fy, s));
 
-  const hasMoment = !(i.Mx === 0 && i.My === 0);
-  function Rfactor(klr) {
-    let R;
-    if (hasMoment) R = 1.07 - 0.006 * i.L / (klr === klrx ? rx : ry);
-    else           R = 1.07 - 0.008 * i.L / (klr === klrx ? rx : ry);
-    return Math.min(R, 1);
-  }
-  const Rx = Rfactor(klrx);
-  const Ry = Rfactor(klry);
-  const R  = Math.min(Rx, Ry);
-  const phi = R;
-
-  // ---- KEY POINTS ----
-  // 1) Pure Compression
-  const Pn0 = (0.85 * i.fc * (A - Ast) + i.fy * Ast) / 1000; // tons
-
-  // Helper: cap stress
-  function capStress(s) { return Math.min(Math.abs(s), i.fy) * Math.sign(s); }
-
-  // ---- X-axis Points ----
-  function computeX(c) {
-    const a = 0.85 * c;
-    const Cc = 0.85 * i.fc * i.W * a / 1000;
-    const es_tens = 0.003 * (d_x - c) / c;
-    const fs_tens = capStress(es_tens * i.Es);
-    const es_comp = 0.003 * (c - dp_x) / c;
-    const fs_comp = capStress(es_comp * i.Es);
-    const Pn = (Cc + Ast_y * fs_comp / 1000 - Ast_y * fs_tens / 1000);
-    const Mn = (Cc * (i.H/2 - a/2) + Ast_y * fs_comp * (i.H/2 - dp_x) + Ast_y * fs_tens * (d_x - i.H/2)) / 100000;
-    return { Pn, Mn };
-  }
-  function computeY(c) {
-    const a = 0.85 * c;
-    const Cc = 0.85 * i.fc * i.H * a / 1000;
-    const es_tens = 0.003 * (d_y - c) / c;
-    const fs_tens = capStress(es_tens * i.Es);
-    const es_comp = 0.003 * (c - dp_y) / c;
-    const fs_comp = capStress(es_comp * i.Es);
-    const Pn = (Cc + Ast_x * fs_comp / 1000 - Ast_x * fs_tens / 1000);
-    const Mn = (Cc * (i.W/2 - a/2) + Ast_x * fs_comp * (i.W/2 - dp_y) + Ast_x * fs_tens * (d_y - i.W/2)) / 100000;
-    return { Pn, Mn };
+  // ── Longitudinal bar layout ──
+  // tied/crossties/seismic: bars on 4 faces (calc uses the 2 faces normal to bending — conservative)
+  // spiral: all bars on a circle inside the spiral (ACI 10.7.3.1: ≥ 6 bars)
+  const nBars   = Math.round(Ast / barArea);
+  const Dch     = Math.min(i.H, i.W) - 2 * i.cover;                 // spiral outside diameter
+  const rBar    = Dch / 2 - 2 * stirrupR - barR;                     // bar-circle radius
+  const circleXY = Array.from({ length: nBars }, (_, k) => {
+    const th = 2 * Math.PI * k / nBars + Math.PI / nBars;
+    return { x: rBar * Math.cos(th), y: rBar * Math.sin(th) };
+  });
+  function layersFor(axis) {
+    const h = axis === 'X' ? i.H : i.W;
+    if (isSpiral) return circleXY.map(q => ({ y: h / 2 - (axis === 'X' ? q.x : q.y), As: barArea }));
+    return axis === 'X'
+      ? [{ y: dp_x, As: Ast_y }, { y: d_x, As: Ast_y }]
+      : [{ y: dp_y, As: Ast_x }, { y: d_y, As: Ast_x }];
   }
 
-  // Moment Zero Tension (c = full depth = H or W)
-  const mzt_x = computeX(i.H);
-  const mzt_y = computeY(i.W);
-
-  // Balance
-  const Cb_x = 6120 * d_x / (i.fy + 6120);
-  const Cb_y = 6120 * d_y / (i.fy + 6120);
-  const bal_x = computeX(Cb_x);
-  const bal_y = computeY(Cb_y);
-
-  // Tension Controlled Limit (εt = 0.005)
-  // Excel: C = 0.003/(0.003+0.005)*d
-  //        fs  = fy  (tension steel yields)
-  //        fs' = IF(6120*(C-d')/d > fy, fy, 6120*(C-d')/d)   ← key difference from generic computeX
-  //        Pn  = Cc - fs*Ast_y + fs'*Ast_y
-  //        Mn  = (Cc*(H/2-a/2) + Ast_y*fs*(H/2-d') + fs'*Ast_y*(d-H/2)) / 100000
-  function tclX() {
-    const C   = 0.003 / (0.003 + 0.005) * d_x;
-    const a   = 0.85 * C;
-    const Cc  = 0.85 * i.fc * i.W * a / 1000;
-    const fs  = i.fy;
-    const fsp = Math.min(6120 * (C - dp_x) / d_x, i.fy);
-    const Pn  = Cc - fs * Ast_y / 1000 + fsp * Ast_y / 1000;
-    const Mn  = (Cc * (i.H/2 - a/2) + Ast_y * fs * (i.H/2 - dp_x) + fsp * Ast_y * (d_x - i.H/2)) / 100000;
-    return { Pn, Mn };
-  }
-  function tclY() {
-    const C   = 0.003 / (0.003 + 0.005) * d_y;
-    const a   = 0.85 * C;
-    const Cc  = 0.85 * i.fc * i.H * a / 1000;
-    const fs  = i.fy;
-    const fsp = Math.min(6120 * (C - dp_y) / d_y, i.fy);
-    const Pn  = Cc - fs * Ast_x / 1000 + fsp * Ast_x / 1000;
-    const Mn  = (Cc * (i.W/2 - a/2) + Ast_x * fs * (i.W/2 - dp_y) + fsp * Ast_x * (d_y - i.W/2)) / 100000;
-    return { Pn, Mn };
-  }
-  const tcl_x = tclX();
-  const tcl_y = tclY();
-
-  // Pure Bending — Excel uses interpolation formula (NOT iteration):
-  // Mn_pb_x = (|Pn_tension| * Mn_TCL_x) / (|Pn_tension| + Pn_TCL_x)
-  // Mn_pb_y = (|Pn_tension| * Mn_TCL_y) / (|Pn_tension| + Pn_TCL_y)
-  // ϕPn = 0  (pure bending, no axial)
-  // Pure Tension (needed for Pure Bending interpolation)
-  const Pnt = -Ast * i.fy / 1000;
-
-  const pb_x = {
-    Mn: (Math.abs(Pnt) * tcl_x.Mn) / (Math.abs(Pnt) + tcl_x.Pn),
-    Pn: 0
-  };
-  const pb_y = {
-    Mn: (Math.abs(Pnt) * tcl_y.Mn) / (Math.abs(Pnt) + tcl_y.Pn),
-    Pn: 0
-  };
-
-  // Pure Tension
-  // ── Shear Capacity ──
-  const s_cm   = parseFloat(document.getElementById('stirrupSpacing').value); // cm
-  const Av     = 2 * Math.PI * (i.RB/10)**2 / 4; // 2-leg stirrup area, cm²
-  const Vs     = Av * i.fys * d_x / s_cm / 1000;  // tons (use d_x for Vs)
-
-  const Ag = i.H * i.W;
-  let Vc_x, Vc_y;
-  if (i.P >= 0) {
-    // Compression: Vc = 0.93√fc' × b × d × √(1 + 0.029P/Ag)
-    Vc_x = 0.93 * Math.sqrt(i.fc) * i.W * d_x * Math.sqrt(1 + 0.029 * (i.P/Ag)) / 1000;
-    Vc_y = 0.93 * Math.sqrt(i.fc) * i.H * d_y * Math.sqrt(1 + 0.029 * (i.P/Ag)) / 1000;
-  } else {
-    // Tension: Vc = 0.53(1 + 0.029P/Ag)√fc' × b × d
-    Vc_x = 0.53 * (1 + 0.029 * (i.P/Ag)) * Math.sqrt(i.fc) * i.W * d_x / 1000;
-    Vc_y = 0.53 * (1 + 0.029 * (i.P/Ag)) * Math.sqrt(i.fc) * i.H * d_y / 1000;
-    Vc_x = Math.max(Vc_x, 0);
-    Vc_y = Math.max(Vc_y, 0);
-  }
-  const Vn_x = Vc_x + Vs;
-  const Vn_y = Vc_y + Vs;
-  const Vx_tons = i.Vx / 1000;
-  const Vy_tons = i.Vy / 1000;
-  const shearOK_x = Vx_tons <= Vn_x;
-  const shearOK_y = Vy_tons <= Vn_y;
-
-  // Build full curve (many points)
-  function buildCurveX() {
-    const pts = [];
-    pts.push({ x: 0, y: Pn0 * phi });
-    pts.push({ x: Math.abs(mzt_x.Mn), y: mzt_x.Pn * phi });
-    pts.push({ x: Math.abs(bal_x.Mn), y: bal_x.Pn * phi });
-    pts.push({ x: Math.abs(tcl_x.Mn), y: tcl_x.Pn * phi });
-    pts.push({ x: Math.abs(pb_x.Mn), y: 0 });
-    pts.push({ x: 0, y: Pnt * phi });
-    return pts;
-  }
-  function buildCurveY() {
-    const pts = [];
-    pts.push({ x: 0, y: Pn0 * phi });
-    pts.push({ x: Math.abs(mzt_y.Mn), y: mzt_y.Pn * phi });
-    pts.push({ x: Math.abs(bal_y.Mn), y: bal_y.Pn * phi });
-    pts.push({ x: Math.abs(tcl_y.Mn), y: tcl_y.Pn * phi });
-    pts.push({ x: Math.abs(pb_y.Mn), y: 0 });
-    pts.push({ x: 0, y: Pnt * phi });
-    return pts;
+  // Strain compatibility at neutral-axis depth c.
+  // b = width of compression face, h = depth in bending direction,
+  // layers = [{ y: depth from compression face, As }]
+  function sectionAt(c, b, h, layers) {
+    const a  = Math.min(beta1 * c, h);
+    const Cc = 0.85 * fc * b * a;                                     // kg
+    let F = 0, Mc = 0, dt = 0;
+    const fsL = layers.map(L => {
+      const fs  = clampFy(0.003 * (c - L.y) / c * Es);                // + = compression
+      const net = L.As * (fs - (L.y < a ? 0.85 * fc : 0));            // kg, net of displaced concrete
+      F += net; Mc += net * (h / 2 - L.y); dt = Math.max(dt, L.y);
+      return fs;
+    });
+    const epsT = 0.003 * (dt - c) / c;                                // extreme tension steel
+    const Pn   = (Cc + F) / 1000;                                     // tons
+    const Mn   = (Cc * (h / 2 - a / 2) + Mc) / 100000;                // t-m
+    const phi  = phiOf(epsT);
+    return { c, a, Cc: Cc / 1000, epsT, fsC: fsL[0], fsT: -fsL[fsL.length - 1], Fs: F / 1000,
+             Pn, Mn, phi, phiPn: phi * Pn, phiMn: phi * Mn };
   }
 
-  const curveX = buildCurveX();
-  const curveY = buildCurveY();
+  // Pure compression / tension (22.4.2)
+  const Po      = (0.85 * fc * (A - Ast) + fy * Ast) / 1000;  // tons
+  const Pn0     = Po;
+  const Pnmax   = PN_MAX_F * Po;
+  const phiPnmax = PHI_C * Pnmax;
+  const Pnt     = -Ast * fy / 1000;
+  const phiPnt  = PHI_T * Pnt;
 
-  // Demand point
-  const demandMx = i.Mx / 1000; // kg-m → tons-m
-  const demandMy = i.My / 1000;
+  function axisPoints(b, h, layers) {
+    const d = Math.max(...layers.map(L => L.y));
+    const mzt = sectionAt(h, b, h, layers);
+    const cB  = 0.003 / (0.003 + ety) * d;
+    const bal = sectionAt(cB, b, h, layers);
+    const cT  = 0.003 / (0.003 + etTC) * d;
+    const tcl = sectionAt(cT, b, h, layers);
+    // Pure bending: find c with Pn = 0 (bisection)
+    let lo = 1e-4 * h, hi = h;
+    for (let k = 0; k < 80; k++) {
+      const mid = (lo + hi) / 2;
+      if (sectionAt(mid, b, h, layers).Pn > 0) hi = mid; else lo = mid;
+    }
+    const pbRaw = sectionAt((lo + hi) / 2, b, h, layers);
+    const pb = Object.assign({}, pbRaw, { Pn: 0, phiPn: 0, phiMn: pbRaw.phi * pbRaw.Mn });
+    const capP = p => Math.min(p, phiPnmax);
+    const curve = [
+      { x: 0,                       y: phiPnmax },
+      { x: Math.max(0, mzt.phiMn),  y: capP(mzt.phiPn) },
+      { x: Math.max(0, bal.phiMn),  y: capP(bal.phiPn) },
+      { x: Math.max(0, tcl.phiMn),  y: capP(tcl.phiPn) },
+      { x: Math.max(0, pb.phiMn),   y: 0 },
+      { x: 0,                       y: phiPnt },
+    ];
+    return { mzt, bal, tcl, pb, curve, cB, cT, d, dp: Math.min(...layers.map(L => L.y)) };
+  }
+  // X axis: depth H, compression face width W (face bars n(Y) → Ast_y)
+  const AX = axisPoints(i.W, i.H, layersFor('X'));
+  // Y axis: depth W, compression face width H (face bars n(X) → Ast_x)
+  const AY = axisPoints(i.H, i.W, layersFor('Y'));
+  const mzt_x = AX.mzt, bal_x = AX.bal, tcl_x = AX.tcl, pb_x = AX.pb;
+  const mzt_y = AY.mzt, bal_y = AY.bal, tcl_y = AY.tcl, pb_y = AY.pb;
+  const Cb_x = AX.cB, Cb_y = AY.cB;
+  const curveX = AX.curve, curveY = AY.curve;
+
+  // ── Slenderness — ACI 6.2.5 / 6.6.4 (nonsway) ──
+  // M1/M2 unknown → assume single curvature M1/M2 = −1 (conservative):
+  //   limit = 34 + 12(M1/M2) = 22,  Cm = 1.0,  βdns = 0.6
+  const limit = 22;
+  const BETA_DNS = 0.6, CM = 1.0;
+  const Pu_t = Math.max(i.P, 0) / 1000;               // tons (compression only)
+  function magnifier(klr, Ig, h) {
+    if (klr <= limit || Pu_t <= 0) return { slender: klr > limit, delta: 1, EI: null, Pc: null, Mmin: 0 };
+    const EI = 0.4 * Ec * Ig / (1 + BETA_DNS);          // kg-cm²  (6.6.4.4.4b)
+    const Pc = Math.PI ** 2 * EI / (i.k * i.L) ** 2 / 1000; // tons (6.6.4.4.2)
+    const den = 1 - Pu_t / (0.75 * Pc);
+    const delta = den > 0 ? Math.max(1, CM / den) : Infinity; // 6.6.4.5.2
+    const Mmin = Pu_t * (1.5 + 0.03 * h) / 100;        // t-m (6.6.4.5.4, h in cm)
+    return { slender: true, delta, EI, Pc, Mmin };
+  }
+  const magX = magnifier(klrx, Ix, i.H);
+  const magY = magnifier(klry, Iy, i.W);
+
+  // ── Demand (moments magnified when slender) ──
+  const Mx_t = Math.abs(i.Mx) / 1000, My_t = Math.abs(i.My) / 1000;   // kg-m → t-m
+  const demandMx = magX.slender && Pu_t > 0 ? magX.delta * Math.max(Mx_t, magX.Mmin) : Mx_t;
+  const demandMy = magY.slender && Pu_t > 0 ? magY.delta * Math.max(My_t, magY.Mmin) : My_t;
   const demandP  = i.P / 1000;
 
-  // Check if demand inside X-curve (simple polygon check)
+  // ── Shear — ACI 22.5 (φv = 0.75) ──
+  const s_cm  = parseFloat(document.getElementById('stirrupSpacing').value); // cm
+  const Ab    = Math.PI * (i.RB / 10) ** 2 / 4;      // one tie leg, cm²
+  const hasCross = tieType === 'cross' || tieType === 'seismic';
+  const cX = hasCross ? Math.max(0, Math.floor(i.cX || 0)) : 0;   // crossties holding n(X) face bars (run along W)
+  const cY = hasCross ? Math.max(0, Math.floor(i.cY || 0)) : 0;   // crossties holding n(Y) face bars (run along H)
+  const legsX = 2 + cY, legsY = 2 + cX;                            // legs parallel to H / to W
+  const Av    = legsX * Ab;                                         // for Vx (legs parallel to H)
+  const Ag    = i.H * i.W;
+  const PHI_V = 0.75;
+  const sqfc  = Math.sqrt(fc);
+  function shearAxis(b, d, AsFace, Av) {
+    const NuAg  = i.P / Ag;                                           // ksc, + = compression
+    const axial = NuAg > 0 ? Math.min(NuAg / 6, 0.05 * fc) : NuAg / 6; // 22.5.5.1
+    const Avmin = Math.max(0.2 * sqfc, 3.5) * b * s_cm / i.fys;       // 9.6.3.4
+    let vc, method, lamS = 1, rhow = AsFace / (b * d);
+    if (Av >= Avmin) {
+      vc = 0.53 * sqfc + axial; method = 'a';                           // Table 22.5.5.1(a)
+    } else {
+      lamS = Math.min(1, Math.sqrt(2 / (1 + d / 25.4)));               // 22.5.5.1.3
+      vc = 2.12 * lamS * Math.cbrt(rhow) * sqfc + axial; method = 'c';  // Table 22.5.5.1(c)
+    }
+    const VcMax = 1.33 * sqfc * b * d / 1000;                          // 22.5.5.1.1
+    const Vc  = Math.min(Math.max(0, vc) * b * d / 1000, VcMax);       // tons
+    const VsRaw = Av * i.fys * d / s_cm / 1000;                        // tons (22.5.8.5.3)
+    const VsMax = 2.12 * sqfc * b * d / 1000;                          // 22.5.1.2
+    const Vs  = VsRaw;
+    const phiVn = PHI_V * (Vc + Vs);
+    return { NuAg, axial, Av, Avmin, method, lamS, rhow, Vc, VcMax, Vs, VsMax, sectionOK: VsRaw <= VsMax, phiVn };
+  }
+  const SX = shearAxis(i.W, AX.d, isSpiral ? Ast / 2 : Ast_y, legsX * Ab);
+  const SY = shearAxis(i.H, AY.d, isSpiral ? Ast / 2 : Ast_x, legsY * Ab);
+  const Vs   = SX.Vs;
+  const Vc_x = SX.Vc,    Vc_y = SY.Vc;
+  const Vn_x = SX.phiVn, Vn_y = SY.phiVn;   // design shear strength φVn
+  const Vx_tons = Math.abs(i.Vx) / 1000;
+  const Vy_tons = Math.abs(i.Vy) / 1000;
+  const shearOK_x = Vx_tons <= Vn_x && SX.sectionOK;
+  const shearOK_y = Vy_tons <= Vn_y && SY.sectionOK;
+
+  // Capacity φMn at demand P on the φ-curve (linear between key points — conservative)
   function isInsideCurve(Mn, Pn, curve) {
-    // Use linear interpolation: at given Pn, find max Mn from curve
-    // Find two bracketing points by Pn (y)
-    let maxMn = 0;
+    let maxMn = 0, found = false;
     for (let j = 0; j < curve.length - 1; j++) {
-      const p1 = curve[j], p2 = curve[j+1];
+      const p1 = curve[j], p2 = curve[j + 1];
       const minP = Math.min(p1.y, p2.y), maxP = Math.max(p1.y, p2.y);
       if (Pn >= minP && Pn <= maxP) {
-        const t = (Pn - p1.y) / (p2.y - p1.y + 0.0001);
-        const interp = p1.x + t * (p2.x - p1.x);
-        maxMn = Math.max(maxMn, interp);
+        const t = p2.y === p1.y ? 1 : (Pn - p1.y) / (p2.y - p1.y);
+        maxMn = Math.max(maxMn, p1.x + t * (p2.x - p1.x));
+        found = true;
       }
     }
-    return { inside: Mn <= maxMn, capacity: maxMn };
+    return { inside: found && Mn <= maxMn, capacity: found ? maxMn : 0 };
   }
-
   const chkX = isInsideCurve(demandMx, demandP, curveX);
   const chkY = isInsideCurve(demandMy, demandP, curveY);
-
-  // Mn at demand P level (capacity from interaction diagram)
-  const MnX_atP = chkX.capacity; // t-m
-  const MnY_atP = chkY.capacity; // t-m
+  const MnX_atP = chkX.capacity; // φMn-x at demand P, t-m
+  const MnY_atP = chkY.capacity;
 
   // ── Capacity check ──
-  const noMoment = (i.Mx === 0 && i.My === 0);
+  const noMoment = (demandMx === 0 && demandMy === 0);
+  const unstable = (magX.delta === Infinity || magY.delta === Infinity);
   let biaxVal, biaxOK, biaxLabel, ratioX, ratioY;
   let MnX_display = MnX_atP, MnY_display = MnY_atP;
-
-  if (noMoment) {
-    // Pure axial: check P against ϕPn (compression or tension)
+  if (unstable) {
+    ratioX = ratioY = biaxVal = 999; biaxOK = false;
+    biaxLabel = 'Pu ≥ 0.75Pc — เสาชะลูดไม่เสถียร';
+  } else if (noMoment) {
     if (demandP >= 0) {
-      // Compression: check against Pure Compression ϕPn0
-      const phiPn0 = Pn0 * phi;
-      ratioX = demandP / phiPn0;
-      ratioY = demandP / phiPn0;
-      biaxVal = ratioX; // single ratio
-      biaxOK  = demandP <= phiPn0;
-      biaxLabel = `P / ϕPn₀ = ${demandP.toFixed(2)} / ${phiPn0.toFixed(2)}`;
-      MnX_display = phiPn0;
-      MnY_display = phiPn0;
+      ratioX = ratioY = biaxVal = demandP / phiPnmax;
+      biaxOK = demandP <= phiPnmax;
+      biaxLabel = `P / ϕPn,max = ${demandP.toFixed(2)} / ${phiPnmax.toFixed(2)}`;
+      MnX_display = MnY_display = phiPnmax;
     } else {
-      // Tension: check against Pure Tension ϕPnt
-      const phiPnt = Pnt * phi; // negative
-      ratioX = demandP / phiPnt;
-      ratioY = demandP / phiPnt;
-      biaxVal = ratioX;
-      biaxOK  = demandP >= phiPnt;
+      ratioX = ratioY = biaxVal = demandP / phiPnt;
+      biaxOK = demandP >= phiPnt;
       biaxLabel = `P / ϕPnt = ${demandP.toFixed(2)} / ${phiPnt.toFixed(2)}`;
-      MnX_display = phiPnt;
-      MnY_display = phiPnt;
+      MnX_display = MnY_display = phiPnt;
     }
   } else {
-    // Biaxial bending: (Mx/Mn-x)^n + (My/Mn-y)^n <= 1
-    ratioX  = MnX_atP > 0 ? demandMx / MnX_atP : 999;
-    ratioY  = MnY_atP > 0 ? demandMy / MnY_atP : 999;
+    // Bresler load contour: (Mux/ϕMnx)ⁿ + (Muy/ϕMny)ⁿ ≤ 1
+    const outOfRange = demandP > phiPnmax || demandP < phiPnt;
+    ratioX = MnX_atP > 0 ? demandMx / MnX_atP : (demandMx > 0 ? 999 : 0);
+    ratioY = MnY_atP > 0 ? demandMy / MnY_atP : (demandMy > 0 ? 999 : 0);
     const n = parseFloat(i.biaxN) || 1.5;
-    biaxVal = Math.pow(ratioX, n) + Math.pow(ratioY, n);
+    biaxVal = outOfRange ? 999 : Math.pow(ratioX, n) + Math.pow(ratioY, n);
     biaxOK  = biaxVal <= 1.0;
-    biaxLabel = `(Mx/Mn-x)ⁿ + (My/Mn-y)ⁿ`;
+    biaxLabel = `(Mux/ϕMn-x)ⁿ + (Muy/ϕMn-y)ⁿ`;
   }
   const isOK = biaxOK;
 
@@ -1158,21 +1205,101 @@ function calculate() {
   slendEl('res-slendX', klrx, limit);
   slendEl('res-slendY', klry, limit);
 
-  document.getElementById('res-R').textContent = R.toFixed(4);
-  // phi = R (no hook factor)
+  const dTxt = m => !m.slender ? '1.000' : (m.delta === Infinity ? '∞' : m.delta.toFixed(3));
+  document.getElementById('res-R').textContent = dTxt(magX) + ' / ' + dTxt(magY);
 
 
-  // ---- STIRRUP SPACING ----
-  const s1 = 16 * (i.DB / 10);
-  const s2 = 48 * (i.RB / 10);
-  const s3 = Math.min(i.H, i.W);
-  window._stirrupMax = Math.min(s1, s2, s3);
+  // ---- CONFINEMENT / TRANSVERSE REINFORCEMENT (ACI 318-19 §25.7, §18.7.5) ----
+  const confRows = [];   // { label, value, ok: true | false | null }
+  const addC = (label, value, ok) => confRows.push({ label, value, ok });
+  const ds = i.RB / 10, dbar = i.DB / 10, minDim = Math.min(i.H, i.W);
+  const cmT = v => v.toFixed(1) + ' cm';
+  const deformed = i.stirrupGrade !== 'SR24';
+  addC('ϕ (คุมด้วยแรงอัด) · Pn,max', `${PHI_C.toFixed(2)} · ${PN_MAX_F.toFixed(2)}Po`, null);
 
-  document.getElementById('res-s1').textContent = s1.toFixed(1) + ' cm';
-  document.getElementById('res-s2').textContent = s2.toFixed(1) + ' cm';
-  document.getElementById('res-s3').textContent = s3.toFixed(1) + ' cm';
-  document.getElementById('res-smax').textContent = window._stirrupMax.toFixed(1) + ' cm';
-  checkStirrup();
+  const dsMin = i.DB > 32 ? 12.7 : 9.5;                                // 25.7.2.2 / 25.7.3.2 (#3 / #4)
+  addC(`∅${isSpiral ? 'เกลียว' : 'ปลอก'} ≥ ${dsMin} mm (${i.DB > 32 ? '#4' : '#3'})`, `${i.RB} mm`, i.RB >= dsMin);
+
+  // Lateral support of face bars (25.7.2.3): every corner + alternate bar supported,
+  // no unsupported bar > 15 cm clear from a supported bar. Crossties placed evenly.
+  function faceSupport(n, faceLen, nCross) {
+    const sup = new Set([0, n - 1]);
+    for (let k = 1; k <= Math.min(nCross, n - 2); k++) sup.add(Math.round(k * (n - 1) / (nCross + 1)));
+    const pitch = (faceLen - 2 * i.cover - 2 * ds - dbar) / (n - 1);  // c/c spacing of bars
+    const clear = pitch - dbar;
+    let altOK = true, anyUnsup = false;
+    for (let k = 1; k < n - 1; k++) {
+      if (!sup.has(k)) { anyUnsup = true; if (!sup.has(k - 1) || !sup.has(k + 1)) altOK = false; }
+    }
+    const s = [...sup].sort((a, b) => a - b);
+    let hx = 0;
+    for (let j = 0; j < s.length - 1; j++) hx = Math.max(hx, (s[j + 1] - s[j]) * pitch);
+    return { sup, nSup: sup.size, n, clear, altOK, clearOK: !anyUnsup || clear <= 15, anyUnsup, hx };
+  }
+  let allSupported = true, hxMax = 0, nl = 0;
+  const FX = faceSupport(i.nX, i.H, cX), FY = faceSupport(i.nY, i.W, cY);
+  window._confSupport = isSpiral ? null : { X: [...FX.sup], Y: [...FY.sup] };
+
+  if (!isSpiral) {
+    [['n(X)', FX, cX], ['n(Y)', FY, cY]].forEach(([nm, F, c]) => {
+      addC(`ยึดรั้งเหล็กด้าน ${nm}`, `ยึด ${F.nSup}/${F.n} เส้น · ช่องว่าง ${cmT(F.clear)}`, F.altOK && F.clearOK);
+      if (c > F.n - 2) addC(`จำนวนเหล็กยึดรั้งด้าน ${nm}`, `${c} > ${F.n - 2} เส้นที่ยึดได้`, false);
+    });
+    allSupported = !FX.anyUnsup && !FY.anyUnsup;
+    hxMax = Math.max(FX.hx, FY.hx);
+    nl = 2 * FX.nSup + 2 * (FY.nSup - 2);
+    const sMaxTie = Math.min(16 * dbar, 48 * ds, minDim);              // 25.7.2.1
+    addC('@ ≤ min(16db, 48dt, ด้านแคบ)', `${cmT(s_cm)} ≤ ${cmT(sMaxTie)}`, s_cm <= sMaxTie);
+  }
+
+  if (isSpiral) {
+    addC('จำนวนเหล็กยืน ≥ 6 (10.7.3.1)', `${nBars} เส้น`, nBars >= 6);
+    const clearPitch = s_cm - ds;
+    addC('ระยะช่องว่างเกลียว 2.5–7.5 cm (25.7.3.1)', cmT(clearPitch), clearPitch >= 2.5 && clearPitch <= 7.5);
+    const Ach = Math.PI * Dch * Dch / 4;
+    const rhoS = 4 * Ab / (Dch * s_cm);                                // 25.7.3.3
+    const rhoSmin = 0.45 * (A / Ach - 1) * fc / i.fys;
+    addC('ρs ≥ 0.45(Ag/Ach − 1)f\'c/fyt', `${rhoS.toFixed(4)} ≥ ${rhoSmin.toFixed(4)}`, rhoS >= rhoSmin);
+    addC('เหล็กยืนจัดเป็นวงกลมในเกลียว', `วง ∅ ${(2 * rBar).toFixed(1)} cm`, null);
+  }
+
+  if (tieType === 'seismic') {
+    addC('เหล็กปลอกต้องเป็นข้ออ้อย (20.2.2)', i.stirrupGrade, deformed);
+    addC('ตะขอ 135° ยื่น ≥ max(6db, 7.5 cm) (25.3.4)', `≥ ${cmT(Math.max(6 * ds, 7.5))}`, null);
+    const Pu_kg = Math.max(i.P, 0);
+    const highAx = Pu_kg > 0.3 * A * fc || fc > 700;                  // 18.7.5.2(f)
+    const hxLim = highAx ? 20 : 35;
+    addC(`hx ≤ ${hxLim} cm${highAx ? ' (Pu > 0.3Agf\'c)' : ''}`, cmT(hxMax), hxMax <= hxLim);
+    if (highAx) addC('ต้องยึดเหล็กยืนทุกเส้น (Pu > 0.3Agf\'c)', allSupported ? 'ครบ' : 'ไม่ครบ', allSupported);
+    const so = Math.min(15.24, Math.max(10.16, 10.16 + (35.56 - hxMax) / 3)); // 18.7.5.3(c)
+    const sLo = Math.min(minDim / 4, 6 * dbar, so);
+    addC('@ ในช่วง lo ≤ min(b/4, 6db, so)', `${cmT(s_cm)} ≤ ${cmT(sLo)}`, s_cm <= sLo);
+    const lo = Math.max(i.H, i.W, i.L / 6, 45);                         // 18.7.5.1
+    addC('ระยะ lo จากปลายเสา', `≥ ${cmT(lo)}`, null);
+    const Ach = (i.H - 2 * i.cover) * (i.W - 2 * i.cover);
+    const kf = Math.max(1, fc / 1750 + 0.6), kn = nl > 2 ? nl / (nl - 2) : 1;
+    const req = Math.max(0.3 * (A / Ach - 1) * fc / i.fys, 0.09 * fc / i.fys,
+                         highAx ? 0.2 * kf * kn * Pu_kg / (i.fys * Ach) : 0);   // Table 18.7.5.4
+    [['ขาขนาน H', legsX, i.W - 2 * i.cover], ['ขาขนาน W', legsY, i.H - 2 * i.cover]].forEach(([nm, legs, bc]) => {
+      const need = req * s_cm * bc, have = legs * Ab;
+      addC(`Ash (${nm}, bc=${bc.toFixed(1)})`, `${have.toFixed(2)} ≥ ${need.toFixed(2)} cm²`, have >= need);
+    });
+  }
+
+  const confOK = confRows.every(r => r.ok !== false);
+  const confTitle = { tied: 'ปลอกเดี่ยว — ACI 25.7.2', cross: 'ปลอก + เหล็กยึดรั้ง — ACI 25.7.2',
+                      spiral: 'ปลอกเกลียว — ACI 25.7.3', seismic: 'ปลอกรัดแผ่นดินไหว — ACI 18.7.5' }[tieType];
+  document.getElementById('conf-title').textContent = confTitle;
+  const pill = ok => ok === null ? '<span class="status-pill" style="opacity:.7">ตรวจในแบบ</span>'
+    : `<span class="status-pill ${ok ? 'status-ok' : 'status-fail'}">${ok ? '✓ ผ่าน' : '✗ ไม่ผ่าน'}</span>`;
+  document.getElementById('res-conf').innerHTML = confRows.map(r =>
+    `<div class="result-row"><span class="result-label">${r.label}</span><span class="result-value" style="display:flex;gap:8px;align-items:center">${r.value} ${pill(r.ok)}</span></div>`
+  ).join('') + `<div class="result-row"><span class="result-label" style="font-weight:700;color:#fff">ผลตรวจสอบ</span><span id="res-stirrup-check">${pill(confOK)}</span></div>`;
+  document.getElementById('fld-cX').style.display = hasCross ? '' : 'none';
+  document.getElementById('fld-cY').style.display = hasCross ? '' : 'none';
+  document.getElementById('lbl-spacing').textContent = isSpiral ? '@ Pitch' : '@ Spacing';
+  window._confDraw = { tieType, cX, cY, isSpiral, rBar, nBars, Dch };
+
 
   // Shear results
   document.getElementById('res-Av').textContent  = Av.toFixed(3) + ' cm²';
@@ -1188,24 +1315,24 @@ function calculate() {
 
   // Biaxial results
   if (noMoment) {
-    document.getElementById('lbl-MnxP').innerHTML = demandP >= 0 ? 'ϕPn₀ <em>(comp.)</em>' : 'ϕPnt <em>(tension)</em>';
-    document.getElementById('lbl-MnyP').innerHTML = demandP >= 0 ? 'ϕPn₀ <em>(comp.)</em>' : 'ϕPnt <em>(tension)</em>';
+    document.getElementById('lbl-MnxP').innerHTML = demandP >= 0 ? 'ϕPn,max <em>(comp.)</em>' : 'ϕPnt <em>(tension)</em>';
+    document.getElementById('lbl-MnyP').innerHTML = demandP >= 0 ? 'ϕPn,max <em>(comp.)</em>' : 'ϕPnt <em>(tension)</em>';
     document.getElementById('res-MnxP').textContent = MnX_display.toFixed(2) + ' t';
     document.getElementById('res-MnyP').textContent = MnY_display.toFixed(2) + ' t';
   } else {
-    document.getElementById('lbl-MnxP').innerHTML = 'Mn-x <em>(at P)</em>';
-    document.getElementById('lbl-MnyP').innerHTML = 'Mn-y <em>(at P)</em>';
+    document.getElementById('lbl-MnxP').innerHTML = 'ϕMn-x <em>(at Pu)</em>';
+    document.getElementById('lbl-MnyP').innerHTML = 'ϕMn-y <em>(at Pu)</em>';
     document.getElementById('res-MnxP').textContent = MnX_atP.toFixed(3) + ' t-m';
     document.getElementById('res-MnyP').textContent = MnY_atP.toFixed(3) + ' t-m';
   }
   document.getElementById('res-ratioX').textContent  = ratioX.toFixed(4);
   document.getElementById('res-ratioY').textContent  = ratioY.toFixed(4);
-  document.getElementById('res-biaxVal').textContent = noMoment
+  document.getElementById('res-biaxVal').textContent = unstable ? biaxLabel : noMoment
     ? biaxVal.toFixed(4)
     : biaxVal.toFixed(4) + ' (n=' + (parseFloat(i.biaxN)||1.5) + ')';
   document.getElementById('lbl-biaxFormula').textContent = noMoment
-    ? (demandP >= 0 ? 'P / ϕPn₀' : 'P / ϕPnt')
-    : '(Mx/Mn-x)ⁿ + (My/Mn-y)ⁿ';
+    ? (demandP >= 0 ? 'Pu / ϕPn,max' : 'Pu / ϕPnt')
+    : '(Mux/ϕMn-x)ⁿ + (Muy/ϕMn-y)ⁿ';
   document.getElementById('res-biaxCheck').innerHTML = `<span class="status-pill ${biaxOK ? 'status-ok' : 'status-fail'}">${biaxOK ? '✓ ผ่าน' : '✗ ไม่ผ่าน'}</span>`;
 
   // res-status removed from UI
@@ -1217,12 +1344,12 @@ function calculate() {
 
   // TABLE
   const rows = [
-    { label: 'Pure Compression',        mx: 0,                    px: Pn0*phi,         my: 0,                    py: Pn0*phi },
-    { label: 'Moment Zero Tension',      mx: Math.abs(mzt_x.Mn),  px: mzt_x.Pn*phi,   my: Math.abs(mzt_y.Mn),  py: mzt_y.Pn*phi },
-    { label: 'Balance Failure',          mx: Math.abs(bal_x.Mn),  px: bal_x.Pn*phi,   my: Math.abs(bal_y.Mn),  py: bal_y.Pn*phi },
-    { label: 'Tension Controlled Limit', mx: Math.abs(tcl_x.Mn),  px: tcl_x.Pn*phi,   my: Math.abs(tcl_y.Mn),  py: tcl_y.Pn*phi },
-    { label: 'Pure Bending',             mx: Math.abs(pb_x.Mn),   px: 0,               my: Math.abs(pb_y.Mn),   py: 0 },
-    { label: 'Pure Tension',             mx: 0,                    px: Pnt*phi,         my: 0,                    py: Pnt*phi },
+    { label: 'Pure Compression (ϕPn,max)', mx: 0,              px: phiPnmax,                        my: 0,              py: phiPnmax },
+    { label: 'Moment Zero Tension',      mx: curveX[1].x,      px: curveX[1].y,                     my: curveY[1].x,    py: curveY[1].y },
+    { label: 'Balance Failure',          mx: curveX[2].x,      px: curveX[2].y,                     my: curveY[2].x,    py: curveY[2].y },
+    { label: 'Tension Controlled Limit', mx: curveX[3].x,      px: curveX[3].y,                     my: curveY[3].x,    py: curveY[3].y },
+    { label: 'Pure Bending',             mx: curveX[4].x,      px: 0,                               my: curveY[4].x,    py: 0 },
+    { label: 'Pure Tension',             mx: 0,                px: phiPnt,                          my: 0,              py: phiPnt },
   ];
   // TABLE X
   const tbodyX = document.getElementById('tableBodyX');
@@ -1277,137 +1404,104 @@ function calculate() {
   }
   function resetStepN() { _stepN = 0; }
 
-  // ── X-axis ──
-  const ab_x   = (0.85 * Cb_x).toFixed(2);
-  const Cc_bal_x = (0.85 * i.fc * i.W * 0.85 * Cb_x / 1000).toFixed(3);
-  const fs2_bal_x = Math.min(0.003 * i.Es * (Cb_x - dp_x) / Cb_x, i.fy).toFixed(1);
-  const Ctcl_x_val = (0.003 / 0.008 * d_x).toFixed(2);
-  const atcl_x    = (0.85 * 0.003 / 0.008 * d_x).toFixed(2);
+  // ── Step-by-step (ACI 318-19) — one builder for both axes ──
+  function buildSteps(ax) {
+    const X = ax === 'X';
+    const P = X ? AX : AY, S = X ? SX : SY, M = X ? magX : magY;
+    const h = X ? i.H : i.W, b = X ? i.W : i.H;
+    const d = P.d, dp = P.dp;
+    const As1 = X ? Ast_y : Ast_x, nFace = X ? i.nY : i.nX;
+    const hN = X ? 'H' : 'W', bN = X ? 'W' : 'H';
+    const acc = X ? 'cyan' : 'orange';
+    const klr = X ? klrx : klry, Mu0 = X ? Mx_t : My_t, MuD = X ? demandMx : demandMy;
+    const f2 = v => Number(v).toFixed(2), f3 = v => Number(v).toFixed(3), f4 = v => Number(v).toFixed(4);
+    const phiTxt = pt => pt.epsT <= ety ? `εt ≤ εty → ϕ = ${PHI_C.toFixed(2)}`
+                       : pt.epsT >= etTC ? `εt ≥ εty+0.003 → ϕ = 0.90`
+                       : `${PHI_C.toFixed(2)} + ${(0.9 - PHI_C).toFixed(2)}(εt − εty)/0.003`;
+    function pointSteps(pt, cFormula, cSub) {
+      return [
+        stepRow('c', cFormula, cSub, f2(pt.c), 'cm'),
+        stepRow('a', 'β₁ × c', `${f4(beta1)} × ${f2(pt.c)}`, f2(pt.a), 'cm'),
+        stepRow('Cc', `0.85f'c × ${bN} × a / 1000`, `0.85×${fc}×${b}×${f2(pt.a)}/1000`, f3(pt.Cc), 'tons'),
+        ...(isSpiral ? [
+        stepRow('ΣFs', "Σ As,i·(fs,i − 0.85f'c ถ้าอยู่ในบล็อก), fs,i = 0.003·Es·(c−yi)/c ≤ fy", `เหล็ก ${nBars} เส้น รัศมีวง ${f2(rBar)} cm`, f2(pt.Fs), 'tons'),
+        stepRow('Pn', 'Cc + ΣFs', `${f3(pt.Cc)} + ${f2(pt.Fs)}`, f2(pt.Pn), 'tons'),
+        stepRow('Mn', `Cc(${hN}/2−a/2) + ΣFs,i(${hN}/2−yi)`, '', f3(pt.Mn), 't-m'),
+        ] : [
+        stepRow("fs'", "0.003·Es·(c−d')/c ≤ fy", `0.003×${Es}×(${f2(pt.c)}−${f2(dp)})/${f2(pt.c)}`, f2(pt.fsC), 'ksc'),
+        stepRow('fs', '0.003·Es·(d−c)/c ≤ fy', `0.003×${Es}×(${f2(d)}−${f2(pt.c)})/${f2(pt.c)}`, f2(pt.fsT), 'ksc'),
+        stepRow('Pn', "Cc + As'(fs'−0.85f'c) − As·fs", `${f3(pt.Cc)} + ${f2(As1)}×(${f2(pt.fsC)}${dp < pt.a ? '−' + (0.85*fc).toFixed(1) : ''})/1000 − ${f2(As1)}×${f2(pt.fsT)}/1000`, f2(pt.Pn), 'tons'),
+        stepRow('Mn', `Cc(${hN}/2−a/2) + Cs(${hN}/2−d') + T(d−${hN}/2)`, '', f3(pt.Mn), 't-m'),
+        ]),
+        stepRow('εt', '0.003·(d−c)/c', `0.003×(${f2(d)}−${f2(pt.c)})/${f2(pt.c)}`, pt.epsT.toFixed(5), ''),
+        stepRow('ϕ', phiTxt(pt), '', f3(pt.phi), ''),
+        stepRow('ϕPn', 'ϕ × Pn  (≤ ϕPn,max)', `${f3(pt.phi)} × ${f2(pt.Pn)}`, f2(Math.min(pt.phiPn, phiPnmax)), 'tons', acc),
+        stepRow('ϕMn', 'ϕ × Mn', `${f3(pt.phi)} × ${f3(pt.Mn)}`, f3(pt.phiMn), 't-m', acc),
+      ];
+    }
+    resetStepN();
+    return [
+      stepHeader('1. ข้อมูลพื้นฐาน'),
+      ...(isSpiral ? [
+      stepRow('r', 'Dch/2 − ∅spiral − ∅bar/2,  Dch = min(H,W) − 2·Covering', `${f2(Dch)}/2 − ${(i.RB/10).toFixed(1)} − ${(i.DB/20).toFixed(2)}`, f2(rBar), 'cm'),
+      stepRow('dt', `${hN}/2 + r cos θ (เหล็กเส้นนอกสุด)`, '', f2(d), 'cm'),
+      stepRow('Ast', `(π/4) × (DB/10)² × ${nBars} เส้น (จัดเป็นวงกลม)`, `(π/4) × ${(i.DB/10).toFixed(1)}² × ${nBars}`, f2(Ast), 'cm²'),
+      ] : [
+      stepRow('d', `${hN} − Covering − ∅stirrup − ∅bar/2`, `${h} − ${i.cover} − ${(i.RB/10).toFixed(1)} − ${(i.DB/20).toFixed(2)}`, f2(d), 'cm'),
+      stepRow("d'", 'Covering + ∅stirrup + ∅bar/2', `${i.cover} + ${(i.RB/10).toFixed(1)} + ${(i.DB/20).toFixed(2)}`, f2(dp), 'cm'),
+      stepRow('As (ต่อด้าน)', `(π/4) × (DB/10)² × n(${X ? 'Y' : 'X'})`, `(π/4) × ${(i.DB/10).toFixed(1)}² × ${nFace}`, f2(As1), 'cm²'),
+      ]),
+      stepRow('β₁', "0.85 − 0.05(f'c − 280)/70, 0.65 ≤ β₁ ≤ 0.85", `f'c = ${fc} ksc`, f4(beta1), ''),
+      stepRow('εty', 'fy / Es', `${fy} / ${Es}`, ety.toFixed(5), ''),
 
-  resetStepN();
-  document.getElementById('stepsX').innerHTML = [
-    stepHeader('1. ข้อมูลพื้นฐาน'),
-    stepRow('d',    'H - Covering - ∅stirrup - ∅bar/2',  `${i.H} - ${i.cover} - ${(i.RB/10).toFixed(1)} - ${(i.DB/10/2).toFixed(1)}`,  d_x.toFixed(2), 'cm'),
-    stepRow("d'",   'Covering + ∅stirrup + ∅bar/2',       `${i.cover} + ${(i.RB/10).toFixed(1)} + ${(i.DB/10/2).toFixed(1)}`,          dp_x.toFixed(2), 'cm'),
-    stepRow('Ast-x','(π/4) × (DB/10)² × n(X)',            `(π/4) × ${(i.DB/10).toFixed(1)}² × ${i.nX}`,                               Ast_x.toFixed(2), 'cm²'),
+      stepHeader('2. Pure Compression (ACI 22.4.2)'),
+      stepRow('Po', "0.85f'c(Ag − Ast) + fy·Ast", `0.85×${fc}×(${A}−${f2(Ast)}) + ${fy}×${f2(Ast)}`, f2(Po), 'tons'),
+      stepRow('Pn,max', `${PN_MAX_F.toFixed(2)} × Po  (${isSpiral ? 'ปลอกเกลียว' : 'ปลอกเดี่ยว'})`, `${PN_MAX_F.toFixed(2)} × ${f2(Po)}`, f2(Pnmax), 'tons'),
+      stepRow('ϕPn,max', `${PHI_C.toFixed(2)} × Pn,max`, `${PHI_C.toFixed(2)} × ${f2(Pnmax)}`, f2(phiPnmax), 'tons', acc),
 
-    stepHeader('2. Pure Compression'),
-    stepRow('Pn₀',  "0.85f'c(Ag - Ast) + fy·Ast",       `0.85×${i.fc}×(${i.H*i.W}-${Ast.toFixed(2)}) + ${i.fy}×${Ast.toFixed(2)}`,  Pn0.toFixed(2), 'tons'),
-    stepRow('ϕPn₀', 'Pn₀ × ϕ',                            `${Pn0.toFixed(2)} × ${phi.toFixed(4)}`,                                     (Pn0*phi).toFixed(2), 'tons', 'cyan'),
+      stepHeader(`3. Moment Zero Tension (c = ${hN})`),
+      ...pointSteps(P.mzt, hN, `${h}`),
 
-    stepHeader('3. Moment Zero Tension (c = H)'),
-    stepRow('c',    'H (full compression)',                 `${i.H}`,                                                                    i.H, 'cm'),
-    stepRow('a',    '0.85 × c',                            `0.85 × ${i.H}`,                                                            (0.85*i.H).toFixed(2), 'cm'),
-    stepRow('Cc',   "0.85f'c × W × a / 1000",            `0.85×${i.fc}×${i.W}×${(0.85*i.H).toFixed(2)}/1000`,                       mzt_x.Pn.toFixed(3), 'tons'),
-    stepRow('ϕMn',  "(Cc×(H/2-a/2) + Cs×(H/2-d') + T×(d-H/2)) × ϕ", `(${mzt_x.Pn.toFixed(3)}×(${i.H}/2-${(0.85*i.H).toFixed(2)}/2) + ...) × ${phi.toFixed(4)}`,                                                 (mzt_x.Mn*phi).toFixed(3), 't-m', 'cyan'),
+      stepHeader('4. Balance Failure (εt = εty)'),
+      ...pointSteps(P.bal, '0.003·d / (0.003 + εty)', `0.003×${f2(d)}/(0.003+${ety.toFixed(5)})`),
 
-    stepHeader('4. Balance Failure'),
-    stepRow('Cb',   '6120 × d / (fy + 6120)',              `6120 × ${d_x.toFixed(2)} / (${i.fy} + 6120)`,                             Cb_x.toFixed(2), 'cm'),
-    stepRow('ab',   '0.85 × Cb',                           `0.85 × ${Cb_x.toFixed(2)}`,                                               ab_x, 'cm'),
-    stepRow('Cc',   "0.85f'c × W × ab / 1000",           `0.85×${i.fc}×${i.W}×${ab_x}/1000`,                                        Cc_bal_x, 'tons'),
-    stepRow("fs'",  `${parseFloat(fs2_bal_x)>=i.fy ? "fy (controls)" : "0.003×Es×(Cb-d')/Cb"}`, `${parseFloat(fs2_bal_x)>=i.fy ? i.fy : "0.003×"+i.Es+"×("+Cb_x.toFixed(2)+"-"+dp_x.toFixed(2)+")/"+Cb_x.toFixed(2)}`, fs2_bal_x, 'ksc'),
-    stepRow('fs',   'fy',                                  `${i.fy}`,                                                                  i.fy, 'ksc'),
-    stepRow('ϕPn',  "(Cc + fs'·Ast-x - fs·Ast-x) × ϕ", `(${Cc_bal_x} + ${fs2_bal_x}×${Ast_x.toFixed(2)}/1000 - ${i.fy}×${Ast_x.toFixed(2)}/1000) × ${phi.toFixed(4)}`, (bal_x.Pn*phi).toFixed(2), 'tons', 'cyan'),
-    stepRow('ϕMn',  "(Cc×(H/2-ab/2) + Cs×(H/2-d') + T×(d-H/2)) / 100000 × ϕ", `(${Cc_bal_x}×(${i.H}/2-${ab_x}/2) + ${fs2_bal_x}×${Ast_x.toFixed(2)}×(${i.H}/2-${dp_x.toFixed(2)}) - ${i.fy}×${Ast_x.toFixed(2)}×(${d_x.toFixed(2)}-${i.H}/2)) / 100000 × ${phi.toFixed(4)}`,                                      bal_x.Mn.toFixed(3), 't-m', 'cyan'),
+      stepHeader('5. Tension Controlled Limit (εt = εty + 0.003)'),
+      ...pointSteps(P.tcl, '0.003·d / (0.003 + εty + 0.003)', `0.003×${f2(d)}/(0.003+${etTC.toFixed(5)})`),
 
-    stepHeader('5. Tension Controlled Limit (εt = 0.005)'),
-    stepRow('C',    '0.003/(0.003+0.005) × d',            `0.375 × ${d_x.toFixed(2)}`,                                                Ctcl_x_val, 'cm'),
-    stepRow('a',    '0.85 × C',                            `0.85 × ${Ctcl_x_val}`,                                                    atcl_x, 'cm'),
-    stepRow("fs'",  `${Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x,i.fy)>=i.fy ? "fy (controls)" : "6120×(C-d')/d"}`, `${Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x,i.fy)>=i.fy ? i.fy : "6120×("+Ctcl_x_val+"-"+dp_x.toFixed(2)+")/"+d_x.toFixed(2)}`, Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x, i.fy).toFixed(1), 'ksc'),
-    stepRow('ϕPn',  "(Cc - fs·Ast-x + fs'·Ast-x) × ϕ", `(${(0.85*i.fc*i.W*parseFloat(atcl_x)/1000).toFixed(3)} - ${i.fy}×${Ast_x.toFixed(2)}/1000 + ${Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x,i.fy).toFixed(1)}×${Ast_x.toFixed(2)}/1000) × ${phi.toFixed(4)}`,                                         (tcl_x.Pn*phi).toFixed(2), 'tons', 'cyan'),
-    stepRow('ϕMn',  "(Cc×(H/2-a/2) + Cs×(H/2-d') + T×(d-H/2)) / 100000", `(${(0.85*i.fc*i.W*parseFloat(atcl_x)/1000).toFixed(3)}×(${i.H}/2-${atcl_x}/2) + ${Math.min(6120*(parseFloat(Ctcl_x_val)-dp_x)/d_x,i.fy).toFixed(1)}×${Ast_x.toFixed(2)}×(${i.H}/2-${dp_x.toFixed(2)}) + ${i.fy}×${Ast_x.toFixed(2)}×(${d_x.toFixed(2)}-${i.H}/2)) / 100000`,                                           tcl_x.Mn.toFixed(3), 't-m', 'cyan'),
+      stepHeader('6. Pure Bending (Pn = 0)'),
+      ...pointSteps(P.pb, 'หาค่า c ที่ทำให้ Pn = 0 (ทำซ้ำ)', 'bisection'),
 
-    stepHeader('6. Pure Bending (Interpolation)'),
-    stepRow('ϕMn',  '(|Pnt| × Mn_TCL) / (|Pnt| + Pn_TCL)', `(${Math.abs(Pnt).toFixed(2)} × ${tcl_x.Mn.toFixed(3)}) / (${Math.abs(Pnt).toFixed(2)} + ${tcl_x.Pn.toFixed(2)})`, pb_x.Mn.toFixed(3), 't-m', 'cyan'),
+      stepHeader('7. Pure Tension'),
+      stepRow('Pnt', '−Ast × fy / 1000', `−${f2(Ast)} × ${fy} / 1000`, f2(Pnt), 'tons'),
+      stepRow('ϕPnt', '0.90 × Pnt', `0.90 × ${f2(Pnt)}`, f2(phiPnt), 'tons', acc),
 
-    stepHeader('7. Pure Tension'),
-    stepRow('Pnt',  '-Ast × fy / 1000',                   `-${Ast.toFixed(2)} × ${i.fy} / 1000`,                                     Pnt.toFixed(2), 'tons', 'cyan'),
+      stepHeader('8. Slenderness (ACI 6.2.5, 6.6.4)'),
+      stepRow('kl/r', 'k × L / r', `${i.k} × ${i.L} / ${f2(X ? rx : ry)}`, f2(klr), ''),
+      stepRow('ลิมิต', '34 + 12(M1/M2), M1/M2 = −1 (ปลอดภัยไว้ก่อน)', '34 − 12', limit, ''),
+      ...(M.slender && Pu_t > 0 ? [
+        stepRow('EI', '0.4·Ec·Ig / (1 + βdns), βdns = 0.6', `0.4×${Ec.toFixed(0)}×${(X ? Ix : Iy).toFixed(0)}/1.6`, M.EI.toExponential(3), 'kg-cm²'),
+        stepRow('Pc', 'π²·EI / (k·L)²', `π²×${M.EI.toExponential(3)}/(${i.k}×${i.L})²/1000`, f2(M.Pc), 'tons'),
+        stepRow('δns', 'Cm / (1 − Pu/(0.75Pc)) ≥ 1, Cm = 1.0', `1/(1 − ${f2(Pu_t)}/(0.75×${f2(M.Pc)}))`, M.delta === Infinity ? '∞ (ไม่เสถียร)' : f3(M.delta), ''),
+        stepRow('M2,min', 'Pu(1.5 + 0.03h) / 100', `${f2(Pu_t)}×(1.5+0.03×${h})/100`, f3(M.Mmin), 't-m'),
+        stepRow('Mc', 'δns × max(M2, M2,min)', `${M.delta === Infinity ? '∞' : f3(M.delta)} × ${f3(Math.max(Mu0, M.Mmin))}`, M.delta === Infinity ? '∞' : f3(MuD), 't-m', acc),
+      ] : [
+        stepRow('สถานะ', klr <= limit ? 'kl/r ≤ ลิมิต → เสาสั้น ไม่ต้องขยายโมเมนต์' : 'ไม่มีแรงอัด → ไม่ต้องขยายโมเมนต์', '', '', ''),
+      ]),
 
-    stepHeader('8. Shear Capacity — X'),
-    stepRow('Av',  '2 × (π/4) × (RB/10)²',
-                   `2 × (π/4) × ${(i.RB/10).toFixed(1)}²`,
-                   Av.toFixed(3), 'cm²'),
-    stepRow('Vs',  'Av × fys × d / s',
-                   `${Av.toFixed(3)} × ${i.fys} × ${d_x.toFixed(2)} / ${s_cm}`,
-                   Vs.toFixed(3), 'tons', 'green'),
-    ...(i.P >= 0 ? [
-      stepRow('Vc-x', "0.93√f'c × W × d × √(1 + 0.029P/Ag)",
-                      `0.93 × √${i.fc} × ${i.W} × ${d_x.toFixed(2)} × √(1 + 0.029×${i.P}/${i.H*i.W})`,
-                      Vc_x.toFixed(3), 'tons', 'cyan'),
-    ] : [
-      stepRow('Vc-x', "0.53 × (1 + 0.029P/Ag) × √f'c × W × d",
-                      `0.53 × (1 + 0.029×${i.P}/${i.H*i.W}) × √${i.fc} × ${i.W} × ${d_x.toFixed(2)}`,
-                      Vc_x.toFixed(3), 'tons', 'cyan'),
-    ]),
-    stepRow('Vn-x', 'Vc + Vs',
-                    `${Vc_x.toFixed(3)} + ${Vs.toFixed(3)}`,
-                    Vn_x.toFixed(3), 'tons', 'cyan'),
-  ].join('');
-
-  // ── Y-axis ──
-  const ab_y    = (0.85 * Cb_y).toFixed(2);
-  const Ctcl_y_val = (0.003 / 0.008 * d_y).toFixed(2);
-  const atcl_y     = (0.85 * 0.003 / 0.008 * d_y).toFixed(2);
-
-  resetStepN();
-  document.getElementById('stepsY').innerHTML = [
-    stepHeader('1. ข้อมูลพื้นฐาน'),
-    stepRow('d',    'W - Covering - ∅stirrup - ∅bar/2',  `${i.W} - ${i.cover} - ${(i.RB/10).toFixed(1)} - ${(i.DB/10/2).toFixed(1)}`,  d_y.toFixed(2), 'cm'),
-    stepRow("d'",   'Covering + ∅stirrup + ∅bar/2',       `${i.cover} + ${(i.RB/10).toFixed(1)} + ${(i.DB/10/2).toFixed(1)}`,          dp_y.toFixed(2), 'cm'),
-    stepRow('Ast-y','(π/4) × (DB/10)² × n(Y)',            `(π/4) × ${(i.DB/10).toFixed(1)}² × ${i.nY}`,                               Ast_y.toFixed(2), 'cm²'),
-
-    stepHeader('2. Pure Compression'),
-    stepRow('Pn₀',  "0.85f'c(Ag - Ast) + fy·Ast",       `0.85×${i.fc}×(${i.H*i.W}-${Ast.toFixed(2)}) + ${i.fy}×${Ast.toFixed(2)}`,  Pn0.toFixed(2), 'tons'),
-    stepRow('ϕPn₀', 'Pn₀ × ϕ',                            `${Pn0.toFixed(2)} × ${phi.toFixed(4)}`,                                     (Pn0*phi).toFixed(2), 'tons', 'orange'),
-
-    stepHeader('3. Moment Zero Tension (c = W)'),
-    stepRow('c',    'W (full compression)',                 `${i.W}`,                                                                    i.W, 'cm'),
-    stepRow('a',    '0.85 × c',                            `0.85 × ${i.W}`,                                                            (0.85*i.W).toFixed(2), 'cm'),
-    stepRow('Cc',   "0.85f'c × H × a / 1000",            `0.85×${i.fc}×${i.H}×${(0.85*i.W).toFixed(2)}/1000`,                       mzt_y.Pn.toFixed(3), 'tons'),
-    stepRow('ϕMn',  "(Cc×(W/2-a/2) + Cs×(W/2-d') + T×(d-W/2)) × ϕ", `(${mzt_y.Pn.toFixed(3)}×(${i.W}/2-${(0.85*i.W).toFixed(2)}/2) + ...) × ${phi.toFixed(4)}`,                                                 (mzt_y.Mn*phi).toFixed(3), 't-m', 'orange'),
-
-    stepHeader('4. Balance Failure'),
-    stepRow('Cb',   '6120 × d / (fy + 6120)',              `6120 × ${d_y.toFixed(2)} / (${i.fy} + 6120)`,                             Cb_y.toFixed(2), 'cm'),
-    stepRow('ab',   '0.85 × Cb',                           `0.85 × ${Cb_y.toFixed(2)}`,                                               ab_y, 'cm'),
-    stepRow('Cc',   "0.85f'c × H × ab / 1000",           `0.85×${i.fc}×${i.H}×${ab_y}/1000`,                                        (0.85*i.fc*i.H*parseFloat(ab_y)/1000).toFixed(3), 'tons'),
-    stepRow("fs'",  `${Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y,i.fy)>=i.fy ? "fy (controls)" : "0.003×Es×(Cb-d')/Cb"}`, `${Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y,i.fy)>=i.fy ? i.fy : "0.003×"+i.Es+"×("+Cb_y.toFixed(2)+"-"+dp_y.toFixed(2)+")/"+Cb_y.toFixed(2)}`, Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y, i.fy).toFixed(1), 'ksc'),
-    stepRow('fs',   'fy',                                  `${i.fy}`,                                                                  i.fy, 'ksc'),
-    stepRow('ϕPn',  "(Cc + fs'·Ast-y - fs·Ast-y) × ϕ", `(${(0.85*i.fc*i.H*parseFloat(ab_y)/1000).toFixed(3)} + ${Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y,i.fy).toFixed(1)}×${Ast_y.toFixed(2)}/1000 - ${i.fy}×${Ast_y.toFixed(2)}/1000) × ${phi.toFixed(4)}`,                                         (bal_y.Pn*phi).toFixed(2), 'tons', 'orange'),
-    stepRow('ϕMn',  "(Cc×(W/2-ab/2) + Cs×(W/2-d') + T×(d-W/2)) / 100000 × ϕ", `(${(0.85*i.fc*i.H*parseFloat(ab_y)/1000).toFixed(3)}×(${i.W}/2-${ab_y}/2) + ${Math.min(0.003*i.Es*(Cb_y-dp_y)/Cb_y,i.fy).toFixed(1)}×${Ast_y.toFixed(2)}×(${i.W}/2-${dp_y.toFixed(2)}) - ${i.fy}×${Ast_y.toFixed(2)}×(${d_y.toFixed(2)}-${i.W}/2)) / 100000 × ${phi.toFixed(4)}`,                                      bal_y.Mn.toFixed(3), 't-m', 'orange'),
-
-    stepHeader('5. Tension Controlled Limit (εt = 0.005)'),
-    stepRow('C',    '0.003/(0.003+0.005) × d',            `0.375 × ${d_y.toFixed(2)}`,                                                Ctcl_y_val, 'cm'),
-    stepRow('a',    '0.85 × C',                            `0.85 × ${Ctcl_y_val}`,                                                    atcl_y, 'cm'),
-    stepRow("fs'",  `${Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y,i.fy)>=i.fy ? "fy (controls)" : "6120×(C-d')/d"}`, `${Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y,i.fy)>=i.fy ? i.fy : "6120×("+Ctcl_y_val+"-"+dp_y.toFixed(2)+")/"+d_y.toFixed(2)}`, Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y, i.fy).toFixed(1), 'ksc'),
-    stepRow('ϕPn',  "(Cc - fs·Ast-y + fs'·Ast-y) × ϕ", `(${(0.85*i.fc*i.H*parseFloat(atcl_y)/1000).toFixed(3)} - ${i.fy}×${Ast_y.toFixed(2)}/1000 + ${Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y,i.fy).toFixed(1)}×${Ast_y.toFixed(2)}/1000) × ${phi.toFixed(4)}`,                                         (tcl_y.Pn*phi).toFixed(2), 'tons', 'orange'),
-    stepRow('ϕMn',  "(Cc×(W/2-a/2) + Cs×(W/2-d') + T×(d-W/2)) / 100000", `(${(0.85*i.fc*i.H*parseFloat(atcl_y)/1000).toFixed(3)}×(${i.W}/2-${atcl_y}/2) + ${Math.min(6120*(parseFloat(Ctcl_y_val)-dp_y)/d_y,i.fy).toFixed(1)}×${Ast_y.toFixed(2)}×(${i.W}/2-${dp_y.toFixed(2)}) + ${i.fy}×${Ast_y.toFixed(2)}×(${d_y.toFixed(2)}-${i.W}/2)) / 100000`,                                           tcl_y.Mn.toFixed(3), 't-m', 'orange'),
-
-    stepHeader('6. Pure Bending (Interpolation)'),
-    stepRow('ϕMn',  '(|Pnt| × Mn_TCL) / (|Pnt| + Pn_TCL)', `(${Math.abs(Pnt).toFixed(2)} × ${tcl_y.Mn.toFixed(3)}) / (${Math.abs(Pnt).toFixed(2)} + ${tcl_y.Pn.toFixed(2)})`, pb_y.Mn.toFixed(3), 't-m', 'orange'),
-
-    stepHeader('7. Pure Tension'),
-    stepRow('Pnt',  '-Ast × fy / 1000',                   `-${Ast.toFixed(2)} × ${i.fy} / 1000`,                                     Pnt.toFixed(2), 'tons', 'orange'),
-
-    stepHeader('8. Shear Capacity — Y'),
-    stepRow('Av',  '2 × (π/4) × (RB/10)²',
-                   `2 × (π/4) × ${(i.RB/10).toFixed(1)}²`,
-                   Av.toFixed(3), 'cm²'),
-    stepRow('Vs',  'Av × fys × d / s',
-                   `${Av.toFixed(3)} × ${i.fys} × ${d_y.toFixed(2)} / ${s_cm}`,
-                   (Av * i.fys * d_y / s_cm / 1000).toFixed(3), 'tons', 'green'),
-    ...(i.P >= 0 ? [
-      stepRow('Vc-y', "0.93√f'c × H × d × √(1 + 0.029P/Ag)",
-                      `0.93 × √${i.fc} × ${i.H} × ${d_y.toFixed(2)} × √(1 + 0.029×${i.P}/${i.H*i.W})`,
-                      Vc_y.toFixed(3), 'tons', 'orange'),
-    ] : [
-      stepRow('Vc-y', "0.53 × (1 + 0.029P/Ag) × √f'c × H × d",
-                      `0.53 × (1 + 0.029×${i.P}/${i.H*i.W}) × √${i.fc} × ${i.H} × ${d_y.toFixed(2)}`,
-                      Vc_y.toFixed(3), 'tons', 'orange'),
-    ]),
-    stepRow('Vn-y', 'Vc + Vs',
-                    `${Vc_y.toFixed(3)} + ${(Av * i.fys * d_y / s_cm / 1000).toFixed(3)}`,
-                    Vn_y.toFixed(3), 'tons', 'orange'),
-  ].join('');
+      stepHeader(`9. Shear Capacity — ${ax} (ACI 22.5)`),
+      stepRow('Av', `${X ? legsX : legsY} ขา × (π/4) × (RB/10)²`, `${X ? legsX : legsY} × (π/4) × ${(i.RB/10).toFixed(1)}²`, f3(S.Av), 'cm²'),
+      stepRow('Av,min', "max(0.2√f'c, 3.5)·b·s / fyt", `max(${(0.2*sqfc).toFixed(2)}, 3.5)×${b}×${s_cm}/${i.fys}`, f3(S.Avmin), 'cm²'),
+      stepRow('Nu/6Ag', "≤ 0.05f'c (แรงอัดเป็นบวก)", `${i.P}/(6×${Ag})`, f3(S.axial), 'ksc'),
+      S.method === 'a'
+        ? stepRow('Vc', "(0.53√f'c + Nu/6Ag)·b·d ≤ 1.33√f'c·b·d", `(${(0.53*sqfc).toFixed(2)} + ${f3(S.axial)})×${b}×${f2(d)}/1000`, f3(S.Vc), 'tons')
+        : stepRow('Vc', "(2.12λs(ρw)^⅓√f'c + Nu/6Ag)·b·d  [Av < Av,min]", `λs=${f3(S.lamS)}, ρw=${S.rhow.toFixed(4)}`, f3(S.Vc), 'tons'),
+      stepRow('Vs', 'Av × fyt × d / s', `${f3(S.Av)} × ${i.fys} × ${f2(d)} / ${s_cm}`, f3(S.Vs), 'tons'),
+      stepRow('Vs,max', "2.12√f'c·b·d", `2.12×${sqfc.toFixed(2)}×${b}×${f2(d)}/1000`, f3(S.VsMax), 'tons'),
+      stepRow('ϕVn', '0.75 × (Vc + Vs)', `0.75 × (${f3(S.Vc)} + ${f3(S.Vs)})`, f3(S.phiVn), 'tons', acc),
+    ].join('');
+  }
+  document.getElementById('stepsX').innerHTML = buildSteps('X');
+  document.getElementById('stepsY').innerHTML = buildSteps('Y');
 
   // CHARTS
   const pointLabels = [
@@ -1480,7 +1574,7 @@ function calculate() {
               if (idx < pointLabels.length) return pointLabels[idx];
               return '';
             },
-            label: (item) => `Mn = ${item.parsed.x.toFixed(3)} t-m   ϕPn = ${item.parsed.y.toFixed(2)} t`
+            label: (item) => `ϕMn = ${item.parsed.x.toFixed(3)} t-m   ϕPn = ${item.parsed.y.toFixed(2)} t`
           }
         }
       },
@@ -1636,7 +1730,8 @@ function printReport() {
       row('n(Y)', val('nY'), 'เส้น') +
       row('Stirrup Grade', val('stirrupGrade'), '') +
       row('RB', val('RB'), 'mm') +
-      row('Spacing @', val('stirrupSpacing'), 'cm')
+      row('Spacing @', val('stirrupSpacing'), 'cm') +
+      row('ชนิดปลอก', document.getElementById('tieType').selectedOptions[0].textContent, '')
     )}
   </div>`;
 
