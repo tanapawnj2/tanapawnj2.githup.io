@@ -1595,7 +1595,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="rep-col">
       <div class="sdiv">Web Post Plastic Moment</div>
       <div class="calc-block">
-        <div class="calc-line1"><span class="cl-body">s<sub>o</sub> = e + D<sub>o</sub>·(1−cos θ<sub>cr</sub>), θ<sub>cr</sub>=25°</span></div>
+        <div class="calc-line1"><span class="cl-body">s<sub>o</sub> = e = S − D<sub>o</sub> (ความกว้าง web post ที่แคบที่สุด)</span></div>
         <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="wp_so_sub">—</span></div>
         <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="wp_so">—</span><span class="calc-unit">mm</span></span></div>
       </div>
@@ -3463,27 +3463,11 @@ function calculate(){
   sh('wp_ratio_sub', `${fmtNum(C1,3)}·${fmtNum(SD,3)} − ${fmtNum(C2,4)}·${fmtNum(SD,3)}² − ${fmtNum(C3,5)}`);
   sv('wp_ratio', MeMp, 3);
 
-  // Plastic web post moment: Mp,wp = Fy·tw·so²/4
-  // ─────────────────────────────────────────────────────────
-  // CORRECTED per DG 31 Section 3.5.2 (Cellular Beam)
-  // Reference: Aglan & Redwood (1974), Bjorhovde (2000)
-  //   Mp,wp = Fy·tw·(so)²/4
-  // where so = horizontal web-post width at critical section
-  // For cellular beams, the critical section is located at angle θ
-  // measured from the horizontal axis through opening center.
-  //
-  // The horizontal web-post width at angle θ:  so(θ) = S − Do·cos(θ)
-  // Critical θ ≈ 25° for typical S/Do ratios (DG 31 Section 3.5.2)
-  //
-  // so_eff = e + Do·(1 − cos(θcrit)) where θcrit ≈ 25°
-  //        = e + 0.0937·Do
-  //
-  // Previous incorrect formula used so = e (θ=0°) only,
-  // which underestimates Mp,wp significantly when Do is large.
-  // ─────────────────────────────────────────────────────────
-  const theta_crit_deg = 25;
-  const theta_crit_rad = theta_crit_deg * Math.PI / 180;
-  const so_mm = e + a0 * (1 - Math.cos(theta_crit_rad));
+  // Plastic web post moment at the narrowest web-post section (width e = S − Do):
+  //   Mp,wp = Fy·tw·e²/4
+  // The Mallow/Mp curve (C1, C2, C3 — Ward / DG 31) is calibrated to the web-post
+  // capacity at its minimum width, so no widening of the section is applied.
+  const so_mm = e;
   const so_cm = so_mm / 10;
 
   // Convert to kg·m: Fy [ksc] × tw [cm] × so² [cm²] / 4 = kgf·cm / 4 → /100 to get kg·m
@@ -3491,7 +3475,7 @@ function calculate(){
   const Mallow_kgm = MeMp * Mpwp_kgm;
 
   sv('wp_so', so_mm, 1);
-  sh('wp_so_sub', `${fmtNum(e,0)} + ${a0}·(1−cos25°)`);
+  sh('wp_so_sub', `${fmtNum(S,0)} − ${a0}`);
   sh('wp_Mpwp_sub', `${Fy} × ${fmtNum(tw_cm,2)} × ${fmtNum(so_cm,2)}²/4 / 100`);
   sv('wp_Mpwp', Mpwp_kgm, 3);
   sh('wp_Mallow_sub', `${fmtNum(MeMp,3)} × ${fmtNum(Mpwp_kgm,2)}`);
