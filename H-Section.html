@@ -351,7 +351,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
   <div class="sg">
     <div class="sg-title">หมายเหตุ</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 §H1.1 (P + biaxial M, doubly-sym I) + §G (shear แยกแกน — AISC ไม่มี M-V interaction)<br>M<sub>x</sub>, M<sub>y</sub> = kg·m · P = แรงอัด (kg) · V<sub>x</sub>, V<sub>y</sub> = แรงเฉือน (kg) · n = จำนวนหน้าตัด</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 H1.1 (P + biaxial M, doubly-sym I) + G (shear แยกแกน — AISC ไม่มี M-V interaction)<br>M<sub>x</sub>, M<sub>y</sub> = kg·m · P = แรงอัด (kg) · V<sub>x</sub>, V<sub>y</sub> = แรงเฉือน (kg) · n = จำนวนหน้าตัด</div>
   </div>
   </div>
 </div>
@@ -968,7 +968,7 @@ function calculate(){
   sv('sum_Pny',Pny*kgf,0);sv('sum_phiPny',0.9*Pny*kgf,0);sv('sum_ASDPny',Pny/1.67*kgf,0);
   tx('sum_ltb',ltb);tx('sum_wy',wy);tx('sum_col',col);
 
-  // ── Combined Check — AISC 360-22 §H1.1 (axial + biaxial flexure) + §G shear ──
+  // ── Combined Check — AISC 360-22 H1.1 (axial + biaxial flexure) + G shear ──
   const PV=id=>{const x=Math.abs(pi(id));return isFinite(x)?x:0;};
   const Pap=PV('inp_P'),Mxap=PV('inp_Mx'),Myap=PV('inp_My'),Vxap=PV('inp_Vx'),Vyap=PV('inp_Vy');
   let nSec=pi('inp_n'); if(!(nSec>0))nSec=1;
@@ -995,8 +995,8 @@ function calculate(){
       ? f(Pap,0)+'/'+f(Pc,0)+' + (8/9)('+f(Mxap,1)+'/'+f(Mcx,1)+' + '+f(Myap,1)+'/'+f(Mcy,1)+')'
       : f(Pap,0)+'/(2·'+f(Pc,0)+') + ('+f(Mxap,1)+'/'+f(Mcx,1)+' + '+f(Myap,1)+'/'+f(Mcy,1)+')')
     +'  [H1-1'+(prr>=0.2?'a':'b')+', '+(isASD?'ASD Ω=1.67':'LRFD φ=0.90')+']');
-  tx('ck_vx_sub',f(Vxap,0)+' / '+f(Vcx,0)+'  [§G, '+(isASD?'Vnx/1.67':'0.9·Vnx')+' ×n='+f(nSec,0)+']');
-  tx('ck_vy_sub',f(Vyap,0)+' / '+f(Vcy,0)+'  [§G, '+(isASD?'Vny/1.67':'0.9·Vny')+' ×n='+f(nSec,0)+']');
+  tx('ck_vx_sub',f(Vxap,0)+' / '+f(Vcx,0)+'  [G, '+(isASD?'Vnx/1.67':'0.9·Vnx')+' ×n='+f(nSec,0)+']');
+  tx('ck_vy_sub',f(Vyap,0)+' / '+f(Vcy,0)+'  [G, '+(isASD?'Vny/1.67':'0.9·Vny')+' ×n='+f(nSec,0)+']');
 
   // ── Failure Mode blocks ───────────────────────────────────────
   function setFM(tagId, lblId, tag, label){

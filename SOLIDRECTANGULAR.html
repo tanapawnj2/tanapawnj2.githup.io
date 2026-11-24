@@ -257,7 +257,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
   <div class="sg">
     <div class="sg-title">หมายเหตุ</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 §H1.1 (P + biaxial M) + §G6 (shear). Solid bar: V<sub>n</sub> เท่ากันทุกทิศ → ใช้แรงเฉือนลัพธ์ V<sub>r</sub>=√(V<sub>x</sub>²+V<sub>y</sub>²)<br>M<sub>x</sub>, M<sub>y</sub> = kg·m · P = แรงอัด (kg) · n = จำนวนหน้าตัด</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 H1.1 (P + biaxial M) + G6 (shear). Solid bar: V<sub>n</sub> เท่ากันทุกทิศ → ใช้แรงเฉือนลัพธ์ V<sub>r</sub>=√(V<sub>x</sub>²+V<sub>y</sub>²)<br>M<sub>x</sub>, M<sub>y</sub> = kg·m · P = แรงอัด (kg) · n = จำนวนหน้าตัด</div>
   </div>
   </div>
 </div>
@@ -908,7 +908,7 @@ function calculate(){
   sv('s_Tn',      Tn*kgf,1);     sv('s_phiTn',    0.90*Tn*kgf,1);   sv('s_ASDTn',   Tn/1.67*kgf,1);
   sv('s_Pnc',     Pn_gov*kgf,0); sv('s_phiPnc',   0.90*Pn_gov*kgf,0); sv('s_ASDPnc', Pn_gov/1.67*kgf,0);
 
-  // ── Combined Check — AISC 360-22 §H1.1 (axial + biaxial flexure) + §G6 shear ──
+  // ── Combined Check — AISC 360-22 H1.1 (axial + biaxial flexure) + G6 shear ──
   const PV=id=>{const x=Math.abs(pi(id));return isFinite(x)?x:0;};
   const Pap=PV('inp_P'),Mxap=PV('inp_Mx'),Myap=PV('inp_My'),Vxap=PV('inp_Vx'),Vyap=PV('inp_Vy');
   const Vr=Math.sqrt(Vxap*Vxap+Vyap*Vyap);
@@ -934,7 +934,7 @@ function calculate(){
       ? f(Pap,0)+'/'+f(Pc,0)+' + (8/9)('+f(Mxap,1)+'/'+f(Mcx,1)+' + '+f(Myap,1)+'/'+f(Mcy,1)+')'
       : f(Pap,0)+'/(2·'+f(Pc,0)+') + ('+f(Mxap,1)+'/'+f(Mcx,1)+' + '+f(Myap,1)+'/'+f(Mcy,1)+')')
     +'  [H1-1'+(prr>=0.2?'a':'b')+', '+(isASD?'ASD Ω=1.67':'LRFD φ=0.90')+']');
-  tx('ck_v_sub',f(Vr,0)+' / '+f(Vc,0)+'  [§G6, '+(isASD?'Vn/1.67':'0.9·Vn')+' ×n='+f(nSec,0)+', Vr=√(Vx²+Vy²)]');
+  tx('ck_v_sub',f(Vr,0)+' / '+f(Vc,0)+'  [G6, '+(isASD?'Vn/1.67':'0.9·Vn')+' ×n='+f(nSec,0)+', Vr=√(Vx²+Vy²)]');
 
   // ── Failure mode badges ──
   const phi_ty=0.90*Pn_y, phi_tr=0.75*Pn_r;

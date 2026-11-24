@@ -304,7 +304,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
   <div class="sg">
     <div class="sg-title">หมายเหตุ</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 §H1.1 (P + M) + §G5 (shear). หน้าตัดกลม axisymmetric → ใช้โมเมนต์/แรงเฉือนลัพธ์ M<sub>r</sub>=√(M<sub>x</sub>²+M<sub>y</sub>²), V<sub>r</sub>=√(V<sub>x</sub>²+V<sub>y</sub>²)<br>P = แรงอัด (kg) · n = จำนวนหน้าตัด</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 H1.1 (P + M) + G5 (shear). หน้าตัดกลม axisymmetric → ใช้โมเมนต์/แรงเฉือนลัพธ์ M<sub>r</sub>=√(M<sub>x</sub>²+M<sub>y</sub>²), V<sub>r</sub>=√(V<sub>x</sub>²+V<sub>y</sub>²)<br>P = แรงอัด (kg) · n = จำนวนหน้าตัด</div>
   </div>
   </div>
 </div>
@@ -850,7 +850,7 @@ function calculate(){
   sv('sum_Vn',Vn*kgf,0);sv('sum_phiVn',0.9*Vn*kgf,0);sv('sum_ASDVn',Vn/1.67*kgf,0);
   sv('sum_Pn',Pn_co*kgf,0);sv('sum_phiPn',0.9*Pn_co*kgf,0);sv('sum_ASDPn',Pn_co/1.67*kgf,0);
 
-  // ── Combined Check — AISC 360-22 §H1.1 (axial + flexure) + §G5 shear ──
+  // ── Combined Check — AISC 360-22 H1.1 (axial + flexure) + G5 shear ──
   // Round HSS is axisymmetric → use resultant moment / shear
   const PV=id=>{const x=Math.abs(pi(id));return isFinite(x)?x:0;};
   const Pap=PV('inp_P'),Mxap=PV('inp_Mx'),Myap=PV('inp_My'),Vxap=PV('inp_Vx'),Vyap=PV('inp_Vy');
@@ -876,7 +876,7 @@ function calculate(){
       ? f(Pap,0)+'/'+f(Pc,0)+' + (8/9)('+f(Mr,1)+'/'+f(Mc,1)+')'
       : f(Pap,0)+'/(2·'+f(Pc,0)+') + '+f(Mr,1)+'/'+f(Mc,1))
     +'  [H1-1'+(prr>=0.2?'a':'b')+', '+(isASD?'ASD Ω=1.67':'LRFD φ=0.90')+', Mr=√(Mx²+My²)]');
-  tx('ck_v_sub',f(Vr,0)+' / '+f(Vc,0)+'  [§G5, '+(isASD?'Vn/1.67':'0.9·Vn')+' ×n='+f(nSec,0)+', Vr=√(Vx²+Vy²)]');
+  tx('ck_v_sub',f(Vr,0)+' / '+f(Vc,0)+'  [G5, '+(isASD?'Vn/1.67':'0.9·Vn')+' ×n='+f(nSec,0)+', Vr=√(Vx²+Vy²)]');
 
   // ── Failure Mode tags ──
   // Tension

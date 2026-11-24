@@ -280,7 +280,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
   <div class="sg">
     <div class="sg-title">หมายเหตุ</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 §H1.1 (P + biaxial M) + §G (shear แยก — AISC ไม่มีสมการ M-V interaction)<br>M<sub>x</sub>, M<sub>y</sub> = kg·m · P = แรงอัด (kg) · V<sub>y</sub> = แรงเฉือน (kg) · n = จำนวนหน้าตัด</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 H1.1 (P + biaxial M) + G (shear แยก — AISC ไม่มีสมการ M-V interaction)<br>M<sub>x</sub>, M<sub>y</sub> = kg·m · P = แรงอัด (kg) · V<sub>y</sub> = แรงเฉือน (kg) · n = จำนวนหน้าตัด</div>
   </div>
   </div>
 </div>
@@ -1247,13 +1247,13 @@ function calc(){
   sv('sum_ASDPny', Pny_kgf/1.67, 0);
 
   // ═════════════════════════════════════════════════════════════════════
-  // COMBINED CHECK — AISC 360-22 §H1.1 (axial + biaxial flexure) + §G shear
+  // COMBINED CHECK — AISC 360-22 H1.1 (axial + biaxial flexure) + G shear
   // ═════════════════════════════════════════════════════════════════════
   const Pap=Math.abs(num('inp_P')), Mxap=Math.abs(num('inp_Mx')), Myap=Math.abs(num('inp_My')), Vxap=Math.abs(num('inp_Vx')), Vyap=Math.abs(num('inp_Vy'));
   let nSec=num('inp_n'); if(!(nSec>0))nSec=1;
   const cEl=document.getElementById('inp_code');
   const isASD = cEl && cEl.value==='ASD';
-  // available strengths (×n);  Pn = governing compression Pn, Mn = nominal flexure, Vn = per-axis shear (§G)
+  // available strengths (×n);  Pn = governing compression Pn, Mn = nominal flexure, Vn = per-axis shear (G)
   const Pc = (isASD ? Pn_gov_kgf/1.67 : 0.9*Pn_gov_kgf)*nSec;
   const Mcx= (isASD ? Mnx_kgm/1.67    : 0.9*Mnx_kgm)*nSec;
   const Mcy= (isASD ? Mny_kgm/1.67    : 0.9*Mny_kgm)*nSec;
@@ -1274,8 +1274,8 @@ function calc(){
        ? `${f(Pap,0)}/${f(Pc,0)} + (8/9)(${f(Mxap,1)}/${f(Mcx,1)} + ${f(Myap,1)}/${f(Mcy,1)})`
        : `${f(Pap,0)}/(2·${f(Pc,0)}) + (${f(Mxap,1)}/${f(Mcx,1)} + ${f(Myap,1)}/${f(Mcy,1)})`)
      + ` &nbsp;[H1-1${prr>=0.2?'a':'b'}, ${isASD?'ASD Ω=1.67':'LRFD φ=0.90'}]`);
-  tx('ck_vx_sub', `${f(Vxap,0)} / ${f(Vcx,0)} &nbsp;[§G, ${isASD?'Vnx/1.67':'0.9·Vnx'} ×n=${f(nSec,0)}]`);
-  tx('ck_vy_sub', `${f(Vyap,0)} / ${f(Vcy,0)} &nbsp;[§G, ${isASD?'Vny/1.67':'0.9·Vny'} ×n=${f(nSec,0)}]`);
+  tx('ck_vx_sub', `${f(Vxap,0)} / ${f(Vcx,0)} &nbsp;[G, ${isASD?'Vnx/1.67':'0.9·Vnx'} ×n=${f(nSec,0)}]`);
+  tx('ck_vy_sub', `${f(Vyap,0)} / ${f(Vcy,0)} &nbsp;[G, ${isASD?'Vny/1.67':'0.9·Vny'} ×n=${f(nSec,0)}]`);
 
   // Failure mode cards
   function fmTag(cls){

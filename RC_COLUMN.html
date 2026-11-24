@@ -1209,7 +1209,7 @@ function calculate() {
   document.getElementById('res-R').textContent = dTxt(magX) + ' / ' + dTxt(magY);
 
 
-  // ---- CONFINEMENT / TRANSVERSE REINFORCEMENT (ACI 318-19 §25.7, §18.7.5) ----
+  // ---- CONFINEMENT / TRANSVERSE REINFORCEMENT (ACI 318-19 25.7, 18.7.5) ----
   const confRows = [];   // { label, value, ok: true | false | null }
   const addC = (label, value, ok) => confRows.push({ label, value, ok });
   const ds = i.RB / 10, dbar = i.DB / 10, minDim = Math.min(i.H, i.W);
