@@ -391,7 +391,7 @@ canvas,svg{display:block;border-radius:4px}
     <div class="fld"><label><span class="sy">fc'</span> กำลังอัดคอนกรีต</label><div class="iw"><input type="number" id="fc" value="240" min="1" class="hi"><span class="un">ksc</span></div></div>
     <div class="fld"><label><span class="sy">β₁</span></label><div class="iw"><input type="number" id="beta1" readonly><span class="un">—</span></div></div>
     <div class="fld"><label><span class="sy">Ec</span> Young's Modulus</label><div class="iw"><input type="number" id="Ec" readonly><span class="un">ksc</span></div></div>
-    <div class="fld"><label><span class="sy">φ</span> Strength Reduction</label><div class="iw"><input type="number" id="phi" value="0.9" step="0.01" class="hi"><span class="un">—</span></div></div>
+    <div class="fld"><label><span class="sy">φ</span> Strength Reduction</label><div class="iw"><input type="text" id="phi" value="อัตโนมัติ (εt)" readonly title="ACI 318-19 Table 21.2.2: φ = 0.65–0.90 ตาม εt"><span class="un">—</span></div></div>
   </div>
 
   <!-- Main Steel -->
@@ -692,7 +692,7 @@ const sA=(n,dmm)=>PI*(dmm/10)**2/4*n;
 ['fc','mainGrade','stirrupGrade'].forEach(id=>g(id).addEventListener('input',upd));
 
 // Auto-calculate on any input change
-const autoCalcIds = ['H','W','c','fc','phi','mainGrade','spacing_layer','stirrupGrade','col_stirrup_dia','col_stirrup_sp','col_top1_n','col_top1_d','col_top2_n','col_top2_d','col_top3_n','col_top3_d','col_bot1_n','col_bot1_d','col_bot2_n','col_bot2_d','col_bot3_n','col_bot3_d','mid_stirrup_dia','mid_stirrup_sp','mid_top1_n','mid_top1_d','mid_top2_n','mid_top2_d','mid_top3_n','mid_top3_d','mid_bot1_n','mid_bot1_d','mid_bot2_n','mid_bot2_d','mid_bot3_n','mid_bot3_d'];
+const autoCalcIds = ['H','W','c','fc','mainGrade','spacing_layer','stirrupGrade','col_stirrup_dia','col_stirrup_sp','col_top1_n','col_top1_d','col_top2_n','col_top2_d','col_top3_n','col_top3_d','col_bot1_n','col_bot1_d','col_bot2_n','col_bot2_d','col_bot3_n','col_bot3_d','mid_stirrup_dia','mid_stirrup_sp','mid_top1_n','mid_top1_d','mid_top2_n','mid_top2_d','mid_top3_n','mid_top3_d','mid_bot1_n','mid_bot1_d','mid_bot2_n','mid_bot2_d','mid_bot3_n','mid_bot3_d'];
 autoCalcIds.forEach(id => {
   const el = g(id);
   if (el) el.addEventListener('input', () => calculate());
@@ -719,7 +719,6 @@ function calc(pfx,isTop){
   const c  = parseFloat(g('c').value);           // K5
   const fc = parseFloat(g('fc').value);          // K7
   const b1 = parseFloat(g('beta1').value);       // K20
-  const phi= parseFloat(g('phi').value);         // K21
   const Fy = parseFloat(g('mainFy').value);      // K14
   const Fys= parseFloat(g('stirrupFy').value);   // K18
   const sl = parseFloat(g('spacing_layer').value); // K11
@@ -775,80 +774,70 @@ function calc(pfx,isTop){
   const As  = tN.reduce((s,n,i)=>s+sA(n,tD[i]),0);  // M32/M49
   const As2 = cN.reduce((s,n,i)=>s+sA(n,cD[i]),0);  // M37/M44
 
-  // ─── ρ, ρ' ────────────────────────────────────────────────────
-  // K53=M32/(K4*R32)  K54=M37/(K4*R32)
-  // K71=M49/(K4*R49)  K72=M44/(K4*R49)
+  // ═════════ ACI 318-19 — strain compatibility (ksc, cm, kg) ═════════
+  const Es = 2.04e6, ecu = 0.003, ety = Fy / Es;
   const rho  = As  / (W*d);
   const rho2 = As2 / (W*d);
-  const rhob   = b1*0.85*fc*6120 / (Fy*(6120+Fy));  // K22
-  const rhomin = 14/Fy;                              // K24
-
-  // ─── (ρ−ρ')min ────────────────────────────────────────────────
-  // K55 = 0.85*K20*(K7*R37*6120 / (K14*R32*(6120-K14)))
-  // K73 = 0.85*K20*(K7*R44*6120 / (K14*R49*(6120-K14)))
-  const rdmin = 0.85*b1 * (fc*dp*6120) / (Fy*d*(6120-Fy));
-  const rd    = rho - rho2;           // K56/K74
-  const mode  = rd>=rdmin ? 1 : 2;   // K57/K75
-
-  // ─── Quadratic (Mode 2) ───────────────────────────────────────
-  // Col Q54 = K20*K7*K4*K20 = b1²·fc·W
-  // Mid Q72 = 0.85*K7*K4*K20 = 0.85·fc·W·b1
-  // ทั้งคู่เท่ากันเมื่อ b1=0.85 → ใช้สูตรตรงจาก Excel
-  const Aq_col = b1*fc*W*b1;          // Q54 = K20·K7·K4·K20
-  const Aq_mid = 0.85*fc*W*b1;        // Q72 = 0.85·K7·K4·K20
-  const Aq = isTop ? Aq_col : Aq_mid;
-
-  // Q55/Q73 = 6120*As2 - Fy*As
-  const Bq = 6120*As2 - Fy*As;
-  // Q56 = -6120*M37*R37   (comp-area × comp-depth)
-  // Q74 = -6120*R44*M44   (same form)
-  const Cq = -6120*As2*dp;
-
-  const disc = Math.sqrt(Math.max(Bq**2 - 4*Aq*Cq, 0));
-  const cv = Math.max((-Bq+disc)/(2*Aq), (-Bq-disc)/(2*Aq)); // W56/W74 = MAX(c1,c2)
-
-  // ─── Mode 1 ───────────────────────────────────────────────────
-  // W55/W73 = (As-As2)*Fy / (0.85*fc*W)   → a
-  // Z55/Z73 = W55/b1                       → c
-  // T55/T73 = Fy                            → fs'
-  // AA55 = ((As-As2)*Fy*(d-0.5*a) + As2*Fy*(d-dp)) / 100 * phi
-  const a1  = (As-As2)*Fy / (0.85*fc*W);   // W55/W73
-  const c1v = a1/b1;                        // Z55/Z73
-  const phiMn1 = phi * ((As-As2)*Fy*(d-0.5*a1) + As2*Fy*(d-dp)) / 100;
-
-  // ─── Mode 2 ───────────────────────────────────────────────────
-  // T56/T74 = ABS(W56-R37)*6120/W56  → fs' ใช้ c (W56) ไม่ใช่ a
-  // AA56/AA74 = (b1*fc*W*cv*b1*(d-0.5*cv*b1) + As2*T56*(d-dp)) / 100 * phi
-  const fs2_m2 = Math.abs(cv-dp)*6120/cv;  // T56/T74
-  const phiMn2 = phi * (b1*fc*W*cv*b1*(d-0.5*cv*b1) + As2*fs2_m2*(d-dp)) / 100;
-
-  let ao, co, fs2o, phiMn;
-  if(mode===1){
-    ao=a1; co=c1v; fs2o=Fy; phiMn=phiMn1;
-  } else {
-    ao=cv*b1; co=cv; fs2o=fs2_m2; phiMn=phiMn2;
+  const rhob   = b1*0.85*fc*6120 / (Fy*(6120+Fy));                  // info only
+  const rhomin = Math.max(0.8*Math.sqrt(fc), 14) / Fy;               // 9.6.1.2 (ksc)
+  // steel layers (depth from compression face, area)
+  const tLay = [AF0, AF1, AF2].map((y,k)=>({ y, As: sA(tN[k], tD[k]) })).filter(L=>L.As>0 && L.y>0);
+  const cLay = [BF0, BF1, BF2].map((y,k)=>({ y, As: sA(cN[k], cD[k]) })).filter(L=>L.As>0 && L.y>0);
+  const lays = cLay.concat(tLay);
+  const dt   = tLay.length ? Math.max(...tLay.map(L=>L.y)) : d;      // extreme tension steel
+  function forces(cc){
+    const a  = Math.min(b1*cc, H);
+    const Cc = 0.85*fc*W*a;
+    let F = Cc, Mtop = Cc*a/2;                                       // compression +, moment about top
+    const fsL = lays.map(L=>{
+      const fs  = Math.max(-Fy, Math.min(Fy, ecu*(cc-L.y)/cc*Es));   // + = compression
+      const net = L.As*(fs - (L.y < a ? 0.85*fc : 0));
+      F += net; Mtop += net*L.y;
+      return fs;
+    });
+    return { a, Cc, F, Mtop, fsL };
   }
+  let lo = 1e-4*H, hi = H;
+  for (let k = 0; k < 100; k++) { const m = (lo+hi)/2; if (forces(m).F > 0) hi = m; else lo = m; }
+  const cv = (lo+hi)/2, FR = forces(cv);
+  const ao = FR.a, co = cv;
+  // Mn = couple: Σ(tension)·y − Σ(compression)·y  →  −Mtop (ΣF = 0)
+  const Mn  = -FR.Mtop;                                              // kg-cm
+  const et  = ecu*(dt - cv)/cv;
+  const phi = et <= ety ? 0.65 : (et >= ety + 0.003 ? 0.90 : 0.65 + 0.25*(et - ety)/0.003);   // 21.2.2
+  const phiMn = phi*Mn/100;                                          // kg-m
+  const fs2o = cLay.length ? FR.fsL[0] : 0;                          // compression steel stress (layer 1)
+  const mode = cLay.length && fs2o >= Fy - 1e-6 ? 1 : 2;             // 1 = A's yields, 2 = A's not yielding
+  const rd    = rho - rho2;
+  const rdmin = 0.85*b1*(fc*dp*6120)/(Fy*d*(6120-Fy));              // info: (ρ−ρ')min for A's to yield
 
-  // ─── Shear ────────────────────────────────────────────────────
-  // K62/K80 = K20*0.53*SQRT(K7)*K4*d
-  // K63/K81 = PI()*(J_stirrup/10)^2/4   (1 leg)
-  // K64/K82 = K63*K18*d/M_sp*K20*2
-  // K65/K83 = K64+K62
-  const As1leg = PI*sDia**2/4;                 // K63/K81
-  const phiVc  = b1*0.53*Math.sqrt(fc)*W*d;   // K62/K80
-  const phiVs  = As1leg*Fys*d/sSp*b1*2;       // K64/K82
-  const phiVb  = phiVc + phiVs;               // K65/K83
+  // ─── Shear — ACI 318-19 §22.5 (φ = 0.75) ───────────────────────
+  const As1leg = PI*sDia**2/4;
+  const Av    = 2*As1leg;                                            // 2-leg stirrup
+  const sqfc  = Math.sqrt(fc);
+  const Avmin = Math.max(0.2*sqfc, 3.5)*W*sSp/Fys;                   // 9.6.3.4
+  let vcCoef, vcMethod, lamS = 1;
+  if (Av >= Avmin) { vcCoef = 0.53*sqfc; vcMethod = 'a'; }           // Table 22.5.5.1(a)
+  else { lamS = Math.min(1, Math.sqrt(2/(1 + d/25.4))); vcCoef = 2.12*lamS*Math.cbrt(rho)*sqfc; vcMethod = 'c'; }
+  const Vc    = Math.min(vcCoef, 1.33*sqfc)*W*d;                     // kg
+  const Vs    = Av*Fys*d/sSp;                                        // kg
+  const VsMax = 2.12*sqfc*W*d;                                       // 22.5.1.2
+  const sMax  = Vs <= 1.06*sqfc*W*d ? Math.min(d/2, 60) : Math.min(d/4, 30);   // 9.7.6.2.2
+  const phiVc = 0.75*Vc;
+  const phiVs = 0.75*Vs;
+  const phiVb = phiVc + phiVs;
 
-  // ─── Behavior ─────────────────────────────────────────────────
-  // K67 = IF(AND(rho>rhomin, rho>rhob), "Concrete Crushing",
-  //         IF(AND(rho>rhomin, rho<rhob), "Steel Yielding", "Required more..."))
+  // ─── Behavior (ACI 21.2.2, 9.3.3.1, 9.6.1) ─────────────────────
   let beh;
-  if(rho>rhomin && rho>rhob)      beh='Failure Mode: Concrete Crushing';
-  else if(rho>rhomin && rho<rhob) beh='Failure Mode: Steel Yielding';
-  else beh=isTop?'Required more Top Main Steel':'Required more Bottom Main Steel';
-  const cbeh = rd>=rdmin ? 'Steel Compression Yielding' : 'Steel Compression Not Yielding';
+  if (rho < rhomin)            beh = (isTop ? 'Required more Top Main Steel' : 'Required more Bottom Main Steel') + ' (As < As,min)';
+  else if (et < 0.004)         beh = 'Not permitted: εt < 0.004 (ACI 9.3.3.1) — Concrete Crushing';
+  else if (et < ety + 0.003)   beh = 'Transition: Steel Yielding, φ < 0.90';
+  else                         beh = 'Tension-controlled: Steel Yielding';
+  const cbeh = !cLay.length ? 'No Compression Steel' : (mode === 1 ? 'Steel Compression Yielding' : 'Steel Compression Not Yielding');
+  const shearOK = Vs <= VsMax && sSp <= sMax;
 
-  return{As,As2,d,dp,rho,rho2,rhob,rhomin,rd,rdmin,mode,a:ao,c:co,fs2:fs2o,phiMn,phiVc,phiVs,phiVb,beh,cbeh};
+  return{As,As2,d,dp,dt,rho,rho2,rhob,rhomin,rd,rdmin,mode,a:ao,c:co,c_val:co,fs2:fs2o,et,ety,phi,Mn,phiMn,
+         Av,Avmin,vcMethod,lamS,Vc,Vs,VsMax,sMax,shearOK,phiVc,phiVs,phiVb,beh,cbeh,lays};
 }
 
 function fill(p,r){
@@ -869,7 +858,7 @@ function fill(p,r){
   else if(r.rho>r.rhob) re.className='v vy';
   else re.className='v vg';
 
-  g(`r${p}_mode`).textContent='Mode '+r.mode;
+  g(`r${p}_mode`).textContent=`εt = ${r.et.toFixed(4)} · φ = ${r.phi.toFixed(3)}`;
   g(`r${p}_a`).textContent=fmt(r.a);
   g(`r${p}_c`).textContent=fmt(r.c);
   g(`r${p}_fs2`).textContent=fmt(r.fs2,0);
@@ -963,7 +952,7 @@ function fillSteps(elId, r, pfx){
   const b1 =parseFloat(g('beta1').value);
   const Fy =parseFloat(g('mainFy').value);
   const Fys=parseFloat(g('stirrupFy').value);
-  const phi=parseFloat(g('phi').value);
+  const phi=r.phi;
   const W  =parseFloat(g('W').value);
   const H  =parseFloat(g('H').value);
   const cv =parseFloat(g('c').value);
@@ -1016,78 +1005,57 @@ function fillSteps(elId, r, pfx){
   );
 
   // ── 3. Steel Ratio ───────────────────────────────────────
-  const rhoOk = rho>=rhomin && rho<=rhob;
   html+=grp('③ Steel Ratio',
-    row('ρ  = As / (b·d)',`${f2(As)} / (${f2(W)}×${f2(d)})`,f4(rho),
-        rho>rhob?'warn':rhoOk?'ok':'bad')+
+    row('ρ  = As / (b·d)',`${f2(As)} / (${f2(W)}×${f2(d)})`,f4(rho), rho<rhomin?'bad':'ok')+
     row("ρ' = A's / (b·d)",`${f2(As2)} / (${f2(W)}×${f2(d)})`,f4(rho2))+
-    row('ρb','β₁·0.85·fc·6120 / (Fy·(6120+Fy))',f4(rhob))+
-    row('ρmin','14 / Fy',f4(rhomin))+
-    row("ρ − ρ'","—",f4(rd),rd>=rdmin?'ok':'bad')+
-    row("(ρ−ρ')min","0.85·β₁·(fc·d'·6120) / (Fy·d·(6120−Fy))",f4(rdmin))+
-    row('Mode', rd>=rdmin ? "ρ−ρ' ≥ (ρ−ρ')min" : "ρ−ρ' < (ρ−ρ')min", 'Mode '+mode,
-        mode===1?'ok':'warn',
-        mode===1
-          ? "Mode 1: หา a จาก force equilibrium"
-          : "Mode 2: แก้สมการกำลังสอง Ac²+Bc+C=0")
+    row('ρmin',"max(0.8√fc', 14) / Fy  (ACI 9.6.1.2)",f4(rhomin), rho<rhomin?'bad':'ok')+
+    row('ρb (อ้างอิง)','β₁·0.85·fc·6120 / (Fy·(6120+Fy))',f4(rhob))
   );
 
-  // ── 4. Neutral Axis ──────────────────────────────────────
-  if(mode===1){
-    html+=grp('④ Neutral Axis — Mode 1',
-      row('a','(As − A\'s)·Fy / (0.85·fc\'·b)',f2(ao)+' cm')+
-      row('c = a / β₁',`${f2(ao)} / ${b1}`,f2(co)+' cm')+
-      row("fs'","Fy  (Mode 1 → comp. steel yields)",f0(fs2)+' ksc',fs2>=Fy?'ok':'warn')
-    );
-  } else {
-    const A=0.85*b1*fc*W, B=6120*As2-Fy*As, C=-6120*As2*dp;
-    html+=grp('④ Neutral Axis — Mode 2 (Quadratic)',
-      row('A = 0.85·β₁·fc\'·b',`0.85×${b1}×${fc}×${W}`,f2(A))+
-      row('B = 6120·A\'s − Fy·As',`6120×${f2(As2)} − ${Fy}×${f2(As)}`,f2(B))+
-      row('C = −6120·A\'s·d\'',`−6120×${f2(As2)}×${f2(dp)}`,f2(C))+
-      row('c = (−B + √(B²−4AC)) / 2A','',f2(co)+' cm')+
-      row('a = c · β₁',`${f2(co)} × ${b1}`,f2(ao)+' cm')+
-      row("fs' = |c−d'|·6120 / c",`|${f2(co)}−${f2(dp)}|×6120/${f2(co)}`,f0(fs2)+' ksc',
-          fs2>=Fy?'ok':'warn',
-          fs2>=Fy?"fs' ≥ Fy → เหล็กรับแรงอัดคราก":"fs' < Fy → เหล็กรับแรงอัดยังไม่คราก")
-    );
-  }
+  // ── 4. Neutral Axis (strain compatibility) ───────────────
+  const layRows = r.lays.map((L,k)=>{
+    const fs = Math.max(-Fy, Math.min(Fy, 0.003*(co-L.y)/co*2.04e6));
+    return row(`ชั้นเหล็ก y = ${f2(L.y)} cm`, `As = ${f2(L.As)} cm² · fs = 0.003·Es·(c−y)/c ≤ Fy`, f0(fs)+' ksc', fs>0?'':'ok', fs>0?'รับแรงอัด':'รับแรงดึง');
+  }).join('');
+  html+=grp('④ Neutral Axis — Strain Compatibility (ACI 22.2)',
+    row('c','หาค่า c ที่ ΣF = 0: 0.85fc\'·b·β₁c + ΣAs,i(fs,i − 0.85fc\' ในบล็อก) = 0',f2(co)+' cm')+
+    row('a = β₁·c',`${b1} × ${f2(co)}`,f2(ao)+' cm')+
+    layRows+
+    row('dt (เหล็กดึงชั้นนอกสุด)','',f2(r.dt)+' cm')+
+    row('εt = 0.003·(dt − c)/c',`0.003×(${f2(r.dt)}−${f2(co)})/${f2(co)}`,r.et.toFixed(5), r.et>=0.004?'ok':'bad')+
+    row('εty = Fy / Es',`${Fy} / 2,040,000`,r.ety.toFixed(5))+
+    row('φ (Table 21.2.2)', r.et>=r.ety+0.003 ? 'εt ≥ εty + 0.003 → 0.90' : (r.et<=r.ety ? 'εt ≤ εty → 0.65' : '0.65 + 0.25(εt − εty)/0.003'), phi.toFixed(3), phi>=0.9?'ok':'warn')
+  );
 
   // ── 5. φMn ───────────────────────────────────────────────
   let html2 = '';
-  if(mode===1){
-    html2+=grp('⑤ กำลังรับโมเมนต์ φMn — Mode 1',
-      row('φMn',
-        "[(As−A's)·Fy·(d−a/2) + A's·Fy·(d−d')] / 100 · φ",
-        f0(Math.abs(phiMn))+' kg-m','hi')
-    );
-  } else {
-    html2+=grp('⑤ กำลังรับโมเมนต์ φMn — Mode 2',
-      row('φMn',
-        "[0.85·fc'·b·c·β₁·(d−0.5·c·β₁) + A's·fs'·(d−d')] / 100 · φ",
-        f0(Math.abs(phiMn))+' kg-m','hi')
-    );
-  }
+  html2+=grp('⑤ กำลังรับโมเมนต์ φMn',
+    row('Mn','Cc·(dt-arm) + ΣFs,i·arm (คู่แรงจากสมดุล)',f0(r.Mn/100)+' kg-m')+
+    row('φMn','φ × Mn',f0(Math.abs(phiMn))+' kg-m','hi')
+  );
 
   // ── 6. Shear ──────────────────────────────────────────────
   const sDia=parseFloat(g(pfx+'_stirrup_dia').value)/10;
   const sSp =parseFloat(g(pfx+'_stirrup_sp').value);
   const As1 =Math.PI*sDia**2/4;
-  html2+=grp('⑥ กำลังรับแรงเฉือน',
+  html2+=grp('⑥ กำลังรับแรงเฉือน (ACI 22.5, φ = 0.75)',
     row('Diameter stirrup','',f2(sDia*10)+' mm')+
-    row('As stirrup','π·(Φs/10)² / 4',f4(As1)+' cm²')+
-    row('Spacing @','',f2(sSp)+' cm')+
-    row('φVc','φ · 0.53 · √fc\' · b · d',f0(phiVc)+' kg')+
-    row('φVs','φ · As(1leg) · Fys · d / s · 2',f0(phiVs)+' kg')+
-    row('φVb = φVc + φVs','',f0(phiVb)+' kg','hi')
+    row('Av (2 ขา)','2 · π·(Φs/10)² / 4',f4(r.Av)+' cm²')+
+    row('Spacing @','',f2(sSp)+' cm', sSp<=r.sMax?'ok':'bad', `s,max = ${f2(r.sMax)} cm (ACI 9.7.6.2.2)`)+
+    row('Av,min',"max(0.2√fc', 3.5)·b·s / Fyt",f4(r.Avmin)+' cm²', r.Av>=r.Avmin?'ok':'warn', r.Av>=r.Avmin?'Av ≥ Av,min → Vc = 0.53√fc·b·d':'Av < Av,min → คิด size effect λs')+
+    row('Vc', r.vcMethod==='a' ? "0.53√fc' · b · d" : `2.12·λs·ρ^⅓·√fc'·b·d (λs = ${r.lamS.toFixed(3)})`, f0(r.Vc)+' kg')+
+    row('Vs','Av · Fyt · d / s',f0(r.Vs)+' kg', r.Vs<=r.VsMax?'':'bad', `Vs,max = 2.12√fc'·b·d = ${f0(r.VsMax)} kg`)+
+    row('φVc','0.75 · Vc',f0(phiVc)+' kg')+
+    row('φVs','0.75 · Vs',f0(phiVs)+' kg')+
+    row('φVn = φVc + φVs','',f0(phiVb)+' kg','hi')
   );
 
   // ── 7. Behavior ───────────────────────────────────────────
   html2+=grp('⑦ พฤติกรรมการวิบัติ',
     row('Failure Mode','',beh,
-        beh.includes('Crushing')?'warn':beh.includes('Yielding')?'ok':'bad')+
+        beh.startsWith('Tension')?'ok':beh.startsWith('Transition')?'warn':'bad')+
     row('Comp. Steel Behavior','',cbeh,
-        cbeh.includes('not')?'warn':'ok')
+        cbeh.includes('Not')?'warn':'ok')
   );
 
   g(elId).innerHTML=html;
@@ -1107,7 +1075,7 @@ function calculate(){
 }
 
 function resetDefaults(){
-  const def={H:50,W:25,c:3,fc:240,phi:0.9,spacing_layer:2,col_stirrup_dia:9,col_stirrup_sp:10,col_top1_n:2,col_top1_d:12,col_top2_n:2,col_top2_d:12,col_top3_n:2,col_top3_d:12,col_bot1_n:2,col_bot1_d:12,col_bot2_n:2,col_bot2_d:12,col_bot3_n:2,col_bot3_d:12,mid_stirrup_dia:9,mid_stirrup_sp:10,mid_top1_n:2,mid_top1_d:12,mid_top2_n:2,mid_top2_d:12,mid_top3_n:2,mid_top3_d:12,mid_bot1_n:2,mid_bot1_d:12,mid_bot2_n:2,mid_bot2_d:12,mid_bot3_n:2,mid_bot3_d:12};
+  const def={H:50,W:25,c:3,fc:240,spacing_layer:2,col_stirrup_dia:9,col_stirrup_sp:10,col_top1_n:2,col_top1_d:12,col_top2_n:2,col_top2_d:12,col_top3_n:2,col_top3_d:12,col_bot1_n:2,col_bot1_d:12,col_bot2_n:2,col_bot2_d:12,col_bot3_n:2,col_bot3_d:12,mid_stirrup_dia:9,mid_stirrup_sp:10,mid_top1_n:2,mid_top1_d:12,mid_top2_n:2,mid_top2_d:12,mid_top3_n:2,mid_top3_d:12,mid_bot1_n:2,mid_bot1_d:12,mid_bot2_n:2,mid_bot2_d:12,mid_bot3_n:2,mid_bot3_d:12};
   Object.entries(def).forEach(([k,v])=>{if(g(k))g(k).value=v;});
   g('mainGrade').value='SD40'; g('stirrupGrade').value='SR24'; upd(); showN('↺ Reset');
 }
