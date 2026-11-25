@@ -6,25 +6,25 @@
 <title>CAPACITY PILE CALCULATOR | Effective stress calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #1a1814;
-    --bg-panel: #221f1a;
-    --bg-input: #2a2620;
-    --ink: #ebe5d8;
-    --ink-dim: #a39c8c;
-    --ink-faint: #6b6557;
-    --accent: #d97757;
-    --accent-bright: #e8a07a;
+    --bg: #0f1117;
+    --bg-panel: #161b25;
+    --bg-input: #1c2333;
+    --ink: #ffffff;
+    --ink-dim: #b8c2d6;
+    --ink-faint: #7d8aa5;
+    --accent: #4a90d9;
+    --accent-bright: #7cb3ea;
     --soil-1: #8b6f47;
     --soil-2: #a68159;
     --soil-3: #6b5435;
     --water: #5b8aa6;
     --water-light: #7fa8c4;
-    --line: #3a3530;
+    --line: #2a3650;
     --danger: #c85a4a;
-    --grid: #2f2a23;
+    --grid: #222c3c;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
@@ -34,11 +34,11 @@
   body {
     background: var(--bg);
     color: var(--ink);
-    font-family: 'IBM Plex Sans Thai', 'Fraunces', serif;
+    font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
     line-height: 1.6;
     min-height: 100vh;
     background-image:
-      radial-gradient(circle at 15% 20%, rgba(217, 119, 87, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 15% 20%, rgba(74, 144, 217, 0.06) 0%, transparent 40%),
       radial-gradient(circle at 85% 80%, rgba(91, 138, 166, 0.05) 0%, transparent 40%);
   }
 
@@ -62,7 +62,7 @@
   }
 
   .title-block h1 {
-    font-family: 'Fraunces', serif;
+    font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
     font-weight: 800;
     font-size: 2.6rem;
     line-height: 1;
@@ -79,13 +79,13 @@
     color: var(--ink-dim);
     font-size: 0.95rem;
     margin-top: 8px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     letter-spacing: 0.02em;
   }
 
   .meta {
     text-align: right;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.78rem;
     color: var(--ink-faint);
     text-transform: uppercase;
@@ -151,7 +151,7 @@
     font-weight: 600;
   }
   .tab-btn .tab-num {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.72rem;
     color: var(--ink-faint);
     background: var(--bg-input);
@@ -160,7 +160,7 @@
   }
   .tab-btn.active .tab-num {
     color: var(--accent-bright);
-    background: rgba(232, 160, 122, 0.12);
+    background: rgba(124, 179, 234, 0.12);
   }
 
   .tab-panel { display: none; }
@@ -192,14 +192,14 @@
   }
 
   .panel-title {
-    font-family: 'Fraunces', serif;
+    font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
     font-size: 1.3rem;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
 
   .panel-num {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.75rem;
     color: var(--ink-faint);
     text-transform: uppercase;
@@ -223,7 +223,7 @@
   .input-group label {
     font-size: 0.8rem;
     color: var(--ink-dim);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     letter-spacing: 0.03em;
   }
 
@@ -238,7 +238,7 @@
     border: 1px solid var(--line);
     color: var(--ink);
     padding: 10px 12px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.95rem;
     border-radius: 3px;
     transition: border-color 0.15s, background 0.15s;
@@ -266,7 +266,7 @@
   }
 
   .layers-section h3 {
-    font-family: 'Fraunces', serif;
+    font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
     font-size: 1.05rem;
     font-weight: 600;
     margin-bottom: 12px;
@@ -284,7 +284,7 @@
   }
 
   .pile-section h3 {
-    font-family: 'Fraunces', serif;
+    font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 10px;
@@ -297,7 +297,7 @@
     background: var(--bg-input);
     border: 1px solid var(--line);
     border-radius: 3px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.76rem;
     color: var(--ink-dim);
     display: grid;
@@ -335,7 +335,7 @@
     border: 1px solid var(--line);
     color: var(--water-light);
     padding: 10px 12px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.88rem;
     border-radius: 3px;
     min-height: 40px;
@@ -355,7 +355,7 @@
     border-radius: 3px;
     padding: 12px 16px;
     margin-bottom: 18px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.82rem;
     color: var(--ink-dim);
     display: flex;
@@ -394,17 +394,17 @@
 
   .capacity-card-highlight {
     border-color: var(--accent);
-    background: rgba(217, 119, 87, 0.08);
+    background: rgba(74, 144, 217, 0.08);
   }
 
   .capacity-card-final {
     border-color: var(--accent-bright);
-    background: linear-gradient(135deg, rgba(217, 119, 87, 0.18), rgba(232, 160, 122, 0.08));
-    box-shadow: 0 0 0 1px rgba(232, 160, 122, 0.2);
+    background: linear-gradient(135deg, rgba(74, 144, 217, 0.18), rgba(124, 179, 234, 0.08));
+    box-shadow: 0 0 0 1px rgba(124, 179, 234, 0.2);
   }
 
   .cap-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.72rem;
     color: var(--ink-faint);
     text-transform: uppercase;
@@ -412,14 +412,14 @@
   }
 
   .cap-formula {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.85rem;
     color: var(--ink);
     padding: 4px 0;
   }
 
   .cap-detail {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.74rem;
     color: var(--ink-dim);
     line-height: 1.5;
@@ -427,7 +427,7 @@
   }
 
   .cap-value {
-    font-family: 'Fraunces', serif;
+    font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
     font-size: 1.7rem;
     font-weight: 600;
     line-height: 1;
@@ -435,7 +435,7 @@
   }
 
   .cap-value .unit {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.75rem;
     color: var(--ink-dim);
     margin-left: 4px;
@@ -447,7 +447,7 @@
   .cap-allow { color: var(--accent-bright); font-size: 2rem; }
 
   .cap-tons {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.85rem;
     color: var(--ink-dim);
     margin-top: 2px;
@@ -471,7 +471,7 @@
   }
 
   .layer-card-title {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.85rem;
     color: var(--accent-bright);
     font-weight: 500;
@@ -486,7 +486,7 @@
     height: 24px;
     border-radius: 3px;
     cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 1rem;
     line-height: 1;
     transition: all 0.15s;
@@ -572,7 +572,7 @@
     color: var(--ink);
   }
   .su-mode-opt.active {
-    background: rgba(232, 160, 122, 0.15);
+    background: rgba(124, 179, 234, 0.15);
     border-color: var(--accent-bright);
     color: var(--accent-bright);
     font-weight: 600;
@@ -657,7 +657,7 @@
     border: 1px solid var(--line);
     color: var(--ink);
     padding: 10px 18px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.82rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -705,7 +705,7 @@
   }
 
   .summary-card .label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.65rem;
     color: var(--ink-faint);
     text-transform: uppercase;
@@ -715,7 +715,7 @@
   }
 
   .summary-card .value {
-    font-family: 'Fraunces', serif;
+    font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
     font-size: 1.35rem;
     font-weight: 600;
     line-height: 1;
@@ -723,7 +723,7 @@
   }
 
   .summary-card .value .unit {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.7rem;
     color: var(--ink-dim);
     margin-left: 3px;
@@ -742,7 +742,7 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.78rem;
   }
 
@@ -773,7 +773,7 @@
   }
 
   tbody tr.boundary td {
-    background: rgba(217, 119, 87, 0.04);
+    background: rgba(74, 144, 217, 0.04);
   }
 
   tbody tr.water-table td {
@@ -818,7 +818,7 @@
     gap: 20px;
     flex-wrap: wrap;
     margin-top: 12px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.78rem;
     color: var(--ink-dim);
   }
@@ -843,7 +843,7 @@
     border-radius: 3px;
     padding: 14px 18px;
     margin-bottom: 24px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.9rem;
     color: var(--ink-dim);
     display: flex;
@@ -889,10 +889,10 @@
   .point-result {
     margin-top: 14px;
     padding: 14px;
-    background: rgba(217, 119, 87, 0.08);
+    background: rgba(74, 144, 217, 0.08);
     border: 1px solid var(--accent);
     border-radius: 3px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.85rem;
     line-height: 1.8;
     display: none;
@@ -914,7 +914,7 @@
     padding-top: 20px;
     border-top: 1px solid var(--line);
     color: var(--ink-faint);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.75rem;
     text-align: center;
     letter-spacing: 0.05em;
@@ -943,8 +943,8 @@
     #printRoot {
       display: block !important;
       background: white;
-      color: #1a1814;
-      font-family: 'IBM Plex Sans Thai', 'Fraunces', serif;
+      color: #0f1117;
+      font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
     }
 
     @page {
@@ -962,23 +962,23 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      color: #1a1814;
+      color: #0f1117;
     }
     .print-page:last-child { page-break-after: auto; }
 
     .print-header {
-      border: 1px solid #2a2620;
+      border: 1px solid #1c2333;
       padding: 6px 0;
       text-align: center;
       margin-bottom: 8mm;
     }
     .print-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
       font-size: 13pt;
       font-weight: 700;
       text-decoration: underline;
       text-underline-offset: 3px;
-      color: #1a1814;
+      color: #0f1117;
       letter-spacing: 0.02em;
     }
 
@@ -987,12 +987,12 @@
     .print-section-label {
       background: #c8b4d8;
       padding: 3px 10px;
-      font-family: 'Fraunces', serif;
+      font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
       font-weight: 600;
       font-size: 9.5pt;
       text-decoration: underline;
       text-underline-offset: 3px;
-      color: #2a2620;
+      color: #1c2333;
       margin-bottom: 4mm;
       display: inline-block;
     }
@@ -1002,7 +1002,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 9pt;
-      font-family: 'JetBrains Mono', 'IBM Plex Sans Thai', monospace;
+      font-family: 'IBM Plex Mono', 'IBM Plex Sans Thai', monospace;
     }
     .kv-table td {
       padding: 4px 8px;
@@ -1010,12 +1010,12 @@
     }
     .kv-table td.k {
       width: 22%;
-      color: #4a4438;
+      color: #334166;
     }
     .kv-table td.v {
       width: 28%;
       font-weight: 600;
-      color: #1a1814;
+      color: #0f1117;
     }
 
     /* Data tables (Soil Layer, Stress) */
@@ -1023,28 +1023,28 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 8.5pt;
-      font-family: 'JetBrains Mono', 'IBM Plex Sans Thai', monospace;
+      font-family: 'IBM Plex Mono', 'IBM Plex Sans Thai', monospace;
       margin-top: 2mm;
     }
     .data-table thead th {
-      border-bottom: 1.2pt solid #1a1814;
-      border-top: 1.2pt solid #1a1814;
+      border-bottom: 1.2pt solid #0f1117;
+      border-top: 1.2pt solid #0f1117;
       padding: 5px 6px;
       text-align: center;
       font-weight: 600;
-      font-family: 'Fraunces', serif;
+      font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
       font-size: 8.5pt;
-      color: #1a1814;
-      background: #f5f1e8;
+      color: #0f1117;
+      background: #ffffff;
     }
     .data-table tbody td {
       padding: 4px 6px;
       text-align: center;
-      border-bottom: 0.4pt solid #c0b8a8;
-      color: #1a1814;
+      border-bottom: 0.4pt solid #d0d8e6;
+      color: #0f1117;
     }
     .data-table tbody tr:last-child td {
-      border-bottom: 1.2pt solid #1a1814;
+      border-bottom: 1.2pt solid #0f1117;
     }
     .data-table tbody td:nth-child(2) { text-align: left; }
 
@@ -1056,10 +1056,10 @@
       margin-bottom: 3mm;
     }
     .chart-cell {
-      border: 0.6pt solid #c0b8a8;
+      border: 0.6pt solid #d0d8e6;
       border-radius: 2px;
       overflow: hidden;
-      background: #1a1814;
+      background: #0f1117;
       /* Fixed height so left and right cells match regardless of source aspect */
       height: 95mm;
       display: flex;
@@ -1072,10 +1072,10 @@
       object-fit: contain;
     }
     .chart-single {
-      border: 0.6pt solid #c0b8a8;
+      border: 0.6pt solid #d0d8e6;
       border-radius: 2px;
       overflow: hidden;
-      background: #1a1814;
+      background: #0f1117;
       margin-bottom: 2mm;
       /* Fixed height — page 3 has 3 charts that must fit on one A4 page.
          A4 usable height = 271mm (297mm - 14mm top - 12mm bottom margin).
@@ -1117,8 +1117,8 @@
       gap: 12px;
       padding: 4px 0;
       font-size: 8pt;
-      font-family: 'JetBrains Mono', monospace;
-      color: #4a4438;
+      font-family: 'IBM Plex Mono', monospace;
+      color: #334166;
     }
     .lg-item {
       display: inline-flex;
@@ -1140,47 +1140,47 @@
       margin-bottom: 4mm;
     }
     .cap-box {
-      border: 0.6pt solid #1a1814;
+      border: 0.6pt solid #0f1117;
       border-radius: 2px;
       padding: 3mm 4mm;
       font-size: 9pt;
-      font-family: 'JetBrains Mono', 'IBM Plex Sans Thai', monospace;
+      font-family: 'IBM Plex Mono', 'IBM Plex Sans Thai', monospace;
       background: #fafaf6;
     }
     .cap-box.highlight {
       background: #f5e8d8;
-      border: 1pt solid #1a1814;
+      border: 1pt solid #0f1117;
     }
     .cap-box-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
       font-weight: 700;
       font-size: 10pt;
       margin-bottom: 2mm;
-      color: #1a1814;
+      color: #0f1117;
       text-decoration: underline;
       text-underline-offset: 2px;
     }
     .cap-line {
       padding: 1.5px 0;
-      color: #2a2620;
+      color: #1c2333;
     }
-    .cap-line b { color: #1a1814; }
+    .cap-line b { color: #0f1117; }
     .cap-result {
       margin-top: 2mm;
       padding-top: 2mm !important;
-      border-top: 0.4pt solid #c0b8a8;
+      border-top: 0.4pt solid #d0d8e6;
       font-weight: 600;
-      color: #1a1814;
+      color: #0f1117;
     }
     .cap-result-big {
       margin-top: 2mm;
       padding-top: 2mm !important;
-      border-top: 0.6pt solid #1a1814;
+      border-top: 0.6pt solid #0f1117;
       font-weight: 700;
       font-size: 10pt;
     }
     .ton-tag {
-      color: #4a4438;
+      color: #334166;
       font-size: 9pt;
       font-weight: 600;
       margin-left: 4px;
@@ -1190,16 +1190,16 @@
       display: flex;
       gap: 18px;
       flex-wrap: wrap;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 9pt;
       padding: 3mm 4mm;
-      background: #f5f1e8;
-      border-left: 1.5pt solid #1a1814;
+      background: #ffffff;
+      border-left: 1.5pt solid #0f1117;
       margin-bottom: 3mm;
     }
     .group-formula {
       padding: 2mm 4mm;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 9pt;
       margin-bottom: 3mm;
     }
@@ -1207,18 +1207,18 @@
       margin-top: 2mm;
       font-weight: 700;
       font-size: 11pt;
-      color: #1a1814;
+      color: #0f1117;
     }
 
     .print-footer {
       margin-top: auto;
       padding-top: 4mm;
-      border-top: 0.4pt solid #c0b8a8;
+      border-top: 0.4pt solid #d0d8e6;
       display: flex;
       justify-content: space-between;
       font-size: 7.5pt;
-      font-family: 'JetBrains Mono', monospace;
-      color: #6b6557;
+      font-family: 'IBM Plex Mono', monospace;
+      color: #7d8aa5;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
@@ -1226,6 +1226,65 @@
     /* Improve print rendering */
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   }
+
+  /* ===== CivilToolsKit common look (navy theme, header bar, sidebar) ===== */
+  :root{
+    --bg:#0f1117; --bg-panel:#161b25; --bg-input:#1c2333; --ink:#ffffff; --ink-dim:#b8c2d6; --ink-faint:#7d8aa5;
+    --accent:#4a90d9; --accent-bright:#7cb3ea; --line:#2a3650; --grid:#222c3c; --danger:#e05252;
+  }
+  body{background:var(--bg)!important;background-image:none!important;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;font-size:13px;line-height:1.5}
+  .hdr{background:linear-gradient(135deg,#0d1520,#1a2540);border-bottom:1px solid #334166;padding:0 24px;display:flex;align-items:center;gap:14px;
+    height:52px;position:sticky;top:0;z-index:100;margin:0;flex-wrap:nowrap}
+  .hdr-logo{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#4a90d9;letter-spacing:.12em;text-transform:uppercase;border:1px solid #2563a8;padding:3px 9px;border-radius:3px;white-space:nowrap}
+  .hdr-title{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:#fff;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hdr-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap}
+  .hdr-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80;flex-shrink:0}
+  .btn-print{background:#2563a8;color:#fff;border:1px solid #4a90d9;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
+    letter-spacing:.1em;padding:6px 14px;cursor:pointer;text-transform:uppercase;margin-left:auto}
+  .btn-print:hover{background:#4a90d9}
+  .container.layout{display:flex;max-width:none;margin:0;padding:0;width:100%;align-items:flex-start}
+  .sidebar{width:360px;min-width:360px;flex-shrink:0;background:#161b25;border-right:1px solid #2a3650;position:sticky;top:52px;
+    height:calc(100vh - 52px);overflow-y:auto}
+  .sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:#334166}
+  .main{flex:1;min-width:0;max-width:1500px;padding:20px}
+  /* inputs stacked in one column inside the sidebar */
+  .sidebar .panel{border:none!important;border-radius:0!important;background:transparent!important;margin:0!important;padding:12px 14px!important;box-shadow:none!important}
+  .sidebar .input-row{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  .sidebar .input-row > div:empty{display:none}
+  .sidebar .pile-section{background:transparent!important;border:none!important;padding:0!important;margin-top:10px!important}
+  .sidebar .pile-section h3, .sidebar h3{font-family:'IBM Plex Mono',monospace!important;font-size:9px!important;font-weight:600!important;letter-spacing:.18em!important;
+    text-transform:uppercase!important;color:#4a90d9!important;margin:14px 0 10px!important;display:flex;align-items:center;gap:8px}
+  .sidebar .pile-section h3::after, .sidebar h3::after{content:'';flex:1;height:1px;background:#334166}
+  /* panels → section blocks */
+  .panel{background:#161b25!important;border:1px solid #2a3650!important;border-radius:6px!important;box-shadow:none!important}
+  .panel-header{background:#1c2333;border-bottom:1px solid #2a3650!important;margin:-20px -20px 16px!important;padding:7px 14px!important;align-items:center!important;
+    display:flex;align-items:center;justify-content:flex-start!important;gap:10px;border-radius:6px 6px 0 0}
+  .sidebar input,.sidebar select,.sidebar .tip-layer-display{background:#1c2333!important;border:1px solid #2a3650!important;color:#fff!important;font-size:13px!important;font-weight:600;padding:5px 10px!important;border-radius:4px!important}
+  .sidebar input:focus,.sidebar select:focus{outline:none;border-color:#4a90d9!important;background:#222c3c!important}
+  .sidebar label{font-size:12px!important;color:#fff!important}
+  .panel-title{font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif!important;font-size:12px!important;font-weight:600!important;color:#fff!important;letter-spacing:0!important}
+  .panel-num{order:-1;font-family:'IBM Plex Mono',monospace!important;font-size:8px!important;font-weight:700!important;letter-spacing:.14em!important;text-transform:uppercase;
+    color:#fff!important;background:#2563a8;padding:2px 7px;border-radius:2px}
+  .sidebar .panel-header{margin:-12px -14px 12px!important;border-radius:0}
+  /* tabs like the other tools */
+  .tab-nav{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #2a3650;margin-bottom:14px;overflow:visible}
+  .tab-btn{background:#161b25!important;border:1px solid #2a3650!important;border-bottom:none!important;color:rgba(255,255,255,.6)!important;
+    font-family:'IBM Plex Mono',monospace!important;font-size:11px!important;font-weight:600!important;letter-spacing:.04em!important;padding:8px 15px!important;
+    border-radius:6px 6px 0 0!important;margin-bottom:0!important;text-transform:none!important}
+  .tab-btn:hover{color:#fff!important;background:#1c2333!important}
+  .tab-btn.active{color:#4a90d9!important;border-color:#2563a8!important;background:#1c2333!important;border-bottom:2px solid #4a90d9!important}
+  .tab-btn .tab-num{color:rgba(255,255,255,.35)!important;margin-right:6px}
+  .tab-btn.active .tab-num{color:#4a90d9!important}
+  input,select{font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
+  @media (max-width: 900px){
+    .container.layout{flex-direction:column}
+    .sidebar{position:static;width:100%;min-width:0;height:auto;border-right:none;border-bottom:1px solid #2a3650}
+    .hdr-sub{display:none}
+    .hdr{padding:0 10px;gap:8px}
+    .hdr-logo{display:none}
+    .main{padding:14px}
+  }
+  @media print{ .layout,.sidebar,.main,.hdr{display:none!important} }
 </style>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -1263,55 +1322,35 @@
 <script type="module" src="site-nav.js"></script>
 </head>
 <body>
-<div class="container">
 
   <!-- HEADER -->
-  <header>
-    <div class="title-block">
-      <h1>Pile Capacity Calculator</h1>
-      <div><span class="label"><br>Method:</span> Terzaghi's Principle</div>
-      <div><span class="label">Units:</span> kN/m³ &middot; m &middot; kPa</div>
+  <header class="hdr">
+    <div class="hdr-logo">PILE</div>
+    <div class="hdr-title">Pile Capacity Calculator — Effective Stress</div>
+    <span class="hdr-sub">kN/m³ · m · kPa</span>
+    <button id="printBtn" type="button" class="btn-print">⎙ Print</button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="user-name" style="font-size:11px;color:#b8c2d6;font-family:'IBM Plex Mono',monospace;"></span>
+      <button id="btn-logout" style="font-size:10px;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#8896b8;padding:3px 10px;cursor:pointer;font-family:'IBM Plex Mono',monospace;">LOGOUT</button>
     </div>
-    <div class="meta">
-
-      <div style="margin-top:10px;">
-        <button id="printBtn" type="button" style="
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.85rem;
-          font-weight: 600;
-          letter-spacing: 0.05em;
-          background: var(--accent);
-          color: var(--bg);
-          border: none;
-          padding: 9px 18px;
-          border-radius: 4px;
-          cursor: pointer;
-          text-transform: uppercase;
-          transition: background 0.15s ease;
-        " onmouseover="this.style.background='var(--accent-bright)'" onmouseout="this.style.background='var(--accent)'">
-          🖨 Print
-        </button>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
-      <span id="user-name" style="font-size:0.78rem;color:#e8d5a3;font-family:monospace;"></span>
-      <button id="btn-logout" style="font-size:0.78rem;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#8896b8;padding:3px 10px;cursor:pointer;font-family:monospace;">LOGOUT</button>
-    </div>
+    <div class="hdr-dot"></div>
   </header>
   
+<div class="container layout">
+  <aside class="sidebar" id="sidebarInputs"></aside>
+  <div class="main">
   <!-- TAB NAVIGATION -->
   <nav class="tab-nav" id="tabNav">
-    <button class="tab-btn active" data-tab="1"><span class="tab-num">01</span>Input Parameters</button>
-    <button class="tab-btn" data-tab="2"><span class="tab-num">02</span>Input Soil Layers</button>
-    <button class="tab-btn" data-tab="3"><span class="tab-num">03</span>Soil Profile &amp; Stress</button>
-    <button class="tab-btn" data-tab="4"><span class="tab-num">04</span>Reference Curves</button>
-    <button class="tab-btn" data-tab="5"><span class="tab-num">05</span>Pile Profiles</button>
-    <button class="tab-btn" data-tab="6"><span class="tab-num">06</span>Capacity</button>
+    <button class="tab-btn active" data-tab="2"><span class="tab-num">01</span>Soil Layers</button>
+    <button class="tab-btn" data-tab="3"><span class="tab-num">02</span>Soil Profile &amp; Stress</button>
+    <button class="tab-btn" data-tab="4"><span class="tab-num">03</span>Reference Curves</button>
+    <button class="tab-btn" data-tab="5"><span class="tab-num">04</span>Pile Profiles</button>
+    <button class="tab-btn" data-tab="6"><span class="tab-num">05</span>Capacity</button>
   </nav>
 
   <!-- Empty tab content containers (JS moves sections into them at init) -->
-  <div class="tab-panel active" data-tab="1" id="tabContent1"></div>
-  <div class="tab-panel" data-tab="2" id="tabContent2"></div>
+  <div class="tab-panel" data-tab="1" id="tabContent1"></div>
+  <div class="tab-panel active" data-tab="2" id="tabContent2"></div>
   <div class="tab-panel" data-tab="3" id="tabContent3"></div>
   <div class="tab-panel" data-tab="4" id="tabContent4"></div>
   <div class="tab-panel" data-tab="5" id="tabContent5"></div>
@@ -1378,7 +1417,7 @@
 
         <!-- PILE GROUP CONFIGURATION -->
         <div style="margin-top:14px; padding-top:14px; border-top:1px dashed var(--line);">
-          <h3 style="font-family:'Fraunces',serif; font-size:0.95rem; font-weight:600; margin-bottom:10px; color:var(--ink-dim);">
+          <h3 style="font-family:'IBM Plex Sans Thai',serif; font-size:0.95rem; font-weight:600; margin-bottom:10px; color:var(--ink-dim);">
             Pile Group Configuration
           </h3>
           <div class="input-row" style="grid-template-columns: 1fr 1fr 1fr;">
@@ -1518,7 +1557,7 @@
           <div class="legend">
             <div class="legend-item"><span class="legend-swatch" style="background:#a68159"></span>σ (Total Stress)</div>
             <div class="legend-item"><span class="legend-swatch" style="background:#7fa8c4"></span>u (Pore Pressure)</div>
-            <div class="legend-item"><span class="legend-swatch" style="background:#e8a07a"></span>σ' (Effective Stress)</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:#7cb3ea"></span>σ' (Effective Stress)</div>
           </div>
         </div>
       </div>
@@ -1535,14 +1574,14 @@
       </p>
       <canvas id="adhesionCanvas" style="width:100%; height:380px; background:var(--bg-input); border:1px solid var(--line); border-radius:3px; display:block;"></canvas>
       <div class="legend">
-        <div class="legend-item"><span class="legend-swatch" style="background:#d97757"></span>Tomlinson (1957)</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#4a90d9"></span>Tomlinson (1957)</div>
         <div class="legend-item"><span class="legend-swatch" style="background:#7fa8c4"></span>Holmberg (1970) Bangkok Clay</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#e8a07a; border-radius:50%"></span>ค่า α ของชั้น Clay ในโครงการนี้</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#7cb3ea; border-radius:50%"></span>ค่า α ของชั้น Clay ในโครงการนี้</div>
       </div>
 
       <!-- Skin friction & End Bearing for Clay -->
       <div style="margin-top:24px; padding-top:20px; border-top:1px dashed var(--line);">
-        <h3 style="font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">Unit Skin Friction (α-method) &amp; End Bearing &mdash; Clay Layers</h3>
+        <h3 style="font-family:'IBM Plex Sans Thai',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">Unit Skin Friction (α-method) &amp; End Bearing &mdash; Clay Layers</h3>
         <p style="color:var(--ink-dim); font-size:0.85rem; margin-bottom:12px;">
           f<sub>s</sub> = α × S<sub>u</sub> (Tomlinson α-method) &middot; q<sub>p</sub> = N<sub>c</sub> × S<sub>u</sub> (Skempton, N<sub>c</sub>=9 for deep foundation)
         </p>
@@ -1579,12 +1618,12 @@
       <canvas id="nqCanvas" style="width:100%; height:420px; background:var(--bg-input); border:1px solid var(--line); border-radius:3px; display:block;"></canvas>
       <div class="legend">
         <div class="legend-item"><span class="legend-swatch" style="background:#c9a26b"></span>N<sub>q</sub> (Terzaghi 1943)</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#e8a07a; border-radius:50%"></span>ค่า N<sub>q</sub> ของชั้น Sand ในโครงการนี้</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#7cb3ea; border-radius:50%"></span>ค่า N<sub>q</sub> ของชั้น Sand ในโครงการนี้</div>
       </div>
 
       <!-- Skin friction & End Bearing for Sand -->
       <div style="margin-top:24px; padding-top:20px; border-top:1px dashed var(--line);">
-        <h3 style="font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">Unit Skin Friction (β-method) &amp; End Bearing &mdash; Sand Layers</h3>
+        <h3 style="font-family:'IBM Plex Sans Thai',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">Unit Skin Friction (β-method) &amp; End Bearing &mdash; Sand Layers</h3>
         <p style="color:var(--ink-dim); font-size:0.85rem; margin-bottom:12px;">
           f<sub>s</sub> = K<sub>0</sub> × σ'<sub>v,mid</sub> × tan(δ) ≤ f<sub>s,lim</sub> (β-method, ค่าจำกัดตาม API RP 2A) &middot; q<sub>p</sub> = σ'<sub>v,bottom</sub> × N<sub>q</sub> ≤ q<sub>p,lim</sub> (Terzaghi, ที่ก้นชั้น)
         </p>
@@ -1624,7 +1663,7 @@
       <div class="legend">
         <div class="legend-item"><span class="legend-swatch" style="background:#c9a26b"></span>f<sub>s</sub> in Sand (β-method)</div>
         <div class="legend-item"><span class="legend-swatch" style="background:#8a6a52"></span>f<sub>s</sub> in Clay (α-method)</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#e8a07a"></span>Cumulative Σf<sub>s</sub>×Δz (kN/m)</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#7cb3ea"></span>Cumulative Σf<sub>s</sub>×Δz (kN/m)</div>
       </div>
     </section>
 
@@ -1641,7 +1680,7 @@
       <div class="legend">
         <div class="legend-item"><span class="legend-swatch" style="background:#c9a26b"></span>Sand</div>
         <div class="legend-item"><span class="legend-swatch" style="background:#8a6a52"></span>Clay</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#1a1814; border-color:#444"></span>Pile</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#0f1117; border-color:#444"></span>Pile</div>
         <div class="legend-item"><span class="legend-swatch" style="background:#1947d1"></span>Water Table</div>
       </div>
     </section>
@@ -1717,7 +1756,7 @@
 
       <!-- Detailed breakdown table -->
       <div style="margin-top:24px;">
-        <h3 style="font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">Layer-by-Layer Breakdown (Skin Friction)</h3>
+        <h3 style="font-family:'IBM Plex Sans Thai',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">Layer-by-Layer Breakdown (Skin Friction)</h3>
         <div class="table-wrapper">
           <table id="pileCapTable">
             <thead>
@@ -1784,7 +1823,7 @@
 
       <!-- Block failure check (shown only if pile tip in clay) -->
       <div id="groupBlockSection" style="display:none; margin-top:20px;">
-        <h3 style="font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">
+        <h3 style="font-family:'IBM Plex Sans Thai',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">
           Block Failure Check (Pile Tip in Clay)
         </h3>
         <p style="color:var(--ink-dim); font-size:0.88rem; margin-bottom:10px;">
@@ -1821,8 +1860,8 @@
 
       <!-- Calculation trace -->
       <div style="margin-top:20px;">
-        <h3 style="font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">Calculation Trace</h3>
-        <div id="groupTrace" style="background:var(--bg-input); border:1px solid var(--line); border-radius:3px; padding:12px 16px; font-family:'JetBrains Mono', monospace; font-size:0.85rem; line-height:1.7; color:var(--ink-dim); white-space:pre-line;"></div>
+        <h3 style="font-family:'IBM Plex Sans Thai',serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;">Calculation Trace</h3>
+        <div id="groupTrace" style="background:var(--bg-input); border:1px solid var(--line); border-radius:3px; padding:12px 16px; font-family:'IBM Plex Mono', monospace; font-size:0.85rem; line-height:1.7; color:var(--ink-dim); white-space:pre-line;"></div>
       </div>
     </section>
 
@@ -1831,7 +1870,8 @@
   <footer>
     
   </footer>
-</div>
+  </div><!-- /.main -->
+</div><!-- /.layout -->
 
 <!-- PRINT REPORT ROOT - populated by buildPrintReport() before window.print() -->
 <div id="printRoot"></div>
@@ -2710,16 +2750,16 @@ function drawSoilProfile() {
     drawHatchPattern(ctx, padLeft, yCursor, drawW, layerH, typeInfo.hatch);
 
     // border
-    ctx.strokeStyle = '#3a3530';
+    ctx.strokeStyle = '#2a3650';
     ctx.lineWidth = 1;
     ctx.strokeRect(padLeft, yCursor, drawW, layerH);
 
     // Layer label — black text, larger size
     ctx.fillStyle = '#000';
-    ctx.font = '700 16px "JetBrains Mono", monospace';
+    ctx.font = '700 16px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`${layer.name}`, padLeft + 8, yCursor + 18);
-    ctx.font = '600 13px "JetBrains Mono", monospace';
+    ctx.font = '600 13px "IBM Plex Mono", monospace';
     ctx.fillStyle = '#000';
     ctx.fillText(`[${typeInfo.label}] ${layer.thickness}m | γ=${layer.gamma} | N=${layer.nspt ?? '-'}`, padLeft + 8, yCursor + 36);
 
@@ -2727,7 +2767,7 @@ function drawSoilProfile() {
   });
 
   // Depth axis
-  ctx.strokeStyle = '#6b6557';
+  ctx.strokeStyle = '#7d8aa5';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(padLeft - 5, padTop);
@@ -2735,8 +2775,8 @@ function drawSoilProfile() {
   ctx.stroke();
 
   // Depth ticks
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '10px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.textAlign = 'right';
   let cumDepth = 0;
   ctx.fillText('0.0', padLeft - 8, padTop + 4);
@@ -2755,8 +2795,8 @@ function drawSoilProfile() {
   ctx.translate(15, padTop + drawH / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '11px "IBM Plex Mono", monospace';
   ctx.fillText('DEPTH (m)', 0, 0);
   ctx.restore();
 
@@ -2788,15 +2828,15 @@ function drawSoilProfile() {
     ctx.fill();
 
     // WT label — dark navy blue text
-    ctx.font = '700 14px "JetBrains Mono", monospace';
+    ctx.font = '700 14px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillStyle = '#1947d1';
     ctx.fillText(`WT @ ${wt.toFixed(2)}m`, padLeft + drawW - 36, yWT - 6);
   }
 
   // Title
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '11px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   ctx.fillText('SOIL PROFILE', W / 2, 18);
 }
@@ -2842,7 +2882,7 @@ function drawStressDiagram() {
   const pxPerKpa = drawW / maxStress;
 
   // Grid
-  ctx.strokeStyle = '#2f2a23';
+  ctx.strokeStyle = '#222c3c';
   ctx.lineWidth = 0.5;
   const stressStep = maxStress / 5;
   for (let s = 0; s <= maxStress + 0.001; s += stressStep) {
@@ -2889,7 +2929,7 @@ function drawStressDiagram() {
 
   drawCurve('sigma', '#a68159');
   drawCurve('u', '#7fa8c4');
-  drawCurve('sigmaEff', '#e8a07a', 3);
+  drawCurve('sigmaEff', '#7cb3ea', 3);
 
   // Water table line
   const wt = lastResult.wt;
@@ -2906,7 +2946,7 @@ function drawStressDiagram() {
   }
 
   // Axes
-  ctx.strokeStyle = '#6b6557';
+  ctx.strokeStyle = '#7d8aa5';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(padLeft, padTop);
@@ -2921,8 +2961,8 @@ function drawStressDiagram() {
   ctx.stroke();
 
   // Stress ticks (top)
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '10px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   for (let s = 0; s <= maxStress + 0.001; s += stressStep) {
     const x = padLeft + s * pxPerKpa;
@@ -2948,8 +2988,8 @@ function drawStressDiagram() {
   });
 
   // Axis labels
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '11px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   ctx.fillText('STRESS (kPa)', padLeft + drawW / 2, padTop - 22);
 
@@ -2960,8 +3000,8 @@ function drawStressDiagram() {
   ctx.restore();
 
   // Title
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '11px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   ctx.fillText('STRESS DISTRIBUTION', W / 2, H - 8);
 }
@@ -3009,7 +3049,7 @@ function drawAdhesionCurve() {
   const pxPerAlpha = drawH / yMax;
 
   // Grid
-  ctx.strokeStyle = '#2f2a23';
+  ctx.strokeStyle = '#222c3c';
   ctx.lineWidth = 0.5;
   for (let x = 0; x <= xMax; x += 25) {
     const px = padLeft + x * pxPerKpa;
@@ -3042,12 +3082,12 @@ function drawAdhesionCurve() {
     ctx.stroke();
   }
 
-  plotCurve('tomlinson', '#d97757', 2.2);
+  plotCurve('tomlinson', '#4a90d9', 2.2);
   plotCurve('holmberg', '#7fa8c4', 2.2);
 
   // Curve labels
-  ctx.font = '600 11px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#d97757';
+  ctx.font = '600 11px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#4a90d9';
   ctx.textAlign = 'left';
   ctx.fillText('Tomlinson (1957)', padLeft + 65 * pxPerKpa, padTop + drawH - 0.55 * pxPerAlpha);
   ctx.fillStyle = '#7fa8c4';
@@ -3062,8 +3102,8 @@ function drawAdhesionCurve() {
     const py = padTop + drawH - alpha * pxPerAlpha;
 
     // marker
-    ctx.fillStyle = '#e8a07a';
-    ctx.strokeStyle = '#1a1814';
+    ctx.fillStyle = '#7cb3ea';
+    ctx.strokeStyle = '#0f1117';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(px, py, 6, 0, Math.PI * 2);
@@ -3071,16 +3111,16 @@ function drawAdhesionCurve() {
     ctx.stroke();
 
     // label
-    ctx.fillStyle = '#ebe5d8';
-    ctx.font = '600 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`L${i+1}: α=${alpha.toFixed(2)}`, px + 10, py - 6);
-    ctx.fillStyle = '#a39c8c';
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#b8c2d6';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.fillText(`Su=${su.toFixed(0)} kPa`, px + 10, py + 8);
 
     // dashed connectors to axes
-    ctx.strokeStyle = 'rgba(232, 160, 122, 0.3)';
+    ctx.strokeStyle = 'rgba(124, 179, 234, 0.3)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
@@ -3093,7 +3133,7 @@ function drawAdhesionCurve() {
   });
 
   // Axes
-  ctx.strokeStyle = '#6b6557';
+  ctx.strokeStyle = '#7d8aa5';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(padLeft, padTop);
@@ -3102,8 +3142,8 @@ function drawAdhesionCurve() {
   ctx.stroke();
 
   // X-axis labels (Su in kPa)
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '10px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   for (let x = 0; x <= xMax; x += 50) {
     const px = padLeft + x * pxPerKpa;
@@ -3126,8 +3166,8 @@ function drawAdhesionCurve() {
   }
 
   // Axis titles
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '11px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   ctx.fillText('Undrained Shear Strength S\u1d64 (kPa)', padLeft + drawW / 2, padTop + drawH + 36);
   ctx.save();
@@ -3368,7 +3408,7 @@ function drawSkinFrictionProfile() {
   const xCumToPx = (c) => padLeft + (c / cumMax) * drawW;
 
   // Grid
-  ctx.strokeStyle = '#2f2a23';
+  ctx.strokeStyle = '#222c3c';
   ctx.lineWidth = 0.5;
   // vertical (5 divisions for fs scale)
   for (let s = 0; s <= 5; s++) {
@@ -3421,8 +3461,8 @@ function drawSkinFrictionProfile() {
     ctx.stroke();
 
     // fs value label
-    ctx.fillStyle = '#ebe5d8';
-    ctx.font = '600 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     const labelY = (yTop + yBot) / 2 + 3;
     if (xRight - padLeft > 60) {
@@ -3433,7 +3473,7 @@ function drawSkinFrictionProfile() {
   });
 
   // ==== Plot cumulative line (uses xCumToPx) ====
-  ctx.strokeStyle = '#e8a07a';
+  ctx.strokeStyle = '#7cb3ea';
   ctx.lineWidth = 2.5;
   ctx.beginPath();
   cumPoints.forEach((p, idx) => {
@@ -3449,8 +3489,8 @@ function drawSkinFrictionProfile() {
     if (idx === 0 && p.cum === 0) return;
     const x = xCumToPx(p.cum);
     const y = yToPx(p.depth);
-    ctx.fillStyle = '#e8a07a';
-    ctx.strokeStyle = '#1a1814';
+    ctx.fillStyle = '#7cb3ea';
+    ctx.strokeStyle = '#0f1117';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI * 2);
@@ -3463,14 +3503,14 @@ function drawSkinFrictionProfile() {
     const lastP = cumPoints[cumPoints.length - 1];
     const x = xCumToPx(lastP.cum);
     const y = yToPx(lastP.depth);
-    ctx.fillStyle = '#e8a07a';
-    ctx.font = 'bold 11px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#7cb3ea';
+    ctx.font = 'bold 11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillText(`Total: ${runningCum.toFixed(2)} kN/m`, x - 8, y - 6);
   }
 
   // ==== Axes ====
-  ctx.strokeStyle = '#6b6557';
+  ctx.strokeStyle = '#7d8aa5';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(padLeft, padTop);
@@ -3483,8 +3523,8 @@ function drawSkinFrictionProfile() {
   ctx.stroke();
 
   // X axis (fs) — top, in sand/clay color (use neutral)
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '10px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   for (let s = 0; s <= 5; s++) {
     const v = (fsMax * s / 5);
@@ -3497,7 +3537,7 @@ function drawSkinFrictionProfile() {
   }
 
   // X axis (cumulative) — bottom, in accent color
-  ctx.fillStyle = '#e8a07a';
+  ctx.fillStyle = '#7cb3ea';
   for (let s = 0; s <= 5; s++) {
     const v = (cumMax * s / 5);
     const x = padLeft + (s / 5) * drawW;
@@ -3509,7 +3549,7 @@ function drawSkinFrictionProfile() {
   }
 
   // Depth axis (left)
-  ctx.fillStyle = '#a39c8c';
+  ctx.fillStyle = '#b8c2d6';
   ctx.textAlign = 'right';
   ctx.fillText('0.0', padLeft - 8, padTop + 4);
   data.forEach(d => {
@@ -3522,31 +3562,31 @@ function drawSkinFrictionProfile() {
   });
 
   // Layer name labels on right side
-  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.font = '9px "IBM Plex Mono", monospace';
   ctx.textAlign = 'left';
   data.forEach(d => {
     const yMid = yToPx(d.mid);
-    ctx.fillStyle = d.l.soilType === 'sand' ? '#c9a26b' : (d.l.soilType === 'clay' ? '#d4ad8d' : '#a39c8c');
+    ctx.fillStyle = d.l.soilType === 'sand' ? '#c9a26b' : (d.l.soilType === 'clay' ? '#d4ad8d' : '#b8c2d6');
     ctx.fillText(`L${d.i+1} ${d.l.name}`, padLeft + drawW + 6, yMid - 4);
-    ctx.fillStyle = '#a39c8c';
+    ctx.fillStyle = '#b8c2d6';
     ctx.fillText(`(${d.l.soilType})`, padLeft + drawW + 6, yMid + 8);
   });
 
   // Axis titles
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '11px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   // Top axis title
   ctx.fillStyle = '#c9a26b';
   ctx.fillText('Unit Skin Friction f\u209b (kPa)', padLeft + drawW / 2, padTop - 26);
   // Bottom axis title
-  ctx.fillStyle = '#e8a07a';
+  ctx.fillStyle = '#7cb3ea';
   ctx.fillText('Cumulative Σf\u209b × Δz (kN/m)', padLeft + drawW / 2, padTop + drawH + 32);
   // Y axis title
   ctx.save();
   ctx.translate(18, padTop + drawH / 2);
   ctx.rotate(-Math.PI / 2);
-  ctx.fillStyle = '#a39c8c';
+  ctx.fillStyle = '#b8c2d6';
   ctx.fillText('Depth (m)', 0, 0);
   ctx.restore();
 }
@@ -3626,7 +3666,7 @@ function drawEndBearingProfile() {
   const xQpToPx = (qp) => padLeft + (qp / qpMax) * drawW;
 
   // Grid
-  ctx.strokeStyle = '#2f2a23';
+  ctx.strokeStyle = '#222c3c';
   ctx.lineWidth = 0.5;
   for (let s = 0; s <= 5; s++) {
     const x = padLeft + (s / 5) * drawW;
@@ -3679,8 +3719,8 @@ function drawEndBearingProfile() {
     ctx.stroke();
 
     // qp value label inside bar
-    ctx.fillStyle = '#ebe5d8';
-    ctx.font = '600 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     const labelY = (yTop + yBot) / 2 + 3;
     if (xRight - padLeft > 90) {
@@ -3691,7 +3731,7 @@ function drawEndBearingProfile() {
 
     // Marker at the bottom (pile tip location for this scenario)
     ctx.fillStyle = '#7fa8c4';
-    ctx.strokeStyle = '#1a1814';
+    ctx.strokeStyle = '#0f1117';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(xRight, yBot, 5, 0, Math.PI * 2);
@@ -3700,7 +3740,7 @@ function drawEndBearingProfile() {
   });
 
   // ==== Axes ====
-  ctx.strokeStyle = '#6b6557';
+  ctx.strokeStyle = '#7d8aa5';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(padLeft, padTop);
@@ -3711,8 +3751,8 @@ function drawEndBearingProfile() {
   ctx.stroke();
 
   // X axis labels (qp)
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '10px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   for (let s = 0; s <= 5; s++) {
     const v = (qpMax * s / 5);
@@ -3737,31 +3777,31 @@ function drawEndBearingProfile() {
   });
 
   // Layer labels on right
-  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.font = '9px "IBM Plex Mono", monospace';
   ctx.textAlign = 'left';
   data.forEach(d => {
     const yMid = yToPx(d.mid);
-    ctx.fillStyle = d.l.soilType === 'sand' ? '#c9a26b' : (d.l.soilType === 'clay' ? '#d4ad8d' : '#a39c8c');
+    ctx.fillStyle = d.l.soilType === 'sand' ? '#c9a26b' : (d.l.soilType === 'clay' ? '#d4ad8d' : '#b8c2d6');
     ctx.fillText(`L${d.i+1} ${d.l.name}`, padLeft + drawW + 6, yMid - 10);
-    ctx.fillStyle = '#a39c8c';
+    ctx.fillStyle = '#b8c2d6';
     ctx.fillText(`(${d.l.soilType})`, padLeft + drawW + 6, yMid + 2);
     if (d.qp > 0) {
       ctx.fillStyle = '#7fa8c4';
-      ctx.font = '600 9px "JetBrains Mono", monospace';
+      ctx.font = '600 9px "IBM Plex Mono", monospace';
       ctx.fillText(`tip → qp=${d.qp.toFixed(0)}`, padLeft + drawW + 6, yMid + 14);
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
     }
   });
 
   // Axis titles
   ctx.fillStyle = '#c9a26b';
-  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.font = '11px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   ctx.fillText('Unit End Bearing q\u209a (kPa)', padLeft + drawW / 2, padTop - 22);
   ctx.save();
   ctx.translate(18, padTop + drawH / 2);
   ctx.rotate(-Math.PI / 2);
-  ctx.fillStyle = '#a39c8c';
+  ctx.fillStyle = '#b8c2d6';
   ctx.fillText('Depth (m)', 0, 0);
   ctx.restore();
 }
@@ -3829,7 +3869,7 @@ function drawPileSchematic() {
     drawHatchPattern(ctx, padLeft, yCursor, drawW, layerH, hatch);
 
     // Border
-    ctx.strokeStyle = '#3a3530';
+    ctx.strokeStyle = '#2a3650';
     ctx.lineWidth = 1;
     ctx.strokeRect(padLeft, yCursor, drawW, layerH);
 
@@ -3838,7 +3878,7 @@ function drawPileSchematic() {
 
   // === Sky / above-ground area (top boundary) ===
   // Draw ground surface line bold
-  ctx.strokeStyle = '#1a1814';
+  ctx.strokeStyle = '#0f1117';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(padLeft, padTop);
@@ -3846,7 +3886,7 @@ function drawPileSchematic() {
   ctx.stroke();
 
   // Ground hatching above (small triangles)
-  ctx.fillStyle = '#a39c8c';
+  ctx.fillStyle = '#b8c2d6';
   const groundY = padTop;
   for (let x = padLeft; x < padLeft + drawW - 8; x += 14) {
     ctx.beginPath();
@@ -3885,7 +3925,7 @@ function drawPileSchematic() {
     ctx.fill();
 
     // WT label — dark navy blue text
-    ctx.font = '700 15px "JetBrains Mono", monospace';
+    ctx.font = '700 15px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#1947d1';
     ctx.fillText(`▼ WT @ ${wt.toFixed(2)} m`, padLeft + 32, yWT - 4);
@@ -3899,7 +3939,7 @@ function drawPileSchematic() {
   const pileH = pileBotY - pileTopY;
 
   // ===== Always render as SOLID SQUARE pile (regardless of pile.type) =====
-  ctx.fillStyle = '#1a1814';
+  ctx.fillStyle = '#0f1117';
   ctx.fillRect(pileX, pileTopY, pileWidth, pileH);
   ctx.strokeStyle = '#666';
   ctx.lineWidth = 1.5;
@@ -3921,7 +3961,7 @@ function drawPileSchematic() {
   ctx.restore();
 
   // Pointed tip
-  ctx.fillStyle = '#1a1814';
+  ctx.fillStyle = '#0f1117';
   ctx.strokeStyle = '#666';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
@@ -3938,14 +3978,14 @@ function drawPileSchematic() {
   const iconY = pileTopY - 4;
 
   // Background for the icon
-  ctx.fillStyle = '#2a2620';
-  ctx.strokeStyle = '#3a3530';
+  ctx.fillStyle = '#1c2333';
+  ctx.strokeStyle = '#2a3650';
   ctx.lineWidth = 1;
   ctx.fillRect(iconX, iconY, iconSize, iconSize);
   ctx.strokeRect(iconX, iconY, iconSize, iconSize);
 
   // Draw the cross-section based on pile type
-  ctx.fillStyle = '#1a1814';
+  ctx.fillStyle = '#0f1117';
   ctx.strokeStyle = '#888';
   ctx.lineWidth = 1.2;
   const cx = iconX + iconSize / 2;
@@ -3954,27 +3994,27 @@ function drawPileSchematic() {
 
   if (pile.type === 'spun') {
     // Solid square (forced — pile is rendered as square regardless)
-    ctx.fillStyle = '#1a1814';
+    ctx.fillStyle = '#0f1117';
     ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
     ctx.strokeStyle = '#888';
     ctx.strokeRect(cx - r, cy - r, r * 2, r * 2);
   } else if (pile.type === 'ishape') {
     // Solid square (forced — pile is rendered as square regardless)
-    ctx.fillStyle = '#1a1814';
+    ctx.fillStyle = '#0f1117';
     ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
     ctx.strokeStyle = '#888';
     ctx.strokeRect(cx - r, cy - r, r * 2, r * 2);
   } else {
     // Solid square
-    ctx.fillStyle = '#1a1814';
+    ctx.fillStyle = '#0f1117';
     ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
     ctx.strokeStyle = '#888';
     ctx.strokeRect(cx - r, cy - r, r * 2, r * 2);
   }
 
   // Icon label below
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '8px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '8px "IBM Plex Mono", monospace';
   ctx.textAlign = 'left';
   const iconLabel = pile.type === 'spun' ? 'SPUN' :
                     pile.type === 'ishape' ? 'I-SHAPE' :
@@ -3982,18 +4022,18 @@ function drawPileSchematic() {
   ctx.fillText(iconLabel, iconX, iconY + iconSize + 10);
 
   // Pile top label (re-centered above pile)
-  ctx.fillStyle = '#ebe5d8';
-  ctx.font = '600 11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '600 11px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   ctx.fillText(escapeHtml(pile.dimText), pileX + pileWidth / 2, padTop - 22);
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '10px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.fillText(`L = ${tipDepth.toFixed(2)} m`, pileX + pileWidth / 2, padTop - 8);
 
   // Pile tip arrow + label on left side
   const arrowY = pileBotY;
-  ctx.strokeStyle = '#e8a07a';
-  ctx.fillStyle = '#e8a07a';
+  ctx.strokeStyle = '#7cb3ea';
+  ctx.fillStyle = '#7cb3ea';
   ctx.lineWidth = 1.5;
   ctx.setLineDash([3, 3]);
   ctx.beginPath();
@@ -4009,20 +4049,20 @@ function drawPileSchematic() {
   ctx.closePath();
   ctx.fill();
   // tip label
-  ctx.font = 'bold 10px "JetBrains Mono", monospace';
+  ctx.font = 'bold 10px "IBM Plex Mono", monospace';
   ctx.textAlign = 'right';
   ctx.fillText(`Pile Tip ${tipDepth.toFixed(2)}m`, padLeft - 34, arrowY + 4);
 
   // === Depth axis (left side) ===
-  ctx.strokeStyle = '#6b6557';
+  ctx.strokeStyle = '#7d8aa5';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(padLeft - 8, padTop);
   ctx.lineTo(padLeft - 8, padTop + drawH);
   ctx.stroke();
 
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '10px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.textAlign = 'right';
   // Tick at 0
   ctx.fillText('0.0', padLeft - 12, padTop + 4);
@@ -4059,7 +4099,7 @@ function drawPileSchematic() {
     const labelH = Math.min(layerH - 4, 92);
     const labelY = Math.max(yMid - labelH / 2, padTop);
 
-    ctx.fillStyle = 'rgba(42, 38, 32, 0.95)';
+    ctx.fillStyle = 'rgba(22, 27, 37, 0.95)';
     ctx.strokeStyle = l.soilType === 'sand' ? '#c9a26b' : '#8a6a52';
     ctx.lineWidth = 1.5;
     ctx.fillRect(labelX, labelY, labelW, labelH);
@@ -4067,13 +4107,13 @@ function drawPileSchematic() {
 
     // Layer header
     ctx.fillStyle = l.soilType === 'sand' ? '#e0c08a' : '#d4ad8d';
-    ctx.font = 'bold 11px "JetBrains Mono", monospace';
+    ctx.font = 'bold 11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`L${i+1} ${l.name} [${l.soilType.toUpperCase()}]`, labelX + 8, labelY + 14);
 
     // Properties
-    ctx.fillStyle = '#a39c8c';
-    ctx.font = '9.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#b8c2d6';
+    ctx.font = '9.5px "IBM Plex Mono", monospace';
     let txtY = labelY + 28;
     const lh = 12;
 
@@ -4100,8 +4140,8 @@ function drawPileSchematic() {
   });
 
   // === Title in top-left corner ===
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '11px "IBM Plex Mono", monospace';
   ctx.textAlign = 'left';
   ctx.fillText('// PILE SCHEMATIC', padLeft - 8, 24);
 
@@ -4321,10 +4361,10 @@ function renderPileGroup() {
   let warnHtml = '';
   let warnColor = '#7fa8c4';
   if (sd < 2.0) {
-    warnColor = '#d97757';
+    warnColor = '#4a90d9';
     warnHtml = `<strong style="color:${warnColor}">⚠ ระยะห่างน้อยเกินเกณฑ์ขั้นต่ำ</strong> &mdash; s/d = ${sd.toFixed(2)} (ควร ≥ 2.5)`;
   } else if (sd < 2.5) {
-    warnColor = '#e8a07a';
+    warnColor = '#7cb3ea';
     warnHtml = `<strong style="color:${warnColor}">⚠ ระยะใกล้เกณฑ์ขั้นต่ำ</strong> &mdash; s/d = ${sd.toFixed(2)} (แนะนำ ≥ 3.0)`;
   } else if (sd >= 6.0) {
     warnHtml = `<strong style="color:${warnColor}">ℹ ระยะห่างมาก</strong> &mdash; s/d = ${sd.toFixed(2)} (group effect แทบไม่มี, E<sub>g</sub> ≈ 1.0)`;
@@ -4433,9 +4473,9 @@ function renderPileGroup() {
     // Verdict
     const verdictEl = document.getElementById('groupBlockVerdict');
     if (QblockUlt < QultGroup) {
-      verdictEl.style.background = 'rgba(217, 119, 87, 0.15)';
-      verdictEl.style.borderLeft = '3px solid #d97757';
-      verdictEl.innerHTML = `<strong style="color:#d97757">⚠ Block failure controls!</strong> &mdash; Q<sub>block</sub> (${QblockUlt.toFixed(0)} kN) &lt; Q<sub>ult,group</sub> (${QultGroup.toFixed(0)} kN) → ใช้ Q<sub>block</sub> เป็น design capacity`;
+      verdictEl.style.background = 'rgba(74, 144, 217, 0.15)';
+      verdictEl.style.borderLeft = '3px solid #4a90d9';
+      verdictEl.innerHTML = `<strong style="color:#4a90d9">⚠ Block failure controls!</strong> &mdash; Q<sub>block</sub> (${QblockUlt.toFixed(0)} kN) &lt; Q<sub>ult,group</sub> (${QultGroup.toFixed(0)} kN) → ใช้ Q<sub>block</sub> เป็น design capacity`;
     } else {
       verdictEl.style.background = 'rgba(127, 168, 196, 0.12)';
       verdictEl.style.borderLeft = '3px solid #7fa8c4';
@@ -4525,7 +4565,7 @@ function drawNqCurve() {
   const yToPx = (phi) => padTop + drawH - (phi / yMax) * drawH;
 
   // Grid - vertical (log minor lines)
-  ctx.strokeStyle = '#2a2620';
+  ctx.strokeStyle = '#1c2333';
   ctx.lineWidth = 0.4;
   for (let dec = -1; dec <= 3; dec++) {
     for (let m = 1; m < 10; m++) {
@@ -4539,7 +4579,7 @@ function drawNqCurve() {
     }
   }
   // Grid - major decades
-  ctx.strokeStyle = '#3a3530';
+  ctx.strokeStyle = '#2a3650';
   ctx.lineWidth = 0.8;
   [0.5, 1, 2, 3, 5, 10, 20, 30, 50, 100, 200, 300, 500, 1000].forEach(v => {
     const px = xToPx(v);
@@ -4549,7 +4589,7 @@ function drawNqCurve() {
     ctx.stroke();
   });
   // Grid - horizontal (every 5°)
-  ctx.strokeStyle = '#2f2a23';
+  ctx.strokeStyle = '#222c3c';
   ctx.lineWidth = 0.5;
   for (let phi = 0; phi <= yMax; phi += 5) {
     const py = yToPx(phi);
@@ -4575,7 +4615,7 @@ function drawNqCurve() {
   ctx.stroke();
 
   // Curve label
-  ctx.font = 'bold 14px "Fraunces", serif';
+  ctx.font = 'bold 14px "IBM Plex Sans Thai", serif';
   ctx.fillStyle = '#e0c08a';
   ctx.textAlign = 'left';
   const labelPhi = 38;
@@ -4592,7 +4632,7 @@ function drawNqCurve() {
     const py = yToPx(phi);
 
     // dashed connectors
-    ctx.strokeStyle = 'rgba(232, 160, 122, 0.35)';
+    ctx.strokeStyle = 'rgba(124, 179, 234, 0.35)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
@@ -4604,8 +4644,8 @@ function drawNqCurve() {
     ctx.setLineDash([]);
 
     // marker
-    ctx.fillStyle = '#e8a07a';
-    ctx.strokeStyle = '#1a1814';
+    ctx.fillStyle = '#7cb3ea';
+    ctx.strokeStyle = '#0f1117';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(px, py, 6, 0, Math.PI * 2);
@@ -4613,17 +4653,17 @@ function drawNqCurve() {
     ctx.stroke();
 
     // label
-    ctx.fillStyle = '#ebe5d8';
-    ctx.font = '600 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`L${i+1}: φ=${phi}°`, px + 10, py - 6);
-    ctx.fillStyle = '#a39c8c';
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#b8c2d6';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.fillText(`Nq=${nq.toFixed(2)}`, px + 10, py + 8);
   });
 
   // Axes
-  ctx.strokeStyle = '#6b6557';
+  ctx.strokeStyle = '#7d8aa5';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(padLeft, padTop);
@@ -4632,8 +4672,8 @@ function drawNqCurve() {
   ctx.stroke();
 
   // X-axis labels (log)
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '10px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   [1, 2, 3, 5, 10, 20, 30, 50, 100, 200, 500, 1000].forEach(v => {
     if (v < xMin || v > xMax) return;
@@ -4657,8 +4697,8 @@ function drawNqCurve() {
   }
 
   // Axis titles
-  ctx.fillStyle = '#a39c8c';
-  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#b8c2d6';
+  ctx.font = '11px "IBM Plex Mono", monospace';
   ctx.textAlign = 'center';
   ctx.fillText('Values of N\u2092 (log scale)', padLeft + drawW / 2, padTop + drawH + 36);
   ctx.save();
@@ -4716,7 +4756,7 @@ window.addEventListener('resize', () => {
    - Hidden canvases can't measure size, so we redraw on tab show
 ============================================ */
 const TAB_LAYOUT = {
-  1: ['sec-input'],
+  sidebar: ['sec-input'],
   2: ['sec-soilLayers'],
   3: ['sec-stressBoundaries', 'sec-soilDiagram'],
   4: ['adhesionSection', 'nqSection'],
@@ -4727,7 +4767,7 @@ const TAB_LAYOUT = {
 function initTabs() {
   // 1) Move sections from source container into their tab panels
   Object.entries(TAB_LAYOUT).forEach(([tabId, sectionIds]) => {
-    const target = document.getElementById('tabContent' + tabId);
+    const target = document.getElementById(tabId === 'sidebar' ? 'sidebarInputs' : 'tabContent' + tabId);
     if (!target) return;
     sectionIds.forEach(sid => {
       const el = document.getElementById(sid);
@@ -4841,7 +4881,7 @@ function buildPrintReport() {
             off.height = c.height;
             const octx = off.getContext('2d');
             // Match --bg-input from the page theme so charts look identical to screen
-            octx.fillStyle = '#2a2620';
+            octx.fillStyle = '#1c2333';
             octx.fillRect(0, 0, off.width, off.height);
             octx.drawImage(c, 0, 0);
             return off.toDataURL('image/png');
@@ -5068,7 +5108,7 @@ function renderPrintHtml(ctx) {
         <div class="legend-row">
           <span class="lg-item"><span class="lg-swatch" style="background:#a68159"></span>Soil Layer</span>
           <span class="lg-item"><span class="lg-swatch" style="background:#5b8aa6"></span>Water Table</span>
-          <span class="lg-item"><span class="lg-swatch" style="background:#d97757"></span>σ (Total Stress)</span>
+          <span class="lg-item"><span class="lg-swatch" style="background:#4a90d9"></span>σ (Total Stress)</span>
           <span class="lg-item"><span class="lg-swatch" style="background:#7fa8c4"></span>u (Pore Pressure)</span>
           <span class="lg-item"><span class="lg-swatch" style="background:#c9a26b"></span>σ' (Effective Stress)</span>
         </div>
