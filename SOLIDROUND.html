@@ -242,6 +242,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="inp-row"><span class="lbl">P</span><span class="sym">=</span><input id="inp_P" type="text" value="0"><span class="unit">kg</span></div>
     <div class="inp-row"><span class="lbl">V<sub>x</sub></span><span class="sym">=</span><input id="inp_Vx" type="text" value="0"><span class="unit">kg</span></div>
     <div class="inp-row"><span class="lbl">V<sub>y</sub></span><span class="sym">=</span><input id="inp_Vy" type="text" value="0"><span class="unit">kg</span></div>
+    <div class="inp-row"><span class="lbl">T</span><span class="sym">=</span><input id="inp_T" type="text" value="0"><span class="unit">kg·m</span></div>
     <div class="inp-row"><span class="lbl">n</span><span class="sym">=</span><input id="inp_n" type="text" value="1"><span class="unit">ea</span></div>
   </div>
   <div class="sg">
@@ -250,7 +251,11 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">H1.1 &nbsp;P + M<sub>r</sub></span><span style="font-weight:700" id="ck_pm">0.000</span><span id="ck_pm_st" class="sec-tag tag-green">OK</span></div>
     <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_pm_sub">—</div>
     <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">Shear &nbsp;V<sub>r</sub> / φV<sub>n</sub></span><span style="font-weight:700" id="ck_v">0.000</span><span id="ck_v_st" class="sec-tag tag-green">OK</span></div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0;word-break:break-all" id="ck_v_sub">—</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_v_sub">—</div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">Torsion &nbsp;T<sub>r</sub> / φT<sub>n</sub></span><span style="font-weight:700" id="ck_t">0.000</span><span id="ck_t_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_t_sub">—</div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">H3.3 &nbsp;τ<sub>V</sub> + τ<sub>T</sub> ≤ 0.6F<sub>y</sub></span><span style="font-weight:700" id="ck_tv">0.000</span><span id="ck_tv_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0;word-break:break-all" id="ck_tv_sub">—</div>
   </div>
   <div class="sg">
     <div class="sg-title">หมายเหตุ</div>
@@ -858,6 +863,16 @@ function calculate(){
       : f(Pap,0)+'/(2·'+f(Pc,0)+') + '+f(Mr,1)+'/'+f(Mc,1))
     +'  [H1-1'+(prr>=0.2?'a':'b')+', '+(isASD?'ASD Ω=1.67':'LRFD φ=0.90')+', Mr=√(Mx²+My²)]');
   tx('ck_v_sub',f(Vres,0)+' / '+f(Vc,0)+'  [G6, '+(isASD?'Vn/1.67':'0.9·Vn')+' ×n='+f(nSec,0)+', Vr=√(Vx²+Vy²)]');
+
+  // ── Torsion — AISC 360-22 H3.3 (non-HSS): τ = τV + τT ≤ 0.6Fy (φ = 0.90 / Ω = 1.67) ──
+  const Tap=Math.abs(parseFloat(String((document.getElementById('inp_T')||{}).value||'0').replace(/,/g,'')))||0;
+  const Tc=(isASD?(Tn*kgf)/1.67:0.9*(Tn*kgf))*nSec;
+  const Trat=Tc>0?Tap/Tc:0;
+  sv('ck_t',Trat,3); ckB('ck_t_st',Trat);
+  tx('ck_t_sub',f(Tap,1)+' / '+f(Tc,1)+'  [Tn = 0.6Fy·C, '+(isASD?'Tn/1.67':'0.9·Tn')+' ×n='+f(nSec,0)+']');
+  const IR33=Vrat+Trat;
+  sv('ck_tv',IR33,3); ckB('ck_tv_st',IR33);
+  tx('ck_tv_sub','Vr/Vc + Tr/Tc = '+f(Vrat,3)+' + '+f(Trat,3)+'  [H3.3: รวมหน่วยแรงเฉือนสูงสุดจาก V และ T แบบอนุรักษ์]');
 
   // ── Failure mode tags ──
   // Tension

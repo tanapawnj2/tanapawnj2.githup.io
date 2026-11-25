@@ -266,6 +266,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="inp-row"><span class="lbl">P</span><span class="sym">=</span><input id="inp_P" type="text" value="0"><span class="unit">kg</span></div>
     <div class="inp-row"><span class="lbl">V<sub>x</sub></span><span class="sym">=</span><input id="inp_Vx" type="text" value="0"><span class="unit">kg</span></div>
     <div class="inp-row"><span class="lbl">V<sub>y</sub></span><span class="sym">=</span><input id="inp_Vy" type="text" value="0"><span class="unit">kg</span></div>
+    <div class="inp-row"><span class="lbl">T</span><span class="sym">=</span><input id="inp_T" type="text" value="0"><span class="unit">kg·m</span></div>
     <div class="inp-row"><span class="lbl">n</span><span class="sym">=</span><input id="inp_n" type="text" value="1"><span class="unit">ea</span></div>
   </div>
   <div class="sg">
@@ -276,11 +277,15 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">Shear &nbsp;V<sub>x</sub> / φV<sub>nx</sub></span><span style="font-weight:700" id="ck_vx">0.000</span><span id="ck_vx_st" class="sec-tag tag-green">OK</span></div>
     <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_vx_sub">—</div>
     <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">Shear &nbsp;V<sub>y</sub> / φV<sub>ny</sub></span><span style="font-weight:700" id="ck_vy">0.000</span><span id="ck_vy_st" class="sec-tag tag-green">OK</span></div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0;word-break:break-all" id="ck_vy_sub">—</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_vy_sub">—</div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">Torsion &nbsp;T<sub>r</sub> / φT<sub>n</sub></span><span style="font-weight:700" id="ck_t">0.000</span><span id="ck_t_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_t_sub">—</div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">H3.2 &nbsp;P + M + (V + T)²</span><span style="font-weight:700" id="ck_tv">0.000</span><span id="ck_tv_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0;word-break:break-all" id="ck_tv_sub">—</div>
   </div>
   <div class="sg">
     <div class="sg-title">หมายเหตุ</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 H1.1 (P + biaxial M) + G (shear แยก — AISC ไม่มีสมการ M-V interaction)<br>M<sub>x</sub>, M<sub>y</sub> = kg·m · P = แรงอัด (kg) · V<sub>y</sub> = แรงเฉือน (kg) · n = จำนวนหน้าตัด</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 H1.1 (P + biaxial M) + G (shear แยก — AISC ไม่มีสมการ M-V interaction)<br>M<sub>x</sub>, M<sub>y</sub> = kg·m · P = แรงอัด (kg) · V<sub>y</sub> = แรงเฉือน (kg) · n = จำนวนหน้าตัด<br>T = แรงบิดที่กระทำ (kg·m) · H3.2: V<sub>r</sub>/V<sub>c</sub> ใช้ค่ามากของแกน x, y</div>
   </div>
   </div>
 </div>
@@ -797,7 +802,7 @@ function setShape(s){
 }
 
 // ── Attach listeners ──
-['inp_H','inp_B','inp_t','inp_Fy','inp_Fu','inp_E','inp_Lx','inp_Ly','inp_Kx','inp_Ky','inp_Mx','inp_My','inp_P','inp_Vx','inp_Vy','inp_n'].forEach(id=>{
+['inp_H','inp_B','inp_t','inp_Fy','inp_Fu','inp_E','inp_Lx','inp_Ly','inp_Kx','inp_Ky','inp_Mx','inp_My','inp_P','inp_Vx','inp_Vy','inp_T','inp_n'].forEach(id=>{
   const el = document.getElementById(id);
   if (el) el.addEventListener('input', ()=>{
     if (SHAPE==='SQ' && id==='inp_H') document.getElementById('inp_B').value = document.getElementById('inp_H').value;
@@ -1276,6 +1281,23 @@ function calc(){
      + ` &nbsp;[H1-1${prr>=0.2?'a':'b'}, ${isASD?'ASD Ω=1.67':'LRFD φ=0.90'}]`);
   tx('ck_vx_sub', `${f(Vxap,0)} / ${f(Vcx,0)} &nbsp;[G, ${isASD?'Vnx/1.67':'0.9·Vnx'} ×n=${f(nSec,0)}]`);
   tx('ck_vy_sub', `${f(Vyap,0)} / ${f(Vcy,0)} &nbsp;[G, ${isASD?'Vny/1.67':'0.9·Vny'} ×n=${f(nSec,0)}]`);
+
+  // ── Torsion — AISC 360-22 H3.1 / H3.2 (HSS) ──
+  const Tap=Math.abs(parseFloat(String((document.getElementById('inp_T')||{}).value||'0').replace(/,/g,'')))||0;
+  const Tc=(isASD?Tn_kgm/1.67:0.9*Tn_kgm)*nSec;
+  const Trat=Tc>0?Tap/Tc:0;
+  sv('ck_t',Trat,3); ckB('ck_t_st',Trat);
+  tx('ck_t_sub',f(Tap,1)+' / '+f(Tc,1)+'  [H3.1, '+(isASD?'Tn/1.67':'0.9·Tn')+' ×n='+f(nSec,0)+']');
+  const pr32=Pc>0?Pap/Pc:0;
+  const IR32=pr32+((Mcx>0?Mxap/Mcx:0)+(Mcy>0?Myap/Mcy:0))+Math.pow(Math.max(Vrx,Vry)+Trat,2);
+  if(Trat<=0.2){
+    sv('ck_tv',IR32,3); ckB('ck_tv_st',IR32);
+    tx('ck_tv_sub','Tr ≤ 0.2Tc → ไม่ต้องรวมแรงบิด (H3.2) · ใช้ H1 แทน · ค่า H3-6 = '+f(IR32,3)+' (แสดงเพื่ออ้างอิง)');
+    const e=document.getElementById('ck_tv_st'); if(e){e.textContent='N/A';e.className='sec-tag tag-green';}
+  } else {
+    sv('ck_tv',IR32,3); ckB('ck_tv_st',IR32);
+    tx('ck_tv_sub','(Pr/Pc + Mr/Mc) + (Vr/Vc + Tr/Tc)² = ('+f(pr32,3)+' + '+f((Mcx>0?Mxap/Mcx:0)+(Mcy>0?Myap/Mcy:0),3)+') + ('+f(Math.max(Vrx,Vry),3)+' + '+f(Trat,3)+')²  [H3-6]');
+  }
 
   // Failure mode cards
   function fmTag(cls){

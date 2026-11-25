@@ -292,6 +292,7 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="inp-row"><span class="lbl">P</span><span class="sym">=</span><input id="inp_P" type="text" value="0"><span class="unit">kg</span></div>
     <div class="inp-row"><span class="lbl">V<sub>x</sub></span><span class="sym">=</span><input id="inp_Vx" type="text" value="0"><span class="unit">kg</span></div>
     <div class="inp-row"><span class="lbl">V<sub>y</sub></span><span class="sym">=</span><input id="inp_Vy" type="text" value="0"><span class="unit">kg</span></div>
+    <div class="inp-row"><span class="lbl">T</span><span class="sym">=</span><input id="inp_T" type="text" value="0"><span class="unit">kg·m</span></div>
     <div class="inp-row"><span class="lbl">n</span><span class="sym">=</span><input id="inp_n" type="text" value="1"><span class="unit">ea</span></div>
   </div>
   <div class="sg">
@@ -300,11 +301,15 @@ canvas{display:block;border-radius:4px;background:#0f1117}
     <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">H1.1 &nbsp;P + M<sub>r</sub></span><span style="font-weight:700" id="ck_pm">0.000</span><span id="ck_pm_st" class="sec-tag tag-green">OK</span></div>
     <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_pm_sub">—</div>
     <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">Shear &nbsp;V<sub>r</sub> / φV<sub>n</sub></span><span style="font-weight:700" id="ck_v">0.000</span><span id="ck_v_st" class="sec-tag tag-green">OK</span></div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0;word-break:break-all" id="ck_v_sub">—</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_v_sub">—</div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">Torsion &nbsp;T<sub>r</sub> / φT<sub>n</sub></span><span style="font-weight:700" id="ck_t">0.000</span><span id="ck_t_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0 0 8px;word-break:break-all" id="ck_t_sub">—</div>
+    <div class="inp-row" style="justify-content:space-between;gap:8px"><span class="lbl" style="width:auto;flex:1">H3.2 &nbsp;P + M + (V + T)²</span><span style="font-weight:700" id="ck_tv">0.000</span><span id="ck_tv_st" class="sec-tag tag-green">OK</span></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin:0;word-break:break-all" id="ck_tv_sub">—</div>
   </div>
   <div class="sg">
     <div class="sg-title">หมายเหตุ</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 H1.1 (P + M) + G5 (shear). หน้าตัดกลม axisymmetric → ใช้โมเมนต์/แรงเฉือนลัพธ์ M<sub>r</sub>=√(M<sub>x</sub>²+M<sub>y</sub>²), V<sub>r</sub>=√(V<sub>x</sub>²+V<sub>y</sub>²)<br>P = แรงอัด (kg) · n = จำนวนหน้าตัด</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7">AISC 360-22 H1.1 (P + M) + G5 (shear). หน้าตัดกลม axisymmetric → ใช้โมเมนต์/แรงเฉือนลัพธ์ M<sub>r</sub>=√(M<sub>x</sub>²+M<sub>y</sub>²), V<sub>r</sub>=√(V<sub>x</sub>²+V<sub>y</sub>²)<br>P = แรงอัด (kg) · n = จำนวนหน้าตัด<br>T = แรงบิดที่กระทำ (kg·m) · H3.1 ใช้ L = ความยาวชิ้นส่วน</div>
   </div>
   </div>
 </div>
@@ -505,6 +510,44 @@ canvas{display:block;border-radius:4px;background:#0f1117}
   </div>
 </div>
 
+<!-- TORSION H3.1 -->
+<div class="sec-block">
+  <div class="sec-hdr"><span class="sec-tag tag-yellow">H3.1 — Torsion</span><span class="sec-title">Torsional Strength — Round HSS</span><span class="sec-ref">AISC 360-22 H3.1</span></div>
+  <div class="rep-grid">
+    <div class="rep-col">
+      <div class="sdiv" style="color:#f0883e">Critical Torsional Stress F<sub>cr</sub></div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">(a) F<sub>cr</sub> = 1.23E / [√(L/D)·(D/t)<sup>5/4</sup>] &nbsp;(H3-2a)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Fcr_a">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">(b) F<sub>cr</sub> = 0.60E / (D/t)<sup>3/2</sup> &nbsp;(H3-2b)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Fcr_b">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">F<sub>cr</sub> = min(max(a,b), 0.6F<sub>y</sub>)</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Fcr">—</span><span class="calc-unit">ksc</span></span></div>
+      </div>
+    </div>
+    <div class="rep-col">
+      <div class="sdiv" style="color:#f0883e">Nominal Torsional Strength T<sub>n</sub></div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">C = π(D − t)²·t / 2</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_C">—</span><span class="calc-unit">×10³ mm³</span></span></div>
+      </div>
+      <div class="calc-block">
+        <div class="calc-line1"><span class="cl-body">T<sub>n</sub> = F<sub>cr</sub>·C &nbsp;(H3-1)</span></div>
+        <div class="calc-line2"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body" id="to_Tn_sub">—</span></div>
+        <div class="calc-line3"><span class="cl-ind"></span><span class="cl-eq">=</span><span class="cl-body"><span class="calc-val" id="to_Tn">—</span><span class="calc-unit">kg·m</span></span></div>
+      </div>
+      <div class="gov"><div class="gov-lbl">φ<sub>T</sub>T<sub>n</sub> (LRFD, φ<sub>T</sub>=0.90)</div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="to_phiTn">—</span><span class="gov-unit">kg·m</span></div></div>
+      <div class="gov" style="margin-top:6px"><div class="gov-lbl">T<sub>n</sub>/Ω<sub>T</sub> (ASD, Ω<sub>T</sub>=1.67)</div>
+        <div class="gov-val"><span class="gov-tag">so</span><span id="to_ASDTn">—</span><span class="gov-unit">kg·m</span></div></div>
+    </div>
+  </div>
+</div>
+
 <!-- PRINT: page break + header before Compression -->
 <div class="print-header-repeat print-break-before" aria-hidden="true">
   <div class="ph-left">Round HSS (Pipe) — AISC 360-22<small>Compression — Flexural Buckling &amp; Local Buckling</small></div>
@@ -583,6 +626,12 @@ canvas{display:block;border-radius:4px;background:#0f1117}
         <td class="val"><span id="sum_Vn">37,831</span> kg</td><td>0.90</td>
         <td class="val"><span id="sum_phiVn">34,048</span> kg</td><td>1.67</td>
         <td class="val"><span id="sum_ASDVn">22,654</span> kg</td>
+      </tr>
+      <tr>
+        <td>Torsion T<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">H3.1</td>
+        <td class="val"><span id="sum_Tq">—</span> kg·m</td><td>0.90</td>
+        <td class="val"><span id="sum_phiTq">—</span> kg·m</td><td>1.67</td>
+        <td class="val"><span id="sum_ASDTq">—</span> kg·m</td>
       </tr>
       <tr>
         <td>Compression P<sub>n</sub></td><td style="color:rgba(255,255,255,.5)">E3/E7</td>
@@ -817,6 +866,18 @@ function calculate(){
   tx('sh_Vn_sub',f(Fcr_sh*ksc,1)+' ksc × '+f(Ag/1e4,4)+' m² / 2');
   sv('sh_Vn',Vn*kgf,0);sv('sh_phiVn',0.9*Vn*kgf,0);sv('sh_ASDVn',Vn/1.67*kgf,0);
 
+  // ── Torsion H3.1 (round HSS) ──
+  const Fcr_ta=1.23*E/(Math.sqrt(L/D)*Math.pow(Dt,1.25));   // H3-2a
+  const Fcr_tb=0.60*E/Math.pow(Dt,1.5);                      // H3-2b
+  const Fcr_t=Math.min(Math.max(Fcr_ta,Fcr_tb),Fy06);
+  const C_t=PI*Math.pow(D-t,2)*t/2;                          // mm³
+  const Tq=Fcr_t*C_t/1e6;                                    // kN·m
+  sv('to_Fcr_a',Fcr_ta*ksc,1);sv('to_Fcr_b',Fcr_tb*ksc,1);sv('to_Fcr',Fcr_t*ksc,1);
+  sv('to_C',C_t/1e3,2);
+  tx('to_Tn_sub',f(Fcr_t*ksc,1)+' ksc × '+f(C_t/1e3,2)+' ×10³ mm³');
+  sv('to_Tn',Tq*kgf,1);sv('to_phiTn',0.9*Tq*kgf,1);sv('to_ASDTn',Tq/1.67*kgf,1);
+  sv('sum_Tq',Tq*kgf,1);sv('sum_phiTq',0.9*Tq*kgf,1);sv('sum_ASDTq',Tq/1.67*kgf,1);
+
   // ── Compression E3/E7 ──
   let Q=1;
   if(compCls==='Slender'){
@@ -877,6 +938,23 @@ function calculate(){
       : f(Pap,0)+'/(2·'+f(Pc,0)+') + '+f(Mr,1)+'/'+f(Mc,1))
     +'  [H1-1'+(prr>=0.2?'a':'b')+', '+(isASD?'ASD Ω=1.67':'LRFD φ=0.90')+', Mr=√(Mx²+My²)]');
   tx('ck_v_sub',f(Vr,0)+' / '+f(Vc,0)+'  [G5, '+(isASD?'Vn/1.67':'0.9·Vn')+' ×n='+f(nSec,0)+', Vr=√(Vx²+Vy²)]');
+
+  // ── Torsion — AISC 360-22 H3.1 / H3.2 (HSS) ──
+  const Tap=Math.abs(parseFloat(String((document.getElementById('inp_T')||{}).value||'0').replace(/,/g,'')))||0;
+  const Tc=(isASD?(Tq*kgf)/1.67:0.9*(Tq*kgf))*nSec;
+  const Trat=Tc>0?Tap/Tc:0;
+  sv('ck_t',Trat,3); ckB('ck_t_st',Trat);
+  tx('ck_t_sub',f(Tap,1)+' / '+f(Tc,1)+'  [H3.1, '+(isASD?'Tn/1.67':'0.9·Tn')+' ×n='+f(nSec,0)+']');
+  const pr32=Pc>0?Pap/Pc:0;
+  const IR32=pr32+(mratio)+Math.pow(Vrat+Trat,2);
+  if(Trat<=0.2){
+    sv('ck_tv',IR32,3); ckB('ck_tv_st',IR32);
+    tx('ck_tv_sub','Tr ≤ 0.2Tc → ไม่ต้องรวมแรงบิด (H3.2) · ใช้ H1 แทน · ค่า H3-6 = '+f(IR32,3)+' (แสดงเพื่ออ้างอิง)');
+    const e=document.getElementById('ck_tv_st'); if(e){e.textContent='N/A';e.className='sec-tag tag-green';}
+  } else {
+    sv('ck_tv',IR32,3); ckB('ck_tv_st',IR32);
+    tx('ck_tv_sub','(Pr/Pc + Mr/Mc) + (Vr/Vc + Tr/Tc)² = ('+f(pr32,3)+' + '+f(mratio,3)+') + ('+f(Vrat,3)+' + '+f(Trat,3)+')²  [H3-6]');
+  }
 
   // ── Failure Mode tags ──
   // Tension
