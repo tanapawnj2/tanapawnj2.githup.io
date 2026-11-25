@@ -1285,6 +1285,37 @@
     .main{padding:14px}
   }
   @media print{ .layout,.sidebar,.main,.hdr{display:none!important} }
+
+  /* ===== Print — CivilToolsKit common report look ===== */
+  @media print{
+    #printRoot{color:#222!important;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif!important}
+    .print-page{color:#222!important}
+    .print-header{border:none!important;border-bottom:2px solid #1a365d!important;padding:0 0 5px!important;margin-bottom:5mm!important;
+      display:flex!important;justify-content:space-between;align-items:flex-end;text-align:left!important}
+    .print-header .ph-left{font-family:'IBM Plex Mono',monospace;font-size:13pt;font-weight:700;color:#1a365d;line-height:1.25}
+    .print-header .ph-left small{display:block;font-size:7pt;font-weight:400;color:#555;letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+    .print-header .ph-right{font-family:'IBM Plex Mono',monospace;font-size:7.5pt;color:#555;text-align:right;line-height:1.5}
+    .print-section{border:1px solid #bbb;border-radius:3px;overflow:hidden;margin-bottom:4mm!important;padding:0 3mm 3mm}
+    .print-section-label{display:flex!important;align-items:center;gap:8px;background:#e8edf4!important;border-bottom:1px solid #bbb;
+      margin:0 -3mm 3mm!important;padding:4px 10px!important;text-decoration:none!important;color:#222!important;font-size:10pt!important}
+    .ps-tag{font-family:'IBM Plex Mono',monospace;font-size:6.5pt;font-weight:700;letter-spacing:.12em;color:#fff;padding:1px 6px;border-radius:2px;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .ps-title{font-weight:600;color:#222}
+    .ps-blue{background:#2563a8}.ps-orange{background:#b45309}.ps-teal{background:#0f766e}.ps-cyan{background:#0e7490}
+    .ps-purple{background:#6d28d9}.ps-green{background:#166534}.ps-red{background:#991b1b}
+    .print-section-label,.print-header,.cap-box,.chart-cell,.chart-single{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .chart-cell,.chart-single{background:#ffffff!important;border-color:#bbb!important}
+    .cap-box{background:#f7f9fc!important;border:1px solid #bbb!important;border-radius:3px!important}
+    .cap-box.highlight{background:#eef4fb!important;border:1px solid #4a90d9!important}
+    .cap-box-title{text-decoration:none!important;color:#1a365d!important;font-size:9.5pt!important}
+    .cap-result-big{border-top-color:#1a365d!important;color:#1a365d!important}
+    .group-info{border-left:3px solid #2563a8!important;background:#f7f9fc!important}
+    .data-table thead th{border-top:1px solid #1a365d!important;border-bottom:1px solid #1a365d!important;background:#e8edf4!important;color:#1a365d!important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .data-table tbody tr:last-child td{border-bottom:1px solid #1a365d!important}
+    .kv-table td.k{color:#555!important}
+    .print-footer{color:#777!important;border-top:1px solid #bbb!important}
+  }
 </style>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -4823,6 +4854,51 @@ calculate();
    - Captures live canvas charts as images
    - Pulls data from current state (selectedPile, layers, lastResult, lastSinglePileCapacity)
 ============================================ */
+/* ============================================
+   PRINT PALETTE — charts are drawn for the dark screen theme. While building
+   the print report we remap canvas colours (dark backgrounds → white, light
+   text/grid → dark) so the charts sit on the white PDF page.
+   ============================================ */
+const PRINT_COLOR_MAP = {
+  '#1c2333': '#ffffff', '#161b25': '#ffffff', '#222c3c': '#e6ebf2', '#2a3650': '#cdd5e1', '#334166': '#aab4c8',
+  '#b8c2d6': '#2a3650', '#d0d8e6': '#2a3650', '#ffffff': '#0f1117', '#fff': '#0f1117', 'white': '#0f1117',
+  '#7d8aa5': '#55617a', '#7cb3ea': '#1f5fa8', '#7fa8c4': '#3d6f91', '#e0c08a': '#7a5a22',
+  'rgba(22,27,37,0.95)': 'rgba(255,255,255,0.95)'
+};
+function mapPrintColor(v) {
+  if (typeof v !== 'string') return v;
+  const k = v.replace(/\s+/g, '').toLowerCase();
+  if (PRINT_COLOR_MAP[k]) return PRINT_COLOR_MAP[k];
+  let m = k.match(/^rgba\(255,255,255,([\d.]+)\)$/);
+  if (m) return `rgba(15,17,23,${m[1]})`;
+  m = k.match(/^rgba\(124,179,234,([\d.]+)\)$/);
+  if (m) return `rgba(31,95,168,${m[1]})`;
+  return v;
+}
+let _printPaletteOn = false;
+(function installPrintPalette() {
+  const P = CanvasRenderingContext2D.prototype;
+  ['fillStyle', 'strokeStyle'].forEach(prop => {
+    const d = Object.getOwnPropertyDescriptor(P, prop);
+    if (!d || !d.set) return;
+    Object.defineProperty(P, prop, {
+      configurable: true, enumerable: d.enumerable, get: d.get,
+      set(v) { d.set.call(this, _printPaletteOn ? mapPrintColor(v) : v); }
+    });
+  });
+  const acs = CanvasGradient.prototype.addColorStop;
+  CanvasGradient.prototype.addColorStop = function (o, c) { return acs.call(this, o, _printPaletteOn ? mapPrintColor(c) : c); };
+})();
+function redrawAllCharts() {
+  drawSoilProfile();
+  drawStressDiagram();
+  drawAdhesionCurve();
+  drawNqCurve();
+  drawSkinFrictionProfile();
+  drawEndBearingProfile();
+  drawPileSchematic();
+}
+
 function buildPrintReport() {
   // Force a fresh calculation to make sure all state is up to date
   calculate();
@@ -4853,14 +4929,10 @@ function buildPrintReport() {
     p.style.display = 'block';
   });
 
-  // Force every canvas-drawing function to run now that panels are laid out
-  drawSoilProfile();
-  drawStressDiagram();
-  drawAdhesionCurve();
-  drawNqCurve();
-  drawSkinFrictionProfile();
-  drawEndBearingProfile();
-  drawPileSchematic();
+  // Force every canvas-drawing function to run now that panels are laid out —
+  // using the light print palette so the charts match the white PDF page
+  _printPaletteOn = true;
+  try { redrawAllCharts(); } finally { _printPaletteOn = false; }
 
   return new Promise(resolve => {
     // Two RAFs: first commits layout, second commits the draw calls' pixels
@@ -4880,8 +4952,8 @@ function buildPrintReport() {
             off.width = c.width;
             off.height = c.height;
             const octx = off.getContext('2d');
-            // Match --bg-input from the page theme so charts look identical to screen
-            octx.fillStyle = '#1c2333';
+            // White backdrop — charts were redrawn with the light print palette
+            octx.fillStyle = '#ffffff';
             octx.fillRect(0, 0, off.width, off.height);
             octx.drawImage(c, 0, 0);
             return off.toDataURL('image/png');
@@ -4895,6 +4967,9 @@ function buildPrintReport() {
         const imgAdhesion   = capCanvas('adhesionCanvas');
         const imgNq         = capCanvas('nqCanvas');
         const imgSchematic  = capCanvas('pileSchematicCanvas');
+
+        // Put the on-screen charts back to the dark theme
+        redrawAllCharts();
 
         // Restore panels to their original display state
         panels.forEach((p, i) => {
@@ -5014,11 +5089,12 @@ function renderPrintHtml(ctx) {
     <!-- ============ PAGE 1: PILE GROUP CONFIG + SOIL LAYERS ============ -->
     <div class="print-page">
       <div class="print-header">
-        <div class="print-title">Pile Capacity</div>
+        <div class="ph-left">Pile Capacity — Effective Stress<small>Input Parameters &amp; Soil Layers</small></div>
+        <div class="ph-right">${dateStr}<br>CivilToolsKit — Automated Calculation</div>
       </div>
 
       <div class="print-section">
-        <div class="print-section-label">Parameter Pile Group Configuration</div>
+        <div class="print-section-label"><span class="ps-tag ps-blue">INPUT</span><span class="ps-title">Parameter Pile Group Configuration</span></div>
         <table class="kv-table">
           <tr>
             <td class="k">ประเภทหน้าตัด</td><td class="v">= ${sectionLabel}</td>
@@ -5055,7 +5131,7 @@ function renderPrintHtml(ctx) {
       </div>
 
       <div class="print-section">
-        <div class="print-section-label">Soil Layer Table</div>
+        <div class="print-section-label"><span class="ps-tag ps-orange">SOIL</span><span class="ps-title">Soil Layer Table</span></div>
         <table class="data-table">
           <thead>
             <tr>
@@ -5092,11 +5168,12 @@ function renderPrintHtml(ctx) {
     <!-- ============ PAGE 2: SOIL PROFILE & STRESS DISTRIBUTION ============ -->
     <div class="print-page">
       <div class="print-header">
-        <div class="print-title">Pile Capacity</div>
+        <div class="ph-left">Pile Capacity — Effective Stress<small>Soil Profile &amp; Stress Distribution</small></div>
+        <div class="ph-right">${dateStr}<br>CivilToolsKit — Automated Calculation</div>
       </div>
 
       <div class="print-section">
-        <div class="print-section-label">Soil Profile &amp; Stress Distribution</div>
+        <div class="print-section-label"><span class="ps-tag ps-teal">PROFILE</span><span class="ps-title">Soil Profile &amp; Stress Distribution</span></div>
         <div class="chart-pair">
           <div class="chart-cell">
             ${imgSoil ? `<img src="${imgSoil}" alt="Soil Profile">` : '<div class="no-img">— Soil Profile —</div>'}
@@ -5115,7 +5192,7 @@ function renderPrintHtml(ctx) {
       </div>
 
       <div class="print-section">
-        <div class="print-section-label">Stress at Layer Boundaries</div>
+        <div class="print-section-label"><span class="ps-tag ps-cyan">STRESS</span><span class="ps-title">Stress at Layer Boundaries</span></div>
         <table class="data-table">
           <thead>
             <tr>
@@ -5149,25 +5226,26 @@ function renderPrintHtml(ctx) {
     <!-- ============ PAGE 3: REFERENCE CURVES + PILE SCHEMATIC ============ -->
     <div class="print-page">
       <div class="print-header">
-        <div class="print-title">Pile Capacity</div>
+        <div class="ph-left">Pile Capacity — Effective Stress<small>Reference Curves &amp; Pile Schematic</small></div>
+        <div class="ph-right">${dateStr}<br>CivilToolsKit — Automated Calculation</div>
       </div>
 
       <div class="print-section">
-        <div class="print-section-label">Adhesion Factor (α) — Reference Curves</div>
+        <div class="print-section-label"><span class="ps-tag ps-purple">α CURVE</span><span class="ps-title">Adhesion Factor (α) — Reference Curves</span></div>
         <div class="chart-single">
           ${imgAdhesion ? `<img src="${imgAdhesion}" alt="Adhesion Curves">` : '<div class="no-img">— Adhesion curves not available (no clay layer in pile depth) —</div>'}
         </div>
       </div>
 
       <div class="print-section">
-        <div class="print-section-label">Terzaghi Bearing Capacity Factor — Nq vs φ</div>
+        <div class="print-section-label"><span class="ps-tag ps-purple">Nq CURVE</span><span class="ps-title">Terzaghi Bearing Capacity Factor — Nq vs φ</span></div>
         <div class="chart-single">
           ${imgNq ? `<img src="${imgNq}" alt="Nq vs Phi">` : '<div class="no-img">— Nq curve not available (no sand layer in pile depth) —</div>'}
         </div>
       </div>
 
       <div class="print-section">
-        <div class="print-section-label">Pile Schematic — Soil Profile with Pile</div>
+        <div class="print-section-label"><span class="ps-tag ps-teal">SCHEMATIC</span><span class="ps-title">Pile Schematic — Soil Profile with Pile</span></div>
         <div class="chart-single tall">
           ${imgSchematic ? `<img src="${imgSchematic}" alt="Pile Schematic">` : '<div class="no-img">— Pile Schematic —</div>'}
         </div>
@@ -5183,11 +5261,12 @@ function renderPrintHtml(ctx) {
     <!-- ============ PAGE 4: PILE CAPACITY SUMMARY ============ -->
     <div class="print-page">
       <div class="print-header">
-        <div class="print-title">Pile Capacity</div>
+        <div class="ph-left">Pile Capacity — Effective Stress<small>Pile Capacity &amp; Group Efficiency</small></div>
+        <div class="ph-right">${dateStr}<br>CivilToolsKit — Automated Calculation</div>
       </div>
 
       <div class="print-section">
-        <div class="print-section-label">Pile Capacity Summary</div>
+        <div class="print-section-label"><span class="ps-tag ps-green">CAPACITY</span><span class="ps-title">Pile Capacity Summary</span></div>
 
         <div class="cap-grid">
           <div class="cap-box">
@@ -5224,7 +5303,7 @@ function renderPrintHtml(ctx) {
       </div>
 
       <div class="print-section">
-        <div class="print-section-label">Pile Group Capacity — Group Efficiency (Converse-Labarre)</div>
+        <div class="print-section-label"><span class="ps-tag ps-red">GROUP</span><span class="ps-title">Pile Group Capacity — Group Efficiency (Converse-Labarre)</span></div>
 
         <div class="group-info">
           <div>Number of Piles = <b>${N}</b></div>
